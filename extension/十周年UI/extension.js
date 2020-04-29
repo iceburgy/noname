@@ -19,13 +19,13 @@ content:function(config, pack){
     lib.mode.identity.config.double_hp.item["zuidashangxianzuixiaotili"] = "最大上限最小体力";
 
     lib.translate['woshixiaonei']='我是小内';
-    lib.translate['woshixiaonei_info']='村规小内限定技，先选择自己，然后2选1：1）回复一点体力，摸2张牌，增加一点体力上限；2）回复一点体力，摸3张牌';
+    lib.translate['woshixiaonei_info']='村规小内限定技，先选择自己，然后2选1：1）回复一点体力，摸2张牌，增加一点体力上限；2）回复一点体力，摸3张牌。（响应打出牌事件时，只能默认为选项一）';
     lib.skill['woshixiaonei']={
                               				unique:true,
                               				mark:false,
                               				limited:true,
                               				audio:'guixin',
-                              				enable:'chooseToUse',
+				                            enable:['chooseToUse','chooseToRespond'],
                               				init:function(player){
                               					player.storage.woshixiaonei=false;
                               				},
@@ -38,6 +38,16 @@ content:function(config, pack){
                               				filterTarget:function(card,player,target){
                               					return target==player;
                               				},
+                                            onrespond:function(result,player){
+                                                player.storage.woshixiaonei=true;
+                                                player.gainMaxHp();
+                                                player.draw(2);
+                                                player.recover();
+                                                game.broadcastAll(function(player){
+                                                    player.showIdentity();
+                                                },player);
+                                                result.parent.parent.redo();
+                                            },
                               				content:function(){
                               					'step 0'
                               					player.storage.woshixiaonei=true;

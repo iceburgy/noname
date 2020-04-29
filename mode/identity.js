@@ -2087,7 +2087,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			sheshen_info:'锁定技，主公处于濒死状态即将死亡时，令主公+1体力上限，回复体力至X点（X为你的体力值数），获得你的所有牌，然后你死亡',
 			yexinbilu:'野心毕露',
 			woshixiaonei:'我是小内',
-			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）回复一点体力，摸2张牌，增加一点体力上限；2）回复一点体力，摸3张牌',
+			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）回复一点体力，摸2张牌，增加一点体力上限；2）回复一点体力，摸3张牌。（响应打出牌事件时，只能默认为选项一）',
 		},
 		element:{
 			player:{
@@ -2737,7 +2737,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mark:false,
 				limited:true,
 				audio:'guixin',
-				enable:'chooseToUse',
+				enable:['chooseToUse','chooseToRespond'],
 				init:function(player){
 					player.storage.woshixiaonei=false;
 				},
@@ -2750,6 +2750,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return target==player;
 				},
+                onrespond:function(result,player){
+					player.storage.woshixiaonei=true;
+                    player.gainMaxHp();
+                    player.draw(2);
+                    player.recover();
+                    game.broadcastAll(function(player){
+                        player.showIdentity();
+                    },player);
+                    result.parent.parent.redo();
+                },
 				content:function(){
 					'step 0'
 					player.storage.woshixiaonei=true;
