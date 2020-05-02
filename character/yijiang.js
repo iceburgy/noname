@@ -9425,7 +9425,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:2,
 						trigger:{global:'loseAfter'},
 						filter:function(event,player){
-							if(event.type!='discard') return false;
+							if(event.type&&event.type!='discard') return false;
+							if(!event.type&&event.parent.name!='die') return false;
 							if(event.player==player) return false;
 							for(var i=0;i<event.cards2.length;i++){
 								if(get.suit(event.cards2[i])=='club'&&get.position(event.cards2[i],true)=='d'){
