@@ -317,14 +317,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(players[i].identity=='nei'&&players.length>4){
 				    players[i].hiddenSkills.add('woshixiaonei');
 				}
+                if(players[i].identity=='zhu'&&players.length>=6&&players.length%2==0){
+                    game.broadcastAll(function(player){
+                        player.addSkill('kejizhugong');
+                        player.addSkill('anlezhugong');
+                    },players[i]);
+                }
 			}
-
-            if(game.zhu&&players.length>=6&&players.length%2==0){
-                game.broadcastAll(function(player){
-                    player.addSkill('kejizhugong');
-                    player.addSkill('anlezhugong');
-                },game.zhu);
-            }
 
 			_status.videoInited=true;
 			game.addVideo('init',null,info);

@@ -268,55 +268,7 @@ content:function(config, pack){
 			var createPlayerFunction = ui.create.player;
 			var createMenuFunction = ui.create.menu;
 			var createCardFunction = ui.create.card;
-			ui.create.connectPlayers = function(ip){
-                                               				game.connectPlayers=[];
-                                               				for(var i=0;i<10;i++){
-                                               					var player=ui.create.player(ui.window);
-                                               					player.dataset.position=i;
-                                               					player.classList.add('connect');
-                                               					game.connectPlayers.push(player);
-                                               					if(i>=lib.configOL.number){
-                                               						player.classList.add('unselectable2');
-                                               					}
-                                               				}
-
-                                               				var bar=ui.create.div(ui.window);
-                                               				bar.style.height='20px';
-                                               				bar.style.width='80%';
-                                               				bar.style.left='10%';
-                                               				bar.style.top='calc(200% / 7 - 120px + 5px)';
-                                               				bar.style.textAlign='center';
-                                               				var ipbar=ui.create.div('.shadowed',ip,bar);
-                                               				ipbar.style.padding='4px';
-                                               				ipbar.style.borderRadius='2px';
-                                               				ipbar.style.position='relative';
-
-                                               				var button=ui.create.div('.menubutton.large.highlight.connectbutton.pointerdiv',game.online?'退出联机':'开始游戏',ui.window,function(){
-                                               					if(button.clicked) return;
-                                               					if(game.online){
-                                               						if(game.onlinezhu){
-                                               							game.send('startGame');
-                                               						}
-                                               						else{
-                                               							game.saveConfig('tmp_owner_roomId');
-                                               							game.saveConfig('tmp_user_roomId');
-                                               							game.saveConfig('reconnect_info');
-                                               							game.reload();
-                                               						}
-                                               					}
-                                               					else{
-                                               						game.resume();
-                                               					}
-                                               					button.delete();
-                                               					bar.delete();
-                                               					delete ui.connectStartButton;
-                                               					delete ui.connectStartBar;
-                                               					button.clicked=true;
-                                               				});
-
-                                               				ui.connectStartButton=button;
-                                               				ui.connectStartBar=bar;
-                                               			};
+			var createConnectPlayers = ui.create.connectPlayers;
 			var initCssstylesFunction = lib.init.cssstyles;
 			var initLayoutFunction = lib.init.layout;
 			var cardInitFunction = lib.element.card.init;
@@ -446,10 +398,6 @@ content:function(config, pack){
                                      						}
                                      						this.node.count.classList.add('p2');
                                      						skills=skills.concat(info2[3]);
-
-                                                            if(this.identity=='nei'&&game.players.length>4){
-                                                                this.hiddenSkills.add('woshixiaonei');
-                                                            }
 
                                      						// var name=get.translation(character2);
                                      						this.node.name2.innerHTML=get.slimName(character2);
@@ -610,6 +558,7 @@ content:function(config, pack){
 			};
 
 			var zhuSkillAdded=false;
+			var neiSkillAdded=false;
 			game.updateRoundNumber = function(){
 				game.broadcastAll(function(num1, num2){
 					if(ui.cardPileNumber) ui.cardPileNumber.innerHTML = '牌堆' + num2 + ' 第' + num1 +'轮';
@@ -622,6 +571,13 @@ content:function(config, pack){
                             player.addSkill('kejizhugong');
                             player.addSkill('anlezhugong');
                         },game.zhu);
+                    }
+                }
+
+                if(!neiSkillAdded&&game.nei){
+                    neiSkillAdded=true;
+                    if(game.players.length>4){
+                        game.nei.hiddenSkills.add('woshixiaonei');
                     }
                 }
 			};
@@ -1638,6 +1594,22 @@ content:function(config, pack){
 
 				return card;
 			};
+
+			ui.create.connectPlayers = function(ip){
+			    var returnValue = createConnectPlayers.call(this, ip);
+
+                for(var i=8;i<10;i++){
+                	var player=ui.create.player(ui.window);
+                	player.dataset.position=i;
+                	player.classList.add('connect');
+                	game.connectPlayers.push(player);
+                	if(i>=lib.configOL.number){
+                		player.classList.add('unselectable2');
+                	}
+                }
+
+			    return returnValue;
+            };
 
 			ui.create.cards = function(){
 				var retval = base.ui.create.cards.apply(this, arguments);
