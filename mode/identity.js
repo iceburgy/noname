@@ -318,6 +318,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				    players[i].hiddenSkills.add('woshixiaonei');
 				}
 			}
+
+            if(game.zhu&&players.length>=6&&players.length%2==0){
+                game.broadcastAll(function(player){
+                    player.addSkill('kejizhugong');
+                    player.addSkill('anlezhugong');
+                },game.zhu);
+            }
+
 			_status.videoInited=true;
 			game.addVideo('init',null,info);
 			"step 6"
@@ -2088,6 +2096,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			yexinbilu:'野心毕露',
 			woshixiaonei:'我是小内',
 			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）回复一点体力，摸2张牌，增加一点体力上限；2）回复一点体力，摸3张牌。（响应打出牌事件时，只能默认为选项一）',
+			kejizhugong:'克己主公',
+			kejizhugong_info:'村规主公限定技：如果场上玩家数是6人或者更多，而且为偶数，则主公如果在第一回合没有对其他玩家使用牌，可以不用弃牌',
+			anlezhugong:'安乐主公',
+			anlezhugong_info:'村规主公限定技：主公如果在第一轮被乐而且中乐，则手牌上限加2，（十人局则加3）',
+			anlezhugong2:'安乐主公',
 		},
 		element:{
 			player:{
@@ -2736,7 +2749,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				mark:false,
 				limited:true,
-				audio:'guixin',
+				audio:'yeyan',
 				enable:['chooseToUse','chooseToRespond'],
 				init:function(player){
 					player.storage.woshixiaonei=false;
@@ -2791,6 +2804,111 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return 1;
 						},
 					},
+				},
+			},
+			kejizhugong:{
+				audio:'keji',
+				limited:true,
+				skillAnimation:'legend',
+				animationColor:'thunder',
+				trigger:{player:'phaseDiscardBefore'},
+				filter:function(event,player){
+				    if(game.roundNumber==1&&player==game.zhu){
+                        var usedCards=player.getHistory('useCard',function(evt){
+                            if(evt.targets&&evt.targets.length&&evt.isPhaseUsing()){
+                                var targets=evt.targets.slice(0);
+                                while(targets.contains(player)) targets.remove(player);
+                                return targets.length>0;
+                            }
+                            return false;
+                        });
+                        if(usedCards.length==0) {
+                            return true;
+                        }
+				    }
+                    game.broadcastAll(function(player){
+                        player.removeSkill('kejizhugong');
+                    },player);
+					return false;
+				},
+				content:function(){
+                    game.broadcastAll(function(player){
+                        player.removeSkill('kejizhugong');
+                    },player);
+					trigger.cancel();
+				},
+				oncancel:function(event,player){
+                    game.broadcastAll(function(player){
+                        player.removeSkill('kejizhugong');
+                    },player);
+				},
+				ai:{
+					order:10,
+					result:{
+						player:function(player){
+							return 1;
+						},
+					},
+				},
+			},
+			anlezhugong:{
+				audio:'guose',
+				limited:true,
+				skillAnimation:'legend',
+				animationColor:'thunder',
+				trigger:{player:['judgeEnd','phaseAfter']},
+				filter:function(event,player){
+				    if(event.name=='phase'){
+				        if(game.roundNumber>=2){
+                            game.broadcastAll(function(player){
+                                player.removeSkill('anlezhugong');
+                            },player);
+				        }
+				    }else if(event.name=='judge'){
+                        if(game.roundNumber<=2&&player==game.zhu&&event.judgestr=='乐不思蜀'){
+                            if(event.result.bool==false){
+                                return true;
+                            }
+                            game.broadcastAll(function(player){
+                                player.removeSkill('anlezhugong');
+                            },player);
+                        }
+				    }
+					return false;
+				},
+				content:function(){
+                    game.broadcastAll(function(player){
+                        player.removeSkill('anlezhugong');
+                    },player);
+                    player.addTempSkill('anlezhugong2');
+				},
+				oncancel:function(event,player){
+                    game.broadcastAll(function(player){
+                        player.removeSkill('anlezhugong');
+                    },player);
+				},
+			},
+			anlezhugong2:{
+				audio:'guose',
+				forced:true,
+				trigger:{player:'phaseDiscardBefore'},
+				ai:{
+					order:10,
+					result:{
+						player:function(player){
+							return 1;
+						},
+					}
+				},
+				content:function(){},
+				mod:{
+					maxHandcard:function(player,num){
+					    var keepExtra = 2;
+					    if(game.players.length==10){
+					        keepExtra = 3;
+					    }
+						return num+keepExtra;
+					}
 				},
 			},
 			identity_junshi:{
