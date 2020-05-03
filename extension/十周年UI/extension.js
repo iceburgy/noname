@@ -31,7 +31,7 @@ content:function(config, pack){
                               				},
                               				filter:function(event,player){
                               					if(player.storage.woshixiaonei) return false;
-                              					return true;
+                              					return player.identity=='nei';
                               				},
                               				skillAnimation:'legend',
                               				animationColor:'thunder',
@@ -574,10 +574,16 @@ content:function(config, pack){
                     }
                 }
 
-                if(!neiSkillAdded&&game.nei){
+                if(!neiSkillAdded){
                     neiSkillAdded=true;
                     if(game.players.length>4){
-                        game.nei.hiddenSkills.add('woshixiaonei');
+                        for (var i = 0; i < game.players.length; i++) {
+                            var cur = game.players[i];
+                            if (cur.identity=='nei'){
+                                cur.hiddenSkills.add('woshixiaonei');
+                                break;
+                            }
+                        }
                     }
                 }
 			};
