@@ -211,9 +211,7 @@ content:function(config, pack){
             alert('十周年UI提醒您，请更换<手杀>、<新版>布局以获得良好体验（在选项-外观-布局）。');
             break;
     }
-	
-	
-	
+
 	console.time(extensionName);
 	window.decadeUI = {
 		init:function(){
@@ -628,7 +626,7 @@ content:function(config, pack){
 				
 				return base.game.bossPhaseLoop.apply(this, arguments);
 			};
-			
+
 			game.phaseLoop = function(player){
 				game.broadcastAll(function(firstAction){
 					var cur;
