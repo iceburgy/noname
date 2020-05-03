@@ -107,15 +107,21 @@ content:function(config, pack){
                                                   return true;
                                               }
                                         }
-                                        player.removeSkill('kejizhugong');
+                                        game.broadcastAll(function(player){
+                                            player.removeSkill('kejizhugong');
+                                        },player);
                                         return false;
                                     },
                                     content:function(){
-                                        player.removeSkill('kejizhugong');
+                                        game.broadcastAll(function(player){
+                                            player.removeSkill('kejizhugong');
+                                        },player);
                                         trigger.cancel();
                                     },
                                     oncancel:function(event,player){
-                                        player.removeSkill('kejizhugong');
+                                        game.broadcastAll(function(player){
+                                            player.removeSkill('kejizhugong');
+                                        },player);
                                     },
                                     ai:{
                                         order:10,
@@ -135,24 +141,32 @@ content:function(config, pack){
                                  filter:function(event,player){
                                      if(event.name=='phase'){
                                          if(game.roundNumber>=2){
-                                             player.removeSkill('anlezhugong');
+                                             game.broadcastAll(function(player){
+                                                 player.removeSkill('anlezhugong');
+                                             },player);
                                          }
                                      }else if(event.name=='judge'){
                                           if(game.roundNumber<=2&&player==game.zhu&&event.judgestr=='乐不思蜀'){
                                               if(event.result.bool==false){
                                                   return true;
                                               }
-                                              player.removeSkill('anlezhugong');
+                                              game.broadcastAll(function(player){
+                                                  player.removeSkill('anlezhugong');
+                                              },player);
                                           }
                                      }
                                      return false;
                                  },
                                  content:function(){
-                                     player.removeSkill('anlezhugong');
-                                      player.addTempSkill('anlezhugong2');
+                                     game.broadcastAll(function(player){
+                                         player.removeSkill('anlezhugong');
+                                     },player);
+                                     player.addTempSkill('anlezhugong2');
                                  },
                                  oncancel:function(event,player){
-                                     player.removeSkill('anlezhugong');
+                                     game.broadcastAll(function(player){
+                                         player.removeSkill('anlezhugong');
+                                     },player);
                                  },
                              };
     lib.skill['anlezhugong2']={
@@ -575,15 +589,17 @@ content:function(config, pack){
                 }
 
                 if(!neiSkillAdded){
-                    neiSkillAdded=true;
                     if(game.players.length>4){
                         for (var i = 0; i < game.players.length; i++) {
                             var cur = game.players[i];
                             if (cur.identity=='nei'){
                                 cur.hiddenSkills.add('woshixiaonei');
+                                neiSkillAdded=true;
                                 break;
                             }
                         }
+                    }else{
+                        neiSkillAdded=true;
                     }
                 }
 			};
