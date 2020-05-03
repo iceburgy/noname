@@ -2755,7 +2755,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(player.storage.woshixiaonei) return false;
-					return true;
+					return player.identity=='nei';
 				},
 				skillAnimation:'legend',
 				animationColor:'thunder',
