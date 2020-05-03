@@ -92,20 +92,22 @@ content:function(config, pack){
                                     limited:true,
                                     skillAnimation:'legend',
                                     animationColor:'thunder',
-                                    trigger:{player:'phaseDiscardBefore'},
+                                    trigger:{player:['phaseDiscardBefore','phaseAfter']},
                                     filter:function(event,player){
-                                        if(game.roundNumber==1&&player==game.zhu){
-                                              var usedCards=player.getHistory('useCard',function(evt){
-                                                  if(evt.targets&&evt.targets.length&&evt.isPhaseUsing()){
-                                                      var targets=evt.targets.slice(0);
-                                                      while(targets.contains(player)) targets.remove(player);
-                                                      return targets.length>0;
-                                                  }
-                                                  return false;
-                                              });
-                                              if(usedCards.length==0) {
-                                                  return true;
-                                              }
+                                        if(event.name=='phaseDiscard'){
+                                            if(game.roundNumber==1&&player==game.zhu){
+                                                var usedCards=player.getHistory('useCard',function(evt){
+                                                    if(evt.targets&&evt.targets.length&&evt.isPhaseUsing()){
+                                                        var targets=evt.targets.slice(0);
+                                                        while(targets.contains(player)) targets.remove(player);
+                                                        return targets.length>0;
+                                                    }
+                                                    return false;
+                                                });
+                                                if(usedCards.length==0) {
+                                                    return true;
+                                                }
+                                            }
                                         }
                                         game.broadcastAll(function(player){
                                             player.removeSkill('kejizhugong');
@@ -168,11 +170,20 @@ content:function(config, pack){
                                          player.removeSkill('anlezhugong');
                                      },player);
                                  },
+                                 ai:{
+                                     order:10,
+                                     result:{
+                                         player:function(player){
+                                             return 1;
+                                         },
+                                     }
+                                 },
                              };
     lib.skill['anlezhugong2']={
                                   audio:'guose',
                                   forced:true,
                                   trigger:{player:'phaseDiscardBefore'},
+                                  content:function(){},
                                   ai:{
                                       order:10,
                                       result:{
@@ -181,7 +192,6 @@ content:function(config, pack){
                                           },
                                       }
                                   },
-                                  content:function(){},
                                   mod:{
                                       maxHandcard:function(player,num){
                                           var keepExtra = 2;
@@ -201,9 +211,7 @@ content:function(config, pack){
             alert('十周年UI提醒您，请更换<手杀>、<新版>布局以获得良好体验（在选项-外观-布局）。');
             break;
     }
-	
-	
-	
+
 	console.time(extensionName);
 	window.decadeUI = {
 		init:function(){
@@ -618,7 +626,7 @@ content:function(config, pack){
 				
 				return base.game.bossPhaseLoop.apply(this, arguments);
 			};
-			
+
 			game.phaseLoop = function(player){
 				game.broadcastAll(function(firstAction){
 					var cur;

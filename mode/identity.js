@@ -2810,19 +2810,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				limited:true,
 				skillAnimation:'legend',
 				animationColor:'thunder',
-				trigger:{player:'phaseDiscardBefore'},
+                trigger:{player:['phaseDiscardBefore','phaseAfter']},
 				filter:function(event,player){
-				    if(game.roundNumber==1&&player==game.zhu){
-                        var usedCards=player.getHistory('useCard',function(evt){
-                            if(evt.targets&&evt.targets.length&&evt.isPhaseUsing()){
-                                var targets=evt.targets.slice(0);
-                                while(targets.contains(player)) targets.remove(player);
-                                return targets.length>0;
+                    if(event.name=='phaseDiscard'){
+                        if(game.roundNumber==1&&player==game.zhu){
+                            var usedCards=player.getHistory('useCard',function(evt){
+                                if(evt.targets&&evt.targets.length&&evt.isPhaseUsing()){
+                                    var targets=evt.targets.slice(0);
+                                    while(targets.contains(player)) targets.remove(player);
+                                    return targets.length>0;
+                                }
+                                return false;
+                            });
+                            if(usedCards.length==0) {
+                                return true;
                             }
-                            return false;
-                        });
-                        if(usedCards.length==0) {
-                            return true;
                         }
 				    }
                     game.broadcastAll(function(player){
@@ -2875,6 +2877,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				    }
 					return false;
 				},
+                ai:{
+                    order:10,
+                    result:{
+                        player:function(player){
+                            return 1;
+                        },
+                    }
+                },
 				content:function(){
                     game.broadcastAll(function(player){
                         player.removeSkill('anlezhugong');
@@ -2891,6 +2901,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:'guose',
 				forced:true,
 				trigger:{player:'phaseDiscardBefore'},
+				content:function(){},
 				ai:{
 					order:10,
 					result:{
@@ -2899,7 +2910,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 					}
 				},
-				content:function(){},
 				mod:{
 					maxHandcard:function(player,num){
 					    var keepExtra = 2;
