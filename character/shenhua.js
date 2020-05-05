@@ -294,7 +294,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					prompt:function(links,player){
-						return '选择弃置一手张牌，获得'+get.translation(links[0])+'并弃置一名角色装备区或判定区内的一张牌';
+						return '选择弃置一张手牌，获得'+get.translation(links[0])+'并弃置一名角色装备区或判定区内的一张牌';
 					},
 				},
 				contentx:function(){
@@ -465,13 +465,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.chooseTarget(get.prompt2('drlt_zhenggu'),function(card,player,target){
+						//if(target.storage.drlt_zhenggu_mark&&target.storage.drlt_zhenggu_mark.contains(player)) return false;
 						return target!=player;
-					}).ai=function(target){
+					}).set('ai',function(target){
 						var player=_status.event.player;
+						//if(target.storage.drlt_zhenggu_mark&&target.storage.drlt_zhenggu_mark.contains(player)) return 0;
 						var num=(Math.min(5,player.countCards('h'))-target.countCards('h'));
 						var att=get.attitude(player,target);
 						return num*att;
-					};
+					});
 					"step 1"
 					if(result.bool){
 						var target=result.targets[0];
@@ -504,7 +506,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.player.storage.drlt_zhenggu_mark&&event.player.storage.drlt_zhenggu_mark.contains(player);
 				},
 				content:function(){
-					trigger.player.storage.drlt_zhenggu_mark.remove(player);
+					while(trigger.player.storage.drlt_zhenggu_mark.contains(player)){
+						trigger.player.storage.drlt_zhenggu_mark.remove(player);
+					}
 					if(trigger.player.storage.drlt_zhenggu_mark.length==0) trigger.player.unmarkSkill('drlt_zhenggu_mark');
 					lib.skill.drlt_zhenggu.sync(player,trigger.player);
 				},
@@ -2195,7 +2199,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('logSkill',['jianchu',trigger.target]).set('att',get.attitude(player,trigger.target)<=0);
 					'step 1'
 					if(result.bool&&result.links&&result.links.length){
-						if(get.type(result.links[0])=='equip'){
+						if(get.type(result.links[0],null,result.links[0].original=='h'?player:false)=='equip'){
 							trigger.getParent().directHit.add(trigger.target);
 						}
 						else if(trigger.cards){
@@ -2418,15 +2422,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinlianhuan:{
 				audio:2,
+				audioname:['ol_pangtong'],
 				group:['lianhuan3','lianhuan5','lianhuan4'],
 			},
 			lianhuan5:{
 				inherit:'lianhuan2',
+				audioname:['ol_pangtong'],
 				audio:['xinlianhuan',2],
 			},
 			lianhuan3:{
 				audio:['xinlianhuan',1],
-				audioname:['xinlianhuan'],
+				audioname:['ol_pangtong'],
 				enable:'chooseToUse',
 				filter:function(event,player){
 					return player.countCards('h',{suit:'club'})>0;
@@ -2438,10 +2444,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			lianhuan4:{
 				mod:{
-		selectTarget:function(card,player,range){
-			if(card.name=='tiesuo'&&player.hasSkill('xinlianhuan')&&range[1]<3&&range[1]!=-1) range[1]=3;
-		},
-	},
+					selectTarget:function(card,player,range){
+						if(card.name=='tiesuo'&&range[1]!=-1) range[1]++;
+					},
+				},
 			},
 			reluanji:{
 				audio:2,
@@ -4888,7 +4894,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			bazhen:{
 				audio:2,
-				audioname:['re_sp_zhugeliang','ol_sp_zhugeliang'],
+				audioname:['re_sp_zhugeliang','ol_sp_zhugeliang','ol_pangtong'],
 				equipSkill:true,
 				noHidden:true,
 				inherit:'bagua_skill',
@@ -7355,7 +7361,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luanji:'乱击',
 			xueyi:'血裔',
 			mengjin:'猛进',
-			xinlianhuan_info:' 你可以将一张♣手牌当【铁索连环】使用或重铸。你使用的【铁索连环】可以指定至多3个目标。',
+			xinlianhuan_info:' 你可以将一张♣手牌当【铁索连环】使用或重铸。你使用【铁索连环】选择目标的上限数+1。',
 			huoji_info:'出牌阶段，你可以将你的任意一张红色手牌当作【火攻】使用。',
 			bazhen_info:'锁定技，若你的防具栏内没有牌且没有被废除，则你视为装备着【八卦阵】。',
 			kanpo_info:'你可以将你的任意一张黑色手牌当做【无懈可击】使用。',

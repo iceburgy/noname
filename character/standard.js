@@ -500,12 +500,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.judge>0){
 						event.cards.push(result.card);
-						if(lib.config.autoskilllist.contains('luoshen')){
-							player.chooseBool('是否再次发动【洛神】？');
-						}
-						else{
-							event._result={bool:true};
-						}
+						player.chooseBool('是否再次发动【洛神】？').set('frequentSkill','luoshen');
 					}
 					else{
 						for(var i=0;i<event.cards.length;i++){
@@ -1913,11 +1908,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						position:'he',
 						filterCard:lib.filter.cardDiscardable,
 						filterTarget:function(card,player,target){
-							var trigger=_status.event.getTrigger();
-							if(trigger.targets.contains(target)) return false;
-							if(player.inRange(target)&&
-								target!=trigger.player){
-								if(player.canUse(trigger.card,target)) return true;
+							var trigger=_status.event;
+							if(player.inRange(target)&&target!=trigger.source){
+								if(lib.filter.targetEnabled(trigger.card,trigger.source,target)) return true;
 							}
 							return false;
 						},
@@ -1941,6 +1934,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						prompt:get.prompt('liuli'),
 						prompt2:'弃置一张牌，将此【杀】转移给攻击范围内的一名其他角色',
+						source:trigger.player,
+						card:trigger.card,
 					});
 					"step 1"
 					if(result.bool){
@@ -1948,6 +1943,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill(event.name,target);
 						player.discard(result.cards);
 						var evt=trigger.getParent();
+						evt.triggeredTargets2.remove(player);
 						evt.targets.remove(player);
 						evt.targets.push(target);
 					}
