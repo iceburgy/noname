@@ -20799,7 +20799,7 @@
 						skill=sourceSkill.sourceSkill;
 					}
 					if(lib.skill.global.contains(skill)) return false;
-					if(get.mode()!='guozhan'||game.expandSkills(this.getSkills()).contains(skill)){
+					if((get.mode()!='guozhan'&&get.mode()!='identity')||game.expandSkills(this.getSkills()).contains(skill)){
 						if(showonly){
 							return false;
 						}
@@ -20820,8 +20820,9 @@
 					var name2=this.name2;
 					if(lib.character[name2]&&(!showonly||unseen1)){
 						var skills=game.expandSkills(lib.character[name2][3].slice(0));
-						if(skills.contains(skill)){
-							if(!noshow&&this.isUnseen(1)) this.showCharacter(1);
+						if(skills.contains(skill)||(unseen0&&!unseen1&&(skill=='woshixiaonei'||skill=='kejizhugong'||skill=='anlezhugong'))){
+							if(!noshow&&this.isUnseen(1))
+							    this.showCharacter(1);
 							return 'vice';
 						}
 					}
