@@ -588,7 +588,7 @@ content:function(config, pack){
 					if(ui.cardPileNumber) ui.cardPileNumber.innerHTML = '牌堆' + num2 + ' 第' + num1 +'轮';
 				},game.roundNumber, ui.cardPile.childNodes.length);
 
-                if(!zhuSkillAdded&&game.zhu&&(game.zhu.skills&&game.zhu.skills.length>0||game.zhu.hiddenSkills&&game.zhu.hiddenSkills.length>0)){
+                if(!zhuSkillAdded&&game.zhu&&game.zhu.hiddenSkills&&game.zhu.hiddenSkills.length>0){
                     zhuSkillAdded=true;
                     if(game.players.length>=6&&game.players.length%2==0){
                         game.broadcastAll(function(player){
@@ -602,7 +602,7 @@ content:function(config, pack){
                     if(game.players.length>4){
                         for (var i = 0; i < game.players.length; i++) {
                             var cur = game.players[i];
-                            if (cur.identity=='nei'){
+                            if (cur.identity=='nei'&&cur.hiddenSkills&&cur.hiddenSkills.length>0){
                                 cur.hiddenSkills.add('woshixiaonei');
                                 neiSkillAdded=true;
                                 break;
