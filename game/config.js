@@ -144,7 +144,7 @@ window.config={
 		global:{
 			player_number:8,
 			auto_identity:'off',
-			double_character:false,
+			double_character:true,
 			save_progress:true,
 			free_choose:true,
 			swap:true,
