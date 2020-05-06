@@ -2700,6 +2700,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.addVideo('setIdentity',this,this.identity);
 					}
 					var skills;
+					var realMaxHp=0;
 					switch(num){
 						case 0:
 						if(log!==false) game.log(this,'展示了主将','#b'+this.name1);
@@ -2707,6 +2708,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						skills=lib.character[this.name][3];
 						this.sex=lib.character[this.name][0];
 						this.classList.remove('unseen');
+						realMaxHp=Math.max(realMaxHp,(lib.character[this.name][2]));
 						break;
 						case 1:
 						if(log!==false) game.log(this,'展示了副将','#b'+this.name2);
@@ -2714,6 +2716,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(this.sex=='unknown') this.sex=lib.character[this.name2][0];
 						if(this.name.indexOf('unknown')==0) this.name=this.name2;
 						this.classList.remove('unseen2');
+						realMaxHp=Math.max(realMaxHp,(lib.character[this.name2][2]));
 						break;
 						case 2:
 						if(log!==false) game.log(this,'展示了主将','#b'+this.name1,'、副将','#b'+this.name2);
@@ -2722,6 +2725,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						this.sex=lib.character[this.name][0];
 						this.classList.remove('unseen');
 						this.classList.remove('unseen2');
+						realMaxHp=Math.max(lib.character[this.name][2],(lib.character[this.name2][2]));
 						break;
 					}
 					this.group=lib.character[this.name][1];
@@ -2739,10 +2743,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<skills.length;i++){
 						this.hiddenSkills.remove(skills[i]);
 						this.addSkill(skills[i]);
+						// special treatment for xingshuai: mark it when adding it
+						if(skills[i]=='xingshuai'){
+						    this.markSkill('xingshuai');
+						}
 					}
 
 					// adjust maxHp and hp if maxHp>4
-                    var realMaxHp=Math.max(lib.character[this.name][2],(lib.character[this.name2][2]));
 					var maxHpToGain=realMaxHp-4;
 					if(maxHpToGain>0){
                         this.gainMaxHp(maxHpToGain);
