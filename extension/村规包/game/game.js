@@ -4067,17 +4067,6 @@
 					}
 				},
 			},
-			十周年UI:{
-				enable:{
-					name:'开启',
-					init:true,
-					restart:true,
-				},
-				intro:{
-					name:'十周年UI助手',
-					clear:true,
-				},
-			},
 			coin:{
 				enable:{
 					name:'开启',
