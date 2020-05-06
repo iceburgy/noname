@@ -6866,7 +6866,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					event.current=event.list.shift();
-					if(player.isUnseen()){
+					if(event.current.isUnseen()){
                         event.current.chooseControl('明置主将','明置副将','取消').set('prompt','是否响应'+get.translation(player)+'的'+get.translation('xingshuai')+'召唤？').ai=function(){return Math.floor(Math.random()*3)};
 					}
 					else{
