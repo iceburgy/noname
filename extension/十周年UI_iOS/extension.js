@@ -6,204 +6,6 @@ content:function(config, pack){
 	var extensionPath = lib.assetURL + 'extension/' + extensionName + '/';
     if (!(extension && extension.enable && extension.enable.init)) return;
 
-    lib.config.forbiddouble=['miheng','swd_kangnalishi','wutugu','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'];
-    lib.config.mode_config.identity.identity[7]=['zhu','zhong','zhong','zhong','nei','fan','fan','fan','fan'];
-    lib.config.mode_config.identity.identity[8]=['zhu','zhong','zhong','zhong','nei','fan','fan','fan','fan','fan'];
-    lib.config.mode_config.global.double_character=true;
-
-    lib.mode.identity.connect.connect_player_number.item["9"] = "九人";
-    lib.mode.identity.connect.connect_player_number.item["10"] = "十人";
-
-    lib.mode.identity.config.player_number.item["9"] = "九人";
-    lib.mode.identity.config.player_number.item["10"] = "十人";
-
-    lib.mode.identity.config.double_hp.item["zuidashangxianzuixiaotili"] = "最大上限最小体力";
-
-    lib.translate['woshixiaonei']='我是小内';
-    lib.translate['woshixiaonei_info']='村规小内限定技，先选择自己，然后2选1：1）回复一点体力，摸2张牌，增加一点体力上限；2）回复一点体力，摸3张牌。（响应打出牌事件时，只能默认为选项一）';
-    lib.skill['woshixiaonei']={
-                              				unique:true,
-                              				mark:false,
-                              				limited:true,
-                              				audio:'yeyan',
-				                            enable:['chooseToUse','chooseToRespond'],
-                              				init:function(player){
-                              					player.storage.woshixiaonei=false;
-                              				},
-                              				filter:function(event,player){
-                              					if(player.storage.woshixiaonei) return false;
-                              					return player.identity=='nei';
-                              				},
-                              				skillAnimation:'legend',
-                              				animationColor:'thunder',
-                              				filterTarget:function(card,player,target){
-                              					return target==player;
-                              				},
-                                            onrespond:function(result,player){
-                                                player.storage.woshixiaonei=true;
-                                                player.gainMaxHp();
-                                                player.draw(2);
-                                                player.recover();
-                                                game.broadcastAll(function(player){
-                                                    player.showIdentity();
-                                                },player);
-                                                result.parent.parent.redo();
-                                            },
-                              				content:function(){
-                              					'step 0'
-                              					player.storage.woshixiaonei=true;
-                                                  player.chooseControlList(true,function(event,player){
-                                                      return 0;
-                                                  },
-                                                  ['回复一点体力，摸2张牌，增加一点体力上限','回复一点体力，摸3张牌']);
-
-                              					'step 1'
-                                                  if(result.index==0 || result.index==1){
-                                                      if(result.index==0){
-                                                          player.gainMaxHp();
-                                                          player.draw(2);
-                                                      }
-                                                      else if(result.index==1){
-                                                          player.draw(3);
-                                                      }
-                                                      player.recover();
-                                                      game.broadcastAll(function(player){
-                                                          player.showIdentity();
-                                                      },player);
-                                                      event.parent.parent.parent.redo();
-                                                  }
-                              				},
-                              				ai:{
-                              					order:10,
-                              					result:{
-                              						player:function(player){
-                              							return 1;
-                              						},
-                              					},
-                              				},
-                              			};
-
-    lib.translate['kejizhugong']='克己主公';
-    lib.translate['kejizhugong_info']='村规主公限定技：如果场上玩家数是6人或者更多，而且为偶数，则主公如果在第一回合没有对其他玩家使用牌，可以不用弃牌';
-    lib.translate['anlezhugong']='安乐主公';
-    lib.translate['anlezhugong_info']='村规主公限定技：主公如果在第一轮被乐而且中乐，则手牌上限加2，（十人局则加3）';
-    lib.translate['anlezhugong2']='安乐主公';
-    lib.skill['kejizhugong']={
-                                    audio:'keji',
-                                    limited:true,
-                                    skillAnimation:'legend',
-                                    animationColor:'thunder',
-                                    trigger:{player:['phaseDiscardBefore','phaseAfter']},
-                                    filter:function(event,player){
-                                        if(event.name=='phaseDiscard'){
-                                            if(game.roundNumber==1&&player==game.zhu){
-                                                var usedCards=player.getHistory('useCard',function(evt){
-                                                    if(evt.targets&&evt.targets.length&&evt.isPhaseUsing()){
-                                                        var targets=evt.targets.slice(0);
-                                                        while(targets.contains(player)) targets.remove(player);
-                                                        return targets.length>0;
-                                                    }
-                                                    return false;
-                                                });
-                                                if(usedCards.length==0) {
-                                                    return true;
-                                                }
-                                            }
-                                        }
-                                        game.broadcastAll(function(player){
-                                            player.removeSkill('kejizhugong');
-                                        },player);
-                                        return false;
-                                    },
-                                    content:function(){
-                                        game.broadcastAll(function(player){
-                                            player.removeSkill('kejizhugong');
-                                        },player);
-                                        trigger.cancel();
-                                    },
-                                    oncancel:function(event,player){
-                                        game.broadcastAll(function(player){
-                                            player.removeSkill('kejizhugong');
-                                        },player);
-                                    },
-                                    ai:{
-                                        order:10,
-                                        result:{
-                                            player:function(player){
-                                                return 1;
-                                            },
-                                        },
-                                    },
-                                };
-    lib.skill['anlezhugong']={
-                                 audio:'guose',
-                                 limited:true,
-                                 skillAnimation:'legend',
-                                 animationColor:'thunder',
-                                 trigger:{player:['judgeEnd','phaseAfter']},
-                                 filter:function(event,player){
-                                     if(event.name=='phase'){
-                                         if(game.roundNumber>=2){
-                                             game.broadcastAll(function(player){
-                                                 player.removeSkill('anlezhugong');
-                                             },player);
-                                         }
-                                     }else if(event.name=='judge'){
-                                          if(game.roundNumber<=2&&player==game.zhu&&event.judgestr=='乐不思蜀'){
-                                              if(event.result.bool==false){
-                                                  return true;
-                                              }
-                                              game.broadcastAll(function(player){
-                                                  player.removeSkill('anlezhugong');
-                                              },player);
-                                          }
-                                     }
-                                     return false;
-                                 },
-                                 content:function(){
-                                     game.broadcastAll(function(player){
-                                         player.removeSkill('anlezhugong');
-                                     },player);
-                                     player.addTempSkill('anlezhugong2');
-                                 },
-                                 oncancel:function(event,player){
-                                     game.broadcastAll(function(player){
-                                         player.removeSkill('anlezhugong');
-                                     },player);
-                                 },
-                                 ai:{
-                                     order:10,
-                                     result:{
-                                         player:function(player){
-                                             return 1;
-                                         },
-                                     }
-                                 },
-                             };
-    lib.skill['anlezhugong2']={
-                                  audio:'guose',
-                                  forced:true,
-                                  trigger:{player:'phaseDiscardBefore'},
-                                  content:function(){},
-                                  ai:{
-                                      order:10,
-                                      result:{
-                                          player:function(player){
-                                              return 1;
-                                          },
-                                      }
-                                  },
-                                  mod:{
-                                      maxHandcard:function(player,num){
-                                          var keepExtra = 2;
-                                          if(game.players.length==10){
-                                              keepExtra = 3;
-                                          }
-                                          return num+keepExtra;
-                                      }
-                                  },
-                              };
-
 	switch(lib.config.layout){
         case 'long2':
         case 'nova':
@@ -212,6 +14,8 @@ content:function(config, pack){
             alert('十周年UI提醒您，请更换<手杀>、<新版>布局以获得良好体验（在选项-外观-布局）。');
             break;
     }
+
+
 
 	console.time(extensionName);
 	window.decadeUI = {
@@ -293,167 +97,11 @@ content:function(config, pack){
 			var createPlayerFunction = ui.create.player;
 			var createMenuFunction = ui.create.menu;
 			var createCardFunction = ui.create.card;
-			var createConnectPlayers = ui.create.connectPlayers;
 			var initCssstylesFunction = lib.init.cssstyles;
 			var initLayoutFunction = lib.init.layout;
 			var cardInitFunction = lib.element.card.init;
 			var cardCopyFunction = lib.element.card.copy;
-			var playerInitFunction = function(character,character2,skill){
-                                     					if(typeof character=='string'&&!lib.character[character]){
-                                     						lib.character[character]=get.character(character);
-                                     					}
-                                     					if(typeof character2=='string'&&!lib.character[character2]){
-                                     						lib.character[character2]=get.character(character2);
-                                     					}
-                                     					if(!lib.character[character]) return;
-                                     					if(get.is.jun(character2)){
-                                     						var tmp=character;
-                                     						character=character2;
-                                     						character2=tmp;
-                                     					}
-                                     					if(character2==false){
-                                     						skill=false;
-                                     						character2=null;
-                                     					}
-                                     					var info=lib.character[character];
-                                     					if(!info){
-                                     						info=['','',1,[],[]];
-                                     					}
-                                     					if(!info[4]){
-                                     						info[4]=[];
-                                     					}
-                                     					var skills=info[3];
-                                     					this.clearSkills(true);
-                                     					this.classList.add('fullskin');
-                                     					if(!game.minskin&&get.is.newLayout()&&!info[4].contains('minskin')){
-                                     						this.classList.remove('minskin');
-                                     						this.node.avatar.setBackground(character,'character');
-                                     					}
-                                     					else{
-                                     						this.node.avatar.setBackground(character,'character');
-                                     						if(info[4].contains('minskin')){
-                                     							this.classList.add('minskin');
-                                     						}
-                                     						else if(game.minskin){
-                                     							this.classList.add('minskin');
-                                     						}
-                                     						else{
-                                     							this.classList.remove('minskin');
-                                     						}
-                                     					}
-
-                                     					var hp1=get.infoHp(info[2]);
-                                     					var maxHp1=get.infoMaxHp(info[2]);
-
-                                     					this.node.avatar.show();
-                                     					this.node.count.show();
-                                     					this.node.equips.show();
-                                     					this.name=character;
-                                     					this.sex=info[0];
-                                     					this.group=info[1];
-                                     					this.hp=hp1;
-                                     					this.maxHp=maxHp1;
-                                     					this.hujia=0;
-                                     					this.node.intro.innerHTML=lib.config.intro;
-                                     					this.node.name.dataset.nature=get.groupnature(this.group);
-                                     					lib.setIntro(this);
-                                     					// var name=get.translation(character);
-                                     					this.node.name.innerHTML=get.slimName(character);
-                                     					if(this.classList.contains('minskin')&&this.node.name.querySelectorAll('br').length>=4){
-                                     						this.node.name.classList.add('long');
-                                     					}
-                                     					// if(!lib.config.show_name){
-                                     					// 	this.node.name.style.display='none';
-                                     					// }
-                                     					// for(var i=0;i<name.length;i++){
-                                     					// 	if(name[i]!='s'&&name[i]!='p')
-                                     					// 	this.node.name.innerHTML+=name[i]+'<br/>';
-                                     					// }
-                                     					if(character2&&lib.character[character2]){
-                                     						var info2=lib.character[character2];
-                                     						if(!info2){
-                                     							info2=['','',1,[],[]];
-                                     						}
-                                     						if(!info2[4]){
-                                     							info2[4]=[];
-                                     						}
-                                     						this.classList.add('fullskin2');
-                                     						this.node.avatar2.setBackground(character2,'character');
-
-                                     						this.node.avatar2.show();
-                                     						this.name2=character2;
-                                     						var hp2=get.infoHp(info2[2]);
-                                     						var maxHp2=get.infoMaxHp(info2[2]);
-                                     						var double_hp;
-                                                            double_hp=get.config('double_hp');
-                                     						switch(double_hp){
-                                     							case 'pingjun':{
-                                     								this.maxHp=Math.floor((maxHp1+maxHp2)/2);
-                                     								this.hp=Math.floor((hp1+hp2)/2);
-                                     								this.singleHp=((maxHp1+maxHp2)%2===1);
-                                     								break;
-                                     							}
-                                     							case 'zuidazhi':{
-                                     								this.maxHp=Math.max(maxHp1,maxHp2);
-                                     								this.hp=Math.max(hp1,hp2);
-                                     								break;
-                                     							}
-                                     							case 'zuixiaozhi':{
-                                     								this.maxHp=Math.min(maxHp1,maxHp2);
-                                     								this.hp=Math.min(hp1,hp2);
-                                     								break;
-                                     							}
-                                     							case 'zonghe':{
-                                     								this.maxHp=maxHp1+maxHp2;
-                                     								this.hp=hp1+hp2;
-                                     								break;
-                                     							}
-                                     							case 'zuidashangxianzuixiaotili':{
-                                     								this.maxHp=Math.max(maxHp1,maxHp2);
-                                     								this.hp=Math.min(hp1,hp2);
-                                                                    if(this.maxHp>4){
-                                                                        this.hp+=this.maxHp-4;
-                                                                    }
-                                     								break;
-                                     							}
-                                     							default:{
-                                     								this.maxHp=maxHp1+maxHp2-3;
-                                     								this.hp=hp1+hp2-3;
-                                     							};
-                                     						}
-                                     						this.node.count.classList.add('p2');
-                                     						skills=skills.concat(info2[3]);
-
-                                     						// var name=get.translation(character2);
-                                     						this.node.name2.innerHTML=get.slimName(character2);
-                                     						// this.node.name2.dataset.nature=get.groupnature(info2[1]);
-                                     						// if(!lib.config.show_name){
-                                     						// 	this.node.name2.style.display='none';
-                                     						// }
-                                     						// for(var i=0;i<name.length;i++){
-                                     						// 	this.node.name2.innerHTML+=name[i]+'<br/>';
-                                     						// }
-                                     					}
-                                     					if(skill!=false){
-                                     						for(var i=0;i<skills.length;i++){
-                                     							this.addSkill(skills[i]);
-                                     						}
-                                     						this.checkConflict();
-                                     					}
-                                     					lib.group.add(this.group);
-                                     					if(this.inits){
-                                     						for(var i=0;i<lib.element.player.inits.length;i++){
-                                     							lib.element.player.inits[i](this);
-                                     						}
-                                     					}
-                                     					if(this._inits){
-                                     						for(var i=0;i<this._inits.length;i++){
-                                     							this._inits[i](this);
-                                     						}
-                                     					}
-                                     					this.update();
-                                     					return this;
-                                     				};
+			var playerInitFunction = lib.element.player.init;
 			var playerUninitFunction = lib.element.player.uninit;
 			var playerAddSkillFunction = lib.element.player.addSkill;
 			var playerRemoveSkillFunction = lib.element.player.removeSkill;
@@ -582,37 +230,10 @@ content:function(config, pack){
 				dialog.style.top = idealtop + 'px';
 			};
 
-			var zhuSkillAdded=false;
-			var neiSkillAdded=false;
 			game.updateRoundNumber = function(){
 				game.broadcastAll(function(num1, num2){
 					if(ui.cardPileNumber) ui.cardPileNumber.innerHTML = '牌堆' + num2 + ' 第' + num1 +'轮';
 				},game.roundNumber, ui.cardPile.childNodes.length);
-
-                if(!zhuSkillAdded&&game.zhu&&game.zhu.hiddenSkills&&game.zhu.hiddenSkills.length>0){
-                    zhuSkillAdded=true;
-                    if(game.players.length>=6&&game.players.length%2==0){
-                        game.broadcastAll(function(player){
-                            player.addSkill('kejizhugong');
-                            player.addSkill('anlezhugong');
-                        },game.zhu);
-                    }
-                }
-
-                if(!neiSkillAdded){
-                    if(game.players.length>4){
-                        for (var i = 0; i < game.players.length; i++) {
-                            var cur = game.players[i];
-                            if (cur.identity=='nei'&&cur.hiddenSkills&&cur.hiddenSkills.length>0){
-                                cur.hiddenSkills.add('woshixiaonei');
-                                neiSkillAdded=true;
-                                break;
-                            }
-                        }
-                    }else{
-                        neiSkillAdded=true;
-                    }
-                }
 			};
 			
 			game.bossPhaseLoop = function(){
@@ -1627,22 +1248,6 @@ content:function(config, pack){
 
 				return card;
 			};
-
-			ui.create.connectPlayers = function(ip){
-			    var returnValue = createConnectPlayers.call(this, ip);
-
-                for(var i=8;i<10;i++){
-                	var player=ui.create.player(ui.window);
-                	player.dataset.position=i;
-                	player.classList.add('connect');
-                	game.connectPlayers.push(player);
-                	if(i>=lib.configOL.number){
-                		player.classList.add('unselectable2');
-                	}
-                }
-
-			    return returnValue;
-            };
 
 			ui.create.cards = function(){
 				var retval = base.ui.create.cards.apply(this, arguments);
