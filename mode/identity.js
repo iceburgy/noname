@@ -1016,7 +1016,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					if(_status.event.zhongmode){
 						if(get.config('double_character')){
-							player.init(list[0],list[1]);
+							player.init(list[0],list[1],false);
 						}
 						else{
 							player.init(list[0]);
@@ -1042,7 +1042,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							choice2=list[1];
 						}
 						if(get.config('double_character')){
-							player.init(choice,choice2);
+							player.init(choice,choice2,false);
 						}
 						else{
 							player.init(choice);
@@ -1061,7 +1061,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						if(get.config('double_character')){
-							player.init(list[choice],list[choice==0?choice+1:choice-1]);
+							player.init(list[choice],list[choice==0?choice+1:choice-1],false);
 						}
 						else{
 							player.init(list[choice]);
@@ -1069,7 +1069,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						if(get.config('double_character')){
-							player.init(list[0],list[1]);
+							player.init(list[0],list[1],false);
 						}
 						else{
 							player.init(list[0]);
@@ -1695,13 +1695,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					event.group=result.control||false;
 					if(event.chosen.length){
-						game.me.init(event.chosen[0],event.chosen[1]);
+						game.me.init(event.chosen[0],event.chosen[1],false);
 					}
 					else if(event.modchosen){
-						game.me.init(event.modchosen[0],event.modchosen[1]);
+						game.me.init(event.modchosen[0],event.modchosen[1],false);
 					}
 					else if(event.choosed.length==2){
-						game.me.init(event.choosed[0],event.choosed[1]);
+						game.me.init(event.choosed[0],event.choosed[1],false);
 					}
 					else{
 						game.me.init(event.choosed[0]);
@@ -1972,14 +1972,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					next.set('selectButton',(lib.configOL.double_character?2:1));
 					next.set('createDialog',['选择角色',[list,'character']]);
 					next.set('callback',function(player,result){
-						player.init(result.links[0],result.links[1]);
+						player.init(result.links[0],result.links[1],false);
 					});
 					next.set('ai',function(button){
 						return Math.random();
 					});
 					"step 1"
 					if(game.me!=game.zhu){
-						game.zhu.init(result.links[0],result.links[1])
+						game.zhu.init(result.links[0],result.links[1],false)
 					}
 					event.list.remove(game.zhu.name);
 					event.list.remove(game.zhu.name2);
@@ -2002,7 +2002,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 					game.broadcast(function(zhu,name,name2,addMaxHp){
 						if(game.zhu!=game.me){
-							zhu.init(name,name2);
+							zhu.init(name,name2,false);
 						}
 						if(addMaxHp){
 							zhu.maxHp++;
@@ -2098,7 +2098,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
-						if(game.online||player==game.me) player.init(result.links[0],result.links[1]);
+						if(game.online||player==game.me) player.init(result.links[0],result.links[1],false);
 					});
 					"step 4"
 					var shen=[];
@@ -2146,7 +2146,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.broadcast(function(result,result2){
 						for(var i in result){
 							if(!lib.playerOL[i].name){
-								lib.playerOL[i].init(result[i][0],result[i][1]);
+								lib.playerOL[i].init(result[i][0],result[i][1],false);
 							}
 							if(result2[i]&&result2[i].links) lib.playerOL[i].changeGroup(result2[i].links[0][2].slice(6),false,false);
 						}
@@ -2157,7 +2157,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					
 					for(var i in result2){
 						if(!lib.playerOL[i].name){
-							lib.playerOL[i].init(result2[i][0],result2[i][1]);
+							lib.playerOL[i].init(result2[i][0],result2[i][1],false);
 						}
 						if(result[i]&&result[i].links) lib.playerOL[i].changeGroup(result[i].links[0][2].slice(6),false,false);
 					}
@@ -2740,6 +2740,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						this.hiddenSkills.remove(skills[i]);
 						this.addSkill(skills[i]);
 					}
+
+					// adjust maxHp and hp if maxHp>4
+                    var realMaxHp=Math.max(lib.character[this.name][2],(lib.character[this.name2][2]));
+					var maxHpToGain=realMaxHp-4;
+					if(maxHpToGain>0){
+                        this.gainMaxHp(maxHpToGain);
+                        this.recover(maxHpToGain);
+					}
+
 					this.checkConflict();
 				},
 			}
@@ -3648,7 +3657,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			_mingzhi1:{
-				trigger:{player:'phaseBeginStart'},
+				trigger:{player:['phaseBeginStart','dyingBefore']},
 				priority:19,
 				forced:true,
 				popup:false,
