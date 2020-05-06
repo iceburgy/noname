@@ -6844,7 +6844,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.hp>0) return false;
 					if(!player.hasZhuSkill('xingshuai')) return false;
 					return game.hasPlayer(function(current){
-						return current!=player&&current.group=='wei';
+						return current!=player&&(current.group=='wei'||current.isUnseen(0));
 					});
 				},
 				init:function(player){
@@ -6861,13 +6861,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:false,
 				content:function(){
 					'step 0'
+					event.list=game.filterPlayer(function(current){
+						return current!=player&&current.isUnseen(0);
+					});
+					'step 1'
+					event.current=event.list.shift();
+					if(player.isUnseen()){
+                        event.current.chooseControl('明置主将','明置副将','取消').set('prompt','是否响应'+get.translation(player)+'的'+get.translation('xingshuai')+'召唤？').ai=function(){return Math.floor(Math.random()*3)};
+					}
+					else{
+                        event.current.chooseControl('明置主将','取消').set('prompt','是否响应'+get.translation(player)+'的'+get.translation('xingshuai')+'召唤？').ai=function(){return Math.floor(Math.random()*3)};
+					}
+					'step 2'
+					if(result.control=='明置主将'){
+						event.current.showCharacter(0);
+					}
+					else if(result.control=='明置副将'){
+						event.current.showCharacter(1);
+					}
+					'step 3'
+					if(event.list.length) event.goto(1);
+					'step 4'
 					player.storage.xingshuai=true;
 					player.awakenSkill('xingshuai');
 					var targets=game.filterPlayer();
 					targets.remove(player);
 					event.targets=targets;
 					event.damages=[];
-					'step 1'
+					'step 5'
 					if(event.targets.length){
 						var current=event.targets.shift();
 						if(current.group=='wei'){
@@ -6881,9 +6902,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						event.goto(3);
+						event.goto(7);
 					}
-					'step 2'
+					'step 6'
 					if(result.bool){
 						event.damages.push(event.current);
 						event.current.line(player,'green');
@@ -6891,9 +6912,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover();
 					}
 					if(event.targets.length){
-						event.goto(1);
+						event.goto(5);
 					}
-					'step 3'
+					'step 7'
 					if(event.damages.length){
 						var next=game.createEvent('xingshuaI_next');
 						event.next.remove(next);
