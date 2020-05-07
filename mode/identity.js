@@ -2750,7 +2750,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					// adjust maxHp and hp if maxHp>4
-					var maxHpToGain=realMaxHp-4;
+					if(this==game.zhu) realMaxHp++;
+					var maxHpToGain=realMaxHp-this.maxHp;
 					if(maxHpToGain>0){
                         this.gainMaxHp(maxHpToGain);
                         this.recover(maxHpToGain);
