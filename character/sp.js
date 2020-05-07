@@ -7807,7 +7807,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						num=1;
 					}
-					if(player.getStat().skill.dingpan>=num) return false;
+					if(num==0||player.getStat().skill.dingpan>=num) return false;
 					return true;
 				},
 				filterTarget:function(card,player,target){
