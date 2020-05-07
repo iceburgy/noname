@@ -3747,53 +3747,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			_mingzhi3:{
-				trigger:{player:'phaseBefore'},
-				priority:19.1,
-				forced:true,
-				popup:false,
-				filter:function(event,player){
-					if(player.storage._mingzhi3) return false
-					if(_status.connectMode){
-						if(!lib.configOL.junzhu) return false;
-					}
-					else if(!get.config('junzhu')) return false;
-					return true;
-				},
-				content:function(){
-					'step 0'
-					player.storage._mingzhi3=true;
-					var name=player.name1;
-					if(!player.isUnseen(0)||name.indexOf('gz_')!=0||!lib.junList.contains(name.slice(3))||!lib.character['gz_jun_'+name.slice(3)]) event.finish();
-					else{
-						player.chooseBool("是否将主武将牌替换为君主武将？").ai=function(){return true};
-					}
-					'step 1'
-					if(result.bool){
-						var from=player.name1;
-						var to='gz_jun_'+player.name1.slice(3);
-						event.maxHp=player.maxHp;
-						player.reinit(from,to,4);
-						if(lib.skill[to]) game.trySkillAudio(to,player);
-						player.showCharacter(0);
-						var yelist=[];
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].identity=='ye'&&game.players[i]._group==player.group){
-								yelist.push(game.players[i]);
-							}
-						}
-						game.broadcastAll(function(list,group){
-							for(var i=0;i<list.length;i++){
-								list[i].identity=group;
-								list[i].setIdentity();
-							}
-						},yelist,player.group);
-					}
-					else event.finish();
-					'step 2'
-					if(player.maxHp>event.maxHp) player.recover(player.maxHp-event.maxHp);
-				}
-			},
 		},
 		help:{
 			'身份模式':'<div style="margin:10px">选项</div><ul style="margin-top:0"><li>加强主公<br>反贼人数多于2时主公会额外增加一个技能（每个主公的额外技能固定，非常备主公增加天命）<li>特殊身份<br><ul style="padding-left:20px;padding-top:5px"><li>军师：忠臣身份。只要军师存活，主公在准备阶段开始时，可以观看牌堆顶的三张牌，然后将这些牌以任意顺序置于牌堆顶或牌堆底<li>大将：忠臣身份。只要大将存活，主公手牌上限+1<li>贼首：反贼身份，只要贼首存活，主公手牌上限-1</ul></ul>',
