@@ -24680,7 +24680,11 @@
 							var str='失效技能：';
 							for(var i=0;i<list.length;i++){
 								if(lib.translate[list[i]+'_info']){
-									str+=get.translation(list[i])+'、';
+									if(player.hiddenSkills.contains(list[i])){
+                                    	str+='暗将技能、';
+                                    }else{
+                                    	str+=get.translation(list[i])+'、';
+                                    }
 								}
 							}
 							return str.slice(0,str.length-1);
