@@ -19930,6 +19930,11 @@
 							else{
 								this.markSkill(skill);
 							}
+						}else if(this.isZhu){
+							// special treatment for limited zhu skills like xingshuai: mark it when adding it
+							if(skill=='xingshuai'){
+							    this.markSkill(skill);
+							}
 						}
 					}
 					if(checkConflict) this.checkConflict();
