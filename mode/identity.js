@@ -2741,10 +2741,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<skills.length;i++){
 						this.hiddenSkills.remove(skills[i]);
 						this.addSkill(skills[i]);
-						// special treatment for xingshuai: mark it when adding it
-						if(skills[i]=='xingshuai'){
-						    this.markSkill('xingshuai');
-						}
 					}
 
 					// adjust maxHp and hp if maxHp>4
