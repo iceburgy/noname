@@ -19859,6 +19859,11 @@
 					game.log(this,'获得了技能','#g【'+get.translation(skill)+'】');
 				},
 				addSkill:function(skill,checkConflict,nobroadcast){
+					if(!nobroadcast){
+                    	game.broadcastAll(function(player,checkConflict,skill){
+                    		player.addSkill(skill,checkConflict,true);
+                    	},this,checkConflict,skill);
+                    }
 					if(Array.isArray(skill)){
 						for(var i=0;i<skill.length;i++){
 							this.addSkill(skill[i]);
