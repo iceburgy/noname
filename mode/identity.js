@@ -1646,7 +1646,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                         game.zhu.group='unknown';
                         game.zhu.sex='unknown';
                         game.zhu.name1=game.zhu.name;
-                        game.zhu.name='unknown';
+                        game.zhu.name='unknown0';
                         game.zhu.node.name.show();
                         game.zhu.node.name2.show();
                         game.zhu._group=lib.character[game.zhu.name1][1];
@@ -1742,7 +1742,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                         game.zhu.group='unknown';
                         game.zhu.sex='unknown';
                         game.zhu.name1=game.zhu.name;
-                        game.zhu.name='unknown';
+                        game.zhu.name='unknown0';
                         game.zhu.node.name.show();
                         game.zhu.node.name2.show();
                         game.zhu._group=lib.character[game.zhu.name1][1];
@@ -1791,7 +1791,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.players[i].group='unknown';
 						game.players[i].sex='unknown';
 						game.players[i].name1=game.players[i].name;
-						game.players[i].name='unknown';
+						game.players[i].name='unknown'+get.distance(game.zhu,game.players[i],'absolute');
 						game.players[i].node.name.show();
 						game.players[i].node.name2.show();
 						game.players[i]._group=lib.character[game.players[i].name1][1];
@@ -2033,7 +2033,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                             player.group='unknown';
                             player.sex='unknown';
                             player.name1=player.name;
-                            player.name='unknown';
+                            player.name='unknown0';
                             player.node.name.show();
                             player.node.name2.show();
                             player._group=lib.character[player.name1][1];
@@ -2201,7 +2201,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                             player.group='unknown';
                             player.sex='unknown';
                             player.name1=player.name;
-                            player.name='unknown';
+                            player.name='unknown'+get.distance(game.zhu,game.players[i],'absolute');
                             player.node.name.show();
                             player.node.name2.show();
                             player._group=lib.character[player.name1][1];
