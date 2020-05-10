@@ -13260,16 +13260,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
+					event.recoverNumber=1;
+					var tempEvent=event;
+					while(tempEvent&&tempEvent.name!='recover') tempEvent=tempEvent.parent;
+					if(tempEvent&&tempEvent.num) event.recoverNumber=tempEvent.num;
+					"step 1"
 					player.chooseTarget(get.prompt('shushen'),'令一名其他角色选择摸两张牌或回复1点体力',function(card,player,target){
 						return target!=player;
 					}).set('ai',function(target){
 						return get.attitude(_status.event.player,target);
 					});
-					"step 1"
+					"step 2"
 					if(result.bool){
 						player.logSkill('shushen',result.targets);
 						result.targets[0].chooseDrawRecover(2,true);
 					}
+					event.recoverNumber--;
+					if(event.recoverNumber>0) event.goto(1);
 				},
 				ai:{
 					threaten:0.8,
@@ -14022,7 +14029,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				init:function(player){
 					if(game.online) return;
-					player.removeAdditionalSkill('baobian');
+                    game.broadcastAll(function(player,skillName){
+                        player.removeAdditionalSkill(skillName);
+                    },player,'baobian');
 					var list=[];
 					if(player.hp<=3){
 						//if(trigger.num!=undefined&&trigger.num<0&&player.hp-trigger.num>1) player.logSkill('baobian');
@@ -14035,12 +14044,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.push('xinshensu');
 					}
 					if(list.length){
-						player.addAdditionalSkill('baobian',list);
+                        game.broadcastAll(function(player,skillName,list){
+                            player.addAdditionalSkill(skillName,list);
+                        },player,'baobian',list);
 					}
 				},
 				derivation:['retiaoxin','new_repaoxiao','xinshensu'],
 				content:function(){
-					player.removeAdditionalSkill('baobian');
+                    game.broadcastAll(function(player,skillName){
+                        player.removeAdditionalSkill(skillName);
+                    },player,'baobian');
 					var list=[];
 					if(player.hp<=3){
 						if(trigger.num!=undefined&&trigger.num<0&&player.hp-trigger.num>1) player.logSkill('baobian');
@@ -14053,7 +14066,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.push('xinshensu');
 					}
 					if(list.length){
-						player.addAdditionalSkill('baobian',list);
+                        game.broadcastAll(function(player,skillName,list){
+                            player.addAdditionalSkill(skillName,list);
+                        },player,'baobian',list);
 					}
 				},
 				ai:{

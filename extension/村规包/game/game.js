@@ -14967,6 +14967,7 @@
 						},player);
 					}
 					for(var i in player.tempSkills){
+						if(i=='fengyin') continue;
 						player.removeSkill(i);
 					}
 					var skills=player.getSkills();
