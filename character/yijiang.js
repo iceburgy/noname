@@ -7339,8 +7339,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageSource'},
 				forced:true,
 				filter:function(event,player){
-					if(player.hasSkill('fuhun3')) return false;
-					return event.getParent().skill=='fuhun';
+					if(!player.hasSkill('fuhun3')&&event.getParent().skill=='fuhun') {
+                        var tempEvent=event;
+                        while(tempEvent&&tempEvent.name!='phaseUse') tempEvent=tempEvent.parent;
+                        if(tempEvent&&tempEvent.name=='phaseUse') return true;
+					}
+                    return false;
 				},
 				content:function(){
 					player.addTempSkill('new_rewusheng');
@@ -7348,7 +7352,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('fuhun3');
 				}
 			},
-			fuhun3:{},
+			fuhun3:{
+				unique:true,
+				charlotte:true,
+				intro:{
+					content:function(storage){
+						return '武圣、咆哮';
+					}
+				},
+				mark:true,
+				onremove:true,
+				content:function(){}
+			},
 			fencheng:{
 				skillAnimation:'epic',
 				animationColor:'gray',
@@ -11412,6 +11427,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinxuanhuo_info:'摸牌阶段开始时，你可以改为令一名其他角色摸两张牌，然后该角色需对其攻击范围内你选择的另一名角色使用一张【杀】，否则你获得其两张牌。',
 			fuhun:'父魂',
 			fuhun2:'父魂',
+			fuhun3:'父魂',
 			fuhun_info:'你可以将两张手牌当做【杀】使用或打出；出牌阶段，若你以此法使用的【杀】造成了伤害，你获得技能〖武圣〗和〖咆哮〗直到回合结束。',
 			yuce:'御策',
 			yuce_info:'当你受到伤害后，你可以展示一张手牌，并令伤害来源选择一项：弃置一张与此牌类型不同的手牌，或令你回复一点体力。',
