@@ -258,6 +258,9 @@ content:function(config, pack){
 						
 						cur.seat = get.distance(firstAction, cur, 'absolute') + 1;
 						cur.node.seat.innerHTML = get.cnNumber(cur.seat, true);
+						if(cur.name=='unknown'){
+						    cur.name='unknown'+(cur.seat-1);
+						}
 					}
 				}, player);
 				
