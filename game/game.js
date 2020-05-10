@@ -9817,6 +9817,8 @@
 			unknown5:'六号位',
 			unknown6:'七号位',
 			unknown7:'八号位',
+			unknown8:'九号位',
+			unknown9:'十号位',
 		},
 		element:{
 			content:{
