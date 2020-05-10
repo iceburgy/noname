@@ -10329,8 +10329,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.storage.danji=true;
 					player.loseMaxHp();
-					player.addSkill('mashu');
-					player.addSkill('nuzhan');
+                    game.broadcastAll(function(player){
+                        player.addSkill('mashu');
+                        player.addSkill('nuzhan');
+                    },player);
 					player.awakenSkill('danji');
 				}
 			},
@@ -11361,7 +11363,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover(2-player.hp);
 					}
 					"step 2"
-					player.addSkill('retiaoxin');
+                    game.broadcastAll(function(player){
+                        player.addSkill('retiaoxin');
+                    },player);
 					player.storage.kunfen=true;
 					player.awakenSkill('fengliang');
 				},
@@ -12316,7 +12320,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainMaxHp();
 					player.recover();
 					player.removeSkill('liangzhu');
-					player.addSkill('xiaoji');
+                    game.broadcastAll(function(player){
+                        player.addSkill('xiaoji');
+                    },player);
 					player.awakenSkill('fanxiang');
 				},
 			},
@@ -14404,8 +14410,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num>0){
 						player.draw(num);
 					}
-					player.addSkill('benghuai');
-					player.addSkill('weizhong');
+                    game.broadcastAll(function(player){
+                        player.addSkill('benghuai');
+                        player.addSkill('weizhong');
+                    },player);
 					player.storage.juyi=true;
 					player.awakenSkill('juyi');
 				}
