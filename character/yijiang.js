@@ -9544,7 +9544,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				filter:function(event,player){
 					if(player.classList.contains('turnedover')) return false;
-					if(event.parent.name=='phaseUse'){
+					if(event.parent.name=='phaseUse'||(event._modparent&&event._modparent.name=='phaseUse')){
 						return lib.filter.filterCard({name:'jiu'},player,event);
 					}
 					if(event.type!='dying') return false;
