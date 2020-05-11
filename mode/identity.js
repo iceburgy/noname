@@ -2012,10 +2012,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},game.zhu,game.zhu.name,game.zhu.name2,game.players.length>4);
 					var skipToThree=false;
 					if(game.zhu.group=='shen'){
-						var list=lib.group.slice(0);
-						list.remove('shen');
-						game.zhu.chooseButton(['请选择神武将的势力',[list,'vcard']],true).set('ai',function(){
-                        	return Math.random();
+                        var list=lib.group.slice(0);
+                        list.remove('shen');
+                        for(var i=0;i<list.length;i++){
+                            list[i]=['','','group_'+list[i]];
+                        }
+                        game.zhu.chooseButton(['请选择神武将的势力',[list,'vcard']],true).set('ai',function(){
+                            return Math.random();
                         });
 					}
 					else skipToThree=true;
@@ -2053,8 +2056,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                     }
                     if(skipToThree) event.goto(3);
 					"step 2"
-					var name=result.links[0][2];
-                    game.zhu.groupshen=name;
+                    game.zhu.groupshen=result.links[0][2].slice(6);
 
 					"step 3"
 					var list=[];
@@ -2125,12 +2127,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(shen.length){
                         var list=lib.group.slice(0);
                         list.remove('shen');
+						for(var i=0;i<list.length;i++){
+                        	list[i]=['','','group_'+list[i]];
+                        }
 						for(var i=0;i<shen.length;i++){
 							shen[i]=[shen[i],['请选择神武将的势力',[list,'vcard']],1,true];
 						}
 						game.me.chooseButtonOL(shen,function(player,result){
 							if(player==game.me) {
-                                player.groupshen=result.links[0][2];
+                                player.groupshen=result.links[0][2].slice(6);
 							}
 						});
 					}
@@ -2143,7 +2148,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								lib.playerOL[i].init(result[i][0],result[i][1],false);
 							}
 							if(result2[i]&&result2[i].links) {
-							    lib.playerOL[i].groupshen=result2[i].links[0][2];
+							    lib.playerOL[i].groupshen=result2[i].links[0][2].slice(6);
 							}
 						}
 						setTimeout(function(){
@@ -2156,7 +2161,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							lib.playerOL[i].init(result2[i][0],result2[i][1],false);
 						}
 						if(result[i]&&result[i].links) {
-                            lib.playerOL[i].groupshen=result[i].links[0][2];
+                            lib.playerOL[i].groupshen=result[i].links[0][2].slice(6);
 						}
 					}
 					

@@ -22582,7 +22582,12 @@
 					cardnum={'1':'A','11':'J','12':'Q','13':'K'}[cardnum]
 					}
 					if(!lib.card[card[2]]){
-						lib.card[card[2]]={};
+						if(card[2]&&card[2].startsWith('group_')){
+						    lib.card[card[2]]={fullskin: true}
+						}
+						else{
+						    lib.card[card[2]]={};
+						}
 					}
 					var info=lib.card[card[2]];
 					if(info.global&&!this.classList.contains('button')){
