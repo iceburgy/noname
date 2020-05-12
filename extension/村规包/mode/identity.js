@@ -1976,7 +1976,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.init(result.links[0],result.links[1],false);
 						player.group='unknown';
 						player.classList.add('unseen');
-                        player.classList.add('unseen2');
+						player.classList.add('unseen2');
 					});
 					next.set('ai',function(button){
 						return Math.random();
