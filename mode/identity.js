@@ -1974,9 +1974,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					next.set('callback',function(player,result){
 						// this determines the current user will see full character and group info or not
 						player.init(result.links[0],result.links[1],false);
-						game.zhu.group='unknown';
-						game.zhu.classList.add('unseen');
-                        game.zhu.classList.add('unseen2');
+						player.group='unknown';
+						player.classList.add('unseen');
+						player.classList.add('unseen2');
 					});
 					next.set('ai',function(button){
 						return Math.random();
