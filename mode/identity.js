@@ -1972,14 +1972,24 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					next.set('selectButton',(lib.configOL.double_character?2:1));
 					next.set('createDialog',['选择角色',[list,'character']]);
 					next.set('callback',function(player,result){
+						// this determines the current user will see full character and group info or not
 						player.init(result.links[0],result.links[1],false);
+						game.zhu.group='unknown';
+						game.zhu.classList.add('unseen');
+                        game.zhu.classList.add('unseen2');
 					});
 					next.set('ai',function(button){
 						return Math.random();
 					});
 					"step 1"
 					if(game.me!=game.zhu){
+						// this determines the other online users will see full character and group info or not
 						game.zhu.init(result.links[0],result.links[1],false)
+						// game.zhu.init will be called from host and is broadcasting
+						// avoid exposing zhu character and group after making selection
+						game.zhu.group='unknown';
+						game.zhu.classList.add('unseen');
+                        game.zhu.classList.add('unseen2');
 					}
 					event.list.remove(game.zhu.name);
 					event.list.remove(game.zhu.name2);
@@ -1992,36 +2002,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.zhu.update();
 					}
 
-                    // fix flash of character during initial loading
-                    for(var i=0;i<game.players.length;i++){
-                        game.broadcastAll(function(player){
-                            player.classList.add('unseen');
-                            player.classList.add('unseen2');
-                        },game.players[i]);
-                    }
-
-					game.broadcast(function(zhu,name,name2,addMaxHp){
-						if(game.zhu!=game.me){
-							zhu.init(name,name2,false);
-						}
-						if(addMaxHp){
-							zhu.maxHp++;
-							zhu.hp++;
-							zhu.update();
-						}
-					},game.zhu,game.zhu.name,game.zhu.name2,game.players.length>4);
-					var skipToThree=false;
-
-					var zhuHasShen=false;
+					event.zhuHasShen=false;
 					var zhuNames=[game.zhu.name, game.zhu.name2];
 					for(var i in zhuNames){
                     	if(lib.character[zhuNames[i]]&&lib.character[zhuNames[i]][1]=='shen') {
-                    	    zhuHasShen=true;
+                    	    event.zhuHasShen=true;
                     	    break;
                     	}
                     }
 
-					if(zhuHasShen){
+					if(event.zhuHasShen){
                         var list=lib.group.slice(0);
                         list.remove('shen');
                         for(var i=0;i<list.length;i++){
@@ -2031,44 +2021,58 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                             return Math.random();
                         });
 					}
-					else skipToThree=true;
+					"step 2"
+					if(event.zhuHasShen){
+						game.zhu.groupshen=result.links[0][2].slice(6);
+					}
+					"step 3"
+					// broadcast will exclude sender itself
+					// hence zhu.maxHp++ won't happened repeatedly
+					game.broadcast(function(zhu,name,name2,addMaxHp){
+						if(game.zhu!=game.me){
+							zhu.init(name,name2,false);
+							zhu.group='unknown';
+							zhu.classList.add('unseen');
+							zhu.classList.add('unseen2');
+						}
+						if(addMaxHp){
+							zhu.maxHp++;
+							zhu.hp++;
+							zhu.update();
+						}
+					},game.zhu,game.zhu.name,game.zhu.name2,game.players.length>4);
 
                     // hide zhu character
-                    if(game.zhu.name){
-                        game.broadcastAll(function(player){
-                            if(_status.characterlist){
-                                _status.characterlist.remove(player.name);
-                                _status.characterlist.remove(player.name2);
-                            }
-                            player.hiddenSkills=lib.character[player.name][3].slice(0);
-                            var hiddenSkills2=lib.character[player.name2][3];
-                            for(var j=0;j<hiddenSkills2.length;j++){
-                                player.hiddenSkills.add(hiddenSkills2[j]);
-                                player.skills.remove(hiddenSkills2[j]);
-                            }
-                            for(var j=0;j<player.hiddenSkills.length;j++){
-                                player.skills.remove(player.hiddenSkills);
-                                if(!lib.skill[player.hiddenSkills[j]]){
-                                    player.hiddenSkills.splice(j--,1);
-                                }
-                            }
-                            player.group='unknown';
-                            player.sex='unknown';
-                            player.name1=player.name;
-                            player.name='unknown';
-                            player.node.name.show();
-                            player.node.name2.show();
-                            player._group=lib.character[player.name1][1];
-                            for(var j=0;j<player.hiddenSkills.length;j++){
-                                player.addSkillTrigger(player.hiddenSkills[j],true);
-                            }
-                        },game.zhu);
-                    }
-                    if(skipToThree) event.goto(3);
-					"step 2"
-                    game.zhu.groupshen=result.links[0][2].slice(6);
-
-					"step 3"
+					game.broadcastAll(function(player){
+						player.classList.add('unseen');
+						player.classList.add('unseen2');
+						if(_status.characterlist){
+							_status.characterlist.remove(player.name);
+							_status.characterlist.remove(player.name2);
+						}
+						player.hiddenSkills=lib.character[player.name][3].slice(0);
+						var hiddenSkills2=lib.character[player.name2][3];
+						for(var j=0;j<hiddenSkills2.length;j++){
+							player.hiddenSkills.add(hiddenSkills2[j]);
+							player.skills.remove(hiddenSkills2[j]);
+						}
+						for(var j=0;j<player.hiddenSkills.length;j++){
+							player.skills.remove(player.hiddenSkills);
+							if(!lib.skill[player.hiddenSkills[j]]){
+								player.hiddenSkills.splice(j--,1);
+							}
+						}
+						player.group='unknown';
+						player.sex='unknown';
+						player.name1=player.name;
+						player.name='unknown';
+						player.node.name.show();
+						player.node.name2.show();
+						player._group=lib.character[player.name1][1];
+						for(var j=0;j<player.hiddenSkills.length;j++){
+							player.addSkillTrigger(player.hiddenSkills[j],true);
+						}
+					},game.zhu);
 					var list=[];
 					var selectButton=(lib.configOL.double_character?2:1);
 
@@ -2112,7 +2116,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.me.chooseButtonOL(list,function(player,result){
 						if(game.online||player==game.me) {
 						    player.init(result.links[0],result.links[1],false);
-						    player.group='unknown';
 						}
 					});
 					"step 4"
@@ -2157,6 +2160,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i in result){
 							if(!lib.playerOL[i].name){
 								lib.playerOL[i].init(result[i][0],result[i][1],false);
+								lib.playerOL[i].group='unknown';
+								lib.playerOL[i].classList.add('unseen');
+								lib.playerOL[i].classList.add('unseen2');
 							}
 							if(result2[i]&&result2[i].links) {
 							    lib.playerOL[i].groupshen=result2[i].links[0][2].slice(6);
@@ -2191,6 +2197,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                         if(game.players[i]==game.zhu) continue;
 
                         game.broadcastAll(function(player){
+                            player.classList.add('unseen');
+                            player.classList.add('unseen2');
                             if(_status.characterlist){
                                 _status.characterlist.remove(player.name);
                                 _status.characterlist.remove(player.name2);
