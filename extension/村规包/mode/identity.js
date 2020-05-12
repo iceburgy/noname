@@ -2011,7 +2011,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					},game.zhu,game.zhu.name,game.zhu.name2,game.players.length>4);
 					var skipToThree=false;
-					if(game.zhu.group=='shen'){
+
+					var zhuHasShen=false;
+					var zhuNames=[game.zhu.name, game.zhu.name2];
+					for(var i in zhuNames){
+                    	if(lib.character[zhuNames[i]]&&lib.character[zhuNames[i]][1]=='shen') {
+                    	    zhuHasShen=true;
+                    	    break;
+                    	}
+                    }
+
+					if(zhuHasShen){
                         var list=lib.group.slice(0);
                         list.remove('shen');
                         for(var i=0;i<list.length;i++){
@@ -2121,7 +2131,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						else{
 							result[i]=result[i].links
 						}
-						if(lib.character[result[i][0]]&&lib.character[result[i][0]][1]=='shen') shen.push(lib.playerOL[i]);
+						if(lib.character[result[i][0]]&&lib.character[result[i][0]][1]=='shen'||
+						    lib.character[result[i][1]]&&lib.character[result[i][1]][1]=='shen') shen.push(lib.playerOL[i]);
 					}
 					event.result2=result;
 					if(shen.length){
