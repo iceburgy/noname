@@ -2135,31 +2135,31 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							result[i]=result[i].links
 						}
 						if(lib.character[result[i][0]]&&lib.character[result[i][0]][1]=='shen'||
-						    lib.character[result[i][1]]&&lib.character[result[i][1]][1]=='shen') shen.push(lib.playerOL[i]);
+							lib.character[result[i][1]]&&lib.character[result[i][1]][1]=='shen') shen.push(lib.playerOL[i]);
 					}
 					event.result2=result;
 					if(shen.length){
-                        var list=lib.group.slice(0);
-                        list.remove('shen');
+						var list=lib.group.slice(0);
+						list.remove('shen');
 						for(var i=0;i<list.length;i++){
-                        	list[i]=['','','group_'+list[i]];
-                        }
+							list[i]=['','','group_'+list[i]];
+						}
 						for(var i=0;i<shen.length;i++){
 							shen[i]=[shen[i],['请选择神武将的势力',[list,'vcard']],1,true];
 						}
 						game.me.chooseButtonOL(shen,function(player,result){
 							if(player==game.me) {
-                                player.groupshen=result.links[0][2].slice(6);
+								player.groupshen=result.links[0][2].slice(6);
 							}
 						}).set('switchToAuto',function(){
-                          	_status.event.result='ai';
-                        }).set('processAI',function(){
-                        	var buttons=_status.event.dialog.buttons;
-                        	return {
-                        		bool:true,
-                        		links:[buttons[Math.floor(Math.random()*buttons.length)].link],
-                        	}
-                        });
+							_status.event.result='ai';
+						}).set('processAI',function(){
+							var buttons=_status.event.dialog.buttons;
+							return {
+								bool:true,
+								links:[buttons[Math.floor(Math.random()*buttons.length)].link],
+							}
+						});
 					}
 					"step 5"
 					if(!result) result={};
