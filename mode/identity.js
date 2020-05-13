@@ -2151,7 +2151,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(player==game.me) {
                                 player.groupshen=result.links[0][2].slice(6);
 							}
-						});
+						}).set('switchToAuto',function(){
+                          	_status.event.result='ai';
+                        }).set('processAI',function(){
+                        	var buttons=_status.event.dialog.buttons;
+                        	return {
+                        		bool:true,
+                        		links:[buttons[Math.floor(Math.random()*buttons.length)].link],
+                        	}
+                        });
 					}
 					"step 5"
 					if(!result) result={};
