@@ -332,7 +332,45 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(_status.mode=='purple'&&player.seatNum>5) return 5;
 				return 4;
 			});
-			if(_status.connectMode&&lib.configOL.change_card) game.replaceHandcards(game.players.slice(0));
+
+			// only jiangyouwei has shouqika
+			if(_status.connectMode&&lib.configOL.change_card) {
+				var numberOfPlayers=game.players.length;
+				var numberOfEligiblePlayers=0;
+				switch(numberOfPlayers){
+					case 6:
+					case 7:
+						numberOfEligiblePlayers=1;
+						break;
+					case 8:
+					case 9:
+						numberOfEligiblePlayers=2;
+						break;
+					case 10:
+						numberOfEligiblePlayers=3;
+						break;
+					default:
+						break;
+				}
+				var lastSeatIndex=0;
+				for(var i=0;i<numberOfPlayers;i++){
+					var playerSeatNumber=get.distance(game.zhu, game.players[i], 'absolute') + 1;
+					if(playerSeatNumber==numberOfPlayers){
+						lastSeatIndex=i;
+						break;
+					}
+				}
+
+				var eligiblePlayers=[];
+				while(numberOfEligiblePlayers>0){
+					eligiblePlayers.push(game.players[lastSeatIndex]);
+					lastSeatIndex--;
+					if(lastSeatIndex<0) lastSeatIndex+=numberOfPlayers;
+
+					numberOfEligiblePlayers--;
+				}
+				if(eligiblePlayers.length) game.replaceHandcards(eligiblePlayers);
+			}
 			"step 7"
 			game.phaseLoop(_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me);
 		},
