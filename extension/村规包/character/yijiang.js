@@ -9472,10 +9472,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['loseAfter','changeHp']},
 				frequent:true,
 				filter:function(event,player){
-					return player.countCards('h')<player.getDamagedHp();
+					return player.countCards('h')<player.getDamagedHp()&&player.countCards('h')<2;
 				},
 				content:function(){
-					player.draw(player.getDamagedHp()-player.countCards('h'));
+					player.draw(Math.min(2,player.getDamagedHp())-player.countCards('h'));
 				},
 				ai:{
 					noh:true,
@@ -11580,7 +11580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luoying_info:'当其他角色的梅花牌因弃置或判定而进入弃牌堆时，你可以获得之。',
 			jiushi_info:'当你需要使用一张【酒】时，若你的武将牌正面朝上，则你可以将武将牌翻面并视为使用了一张【酒】；当你受到伤害时，若你的武将牌背面朝上，则你可在此伤害结算后将武将牌翻回正面。',
 			jueqing_info:'锁定技，你即将造成的伤害均视为失去体力。',
-			shangshi_info:'当你的手牌数小于X时，你可以将手牌摸至X张（X为你已损失的体力值）',
+			shangshi_info:'当你的手牌数小于X时，你可以将手牌摸至X张（X为你已损失的体力值且最多为2）',
 			xuanfeng_info:'当你失去装备区内的牌时，或于弃牌阶段弃置了两张或更多的手牌后，你可以依次弃置一至两名其他角色的共计两张牌。',
 			zhiyu_info:'当你受到伤害后，你可以摸一张牌，然后展示所有手牌。若颜色均相同，你令伤害来源弃置一张手牌。',
 			qice_info:'出牌阶段限一次，你可以将所有的手牌（至少一张）当做任意一张普通锦囊牌使用。',
