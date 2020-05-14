@@ -3282,6 +3282,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						skillAnimation:'legend',
 						animationColor:'thunder',
 						trigger:{player:['phaseDiscardBefore','phaseAfter']},
+						frequent:function(event,player){
+							return player.needsToDiscard();
+						},
 						filter:function(event,player){
 							if(event.name=='phaseDiscard'){
 								if(game.roundNumber==1&&player==game.zhu){
