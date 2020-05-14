@@ -14029,9 +14029,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				init:function(player){
 					if(game.online) return;
-                    game.broadcastAll(function(player,skillName){
-                        player.removeAdditionalSkill(skillName);
-                    },player,'baobian');
+					if(player.name2=='xiahouba'){
+						if(player.isUnseen(1)){
+							return;
+						}
+					}else{
+						if(player.isUnseen(0)){
+							return;
+						}
+					}
+					game.broadcastAll(function(player,skillName){
+						player.removeAdditionalSkill(skillName);
+					},player,'baobian');
 					var list=[];
 					if(player.hp<=3){
 						//if(trigger.num!=undefined&&trigger.num<0&&player.hp-trigger.num>1) player.logSkill('baobian');
@@ -14044,16 +14053,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.push('xinshensu');
 					}
 					if(list.length){
-                        game.broadcastAll(function(player,skillName,list){
-                            player.addAdditionalSkill(skillName,list);
-                        },player,'baobian',list);
+						game.broadcastAll(function(player,skillName,list){
+							player.addAdditionalSkill(skillName,list);
+						},player,'baobian',list);
 					}
 				},
 				derivation:['retiaoxin','new_repaoxiao','xinshensu'],
 				content:function(){
-                    game.broadcastAll(function(player,skillName){
-                        player.removeAdditionalSkill(skillName);
-                    },player,'baobian');
+					if(player.name2=='xiahouba'){
+						if(player.isUnseen(1)){
+							return;
+						}
+					}else{
+						if(player.isUnseen(0)){
+							return;
+						}
+					}
+					game.broadcastAll(function(player,skillName){
+						player.removeAdditionalSkill(skillName);
+					},player,'baobian');
 					var list=[];
 					if(player.hp<=3){
 						if(trigger.num!=undefined&&trigger.num<0&&player.hp-trigger.num>1) player.logSkill('baobian');
@@ -14066,9 +14084,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.push('xinshensu');
 					}
 					if(list.length){
-                        game.broadcastAll(function(player,skillName,list){
-                            player.addAdditionalSkill(skillName,list);
-                        },player,'baobian',list);
+						game.broadcastAll(function(player,skillName,list){
+							player.addAdditionalSkill(skillName,list);
+						},player,'baobian',list);
 					}
 				},
 				ai:{
