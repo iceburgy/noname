@@ -3217,7 +3217,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				content:function(){
 					'step 0'
-					player.chooseControlList(get.prompt('zhikezhugong'),'出牌阶段制衡至多四张手牌','如果没有对其他玩家使用牌，可以跳过弃牌阶段',function(event,player){
+					player.chooseControlList(get.prompt('zhikezhugong'),'准备阶段使用一次手气卡','如果没有对其他玩家使用牌，可以跳过弃牌阶段',function(event,player){
 						return Math.floor(Math.random()*2);
 					});
 					'step 1'
@@ -3241,21 +3241,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					zhihengzg:{
 						audio:'zhiheng',
-						unique:true,
-						limited:true,
+						frequent:true,
 						skillAnimation:'legend',
 						animationColor:'thunder',
-						enable:'phaseUse',
-						usable:1,
-						position:'h',
-						filterCard:true,
-						selectCard:[1,4],
-						check:function(card){
-							return 6-get.value(card)
-						},
+						trigger:{player:'phaseZhunbeiEnd'},
 						content:function(){
-							player.awakenSkill('zhikezhugong_zhihengzg');
-							player.draw(cards.length);
+							game.replaceHandcards(player);
 						},
 						ai:{
 							order:1,
