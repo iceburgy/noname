@@ -319,7 +319,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
                 if(players[i].identity=='zhu'&&players.length>=6&&players.length%2==0){
                     game.broadcastAll(function(player){
-                        player.addTempSkill('zhikezhugong');
+                        player.addSkill('zhikezhugong');
                         player.addSkill('anlezhugong');
                     },players[i]);
                 }
@@ -3218,7 +3218,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseControlList(get.prompt('zhikezhugong'),'出牌阶段制衡至多四张手牌','如果没有对其他玩家使用牌，可以跳过弃牌阶段',function(event,player){
-						return 0;
+						return Math.floor(Math.random()*2);
 					});
 					'step 1'
 					if(result.index==0){
@@ -3231,6 +3231,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.log(player,'选择了【',get.translation('zhikezhugong_kejizg')+'】');
 						player.addTempSkill('zhikezhugong_kejizg');
 					}
+					game.broadcastAll(function(player){
+						player.removeSkill('zhikezhugong');
+					},player);
 				},
 				ai:{
 					threaten:1.3,
@@ -3239,14 +3242,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					zhihengzg:{
 						audio:'zhiheng',
 						unique:true,
-						charlotte:true,
-						intro:{
-							content:function(storage){
-								return '出牌阶段制衡至多四张手牌';
-							}
-						},
-						mark:true,
-						onremove:true,
+						limited:true,
 						skillAnimation:'legend',
 						animationColor:'thunder',
 						enable:'phaseUse',
@@ -3258,6 +3254,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return 6-get.value(card)
 						},
 						content:function(){
+							player.awakenSkill('zhikezhugong_zhihengzg');
 							player.draw(cards.length);
 						},
 						ai:{
@@ -3271,39 +3268,31 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					kejizg:{
 						audio:'keji',
 						unique:true,
-						charlotte:true,
-						intro:{
-							content:function(storage){
-								return '如果没有对其他玩家使用牌，可以跳过弃牌阶段';
-							}
-						},
-						mark:true,
-						onremove:true,
+						limited:true,
 						skillAnimation:'legend',
 						animationColor:'thunder',
-						trigger:{player:['phaseDiscardBefore','phaseAfter']},
+						trigger:{player:'phaseDiscardBefore'},
 						frequent:function(event,player){
 							return player.needsToDiscard();
 						},
 						filter:function(event,player){
-							if(event.name=='phaseDiscard'){
-								if(game.roundNumber==1&&player==game.zhu){
-									var usedCards=player.getHistory('useCard',function(evt){
-										if(evt.targets&&evt.targets.length&&evt.isPhaseUsing()){
-											var targets=evt.targets.slice(0);
-											while(targets.contains(player)) targets.remove(player);
-											return targets.length>0;
-										}
-										return false;
-									});
-									if(usedCards.length==0) {
-										return true;
+							if(game.roundNumber==1&&player==game.zhu){
+								var usedCards=player.getHistory('useCard',function(evt){
+									if(evt.targets&&evt.targets.length&&evt.isPhaseUsing()){
+										var targets=evt.targets.slice(0);
+										while(targets.contains(player)) targets.remove(player);
+										return targets.length>0;
 									}
+									return false;
+								});
+								if(usedCards.length==0) {
+									return true;
 								}
 							}
 							return false;
 						},
 						content:function(){
+							player.awakenSkill('zhikezhugong_kejizg');
 							trigger.cancel();
 						},
 						ai:{
