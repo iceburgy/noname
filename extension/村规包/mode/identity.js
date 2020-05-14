@@ -319,7 +319,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
                 if(players[i].identity=='zhu'&&players.length>=6&&players.length%2==0){
                     game.broadcastAll(function(player){
-                        player.addSkill('kejizhugong');
+                        player.addTempSkill('zhikezhugong');
                         player.addSkill('anlezhugong');
                     },players[i]);
                 }
@@ -2343,8 +2343,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			yexinbilu:'野心毕露',
 			woshixiaonei:'我是小内',
 			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）回复一点体力，摸2张牌，增加一点体力上限；2）回复一点体力，摸3张牌。（响应打出牌事件时，只能默认为选项一）',
-			kejizhugong:'克己主公',
-			kejizhugong_info:'村规主公限定技：如果场上玩家数是6人或者更多，而且为偶数，则主公如果在第一回合没有对其他玩家使用牌，可以不用弃牌',
+			zhikezhugong:'制克主公',
+			zhikezhugong_info:'村规主公限定技：如果场上玩家数是6人或者更多，而且为偶数，则主公如果在第一回合内2选1：1）出牌阶段制衡至多四张手牌；2）如果没有对其他玩家使用牌，可以跳过弃牌阶段',
+			zhikezhugong_zhihengzg:'制衡主公',
+			zhikezhugong_kejizg:'克己主公',
 			anlezhugong:'安乐主公',
 			anlezhugong_info:'村规主公限定技：主公如果在第一轮被乐而且中乐，则手牌上限加2，（十人局则加3）',
 			anlezhugong2:'安乐主公',
@@ -3209,52 +3211,108 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			kejizhugong:{
-				audio:'keji',
-				limited:true,
-				skillAnimation:'legend',
-				animationColor:'thunder',
-                trigger:{player:['phaseDiscardBefore','phaseAfter']},
-				filter:function(event,player){
-                    if(event.name=='phaseDiscard'){
-                        if(game.roundNumber==1&&player==game.zhu){
-                            var usedCards=player.getHistory('useCard',function(evt){
-                                if(evt.targets&&evt.targets.length&&evt.isPhaseUsing()){
-                                    var targets=evt.targets.slice(0);
-                                    while(targets.contains(player)) targets.remove(player);
-                                    return targets.length>0;
-                                }
-                                return false;
-                            });
-                            if(usedCards.length==0) {
-                                return true;
-                            }
-                        }
-				    }
-                    game.broadcastAll(function(player){
-                        player.removeSkill('kejizhugong');
-                    },player);
-					return false;
-				},
+			zhikezhugong:{
+				audio:'songwei2',
+				direct:true,
+				trigger:{player:'phaseZhunbeiBegin'},
 				content:function(){
-                    game.broadcastAll(function(player){
-                        player.removeSkill('kejizhugong');
-                    },player);
-					trigger.cancel();
-				},
-				oncancel:function(event,player){
-                    game.broadcastAll(function(player){
-                        player.removeSkill('kejizhugong');
-                    },player);
+					'step 0'
+					player.chooseControlList(get.prompt('zhikezhugong'),'出牌阶段制衡至多四张手牌','如果没有对其他玩家使用牌，可以跳过弃牌阶段',function(event,player){
+						return 0;
+					});
+					'step 1'
+					if(result.index==0){
+						player.logSkill('zhikezhugong');
+						game.log(player,'选择了【',get.translation('zhikezhugong_zhihengzg')+'】');
+						player.addTempSkill('zhikezhugong_zhihengzg');
+					}
+					else if(result.index==1){
+						player.logSkill('zhikezhugong');
+						game.log(player,'选择了【',get.translation('zhikezhugong_kejizg')+'】');
+						player.addTempSkill('zhikezhugong_kejizg');
+					}
 				},
 				ai:{
-					order:10,
-					result:{
-						player:function(player){
-							return 1;
+					threaten:1.3,
+				},
+				subSkill:{
+					zhihengzg:{
+						audio:'zhiheng',
+						unique:true,
+						charlotte:true,
+						intro:{
+							content:function(storage){
+								return '出牌阶段制衡至多四张手牌';
+							}
+						},
+						mark:true,
+						onremove:true,
+						skillAnimation:'legend',
+						animationColor:'thunder',
+						enable:'phaseUse',
+						usable:1,
+						position:'h',
+						filterCard:true,
+						selectCard:[1,4],
+						check:function(card){
+							return 6-get.value(card)
+						},
+						content:function(){
+							player.draw(cards.length);
+						},
+						ai:{
+							order:1,
+							result:{
+								player:1
+							},
+							threaten:1.5
 						},
 					},
-				},
+					kejizg:{
+						audio:'keji',
+						unique:true,
+						charlotte:true,
+						intro:{
+							content:function(storage){
+								return '如果没有对其他玩家使用牌，可以跳过弃牌阶段';
+							}
+						},
+						mark:true,
+						onremove:true,
+						skillAnimation:'legend',
+						animationColor:'thunder',
+						trigger:{player:['phaseDiscardBefore','phaseAfter']},
+						filter:function(event,player){
+							if(event.name=='phaseDiscard'){
+								if(game.roundNumber==1&&player==game.zhu){
+									var usedCards=player.getHistory('useCard',function(evt){
+										if(evt.targets&&evt.targets.length&&evt.isPhaseUsing()){
+											var targets=evt.targets.slice(0);
+											while(targets.contains(player)) targets.remove(player);
+											return targets.length>0;
+										}
+										return false;
+									});
+									if(usedCards.length==0) {
+										return true;
+									}
+								}
+							}
+							return false;
+						},
+						content:function(){
+							trigger.cancel();
+						},
+						ai:{
+							order:10,
+							result:{
+								player:function(player){
+									return 1;
+								},
+							},
+						},
+					}
+				}
 			},
 			anlezhugong:{
 				audio:'guose',
