@@ -3254,7 +3254,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						position:'h',
 						filterCard:true,
 						selectCard:[1,4],
-						prompt:'弃置至多张手牌牌并摸等量的牌',
 						check:function(card){
 							return 6-get.value(card)
 						},
