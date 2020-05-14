@@ -3212,7 +3212,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			zhikezhugong:{
-				audio:'songwei2',
+				audio:false,
 				direct:true,
 				trigger:{player:'phaseZhunbeiBegin'},
 				content:function(){
