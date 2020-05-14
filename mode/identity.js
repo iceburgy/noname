@@ -2344,7 +2344,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			woshixiaonei:'我是小内',
 			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）回复一点体力，摸2张牌，增加一点体力上限；2）回复一点体力，摸3张牌。（响应打出牌事件时，只能默认为选项一）',
 			zhikezhugong:'制克主公',
-			zhikezhugong_info:'村规主公限定技：如果场上玩家数是6人或者更多，而且为偶数，则主公如果在第一回合内2选1：1）准备阶段使用一次手气卡；2）如果没有对其他玩家使用牌，可以跳过弃牌阶段',
+			zhikezhugong_info:'村规主公限定技：如果场上玩家数是6人或者更多，而且为偶数，则主公在第一回合内可以2选1：1）准备阶段使用一次手气卡；2）如果没有对其他玩家使用牌，可以跳过弃牌阶段',
 			zhikezhugong_zhihengzg:'制衡主公',
 			zhikezhugong_kejizg:'克己主公',
 			anlezhugong:'安乐主公',
