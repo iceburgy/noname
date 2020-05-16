@@ -13500,6 +13500,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
+					if(player.name2=='zhugeke'){
+						if(player.isUnseen(1)){
+							player.showCharacter(1);
+						}
+					}else{
+						if(player.isUnseen(0)){
+							player.showCharacter(0);
+						}
+					}
 					var cards=[];
 					if(ui.cardPile.childNodes.length<2){
 						var discardcards=get.cards(2);
@@ -13550,6 +13559,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				chooseButton:{
 					dialog:function(event,player){
+						if(player.name2=='zhugeke'){
+							if(player.isUnseen(1)){
+								player.showCharacter(1);
+							}
+						}else{
+							if(player.isUnseen(0)){
+								player.showCharacter(0);
+							}
+						}
 						return ui.create.dialog('傲才：选择一张卡牌使用',event.aocaicards);
 					},
 					filter:function(button,player){
