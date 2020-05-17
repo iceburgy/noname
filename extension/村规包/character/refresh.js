@@ -2987,7 +2987,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						for(var i=0;i<event.cards.length;i++){
-							if(get.position(event.cards[i],true)!='o'){
+							if(get.position(event.cards[i],true)!='o'&&get.position(event.cards[i],true)!='d'){
 								event.cards.splice(i,1);i--;
 							}
 						}
