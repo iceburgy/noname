@@ -15877,15 +15877,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:["xinfu_jianjie1","xinfu_jianjie2"],
 				audio:3,
 				trigger:{
-					player:"phaseZhunbeiBegin",
+					player:['phaseZhunbeiBegin','phaseAfter'],
 				},
 				forced:true,
 				direct:true,
+				init:function (player){
+					player.storage.initYin=false;
+				},
 				filter:function (event,player){
-					if(player.phaseNumber>1) return false;
-					return !game.hasPlayer(function(current){
-						return current.hasSkill('smh_huoji')||current.hasSkill('smh_lianhuan');
-					});
+					// in case of 'phaseAfter'
+					if(event.name=='phase'){
+						if(!player.storage.initYin) {
+							player.storage.initYin=true;
+						}
+						return false;
+					}
+					// in case of 'phaseZhunbeiBegin'
+					if(!player.storage.initYin) {
+						return !game.hasPlayer(function(current){
+							return current.hasSkill('smh_huoji')||current.hasSkill('smh_lianhuan');
+						});
+					}
+					return false;
 				},
 				content:function (){
 					"step 0"
@@ -15929,7 +15942,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:"phaseUse",
 				usable:1,
 				filter:function (event,player){
-					if(player.phaseNumber==1) return false;
+					if(!player.storage.initYin) {
+						return false;
+					}
 					if(!game.hasPlayer(function(current){
 						return current.hasSkill('smh_huoji')||current.hasSkill('smh_lianhuan');
 					})) return false;
