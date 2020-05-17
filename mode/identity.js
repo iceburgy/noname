@@ -2352,6 +2352,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			anlezhugong2:'安乐主公',
 			bumingzhi:'不明置',
 			tongshimingzhi:'同时明置',
+			_mingzhisuodingji:"亮将",
+			_mingzhisuodingji_info:"你可以明置拥有“锁定技”的武将牌。",
 		},
 		element:{
 			content:{
@@ -3852,6 +3854,71 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				}
+			},
+			_mingzhisuodingji:{
+				audio:'_mingzhisuodingji',
+				enable:'chooseToUse',
+				trigger:{player:'chooseToRespondBegin'},
+				filter:function (event,player){
+					var bool=false;
+					var skillm=lib.character[player.name1][3];
+					var skillv=lib.character[player.name2][3];
+					if(player.isUnseen(0)){
+						for(var i=0;i<skillm.length;i++){
+							if(get.is.locked(skillm[i])){
+								bool=true;
+							}
+						}
+					}
+					if(player.isUnseen(1)){
+						for(var i=0;i<skillv.length;i++){
+							if(get.is.locked(skillv[i])){
+								bool=true;
+							}
+						}
+					}
+					return bool;
+				},
+				filterTarget:function(card,player,target){
+					return target==player;
+				},
+				content:function (){
+					"step 0"
+					var choice=[];
+					var skillm=lib.character[player.name1][3];
+					var skillv=lib.character[player.name2][3];
+					if(player.isUnseen(0)){
+						for(var i=0;i<skillm.length;i++){
+							if(get.is.locked(skillm[i])&&!choice.contains('明置主将')){
+								choice.push("明置主将");
+							}
+						}
+					}
+					if(player.isUnseen(1)){
+						for(var i=0;i<skillv.length;i++){
+							if(get.is.locked(skillv[i])&&!choice.contains('明置副将')){
+								choice.push("明置副将");
+							}
+						}
+					}
+					if(choice.length==2) choice.push('全部明置')
+					player.chooseControl(choice);
+					"step 1"
+					if(result.control){
+						switch(result.control){
+							case "取消":break;
+							case "明置主将":player.showCharacter(0);break;
+							case "明置副将":player.showCharacter(1);break;
+							case "全部明置":player.showCharacter(2);break;
+						}
+					}
+				},
+				ai:{
+					order:11,
+					result:{
+						player:-99,
+					},
+				},
 			},
 		},
 		help:{
