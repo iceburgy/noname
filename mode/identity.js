@@ -315,7 +315,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					identity:players[i].identity
 				});
 				if(players[i].identity=='nei'&&players.length>4){
-				    players[i].hiddenSkills.add('woshixiaonei');
+					game.addGlobalSkill('woshixiaonei');
 				}
                 if(players[i].identity=='zhu'&&players.length>=6&&players.length%2==0){
                     game.broadcastAll(function(player){
@@ -3157,7 +3157,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mark:false,
 				limited:true,
 				audio:'yeyan',
-				enable:['chooseToUse','chooseToRespond'],
+				enable:'chooseToUse',
+				trigger:{player:'chooseToRespondBegin'},
 				init:function(player){
 					player.storage.woshixiaonei=false;
 				},
@@ -3170,16 +3171,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return target==player;
 				},
-                onrespond:function(result,player){
-					player.storage.woshixiaonei=true;
-                    player.gainMaxHp();
-                    player.draw(2);
-                    player.recover();
-                    game.broadcastAll(function(player){
-                        player.showIdentity();
-                    },player);
-                    result.parent.parent.redo();
-                },
 				content:function(){
 					'step 0'
 					player.storage.woshixiaonei=true;
@@ -3201,7 +3192,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                         game.broadcastAll(function(player){
                             player.showIdentity();
                         },player);
-                        event.parent.parent.parent.redo();
+                        game.removeGlobalSkill('woshixiaonei');
                     }
 				},
 				ai:{
