@@ -15001,6 +15001,12 @@
 					// }
 
 					game.broadcastAll(function(player){
+						if(player.name=='simahui'||player.name1=='simahui'||player.name2=='simahui'){
+							for(var i=0;i<game.players.length;i++){
+								game.players[i].removeSkill('smh_huoji');
+								game.players[i].removeSkill('smh_lianhuan');
+							}
+						}
 						player.classList.add('dead');
 						player.removeLink();
 						player.classList.remove('turnedover');
