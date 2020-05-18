@@ -3194,6 +3194,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                         },player);
                         game.removeGlobalSkill('woshixiaonei');
                     }
+					// event hierarchy:
+					// thisskillname/useSkill/chooseToUse/sha - huihewai, need redo
+					// thisskillname/useSkill/_wuxie/trigger/arrangeTrigger/tiesuo - huihewai, need redo
+					// thisskillname/useSkill/chooseToUse/phaseUse/phase - huihenei
+					// thisskillname/trigger/arrangeTrigger/chooseToRespond/wanjian
+					// we need to redo huihewai useSkill
+					var useSkillEvent=event.parent;
+					if(useSkillEvent&&useSkillEvent.name=='useSkill'){
+						if(useSkillEvent.parent) {
+							if(useSkillEvent.parent.name=='_wuxie'||useSkillEvent.parent.name=='chooseToUse'&&useSkillEvent.parent.parent.name!='phaseUse') {
+								useSkillEvent.parent.parent.redo();
+							}
+						}
+					}
 				},
 				ai:{
 					order:10,
@@ -3901,6 +3915,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							case "明置主将":player.showCharacter(0);break;
 							case "明置副将":player.showCharacter(1);break;
 							case "全部明置":player.showCharacter(2);break;
+						}
+					}
+					// event hierarchy:
+					// thisskillname/useSkill/chooseToUse/sha - huihewai, need redo
+					// thisskillname/useSkill/_wuxie/trigger/arrangeTrigger/tiesuo - huihewai, need redo
+					// thisskillname/useSkill/chooseToUse/phaseUse/phase - huihenei
+					// thisskillname/trigger/arrangeTrigger/chooseToRespond/wanjian
+					// we need to redo huihewai useSkill
+					var useSkillEvent=event.parent;
+					if(useSkillEvent&&useSkillEvent.name=='useSkill'){
+						if(useSkillEvent.parent) {
+							if(useSkillEvent.parent.name=='_wuxie'||useSkillEvent.parent.name=='chooseToUse'&&useSkillEvent.parent.parent.name!='phaseUse') {
+								useSkillEvent.parent.parent.redo();
+							}
 						}
 					}
 				},
