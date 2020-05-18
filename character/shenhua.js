@@ -4862,18 +4862,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			weimu:{
-				trigger:{global:'useCard'},
+				trigger:{target:'useCardToTarget',player:'addJudgeBefore'},
 				audio:2,
 				forced:true,
-				filter:function (event,player,card){
-					if(get.color(event.card)!='black') return false;
-					return event.card.name=='nanman'&&player!=event.player||event.card.name=='wanjian'&&player!=event.player||event.card.name=='taoyuan'&&player.hp<player.maxHp||event.card.name=='wugu';
+				filter:function (event,player){
+					return get.type(event.card,'trick')=='trick'&&get.color(event.card)=='black';
 				},
-				content:function(){},
+				priority:15,
+				check:function(event,player){
+					return event.name=='addJudge'||(event.card.name!='chiling'&&get.effect(event.target,event.card,event.player,player)<0);
+				},
+				content:function(){
+					if(trigger.name=='addJudge'){
+						trigger.cancel();
+						for(var i=0;i<trigger.cards.length;i++){
+							trigger.cards[i].discard();
+						}
+					}
+					else trigger.getParent().targets.remove(player);
+				},
 				mod:{
 					targetEnabled:function(card){
 						if((get.type(card)=='trick'||get.type(card)=='delay')&&
 							get.color(card)=='black') return false;
+					}
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current){
+							if(get.type(card,'trick')=='trick'&&get.color(card)=='black') return 'zeroplayertarget';
+						},
 					}
 				}
 			},
@@ -4897,6 +4915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			bazhen:{
+				locked:true,
 				audio:2,
 				audioname:['re_sp_zhugeliang','ol_sp_zhugeliang','ol_pangtong'],
 				equipSkill:true,
