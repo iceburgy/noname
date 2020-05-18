@@ -20828,7 +20828,7 @@
 					if(sourceSkill&&sourceSkill.sourceSkill){
 						skill=sourceSkill.sourceSkill;
 					}
-					if(lib.skill.global.contains(skill)) return false;
+					if(lib.skill.global.contains(skill)&&skill!='woshixiaonei') return false;
 					if((get.mode()!='guozhan'&&get.mode()!='identity')||game.expandSkills(this.getSkills()).contains(skill)){
 						if(showonly){
 							return false;
