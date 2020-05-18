@@ -13492,7 +13492,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			aocai:{
 				audio:2,
-				trigger:{player:'chooseToRespondBegin'},
+				trigger:{player:['chooseToUseBegin','chooseToRespondBegin']},
 				frequent:true,
 				filter:function(event,player){
 					if(event.responded) return false;
@@ -13500,15 +13500,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					if(player.name2=='zhugeke'){
-						if(player.isUnseen(1)){
-							player.showCharacter(1);
-						}
-					}else{
-						if(player.isUnseen(0)){
-							player.showCharacter(0);
-						}
-					}
 					var cards=[];
 					if(ui.cardPile.childNodes.length<2){
 						var discardcards=get.cards(2);
@@ -13527,6 +13518,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.responded=true;
 						result.links[0].remove();
 						trigger.result={bool:true,card:result.links[0]}
+					}else{
+						game.log(player,'傲才发动未遂');
 					}
 				},
 				ai:{
@@ -13537,73 +13530,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				group:'aocai2',
-			},
-			aocai2:{
-				enable:'chooseToUse',
-				filter:function(event,player){
-					return _status.currentPhase!==player&&event.type!='wuxie'&&event.type!='trickuse';
-				},
-				onChooseToUse:function(event){
-					if(!game.online){
-						var cards=[];
-						if(ui.cardPile.childNodes.length<2){
-							var discardcards=get.cards(2);
-							game.cardsDiscard(discardcards);
-						}
-						for(var i=0;i<2;i++){
-							if(ui.cardPile.childNodes.length>i) cards.push(ui.cardPile.childNodes[i]);
-						}
-						event.set('aocaicards',cards);
-					}
-				},
-				chooseButton:{
-					dialog:function(event,player){
-						if(player.name2=='zhugeke'){
-							if(player.isUnseen(1)){
-								player.showCharacter(1);
-							}
-						}else{
-							if(player.isUnseen(0)){
-								player.showCharacter(0);
-							}
-						}
-						return ui.create.dialog('傲才：选择一张卡牌使用',event.aocaicards);
-					},
-					filter:function(button,player){
-						var evt=_status.event.getParent();
-						if(evt&&evt.filterCard){
-							return get.type(button.link)=='basic'&&evt.filterCard(button.link,player,evt);
-						}
-						return false;
-					},
-					check:function(button){
-						return 1;
-					},
-					backup:function(links,player){
-						return {
-							audio:'aocai',
-							filterCard:function(){return false},
-							selectCard:-1,
-							viewAs:links[0],
-						}
-					},
-					prompt:function(links,player){
-						return '选择'+get.translation(links)+'的目标';
-					}
-				},
-				ai:{
-					order:11,
-					respondShan:true,
-					respondSha:true,
-					save:true,
-					result:{
-						player:function(player){
-							if(_status.event.dying) return get.attitude(player,_status.event.dying);
-							return 1;
-						}
-					}
-				}
 			},
 			hongyuan:{
 				trigger:{player:'phaseDrawBegin2'},
