@@ -2004,7 +2004,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						list=event.list.randomGets(8);
 					}
 					else{
-						list=list2.concat(list3.randomGets(5));
+						var choiceZhu=5;
+						if(lib.configOL.choice_zhu){
+							choiceZhu=parseInt(lib.configOL.choice_zhu);
+						}
+						list=list2.concat(list3.randomGets(choiceZhu));
 					}
 					var next=game.zhu.chooseButton(true);
 					next.set('selectButton',(lib.configOL.double_character?2:1));
@@ -2140,8 +2144,26 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							else{
-								if(game.players[i].identity=='nei'){
-									num3=num2;
+								switch(game.players[i].identity){
+									case 'zhong':
+										if(lib.configOL.choice_zhong){
+											num3=parseInt(lib.configOL.choice_zhong)-num;
+										}
+										break;
+									case 'fan':
+										if(lib.configOL.choice_fan){
+											num3=parseInt(lib.configOL.choice_fan)-num;
+										}
+										break;
+									case 'nei':
+										if(lib.configOL.choice_zhong){
+											num3=parseInt(lib.configOL.choice_nei)-num;
+										}else{
+											num3=num2;
+										}
+										break;
+									default:
+										break;
 								}
 							}
 							var str='选择角色';
