@@ -34223,6 +34223,58 @@
 									init:false,
 									connect:true
 								};
+								infoconfig.connect_choice_zhu={
+									name:'主公候选武将数',
+									init:'3',
+									restart:true,
+									item:{
+										'3':'三',
+										'4':'四',
+										'5':'五',
+										'6':'六',
+										'7':'七',
+										'8':'八',
+									},
+								};
+								infoconfig.connect_choice_zhong={
+									name:'忠臣候选武将数',
+									init:'3',
+									restart:true,
+									item:{
+										'3':'三',
+										'4':'四',
+										'5':'五',
+										'6':'六',
+										'7':'七',
+										'8':'八',
+									},
+								};
+								infoconfig.connect_choice_fan={
+									name:'反贼候选武将数',
+									init:'3',
+									restart:true,
+									item:{
+										'3':'三',
+										'4':'四',
+										'5':'五',
+										'6':'六',
+										'7':'七',
+										'8':'八',
+									},
+								};
+								infoconfig.connect_choice_nei={
+									name:'内奸候选武将数',
+									init:'3',
+									restart:true,
+									item:{
+										'3':'三',
+										'4':'四',
+										'5':'五',
+										'6':'六',
+										'7':'七',
+										'8':'八',
+									},
+								};
 							}
 							for(var j in infoconfig){
 								if(j==='update'){
