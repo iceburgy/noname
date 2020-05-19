@@ -39,7 +39,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_huanggai:['male','wu',4,['rekurou','zhaxiang']],
 			re_lvbu:['male','qun',5,['wushuang','new_liyu']],
 			re_gongsunzan:['male','qun',4,['qiaomeng','reyicong']],
-			re_huatuo:['male','qun',3,['jijiu','new_reqingnang']],
+			re_huatuo:['male','qun',3,['jijiu','rechuli']],
 			re_liubei:['male','shu',4,['rerende','jijiang'],['zhu']],
 			re_diaochan:['female','qun',3,['lijian','rebiyue']],
 			re_huangyueying:['female','shu',3,['rejizhi','reqicai']],
@@ -2715,6 +2715,57 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					threaten:2,
+				},
+			},
+			rechuli:{
+				audio:"chulao",
+				enable:"phaseUse",
+				usable:1,
+				filterTarget:function (card,player,target){
+					if(player==target) return false;
+					if(target.group=='unknown') return false;
+					for(var i=0;i<ui.selected.targets.length;i++){
+						if(ui.selected.targets[i].group==target.group) return false;
+					}
+					return target.countCards('he')>0;
+				},
+				filter:function (event,player){
+					return player.countCards('he')>0;
+				},
+				filterCard:true,
+				position:"he",
+				selectTarget:[1,4],
+				check:function (card){
+					if(get.suit(card)=='spade') return 8-get.value(card);
+					return 5-get.value(card);
+				},
+				contentBefore:function(){
+					var evt=event.getParent();
+					evt.draw=[];
+					if(get.suit(cards[0])=='spade') evt.draw.push(player);
+				},
+				content:function (){
+					"step 0"
+					player.discardPlayerCard(target,'he',true);
+					"step 1"
+					if(result.bool){
+						if(get.suit(result.cards[0])=='spade') event.getParent().draw.push(target);
+					}
+				},
+				contentAfter:function(){
+					'step 0'
+					var list=event.getParent().draw;
+					if(!list.length) event.finish();
+					else game.asyncDraw(list);
+					'step 1'
+					game.delay();
+				},
+				ai:{
+					result:{
+						target:-1,
+					},
+					threaten:1.2,
+					order:3,
 				},
 			},
 			"new_reyaowu":{
@@ -5481,6 +5532,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"qingjian_add_info":"",
 			"new_reqingnang":"青囊",
 			"new_reqingnang_info":"出牌阶段，你可以弃置一张手牌，令一名本回合内未成为过〖青囊〗的目标的角色回复一点体力。若你弃置的是黑色牌，则你本回合内不能再发动〖青囊〗。",
+			"rechuli":"除疠",
+			"rechuli_info":"出牌阶段限一次，你可以选择任意名势力各不相同的其他角色，然后你弃置你和这些角色的各一张牌。被弃置黑桃牌的角色各摸一张牌。",
 			"new_reyaowu":"耀武",
 			"new_reyaowu_info":"锁定技，当一名角色使用【杀】对你造成伤害时，若此杀为红色，该角色回复1点体力或摸一张牌。否则则你摸一张牌。",
 			reqingguo:'倾国',
