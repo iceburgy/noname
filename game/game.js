@@ -32807,10 +32807,6 @@
 			}
 		},
 		showChangeLogWorker:function(forceShow){
-			if(forceShow&&!_status.connectMode){
-				alert("请切换到联机模式下查看");
-				return;
-			}
 			if(forceShow||lib.version!=lib.config.version||_status.extensionChangeLog){
 				var ul=document.createElement('ul');
 				ul.style.textAlign='left';
