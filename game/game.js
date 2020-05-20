@@ -32806,13 +32806,13 @@
 				}
 			}
 		},
-		showChangeLogWorker:function(forceShow){
-			if(forceShow||lib.version!=lib.config.version||_status.extensionChangeLog){
+		showChangeLog:function(){
+			if(lib.version!=lib.config.version||_status.extensionChangeLog){
 				var ul=document.createElement('ul');
 				ul.style.textAlign='left';
 				var caption;
 				var players=null,cards=null;
-				if(forceShow||lib.version!=lib.config.version){
+				if(lib.version!=lib.config.version){
 					for(var i=0;i<lib.changeLog.length;i++){
 						if(lib.changeLog[i].indexOf('players://')==0){
 							try{
@@ -32896,9 +32896,6 @@
 				});
 				lib.init.onfree();
 			}
-		},
-		showChangeLog:function(){
-			game.showChangeLogWorker(false);
 		},
 		showExtensionChangeLog:function(str,extname){
 			extname=extname||_status.extension;
@@ -39188,7 +39185,8 @@
 						var button1,button2,button3,button4,button5;
 
 						game.displayChangeLog=function(){
-							game.showChangeLogWorker(true);
+							game.saveConfig('version','0');
+							game.reload();
 						};
 						game.checkForAssetUpdate=function(type){
 							if(button2.disabled){
@@ -39371,7 +39369,8 @@
 							updatepx.style.whiteSpace='nowrap';
 							updatepx.style.marginTop='8px';
 							var buttonx=ui.create.node('button','查看更新内容',function(){
-								game.showChangeLogWorker(true);
+								game.saveConfig('version','0');
+								game.reload();
 							});
 							updatepx.appendChild(buttonx);
 							ui.updateUpdate=function(){
