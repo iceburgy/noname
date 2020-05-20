@@ -6864,6 +6864,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.list=game.filterPlayer(function(current){
 						return current!=player&&current.isUnseen(0);
 					});
+					if(!event.list||event.list.length==0) event.goto(4);
 					'step 1'
 					event.current=event.list.shift();
 					if(event.current.isUnseen()){
