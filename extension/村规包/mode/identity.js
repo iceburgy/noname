@@ -192,9 +192,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				step1();
 			}
 			else{
-				if(!_status.connectMode){
-					game.showChangeLog();
-				}
+				game.showChangeLog();
 			}
 			"step 3"
 			if(typeof _status.new_tutorial=='function'){

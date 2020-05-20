@@ -3,6 +3,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'connect',
 		start:function(){
+			"step 0"
+			game.showChangeLog();
+			"step 1"
 			var directstartmode=lib.config.directstartmode;
 			ui.create.menu(true);
 			event.textnode=ui.create.div('','输入联机地址');
