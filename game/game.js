@@ -32852,13 +32852,7 @@
 					ul.appendChild(li);
 				}
 				var dialog=ui.create.dialog(caption,'hidden');
-				if(_status.connectMode){
-					dialog.classList.add('menu');
-				}else{
-					dialog.classList.add('withbg');
-				}
-
-
+				dialog.classList.add('withbg');
 				var lic=ui.create.div(dialog.content);
 				lic.style.display='block';
 				ul.style.display='inline-block';
