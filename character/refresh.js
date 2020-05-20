@@ -2742,14 +2742,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				contentBefore:function(){
 					var evt=event.getParent();
 					evt.draw=[];
-					if(get.suit(cards[0])=='spade') evt.draw.push(player);
+					if(get.suit(cards[0],player)=='spade') evt.draw.push(player);
 				},
 				content:function (){
 					"step 0"
 					player.discardPlayerCard(target,'he',true);
 					"step 1"
 					if(result.bool){
-						if(get.suit(result.cards[0])=='spade') event.getParent().draw.push(target);
+						if(get.suit(result.cards[0],target)=='spade') event.getParent().draw.push(target);
 					}
 				},
 				contentAfter:function(){
