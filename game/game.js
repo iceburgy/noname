@@ -27,11 +27,11 @@
 		configprefix:'noname_0.9_',
 		versionOL:27,
 		updateURLS:{
-			coding:'https://nakamurayuri.coding.net/p/noname/d/noname/git/raw',
-			github:'https://raw.githubusercontent.com/libccy/noname',
+			coding:'https://raw.githubusercontent.com/iceburgy/noname',
+			github:'https://raw.githubusercontent.com/iceburgy/noname',
 		},
-		updateURL:'https://raw.githubusercontent.com/libccy/noname',
-		mirrorURL:'https://nakamurayuri.coding.net/p/noname/d/noname/git/raw',
+		updateURL:'https://raw.githubusercontent.com/iceburgy/noname',
+		mirrorURL:'https://raw.githubusercontent.com/iceburgy/noname',
 		hallURL:'noname.mobi',
 		assetURL:'',
 		changeLog:[],
@@ -39187,6 +39187,228 @@
 							game.saveConfig('version','0');
 							game.reload();
 						};
+
+						game.checkForUpdate=function(forcecheck,dev){
+							if(!dev&&button1.disabled){
+								return;
+							}
+							else if(dev&&button3.disabled){
+								return;
+							}
+							else if(!game.download){
+								alert('此版本不支持游戏内更新，请手动更新');
+								return;
+							}
+							else{
+								if(dev){
+									button3.innerHTML='正在检查更新';
+								}
+								else{
+									button1.innerHTML='正在检查更新';
+								}
+								button3.disabled=true;
+								button1.disabled=true;
+
+								var goupdate=function(files,update){
+									lib.version=update.version;
+									if(update.dev&&!lib.config.debug){
+										dev='nodev';
+									}
+									lib.init.req('game/source.js',function(){
+										try{
+											eval(this.responseText);
+											if(!window.noname_source_list){
+												throw('err');
+											}
+										}
+										catch(e){
+											alert('更新地址有误');
+											console.log(e);
+											return;
+										}
+
+										var updates=window.noname_source_list;
+										delete window.noname_source_list;
+										if(Array.isArray(files)){
+											files.add('game/update.js');
+											var files2=[];
+											for(var i=0;i<files.length;i++){
+												var str=files[i].indexOf('*');
+												if(str!=-1){
+													str=files[i].slice(0,str);
+													files.splice(i--,1);
+													for(var j=0;j<updates.length;j++){
+														if(updates[j].indexOf(str)==0){
+															files2.push(updates[j]);
+														}
+													}
+												}
+											}
+											updates=files.concat(files2);
+										}
+										for(var i=0;i<updates.length;i++){
+											if(updates[i].indexOf('theme/')==0&&updates[i].indexOf('.css')==-1){
+												updates.splice(i--,1);
+											}
+											else if(updates[i].indexOf('node_modules/')==0&&!update.node){
+												updates.splice(i--,1);
+											}
+										}
+
+										if(!ui.arena.classList.contains('menupaused')){
+											ui.click.configMenu();
+											ui.click.menuTab('其它');
+										}
+										var p=button1.parentNode;
+										button1.remove();
+										button3.remove();
+										var span=document.createElement('span');
+										var n1=0;
+										var n2=updates.length;
+										span.innerHTML='正在下载文件（'+n1+'/'+n2+'）';
+										p.appendChild(span);
+										var finish=function(){
+											span.innerHTML='游戏更新完毕（'+n1+'/'+n2+'）';
+											p.appendChild(document.createElement('br'));
+											var button=document.createElement('button');
+											button.innerHTML='重新启动';
+											button.onclick=game.reload;
+											button.style.marginTop='8px';
+											p.appendChild(button);
+										}
+										game.multiDownload(updates,function(){
+											n1++;
+											span.innerHTML='正在下载文件（'+n1+'/'+n2+'）';
+										},function(e){
+											game.print('下载失败：'+e.source);
+										},function(){
+											setTimeout(finish,500);
+										},null,dev);
+									},function(){
+										alert('更新地址有误');
+									},true);
+								};
+
+								lib.init.req('game/update.js',function(){
+									try{
+										eval(this.responseText);
+										if(!window.noname_update){
+											throw('err');
+										}
+									}
+									catch(e){
+										alert('更新地址有误');
+										console.log(e);
+										return;
+									}
+
+									var update=window.noname_update;
+									delete window.noname_update;
+									if(forcecheck===false){
+										if(update.version==lib.config.check_version){
+											return;
+										}
+									}
+									game.saveConfig('check_version',update.version);
+									var goon=true;
+									if(!dev){
+										if(update.version.indexOf('beta')!=-1||update.version==lib.version){
+											goon=false;
+										}
+									}
+									if(goon){
+										var files=null;
+										var version=lib.version;
+										if(Array.isArray(update.dev)&&dev){
+											files=update.dev;
+										}
+										else if(Array.isArray(update.files)&&update.update&&!dev){
+											var version1=version.split('.');
+											var version2=update.update.split('.');
+											for(var i=0;i<version1.length&&i<version2.length;i++){
+												if(version2[i]>version1[i]){
+													files=false;break;
+												}
+												else if(version1[i]>version2[i]){
+													files=update.files.slice(0);break;
+												}
+											}
+											if(files===null){
+												if(version1.length>=version2.length){
+													files=update.files.slice(0);
+												}
+											}
+										}
+										var str;
+										if(dev){
+											str='开发版仅供测试使用，可能存在风险，是否确定更新？'
+										}
+										else{
+											str='有新版本'+update.version+'可用，是否下载？';
+										}
+										if(navigator.notification&&navigator.notification.confirm){
+											var str2;
+											if(dev){
+												str2=str;
+												str='更新到开发版';
+											}
+											else{
+												str2=update.changeLog[0];
+												for(var i=1;i<update.changeLog.length;i++){
+													if(update.changeLog[i].indexOf('://')==-1){
+														str2+='；'+update.changeLog[i];
+													}
+												}
+											}
+											navigator.notification.confirm(
+												str2,
+												function(index){
+													if(index==1){
+														goupdate(files,update);
+													}
+													else{
+														button1.disabled=false;
+														button1.innerHTML='检查游戏更新';
+														button3.disabled=false;
+														button3.innerHTML='更新到开发版';
+													}
+												},
+												str,
+												['确定','取消']
+											);
+										}
+										else{
+											if(confirm(str)){
+												goupdate(files,update);
+											}
+											else{
+												button1.disabled=false;
+												button1.innerHTML='检查游戏更新';
+												button3.disabled=false;
+												button3.innerHTML='更新到开发版';
+											}
+										}
+									}
+									else{
+										alert('当前村规版本已是最新');
+										button1.disabled=false;
+										button1.innerHTML='检查游戏更新';
+										button3.disabled=false;
+										button3.innerHTML='更新到开发版';
+										game.displayChangeLog;
+									}
+								},function(){
+									if(forcecheck===false){
+										return;
+									}
+									alert('连接失败');
+									button1.disabled=false;
+									button1.innerHTML='检查游戏更新';
+									button3.disabled=false;
+									button3.innerHTML='更新到开发版';
+								},true);
+							}
+						};
 						game.checkForAssetUpdate=function(type){
 							if(button2.disabled){
 								return;
@@ -39353,9 +39575,19 @@
 						};
 
 						button1=document.createElement('button');
-						button1.innerHTML='查看更新内容';
-						button1.onclick=game.displayChangeLog;
+						button1.innerHTML='检查村规更新';
+						button1.onclick=game.checkForUpdate;
 						li1.lastChild.appendChild(button1);
+
+						button3=document.createElement('button');
+						button3.innerHTML='更新到开发版';
+						button3.style.marginLeft='5px';
+						button3.onclick=function(){
+							game.checkForUpdate(null,true);
+						};
+						// if(lib.config.dev){
+						//     li1.lastChild.appendChild(button3);
+						// }
 
 						(function(){
 							var updatep1=li1.querySelector('p');
@@ -39367,7 +39599,7 @@
 							updatepx.style.display='none';
 							updatepx.style.whiteSpace='nowrap';
 							updatepx.style.marginTop='8px';
-							var buttonx=ui.create.node('button','查看更新内容',function(){
+							var buttonx=ui.create.node('button','查看村规更新内容',function(){
 								game.saveConfig('version','0');
 								game.reload();
 							});
@@ -42077,6 +42309,11 @@
 					(lib.arenaReady.shift())();
 				}
 				delete lib.arenaReady;
+				if(lib.config.auto_check_update){
+					setTimeout(function(){
+						game.checkForUpdate(false);
+					},3000);
+				}
 				if(!lib.config.asset_version){
 					lib.onfree.push(function(){
 						setTimeout(function(){
