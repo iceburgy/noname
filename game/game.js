@@ -12831,9 +12831,9 @@
 							if(hs.length){
 								event.dialog.addText('手牌区');
 								hs.randomSort();
+								directh=false;
 								if(event.visible||target.isUnderControl(true)){
 									event.dialog.add(hs);
-									directh=false;
 								}
 								else{
 									event.dialog.add([hs,'blank']);
@@ -12949,9 +12949,9 @@
 							if(hs.length){
 								event.dialog.addText('手牌区');
 								hs.randomSort();
+								directh=false;
 								if(event.visible||target.isUnderControl(true)){
 									event.dialog.add(hs);
-									directh=false;
 								}
 								else{
 									event.dialog.add([hs,'blank']);
@@ -13094,9 +13094,9 @@
 							if(hs.length){
 								event.dialog.addText('手牌区');
 								hs.randomSort();
+								directh=false;
 								if(event.visible||target.isUnderControl(true)){
 									event.dialog.add(hs);
-									directh=false;
 								}
 								else{
 									event.dialog.add([hs,'blank']);
