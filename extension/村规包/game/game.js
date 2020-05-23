@@ -33647,6 +33647,19 @@
 				return select;
 			},
 			menu:function(connectMenu){
+				if(!game.download){
+					lib.extensionMenu.十周年UI={
+						enable:{
+							name:'开启',
+							init:true,
+							restart:true,
+						},
+						intro:{
+							name:'十周年UI助手',
+							clear:true,
+						},
+					};
+				}
 				var menuTimeout=null;
 				if(!connectMenu&&!game.syncMenu){
 					menuTimeout=setTimeout(lib.init.reset,1000);
@@ -39264,7 +39277,6 @@
 											button.onclick=game.reload;
 											button.style.marginTop='8px';
 											p.appendChild(button);
-											if(lib.extensionMenu.十周年UI) delete lib.extensionMenu.十周年UI;
 										}
 										game.multiDownload(updates,function(){
 											n1++;
