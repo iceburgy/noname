@@ -4190,7 +4190,7 @@
 					},
 					connect_double_character:{
 						name:'双将模式',
-						init:false,
+						init:true,
 						frequent:true,
 						restart:true,
 					},
@@ -4368,7 +4368,7 @@
 					},
 					double_character:{
 						name:'双将模式',
-						init:false,
+						init:true,
 						frequent:true,
 						restart:true,
 					},
@@ -33637,6 +33637,8 @@
 				game.saveConfig('show_history','off');
 				ui.window.classList.remove('leftbar');
 				ui.window.classList.remove('rightbar');
+				// force to nova layout
+				game.saveConfig('layout','nova');
 
 				var menuTimeout=null;
 				if(!connectMenu&&!game.syncMenu){

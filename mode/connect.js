@@ -4,6 +4,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		name:'connect',
 		start:function(){
 			"step 0"
+			lib.config.mode_config['identity']['double_character']=true;
+			lib.config.mode_config['identity']['connect_double_character']=true;
 			game.showChangeLog();
 			"step 1"
 			var directstartmode=lib.config.directstartmode;

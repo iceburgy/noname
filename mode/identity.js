@@ -24,6 +24,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			if(!lib.config.new_tutorial){
 				ui.arena.classList.add('only_dialog');
 			}
+			// force double_character to true
+			lib.config.mode_config['identity']['double_character']=true;
+			lib.config.mode_config['identity']['connect_double_character']=true;
 			_status.mode=get.config('identity_mode');
 			if(_status.brawl&&_status.brawl.submode){
 				_status.mode=_status.brawl.submode;
