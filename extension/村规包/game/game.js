@@ -39384,7 +39384,7 @@
 										button1.innerHTML='检查游戏更新';
 										button3.disabled=false;
 										button3.innerHTML='更新到开发版';
-										game.displayChangeLog;
+										game.displayChangeLog();
 									}
 								},function(){
 									if(forcecheck===false){
