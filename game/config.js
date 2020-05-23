@@ -146,6 +146,7 @@ window.config={
 			player_number:8,
 			auto_identity:'off',
 			double_character:true,
+			connect_double_character:true,
 			save_progress:true,
 			free_choose:true,
 			swap:true,
