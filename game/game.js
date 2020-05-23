@@ -2901,34 +2901,6 @@
 							map.show_extensionshare.hide();
 						}
 					},
-					show_history:{
-						name:'出牌记录栏',
-						init:'off',
-						intro:'在屏幕左侧或右侧显示出牌记录',
-						unfrequent:true,
-						item:{
-							off:'关闭',
-							left:'靠左',
-							right:'靠右',
-						},
-						onclick:function(bool){
-							if(lib.config.show_history=='right') ui.window.animate('rightbar2');
-							game.saveConfig('show_history',bool);
-							if(_status.video||!_status.prepareArena) return;
-							if(bool=='left'){
-								ui.window.classList.add('leftbar');
-								ui.window.classList.remove('rightbar');
-							}
-							else if(bool=='right'){
-								ui.window.classList.remove('leftbar');
-								ui.window.classList.add('rightbar');
-							}
-							else{
-								ui.window.classList.remove('leftbar');
-								ui.window.classList.remove('rightbar');
-							}
-						}
-					},
 					pop_logv:{
 						name:'自动弹出记录',
 						init:false,
@@ -33647,6 +33619,7 @@
 				return select;
 			},
 			menu:function(connectMenu){
+				// adding 十周年UI/导入助手 for web version
 				if(!game.download){
 					lib.extensionMenu.十周年UI={
 						enable:{
@@ -33660,6 +33633,11 @@
 						},
 					};
 				}
+				// remove show_history bar
+				game.saveConfig('show_history','off');
+				ui.window.classList.remove('leftbar');
+				ui.window.classList.remove('rightbar');
+
 				var menuTimeout=null;
 				if(!connectMenu&&!game.syncMenu){
 					menuTimeout=setTimeout(lib.init.reset,1000);

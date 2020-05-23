@@ -140,6 +140,7 @@ window.config={
 	addedpile:{},
 
 	mode:'identity',
+	show_replay:true,
 	mode_config:{
 		global:{
 			player_number:8,
