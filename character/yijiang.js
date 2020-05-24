@@ -4175,7 +4175,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.jiaozhao=cards[0];
 					player.storage.jiaozhao_card=fakecard;
 					game.broadcastAll(function(name){
-						lib.skill.jiaozhao2.viewAs=fakecard;
+						lib.skill.jiaozhao2.viewAs=name;
 					},fakecard);
 					var next=game.createEvent('jiaozhao3');
 					event.next.remove(next);
