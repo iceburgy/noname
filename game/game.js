@@ -39349,7 +39349,6 @@
 										button1.innerHTML='检查游戏更新';
 										button3.disabled=false;
 										button3.innerHTML='更新到开发版';
-										game.displayChangeLog();
 									}
 								},function(){
 									if(forcecheck===false){
@@ -39539,6 +39538,15 @@
 							game.checkForUpdate(null,false);
 						};
 						li1.lastChild.appendChild(button1);
+
+						var buttonShowChangeLog=document.createElement('button');
+						buttonShowChangeLog.innerHTML='查看村规更新内容';
+						buttonShowChangeLog.onclick=function(){
+							game.displayChangeLog();
+						};
+						var buttonShowChangeLogP=document.createElement('p');
+						buttonShowChangeLogP.appendChild(buttonShowChangeLog);
+						li1.lastChild.appendChild(buttonShowChangeLogP);
 
 						button3=document.createElement('button');
 						button3.innerHTML='更新到开发版';
