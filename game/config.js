@@ -88,7 +88,8 @@ window.config={
 	show_statusbar_ios:'off',
 	show_statusbar_android:false,
 	show_name:true,
-	show_replay:false,
+	show_replay:true,
+	auto_check_update:true,
 	show_round_menu:true,
 	show_pause:true,
 	show_auto:true,
@@ -140,7 +141,6 @@ window.config={
 	addedpile:{},
 
 	mode:'identity',
-	show_replay:true,
 	mode_config:{
 		global:{
 			player_number:8,
