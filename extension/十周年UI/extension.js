@@ -6,17 +6,6 @@ content:function(config, pack){
 	var extensionPath = lib.assetURL + 'extension/' + extensionName + '/';
     if (!(extension && extension.enable && extension.enable.init)) return;
 
-	switch(lib.config.layout){
-        case 'long2':
-        case 'nova':
-            break;
-        default:
-            alert('十周年UI提醒您，请更换<手杀>、<新版>布局以获得良好体验（在选项-外观-布局）。');
-            break;
-    }
-
-
-
 	console.time(extensionName);
 	window.decadeUI = {
 		init:function(){

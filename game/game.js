@@ -39530,11 +39530,6 @@
 						button1=document.createElement('button');
 						button1.innerHTML='检查村规更新';
 						button1.onclick=function(){
-							if(!lib.config.extensions.contains('十周年UI')){
-								lib.config.extensions.add('十周年UI');
-								game.saveConfig('extensions',lib.config.extensions);
-								game.saveConfig('extension_'+'十周年UI'+'_enable',true);
-							}
 							game.checkForUpdate(null,false);
 						};
 						li1.lastChild.appendChild(button1);
@@ -39569,12 +39564,6 @@
 							updatepx.style.whiteSpace='nowrap';
 							updatepx.style.marginTop='8px';
 							var buttonx=ui.create.node('button','查看村规更新内容',function(){
-								if(!lib.config.extensions.contains('十周年UI')){
-									lib.config.extensions.add('十周年UI');
-									game.saveConfig('extensions',lib.config.extensions);
-									game.saveConfig('extension_'+'十周年UI'+'_enable',true);
-									game.reload();
-								}
 								game.displayChangeLog();
 							});
 							updatepx.appendChild(buttonx);
@@ -42283,6 +42272,13 @@
 					(lib.arenaReady.shift())();
 				}
 				delete lib.arenaReady;
+
+				if(!lib.config.extensions.contains('十周年UI')){
+					lib.config.extensions.add('十周年UI');
+					game.saveConfig('extensions',lib.config.extensions);
+					game.saveConfig('extension_'+'十周年UI'+'_enable',true);
+					game.reload();
+				}
 				if(lib.config.auto_check_update&&game.download){
 					setTimeout(function(){
 						game.checkForUpdate(null,false);
