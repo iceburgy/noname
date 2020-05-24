@@ -13496,7 +13496,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				filter:function(event,player){
 					if(event.responded) return false;
-					return _status.currentPhase!==player;
+					return _status.currentPhase!==player&&event.parent.name!='_wuxie';
 				},
 				content:function(){
 					"step 0"
