@@ -1976,7 +1976,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					var list;
-					var list2=[];
 					var list3=[];
 					event.list=[];
 					event.list2=[];
@@ -1993,12 +1992,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(lib.filter.characterDisabled(i,libCharacter)) continue;
 						event.list.push(i);
 						event.list2.push(i);
-						if(libCharacter[i][4]&&libCharacter[i][4].contains('zhu')){
-							list2.push(i);
-						}
-						else{
-							list3.push(i);
-						}
+						list3.push(i);
 					}
 					_status.characterlist=event.list.slice(0);
 					if(event.zhongmode){
@@ -2009,7 +2003,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(lib.configOL.choice_zhu){
 							choiceZhu=parseInt(lib.configOL.choice_zhu);
 						}
-						list=list2.concat(list3.randomGets(choiceZhu));
+						list=list3.randomGets(choiceZhu);
 					}
 					var next=game.zhu.chooseButton(true);
 					next.set('selectButton',(lib.configOL.double_character?2:1));
