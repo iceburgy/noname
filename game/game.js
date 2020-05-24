@@ -39143,11 +39143,20 @@
 							}
 							return str;
 						}
-						li1.innerHTML='游戏版本：'+lib.version+'<p style="margin-top:8px;white-space:nowrap"></p>';
+						li1.innerHTML='村规版本：'+lib.version+'<p style="margin-top:8px;white-space:nowrap"></p>';
 						li2.innerHTML='素材版本：'+(lib.config.asset_version||'无')+'<p style="margin-top:8px"></p>';
 						li3.innerHTML='更新地址：<span>'+trimurl(lib.config.updateURL||lib.updateURL)+'</span><p style="margin-top:8px"></p>';
 						li3.style.whiteSpace='nowrap';
 						li3.style.display='none';// coding
+
+						var buttonShowChangeLog=document.createElement('button');
+						buttonShowChangeLog.innerHTML='查看村规更新内容';
+						buttonShowChangeLog.onclick=function(){
+							game.displayChangeLog();
+						};
+						var pShowChangeLog=document.createElement('p');
+						pShowChangeLog.appendChild(buttonShowChangeLog);
+						li1.lastChild.appendChild(pShowChangeLog);
 
 						var button1,button2,button3,button4,button5;
 
@@ -39533,15 +39542,6 @@
 							game.checkForUpdate(null,false);
 						};
 						li1.lastChild.appendChild(button1);
-
-						var buttonShowChangeLog=document.createElement('button');
-						buttonShowChangeLog.innerHTML='查看村规更新内容';
-						buttonShowChangeLog.onclick=function(){
-							game.displayChangeLog();
-						};
-						var buttonShowChangeLogP=document.createElement('p');
-						buttonShowChangeLogP.appendChild(buttonShowChangeLog);
-						li1.lastChild.appendChild(buttonShowChangeLogP);
 
 						button3=document.createElement('button');
 						button3.innerHTML='更新到开发版';
