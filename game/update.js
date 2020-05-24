@@ -23,7 +23,7 @@ window.noname_update={
 		'game/game.js',
 		'layout/long2/layout.css',
 		'layout/newlayout/global.css',
-		'layout/layout.css',
+		'layout/nova/layout.css',
 		'mode/connect.js',
 		'mode/identity.js',
 		'extension/十周年UI/decadeLayout.css',
