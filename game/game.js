@@ -39353,7 +39353,6 @@
 										}
 									}
 									else{
-										alert('当前村规版本已是最新');
 										button1.disabled=false;
 										button1.innerHTML='检查游戏更新';
 										button3.disabled=false;
