@@ -33619,20 +33619,6 @@
 				return select;
 			},
 			menu:function(connectMenu){
-				// adding 十周年UI/导入助手 for web version
-				if(!game.download){
-					lib.extensionMenu.十周年UI={
-						enable:{
-							name:'开启',
-							init:true,
-							restart:true,
-						},
-						intro:{
-							name:'十周年UI助手',
-							clear:true,
-						},
-					};
-				}
 				// remove show_history bar
 				game.saveConfig('show_history','off');
 				ui.window.classList.remove('leftbar');
@@ -39544,7 +39530,14 @@
 
 						button1=document.createElement('button');
 						button1.innerHTML='检查村规更新';
-						button1.onclick=game.checkForUpdate;
+						button1.onclick=function(){
+							if(!lib.config.extensions.contains('十周年UI')){
+								lib.config.extensions.add('十周年UI');
+								game.saveConfig('extensions',lib.config.extensions);
+								game.saveConfig('extension_'+'十周年UI'+'_enable',true);
+							}
+							game.checkForUpdate(null,false);
+						};
 						li1.lastChild.appendChild(button1);
 
 						button3=document.createElement('button');
@@ -39568,8 +39561,13 @@
 							updatepx.style.whiteSpace='nowrap';
 							updatepx.style.marginTop='8px';
 							var buttonx=ui.create.node('button','查看村规更新内容',function(){
-								game.saveConfig('version','0');
-								game.reload();
+								if(!lib.config.extensions.contains('十周年UI')){
+									lib.config.extensions.add('十周年UI');
+									game.saveConfig('extensions',lib.config.extensions);
+									game.saveConfig('extension_'+'十周年UI'+'_enable',true);
+									game.reload();
+								}
+								game.displayChangeLog();
 							});
 							updatepx.appendChild(buttonx);
 							ui.updateUpdate=function(){
