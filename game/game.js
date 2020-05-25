@@ -26483,17 +26483,38 @@
 			if(_status.connectMode&&!_status.countDown){
 				ui.timer.show();
 				var num;
+
+				// choose character specific timer count
+				if(_status.event&&_status.event.createDialog&&_status.event.createDialog.length){
+					switch(_status.event.createDialog[0]){
+						case '选择角色1':
+						case '选择角色2':
+							if(lib.configOL.choose_char_timeout){
+								num=lib.configOL.choose_char_timeout;
+							}
+							break;
+						case '选择主副将':
+							if(lib.configOL.choose_main_vice_timeout){
+								num=lib.configOL.choose_main_vice_timeout;
+							}
+							break;
+						default:
+							break;
+					}
+				}
 				//这么一大行都是为了祢衡
-				if(_status.event&&_status.event.name=='chooseToUse'&&_status.event.type=='phase'&&
-					_status.event.player&&_status.event.player.forceCountChoose&&
-					typeof _status.event.player.forceCountChoose.phaseUse=='number'){
-					num=_status.event.player.forceCountChoose.phaseUse;
-				}
-				else if(_status.connectMode){
-					num=lib.configOL.choose_timeout;
-				}
-				else{
-					num=get.config('choose_timeout');
+				if(!num){
+					if(_status.event&&_status.event.name=='chooseToUse'&&_status.event.type=='phase'&&
+						_status.event.player&&_status.event.player.forceCountChoose&&
+						typeof _status.event.player.forceCountChoose.phaseUse=='number'){
+						num=_status.event.player.forceCountChoose.phaseUse;
+					}
+					else if(_status.connectMode){
+						num=lib.configOL.choose_timeout;
+					}
+					else{
+						num=get.config('choose_timeout');
+					}
 				}
 				game.countDown(parseInt(num),function(){
 					ui.click.auto();
@@ -26507,7 +26528,7 @@
 						game.me._hide_all_timer=true;
 					}
 					else if(!_status.event._global_waiting){
-						game.me.showTimer();
+						game.me.showTimer(parseInt(num));
 					}
 				}
 			}
@@ -34183,6 +34204,35 @@
 									name:'出牌时限',
 									init:'30',
 									item:{
+										'10':'10秒',
+										'15':'15秒',
+										'30':'30秒',
+										'60':'60秒',
+										'90':'90秒',
+									},
+									connect:true,
+									frequent:true
+								};
+								infoconfig.connect_choose_char_timeout={
+									name:'选择角色时限',
+									init:'30',
+									item:{
+										'10':'10秒',
+										'15':'15秒',
+										'20':'20秒',
+										'25':'25秒',
+										'30':'30秒',
+										'60':'60秒',
+										'90':'90秒',
+									},
+									connect:true,
+									frequent:true
+								};
+								infoconfig.connect_choose_main_vice_timeout={
+									name:'选择主副将时限',
+									init:'5',
+									item:{
+										'5':'5秒',
 										'10':'10秒',
 										'15':'15秒',
 										'30':'30秒',
