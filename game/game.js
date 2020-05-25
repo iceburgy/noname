@@ -39353,10 +39353,13 @@
 										}
 									}
 									else{
-										button1.disabled=false;
-										button1.innerHTML='检查村规更新';
-										button3.disabled=false;
-										button3.innerHTML='更新到开发版';
+										button1.innerHTML='当前村规版本已是最新';
+										setTimeout(function(){
+											button1.disabled=false;
+											button1.innerHTML='检查村规更新';
+											button3.disabled=false;
+											button3.innerHTML='更新到开发版';
+										},3000);
 									}
 								},function(){
 									if(forcecheck===false){
