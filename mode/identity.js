@@ -318,12 +318,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(players[i].identity=='nei'&&players.length>4){
 					game.addGlobalSkill('woshixiaonei');
 				}
-                if(players[i].identity=='zhu'&&players.length>=6&&players.length%2==0){
-                    game.broadcastAll(function(player){
-                        player.addSkill('zhikezhugong');
-                        player.addSkill('anlezhugong');
-                    },players[i]);
-                }
+				if(players[i].identity=='zhu'&&players.length>=6&&players.length%2==0){
+					game.broadcastAll(function(player){
+						player.addSkill('zhikezhugong');
+						player.addSkill('anlezhugong');
+					},players[i]);
+				}
 			}
 
 			_status.videoInited=true;
@@ -569,7 +569,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(game.players[i].identity=='zhu'){
 						game.players[i].isZhu=true;
 					}
-                    game.players[i].showCharacter(2,false);
+					game.players[i].showCharacter(2,false);
 				}
 				if(_status.clickingidentity){
 					for(var i=0;i<_status.clickingidentity[1].length;i++){
@@ -730,24 +730,24 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						players.push(players.shift());
 					}
 					game.broadcastAll(function(players,identityList,list){
- 					_status.mode='purple';
- 					if(game.online) ui.arena.classList.add('choose-character');
- 					for(var i=0;i<players.length;i++){
- 						players[i].node.identity.classList.add('guessing');
- 						players[i].identity=identityList[i];
- 						players[i].setIdentity(list.contains(identityList[i])?'cai2':'cai');
- 						if(['rZhu','bZhu'].contains(identityList[i])){
- 							game[identityList[i]]=players[i];
- 							players[i].setIdentity(identityList[i]);
- 							players[i].identityShown=true;
- 							players[i].node.identity.classList.remove('guessing');
- 						}
- 					}
- 					game.zhu=game.rZhu;
- 					game.rZhu.isZhu=true;
- 					game.bZhu.isZhu=true;
- 					game.me.setIdentity();
- 					game.me.node.identity.classList.remove('guessing');
+					_status.mode='purple';
+					if(game.online) ui.arena.classList.add('choose-character');
+					for(var i=0;i<players.length;i++){
+						players[i].node.identity.classList.add('guessing');
+						players[i].identity=identityList[i];
+						players[i].setIdentity(list.contains(identityList[i])?'cai2':'cai');
+						if(['rZhu','bZhu'].contains(identityList[i])){
+							game[identityList[i]]=players[i];
+							players[i].setIdentity(identityList[i]);
+							players[i].identityShown=true;
+							players[i].node.identity.classList.remove('guessing');
+						}
+					}
+					game.zhu=game.rZhu;
+					game.rZhu.isZhu=true;
+					game.bZhu.isZhu=true;
+					game.me.setIdentity();
+					game.me.node.identity.classList.remove('guessing');
 					},players,identityList,list);
 					players.sortBySeat(game.zhu);
 					for(var i=0;i<players.length;i++){
@@ -927,8 +927,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					game.zhu=game.rZhu;
- 				game.rZhu.isZhu=true;
- 				game.bZhu.isZhu=true;
+					game.rZhu.isZhu=true;
+					game.bZhu.isZhu=true;
 					game.me.setIdentity();
 					game.me.node.identity.classList.remove('guessing');
 					players.sortBySeat(game.zhu);
@@ -1662,37 +1662,37 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(!ui.cheat2&&get.config('free_choose'))
 						ui.create.cheat2();
 					}
-                    // hide zhu character
-                    if(!game.zhu.isUnseen()&&game.zhu.name){
-                        game.zhu.classList.add('unseen');
-                        game.zhu.classList.add('unseen2');
-                        if(_status.characterlist){
-                            _status.characterlist.remove(game.zhu.name);
-                            _status.characterlist.remove(game.zhu.name2);
-                        }
-                        game.zhu.hiddenSkills=lib.character[game.zhu.name][3].slice(0);
-                        var hiddenSkills2=lib.character[game.zhu.name2][3];
-                        for(var j=0;j<hiddenSkills2.length;j++){
-                            game.zhu.hiddenSkills.add(hiddenSkills2[j]);
-                            game.zhu.skills.remove(hiddenSkills2[j]);
-                        }
-                        for(var j=0;j<game.zhu.hiddenSkills.length;j++){
-                            game.zhu.skills.remove(game.zhu.hiddenSkills);
-                            if(!lib.skill[game.zhu.hiddenSkills[j]]){
-                                game.zhu.hiddenSkills.splice(j--,1);
-                            }
-                        }
-                        game.zhu.group='unknown';
-                        game.zhu.sex='unknown';
-                        game.zhu.name1=game.zhu.name;
-                        game.zhu.name='unknown';
-                        game.zhu.node.name.show();
-                        game.zhu.node.name2.show();
-                        game.zhu._group=lib.character[game.zhu.name1][1];
-                        for(var j=0;j<game.zhu.hiddenSkills.length;j++){
-                            game.zhu.addSkillTrigger(game.zhu.hiddenSkills[j],true);
-                        }
-                    }
+					// hide zhu character
+					if(!game.zhu.isUnseen()&&game.zhu.name){
+						game.zhu.classList.add('unseen');
+						game.zhu.classList.add('unseen2');
+						if(_status.characterlist){
+							_status.characterlist.remove(game.zhu.name);
+							_status.characterlist.remove(game.zhu.name2);
+						}
+						game.zhu.hiddenSkills=lib.character[game.zhu.name][3].slice(0);
+						var hiddenSkills2=lib.character[game.zhu.name2][3];
+						for(var j=0;j<hiddenSkills2.length;j++){
+							game.zhu.hiddenSkills.add(hiddenSkills2[j]);
+							game.zhu.skills.remove(hiddenSkills2[j]);
+						}
+						for(var j=0;j<game.zhu.hiddenSkills.length;j++){
+							game.zhu.skills.remove(game.zhu.hiddenSkills);
+							if(!lib.skill[game.zhu.hiddenSkills[j]]){
+								game.zhu.hiddenSkills.splice(j--,1);
+							}
+						}
+						game.zhu.group='unknown';
+						game.zhu.sex='unknown';
+						game.zhu.name1=game.zhu.name;
+						game.zhu.name='unknown';
+						game.zhu.node.name.show();
+						game.zhu.node.name2.show();
+						game.zhu._group=lib.character[game.zhu.name1][1];
+						for(var j=0;j<game.zhu.hiddenSkills.length;j++){
+							game.zhu.addSkillTrigger(game.zhu.hiddenSkills[j],true);
+						}
+					}
 					"step 1"
 					if(ui.cheat){
 						ui.cheat.close();
@@ -1764,52 +1764,52 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.me.node.name.dataset.nature=get.groupnature(game.me.group);
 						game.me.update();
 					}
-                    // hide zhu character
-                    if(!game.zhu.isUnseen()&&game.zhu.name){
-                        game.zhu.classList.add('unseen');
-                        game.zhu.classList.add('unseen2');
-                        if(_status.characterlist){
-                            _status.characterlist.remove(game.zhu.name);
-                            _status.characterlist.remove(game.zhu.name2);
-                        }
-                        game.zhu.hiddenSkills=lib.character[game.zhu.name][3].slice(0);
-                        var hiddenSkills2=lib.character[game.zhu.name2][3];
-                        for(var j=0;j<hiddenSkills2.length;j++){
-                            game.zhu.hiddenSkills.add(hiddenSkills2[j]);
-                            game.zhu.skills.remove(hiddenSkills2[j]);
-                        }
-                        for(var j=0;j<game.zhu.hiddenSkills.length;j++){
-                            game.zhu.skills.remove(game.zhu.hiddenSkills);
-                            if(!lib.skill[game.zhu.hiddenSkills[j]]){
-                                game.zhu.hiddenSkills.splice(j--,1);
-                            }
-                        }
-                        game.zhu.group='unknown';
-                        game.zhu.sex='unknown';
-                        game.zhu.name1=game.zhu.name;
-                        game.zhu.name='unknown';
-                        game.zhu.node.name.show();
-                        game.zhu.node.name2.show();
-                        game.zhu._group=lib.character[game.zhu.name1][1];
-                        for(var j=0;j<game.zhu.hiddenSkills.length;j++){
-                            game.zhu.addSkillTrigger(game.zhu.hiddenSkills[j],true);
-                        }
-                    }
+					// hide zhu character
+					if(!game.zhu.isUnseen()&&game.zhu.name){
+						game.zhu.classList.add('unseen');
+						game.zhu.classList.add('unseen2');
+						if(_status.characterlist){
+							_status.characterlist.remove(game.zhu.name);
+							_status.characterlist.remove(game.zhu.name2);
+						}
+						game.zhu.hiddenSkills=lib.character[game.zhu.name][3].slice(0);
+						var hiddenSkills2=lib.character[game.zhu.name2][3];
+						for(var j=0;j<hiddenSkills2.length;j++){
+							game.zhu.hiddenSkills.add(hiddenSkills2[j]);
+							game.zhu.skills.remove(hiddenSkills2[j]);
+						}
+						for(var j=0;j<game.zhu.hiddenSkills.length;j++){
+							game.zhu.skills.remove(game.zhu.hiddenSkills);
+							if(!lib.skill[game.zhu.hiddenSkills[j]]){
+								game.zhu.hiddenSkills.splice(j--,1);
+							}
+						}
+						game.zhu.group='unknown';
+						game.zhu.sex='unknown';
+						game.zhu.name1=game.zhu.name;
+						game.zhu.name='unknown';
+						game.zhu.node.name.show();
+						game.zhu.node.name2.show();
+						game.zhu._group=lib.character[game.zhu.name1][1];
+						for(var j=0;j<game.zhu.hiddenSkills.length;j++){
+							game.zhu.addSkillTrigger(game.zhu.hiddenSkills[j],true);
+						}
+					}
 					for(var i=0;i<game.players.length;i++){
 						_status.characterlist.remove(game.players[i].name);
 						_status.characterlist.remove(game.players[i].name2);
 					}
 					"step 4"
 					for(var i=0;i<game.players.length;i++){
-					    // game.zhu has been set at above and it should be skipped here
-					    if(game.players[i]==game.zhu) continue;
+						// game.zhu has been set at above and it should be skipped here
+						if(game.players[i]==game.zhu) continue;
 
 						game.players[i].classList.add('unseen');
 						game.players[i].classList.add('unseen2');
-                        if(_status.characterlist){
-                            _status.characterlist.remove(game.players[i].name);
-                            _status.characterlist.remove(game.players[i].name2);
-                        }
+						if(_status.characterlist){
+							_status.characterlist.remove(game.players[i].name);
+							_status.characterlist.remove(game.players[i].name2);
+						}
 						if(game.players[i]!=game.me){
 							game.players[i].node.identity.firstChild.innerHTML='猜';
 							game.players[i].node.identity.dataset.color='unknown';
@@ -2361,7 +2361,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							lib.playerOL[i].init(result2[i][0],result2[i][1],false);
 						}
 						if(result[i]&&result[i].links) {
-                            lib.playerOL[i].groupshen=result[i].links[0][2].slice(6);
+							lib.playerOL[i].groupshen=result[i].links[0][2].slice(6);
 						}
 					}
 					
@@ -2375,46 +2375,47 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						_status.characterlist.remove(game.players[i].name2);
 					}
 
-                    for(var i=0;i<game.players.length;i++){
-                        // game.zhu has been set at above and it should be skipped here
-                        if(game.players[i]==game.zhu) continue;
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].showGiveup();
+						// game.zhu has been set at above and it should be skipped here
+						if(game.players[i]==game.zhu) continue;
 
-                        game.broadcastAll(function(player){
-                            player.classList.add('unseen');
-                            player.classList.add('unseen2');
-                            if(_status.characterlist){
-                                _status.characterlist.remove(player.name);
-                                _status.characterlist.remove(player.name2);
-                            }
-                            if(player!=game.me){
-                                player.node.identity.firstChild.innerHTML='猜';
-                                player.node.identity.dataset.color='unknown';
-                                player.node.identity.classList.add('guessing');
-                            }
-                            player.hiddenSkills=lib.character[player.name][3].slice(0);
-                            var hiddenSkills2=lib.character[player.name2][3];
-                            for(var j=0;j<hiddenSkills2.length;j++){
-                                player.hiddenSkills.add(hiddenSkills2[j]);
-                                player.skills.remove(hiddenSkills2[j]);
-                            }
-                            for(var j=0;j<player.hiddenSkills.length;j++){
-                                player.skills.remove(player.hiddenSkills);
-                                if(!lib.skill[player.hiddenSkills[j]]){
-                                    player.hiddenSkills.splice(j--,1);
-                                }
-                            }
-                            player.group='unknown';
-                            player.sex='unknown';
-                            player.name1=player.name;
-                            player.name='unknown';
-                            player.node.name.show();
-                            player.node.name2.show();
-                            player._group=lib.character[player.name1][1];
-                            for(var j=0;j<player.hiddenSkills.length;j++){
-                                player.addSkillTrigger(player.hiddenSkills[j],true);
-                            }
-                        },game.players[i]);
-                    }
+						game.broadcastAll(function(player){
+							player.classList.add('unseen');
+							player.classList.add('unseen2');
+							if(_status.characterlist){
+								_status.characterlist.remove(player.name);
+								_status.characterlist.remove(player.name2);
+							}
+							if(player!=game.me){
+								player.node.identity.firstChild.innerHTML='猜';
+								player.node.identity.dataset.color='unknown';
+								player.node.identity.classList.add('guessing');
+							}
+							player.hiddenSkills=lib.character[player.name][3].slice(0);
+							var hiddenSkills2=lib.character[player.name2][3];
+							for(var j=0;j<hiddenSkills2.length;j++){
+								player.hiddenSkills.add(hiddenSkills2[j]);
+								player.skills.remove(hiddenSkills2[j]);
+							}
+							for(var j=0;j<player.hiddenSkills.length;j++){
+								player.skills.remove(player.hiddenSkills);
+								if(!lib.skill[player.hiddenSkills[j]]){
+									player.hiddenSkills.splice(j--,1);
+								}
+							}
+							player.group='unknown';
+							player.sex='unknown';
+							player.name1=player.name;
+							player.name='unknown';
+							player.node.name.show();
+							player.node.name2.show();
+							player._group=lib.character[player.name1][1];
+							for(var j=0;j<player.hiddenSkills.length;j++){
+								player.addSkillTrigger(player.hiddenSkills[j],true);
+							}
+						},game.players[i]);
+					}
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
 					},500);
@@ -2546,16 +2547,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				dieAfter2:function(source){
 					if(_status.mode=='purple'){
 						if(source){
- 						if(this.identity=='rZhu'||this.identity=='bZhu'){
- 							if(this.identity.slice(0,1)!=source.identity.slice(0,1)) source.recover();
- 						}
- 						else if(this.identity=='rZhong'||this.identity=='bZhong'){
- 							if(this.identity.slice(0,1)!=source.identity.slice(0,1)) source.draw(2);
- 							else if(this.identity.indexOf('Zhu')==1) this.discard(this.getCards('h'));
- 						}
- 						else if(this.identity=='rNei'||this.identity=='bNei'){
- 							if(this.identity.slice(0,1)==source.identity.slice(0,1)) source.draw(3);
- 						}
+							if(this.identity=='rZhu'||this.identity=='bZhu'){
+								if(this.identity.slice(0,1)!=source.identity.slice(0,1)) source.recover();
+							}
+							else if(this.identity=='rZhong'||this.identity=='bZhong'){
+								if(this.identity.slice(0,1)!=source.identity.slice(0,1)) source.draw(2);
+								else if(this.identity.indexOf('Zhu')==1) this.discard(this.getCards('h'));
+							}
+							else if(this.identity=='rNei'||this.identity=='bNei'){
+								if(this.identity.slice(0,1)==source.identity.slice(0,1)) source.draw(3);
+							}
 						}
 						if(!_status.yeconfirm){
 							_status.yeconfirm=true;
@@ -2586,19 +2587,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				dieAfter:function(source){
-                    this.showCharacter(2);
-                    game.broadcastAll(function(player,identity,identity2){
-                        player.setIdentity(player.identity);
-                        player.identityShown=true;
-                        player.node.identity.classList.remove('guessing');
-                        if(identity){
-                            player.node.identity.firstChild.innerHTML=get.translation(identity+'_bg');
-                            game.log(player,'的身份是','#g'+get.translation(identity));
-                        }
-                        else{
-                            game.log(player,'的身份是','#g'+get.translation(identity2+'2'));
-                        }
-                    },this,this.special_identity,this.identity);
+					this.showCharacter(2);
+					game.broadcastAll(function(player,identity,identity2){
+						player.setIdentity(player.identity);
+						player.identityShown=true;
+						player.node.identity.classList.remove('guessing');
+						if(identity){
+							player.node.identity.firstChild.innerHTML=get.translation(identity+'_bg');
+							game.log(player,'的身份是','#g'+get.translation(identity));
+						}
+						else{
+							game.log(player,'的身份是','#g'+get.translation(identity2+'2'));
+						}
+					},this,this.special_identity,this.identity);
 					if(this.special_identity){
 						game.broadcastAll(function(zhu,identity){
 							zhu.removeSkill(identity);
@@ -2957,8 +2958,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(this==game.zhu&&game.players.length>4) realMaxHp++;
 					var maxHpToGain=realMaxHp-this.maxHp;
 					if(maxHpToGain>0){
-                        this.gainMaxHp(maxHpToGain);
-                        this.recover(maxHpToGain);
+						this.gainMaxHp(maxHpToGain);
+						this.recover(maxHpToGain);
 					}
 
 					this.checkConflict();
@@ -3311,26 +3312,26 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.storage.woshixiaonei=true;
-                    player.chooseControlList(true,function(event,player){
-                        return 0;
-                    },
-                    ['回复一点体力，摸2张牌，增加一点体力上限','回复一点体力，摸3张牌']);
+					player.chooseControlList(true,function(event,player){
+						return 0;
+					},
+					['回复一点体力，摸2张牌，增加一点体力上限','回复一点体力，摸3张牌']);
 
 					'step 1'
-                    if(result.index==0 || result.index==1){
-                        if(result.index==0){
-                            player.gainMaxHp();
-                            player.draw(2);
-                        }
-                        else if(result.index==1){
-                            player.draw(3);
-                        }
-                        player.recover();
-                        game.broadcastAll(function(player){
-                            player.showIdentity();
-                        },player);
-                        game.removeGlobalSkill('woshixiaonei');
-                    }
+					if(result.index==0 || result.index==1){
+						if(result.index==0){
+							player.gainMaxHp();
+							player.draw(2);
+						}
+						else if(result.index==1){
+							player.draw(3);
+						}
+						player.recover();
+						game.broadcastAll(function(player){
+							player.showIdentity();
+						},player);
+						game.removeGlobalSkill('woshixiaonei');
+					}
 					// event hierarchy:
 					// thisskillname/useSkill/chooseToUse/sha - huihewai, need redo
 					// thisskillname/useSkill/_wuxie/trigger/arrangeTrigger/tiesuo - huihewai, need redo
@@ -3448,42 +3449,42 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				animationColor:'thunder',
 				trigger:{player:['judgeEnd','phaseAfter']},
 				filter:function(event,player){
-				    if(event.name=='phase'){
-				        if(game.roundNumber>=2){
-                            game.broadcastAll(function(player){
-                                player.removeSkill('anlezhugong');
-                            },player);
-				        }
-				    }else if(event.name=='judge'){
-                        if(game.roundNumber<=2&&player==game.zhu&&event.judgestr=='乐不思蜀'){
-                            if(event.result.bool==false){
-                                return true;
-                            }
-                            game.broadcastAll(function(player){
-                                player.removeSkill('anlezhugong');
-                            },player);
-                        }
-				    }
+					if(event.name=='phase'){
+						if(game.roundNumber>=2){
+							game.broadcastAll(function(player){
+								player.removeSkill('anlezhugong');
+							},player);
+						}
+					}else if(event.name=='judge'){
+						if(game.roundNumber<=2&&player==game.zhu&&event.judgestr=='乐不思蜀'){
+							if(event.result.bool==false){
+								return true;
+							}
+							game.broadcastAll(function(player){
+								player.removeSkill('anlezhugong');
+							},player);
+						}
+					}
 					return false;
 				},
-                ai:{
-                    order:10,
-                    result:{
-                        player:function(player){
-                            return 1;
-                        },
-                    }
-                },
+				ai:{
+					order:10,
+					result:{
+						player:function(player){
+							return 1;
+						},
+					}
+				},
 				content:function(){
-                    game.broadcastAll(function(player){
-                        player.removeSkill('anlezhugong');
-                    },player);
-                    player.addTempSkill('anlezhugong2');
+					game.broadcastAll(function(player){
+						player.removeSkill('anlezhugong');
+					},player);
+					player.addTempSkill('anlezhugong2');
 				},
 				oncancel:function(event,player){
-                    game.broadcastAll(function(player){
-                        player.removeSkill('anlezhugong');
-                    },player);
+					game.broadcastAll(function(player){
+						player.removeSkill('anlezhugong');
+					},player);
 				},
 			},
 			anlezhugong2:{
@@ -3501,10 +3502,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					maxHandcard:function(player,num){
-					    var keepExtra = 2;
-					    if(game.players.length==10){
-					        keepExtra = 3;
-					    }
+						var keepExtra = 2;
+						if(game.players.length==10){
+							keepExtra = 3;
+						}
 						return num+keepExtra;
 					}
 				},
