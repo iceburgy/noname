@@ -29957,7 +29957,7 @@
 			if(!playersStatistics){
 				playersStatistics={};
 			}
-			if(game.players.length||game.dead.length){
+			if(_status.connectMode&&(game.players.length||game.dead.length)){
 				var clients=game.players.concat(game.dead);
 				table=document.createElement('table');
 				tr=document.createElement('tr');
