@@ -15855,6 +15855,14 @@
 					this.nickname=name;
 					this.avatar=character;
 					this.node.nameol.innerHTML='';
+
+					// game statistics
+					var numRate='0%';
+					var playersStatistics=lib.storage['players_statistics']
+					if(playersStatistics&&name&&playersStatistics[name]&&playersStatistics[name]['numRate']){
+						numRate=playersStatistics[name]['numRate'];
+					}
+					this.node.intro.innerHTML=numRate;
 				},
 				uninitOL:function(){
 					this.node.avatar.hide();
@@ -29931,9 +29939,151 @@
 					ui.ladder.innerHTML=game.getLadderName(lib.storage.ladder.current);
 				}
 			}
-			// if(true){
-				if(game.players.length){
-					table=document.createElement('table');
+			// game statistics
+			var playersStatisticsKey='players_statistics';
+			var playersStatistics=lib.storage[playersStatisticsKey]
+			if(!playersStatistics){
+				playersStatistics={};
+			}
+			if(game.players.length||game.dead.length){
+				var clients=game.players.concat(game.dead);
+				table=document.createElement('table');
+				tr=document.createElement('tr');
+				tr.appendChild(document.createElement('td'));
+				td=document.createElement('td');
+				td.innerHTML='身份';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='胜利';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='失败';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='胜率';
+				tr.appendChild(td);
+				table.appendChild(tr);
+
+				for(i=0;i<clients.length;i++){
+					var nameol='无名玩家';
+					if(clients[i].nickname){
+						nameol=clients[i].nickname;
+					}
+					if(!playersStatistics[nameol]){
+						playersStatistics[nameol]={
+							'numWin':0,
+							'numLose':0,
+							'numRate':'0%',
+						}
+					}
+					if(nameol!='无名玩家'){
+						playersStatistics[nameol]['lastID']=clients[i].identity;
+						if(game.checkOnlineResult(clients[i])) playersStatistics[nameol]['numWin']++;
+						else playersStatistics[nameol]['numLose']++;
+						var numTotal=playersStatistics[nameol]['numWin']+playersStatistics[nameol]['numLose'];
+						var numRate=0;
+						if(numTotal>0){
+							numRate=(playersStatistics[nameol]['numWin']/(numTotal));
+						}
+						playersStatistics[nameol]['numRate']=(numRate*100).toFixed(2)+"%";
+					}
+
+					tr=document.createElement('tr');
+					td=document.createElement('td');
+					td.innerHTML=nameol;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=get.translation(clients[i].identity);
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=playersStatistics[nameol]['numWin'];
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=playersStatistics[nameol]['numLose'];
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=playersStatistics[nameol]['numRate'];
+					tr.appendChild(td);
+					table.appendChild(tr);
+				}
+				dialog.add(ui.create.div('.placeholder'));
+				dialog.content.appendChild(table);
+			}
+			game.broadcastAll(function(key,val){
+				game.save(key,val);
+			},playersStatisticsKey,playersStatistics);
+
+			if(game.players.length){
+				table=document.createElement('table');
+				tr=document.createElement('tr');
+				tr.appendChild(document.createElement('td'));
+				td=document.createElement('td');
+				td.innerHTML='伤害';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='受伤';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='摸牌';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='出牌';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='杀敌';
+				tr.appendChild(td);
+				table.appendChild(tr);
+				for(i=0;i<game.players.length;i++){
+					tr=document.createElement('tr');
+					td=document.createElement('td');
+					td.innerHTML=get.translation(game.players[i]);
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.players[i].stat.length;j++){
+						if(game.players[i].stat[j].damage!=undefined) num+=game.players[i].stat[j].damage;
+					}
+					td.innerHTML=num;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.players[i].stat.length;j++){
+						if(game.players[i].stat[j].damaged!=undefined) num+=game.players[i].stat[j].damaged;
+					}
+					td.innerHTML=num;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.players[i].stat.length;j++){
+						if(game.players[i].stat[j].gain!=undefined) num+=game.players[i].stat[j].gain;
+					}
+					td.innerHTML=num;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.players[i].stat.length;j++){
+						for(k in game.players[i].stat[j].card){
+							num+=game.players[i].stat[j].card[k];
+						}
+					}
+					td.innerHTML=num;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.players[i].stat.length;j++){
+						if(game.players[i].stat[j].kill!=undefined) num+=game.players[i].stat[j].kill;
+					}
+					td.innerHTML=num;
+					tr.appendChild(td);
+					table.appendChild(tr);
+				}
+				dialog.add(ui.create.div('.placeholder'));
+				dialog.content.appendChild(table);
+			}
+			if(game.dead.length){
+				table=document.createElement('table');
+				table.style.opacity='0.5';
+				if(game.players.length==0){
 					tr=document.createElement('tr');
 					tr.appendChild(document.createElement('td'));
 					td=document.createElement('td');
@@ -29952,174 +30102,104 @@
 					td.innerHTML='杀敌';
 					tr.appendChild(td);
 					table.appendChild(tr);
-					for(i=0;i<game.players.length;i++){
-						tr=document.createElement('tr');
-						td=document.createElement('td');
-						td.innerHTML=get.translation(game.players[i]);
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.players[i].stat.length;j++){
-							if(game.players[i].stat[j].damage!=undefined) num+=game.players[i].stat[j].damage;
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.players[i].stat.length;j++){
-							if(game.players[i].stat[j].damaged!=undefined) num+=game.players[i].stat[j].damaged;
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.players[i].stat.length;j++){
-							if(game.players[i].stat[j].gain!=undefined) num+=game.players[i].stat[j].gain;
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.players[i].stat.length;j++){
-							for(k in game.players[i].stat[j].card){
-								num+=game.players[i].stat[j].card[k];
-							}
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.players[i].stat.length;j++){
-							if(game.players[i].stat[j].kill!=undefined) num+=game.players[i].stat[j].kill;
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						table.appendChild(tr);
-					}
-					dialog.add(ui.create.div('.placeholder'));
-					dialog.content.appendChild(table);
 				}
-				if(game.dead.length){
-					table=document.createElement('table');
-					table.style.opacity='0.5';
-					if(game.players.length==0){
-						tr=document.createElement('tr');
-						tr.appendChild(document.createElement('td'));
-						td=document.createElement('td');
-						td.innerHTML='伤害';
-						tr.appendChild(td);
-						td=document.createElement('td');
-						td.innerHTML='受伤';
-						tr.appendChild(td);
-						td=document.createElement('td');
-						td.innerHTML='摸牌';
-						tr.appendChild(td);
-						td=document.createElement('td');
-						td.innerHTML='出牌';
-						tr.appendChild(td);
-						td=document.createElement('td');
-						td.innerHTML='杀敌';
-						tr.appendChild(td);
-						table.appendChild(tr);
+				for(i=0;i<game.dead.length;i++){
+					tr=document.createElement('tr');
+					td=document.createElement('td');
+					td.innerHTML=get.translation(game.dead[i]);
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.dead[i].stat.length;j++){
+						if(game.dead[i].stat[j].damage!=undefined) num+=game.dead[i].stat[j].damage;
 					}
-					for(i=0;i<game.dead.length;i++){
-						tr=document.createElement('tr');
-						td=document.createElement('td');
-						td.innerHTML=get.translation(game.dead[i]);
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.dead[i].stat.length;j++){
-							if(game.dead[i].stat[j].damage!=undefined) num+=game.dead[i].stat[j].damage;
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.dead[i].stat.length;j++){
-							if(game.dead[i].stat[j].damaged!=undefined) num+=game.dead[i].stat[j].damaged;
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.dead[i].stat.length;j++){
-							if(game.dead[i].stat[j].gain!=undefined) num+=game.dead[i].stat[j].gain;
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.dead[i].stat.length;j++){
-							for(k in game.dead[i].stat[j].card){
-								num+=game.dead[i].stat[j].card[k];
-							}
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.dead[i].stat.length;j++){
-							if(game.dead[i].stat[j].kill!=undefined) num+=game.dead[i].stat[j].kill;
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						table.appendChild(tr);
+					td.innerHTML=num;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.dead[i].stat.length;j++){
+						if(game.dead[i].stat[j].damaged!=undefined) num+=game.dead[i].stat[j].damaged;
 					}
-					dialog.add(ui.create.div('.placeholder'));
-					dialog.content.appendChild(table);
+					td.innerHTML=num;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.dead[i].stat.length;j++){
+						if(game.dead[i].stat[j].gain!=undefined) num+=game.dead[i].stat[j].gain;
+					}
+					td.innerHTML=num;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.dead[i].stat.length;j++){
+						for(k in game.dead[i].stat[j].card){
+							num+=game.dead[i].stat[j].card[k];
+						}
+					}
+					td.innerHTML=num;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.dead[i].stat.length;j++){
+						if(game.dead[i].stat[j].kill!=undefined) num+=game.dead[i].stat[j].kill;
+					}
+					td.innerHTML=num;
+					tr.appendChild(td);
+					table.appendChild(tr);
 				}
-				if(game.additionaldead&&game.additionaldead.length){
-					table=document.createElement('table');
-					table.style.opacity='0.5';
-					for(i=0;i<game.additionaldead.length;i++){
-						tr=document.createElement('tr');
-						td=document.createElement('td');
-						td.innerHTML=get.translation(game.additionaldead[i]);
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.additionaldead[i].stat.length;j++){
-							if(game.additionaldead[i].stat[j].damage!=undefined) num+=game.additionaldead[i].stat[j].damage;
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.additionaldead[i].stat.length;j++){
-							if(game.additionaldead[i].stat[j].damaged!=undefined) num+=game.additionaldead[i].stat[j].damaged;
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.additionaldead[i].stat.length;j++){
-							if(game.additionaldead[i].stat[j].gain!=undefined) num+=game.additionaldead[i].stat[j].gain;
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.additionaldead[i].stat.length;j++){
-							for(k in game.additionaldead[i].stat[j].card){
-								num+=game.additionaldead[i].stat[j].card[k];
-							}
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						num=0;
-						for(j=0;j<game.additionaldead[i].stat.length;j++){
-							if(game.additionaldead[i].stat[j].kill!=undefined) num+=game.additionaldead[i].stat[j].kill;
-						}
-						td.innerHTML=num;
-						tr.appendChild(td);
-						table.appendChild(tr);
+				dialog.add(ui.create.div('.placeholder'));
+				dialog.content.appendChild(table);
+			}
+			if(game.additionaldead&&game.additionaldead.length){
+				table=document.createElement('table');
+				table.style.opacity='0.5';
+				for(i=0;i<game.additionaldead.length;i++){
+					tr=document.createElement('tr');
+					td=document.createElement('td');
+					td.innerHTML=get.translation(game.additionaldead[i]);
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.additionaldead[i].stat.length;j++){
+						if(game.additionaldead[i].stat[j].damage!=undefined) num+=game.additionaldead[i].stat[j].damage;
 					}
-					dialog.add(ui.create.div('.placeholder'));
-					dialog.content.appendChild(table);
+					td.innerHTML=num;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.additionaldead[i].stat.length;j++){
+						if(game.additionaldead[i].stat[j].damaged!=undefined) num+=game.additionaldead[i].stat[j].damaged;
+					}
+					td.innerHTML=num;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.additionaldead[i].stat.length;j++){
+						if(game.additionaldead[i].stat[j].gain!=undefined) num+=game.additionaldead[i].stat[j].gain;
+					}
+					td.innerHTML=num;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.additionaldead[i].stat.length;j++){
+						for(k in game.additionaldead[i].stat[j].card){
+							num+=game.additionaldead[i].stat[j].card[k];
+						}
+					}
+					td.innerHTML=num;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					num=0;
+					for(j=0;j<game.additionaldead[i].stat.length;j++){
+						if(game.additionaldead[i].stat[j].kill!=undefined) num+=game.additionaldead[i].stat[j].kill;
+					}
+					td.innerHTML=num;
+					tr.appendChild(td);
+					table.appendChild(tr);
 				}
-			// }
+				dialog.add(ui.create.div('.placeholder'));
+				dialog.content.appendChild(table);
+			}
 			dialog.add(ui.create.div('.placeholder'));
 
 			var clients=game.players.concat(game.dead);

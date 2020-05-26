@@ -651,7 +651,7 @@ table {
 .player.linked:not(.treasure).playerfocus {
 	transform: scale(1.1) rotate(-90deg);
 }
-.player.connect>div:not(.avatar):not(.name):not(.nameol):not(.hp):not(.room):not(.gaming):not(.identity) {
+.player.connect>div:not(.avatar):not(.name):not(.nameol):not(.hp):not(.room):not(.gaming):not(.identity):not(.intro) {
 	display: none !important;
 }
 .player.connect>.gaming {
@@ -662,6 +662,21 @@ table {
 }
 .player.connect[data-cursor_style="forbidden"]{
 	opacity: 0.5;
+}
+.player.connect[data-position='0']>.intro,
+.player.connect[data-position='1']>.intro,
+.player.connect[data-position='2']>.intro,
+.player.connect[data-position='3']>.intro,
+.player.connect[data-position='4']>.intro,
+.player.connect[data-position='5']>.intro,
+.player.connect[data-position='6']>.intro,
+.player.connect[data-position='7']>.intro,
+.player.connect[data-position='8']>.intro,
+.player.connect[data-position='9']>.intro {
+	bottom: 10px;
+	left: 50px;
+	opacity: 1;
+	display: block !important;
 }
 #arena #me>div>div>.card {
 	position: absolute;
@@ -2137,10 +2152,6 @@ div:not(.handcards)>.card>.info>span,
 
 .button.character>.name {
 	font-family: 'xinwei'
-}
-.player>.intro {
-	top: 87px;
-	left: 18px;
 }
 .player>.turned{
 	font-family: 'xinwei';

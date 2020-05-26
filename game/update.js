@@ -1,9 +1,11 @@
 window.noname_update={
-	version:'2020.05.29',
+	version:'2020.05.29.1',
 	update:'1.9.98.7',
 	changeLog:[
 		'缩短选将时间',
 		'简化版本号儿',
+		'避免重复主内身份',
+		'开启玩家胜率统计',
 		'更多更新历史信息请查看：https://bit.ly/wumingsha',
 	],
 	files:[
