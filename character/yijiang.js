@@ -2658,7 +2658,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 10-get.value(card);
 						}
 						return 0;
-					}).set('att',get.attitude(trigger.player,player)).set('cardname',name).set('dialog',['守玺：请弃置一张【'+get.translation(name)+'】，否则此【杀】对'+get.translation(player)+'无效',[event.vcard,'vcard']]);
+					}).set('att',get.attitude(trigger.player,player)).set('cardname',name).set('dialog',['守玺：请弃置一张【'+get.translation(name)+'】，否则此【杀】对'+get.translation(player)+'无效',[[event.vcard[0][2]],'vcard']]);
 					'step 3'
 					if(result.bool==false){
 						trigger.excluded.push(player);
@@ -2692,6 +2692,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.list=game.filterPlayer(function(current){
 						return current.countCards('h')<current.hp;
 					}).sortBySeat();
+					if(!event.list.length) event.finish();
 					player.draw(event.list.length);
 					'step 1'
 					player.chooseTarget(true,function(card,player,target){
