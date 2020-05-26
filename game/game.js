@@ -19132,7 +19132,9 @@
 						clearTimeout(lib.node.torespondtimeout[this.playerid]);
 						if(this.ws&&!this.ws.closed){
 							var player=this;
-							var time=parseInt(lib.configOL.choose_timeout)*1000;
+							var numTimeout=game.getChooseTimeByEvent();
+							if(!numTimeout) numTimeout=lib.configOL.choose_timeout;
+							var time=parseInt(numTimeout)*1000;
 							if(_status.event.getParent().skillHidden){
 								for(var i=0;i<game.players.length;i++){
 									game.players[i].showTimer(time);
@@ -26483,6 +26485,34 @@
 				}
 			},1000);
 		},
+		getChooseTimeByEvent:function(){
+			var num;
+			// choose character specific timer count
+			var eventName;
+			if(_status.event&&_status.event.createDialog&&_status.event.createDialog.length){
+				eventName=_status.event.createDialog[0];
+			}
+			if(!eventName&&_status.event&&_status.event._args&&_status.event._args.length&&_status.event._args[0].length&&_status.event._args[0][0].length>1&&_status.event._args[0][0][1].length){
+				eventName=_status.event._args[0][0][1][0];
+			}
+			if(!eventName) return num;
+			switch(eventName){
+				case '选择角色1':
+				case '选择角色2':
+					if(lib.configOL.choose_char_timeout){
+						num=lib.configOL.choose_char_timeout;
+					}
+					break;
+				case '选择主副将':
+					if(lib.configOL.choose_main_vice_timeout){
+						num=lib.configOL.choose_main_vice_timeout;
+					}
+					break;
+				default:
+					break;
+			}
+			return num;
+		},
 		countChoose:function(clear){
 			if(_status.imchoosing){
 				return;
@@ -26490,26 +26520,8 @@
 			_status.imchoosing=true;
 			if(_status.connectMode&&!_status.countDown){
 				ui.timer.show();
-				var num;
+				var num=game.getChooseTimeByEvent();
 
-				// choose character specific timer count
-				if(_status.event&&_status.event.createDialog&&_status.event.createDialog.length){
-					switch(_status.event.createDialog[0]){
-						case '选择角色1':
-						case '选择角色2':
-							if(lib.configOL.choose_char_timeout){
-								num=lib.configOL.choose_char_timeout;
-							}
-							break;
-						case '选择主副将':
-							if(lib.configOL.choose_main_vice_timeout){
-								num=lib.configOL.choose_main_vice_timeout;
-							}
-							break;
-						default:
-							break;
-					}
-				}
 				//这么一大行都是为了祢衡
 				if(!num){
 					if(_status.event&&_status.event.name=='chooseToUse'&&_status.event.type=='phase'&&
@@ -26536,7 +26548,7 @@
 						game.me._hide_all_timer=true;
 					}
 					else if(!_status.event._global_waiting){
-						game.me.showTimer(parseInt(num));
+						game.me.showTimer(parseInt(num)*1000);
 					}
 				}
 			}
