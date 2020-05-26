@@ -1895,7 +1895,39 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					}
-					identityList.randomSort();
+					// avoid zhu/nei repeatedly being assigned to the same player
+					// 1. game statistics
+					var playersStatistics=lib.storage['players_statistics']
+					// 2. assign without repetition with max of 10 times
+					var assignAttempts=1;
+					var assignAttemptsMax=10;
+					var isAssignRepeated;
+					do{
+						identityList.randomSort();
+						isAssignRepeated=false;
+						for(i=0;i<game.players.length;i++){
+							var nameol=game.players[i].nickname;
+							if(!nameol) {
+								console.log('warning: player missing nickname!');
+							}
+							else if(nameol=='无名玩家'){
+								console.log('warning: player with bad nickname 无名玩家!');
+							}
+							else if(playersStatistics&&playersStatistics[nameol]&&playersStatistics[nameol]['lastID']){
+								var lastID=playersStatistics[nameol]['lastID'];
+								if(lastID=='zhu'&&identityList[i]=='zhu'||lastID=='nei'&&identityList[i]=='nei'){
+									isAssignRepeated=true;
+									console.log('info: player '+nameol+', lastID '+lastID+', repetition detected at attempt '+assignAttempts);
+									break;
+								}
+							}
+						}
+						assignAttempts++;
+					}while(isAssignRepeated&&assignAttempts<=assignAttemptsMax);
+					if(isAssignRepeated){
+						console.log('info: still end up with repeated identity assignment after '+assignAttemptsMax+' attempts!');
+					}
+
 					for(i=0;i<game.players.length;i++){
 						game.players[i].identity=identityList[i];
 						game.players[i].setIdentity('cai');
