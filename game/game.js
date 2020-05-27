@@ -29746,11 +29746,15 @@
 				dialog.content.innerHTML=result;
 				dialog.forcebutton=true;
 				var result2=arguments[1];
+				var result2WinnerText=arguments[2]?arguments[2]:'';
 				if(result2==true){
 					dialog.content.firstChild.innerHTML='战斗胜利';
 				}
 				else if(result2==false){
-					dialog.content.firstChild.innerHTML='战斗失败';
+					dialog.content.firstChild.innerHTML='战斗失败'+result2WinnerText;
+				}
+				else{
+					dialog.content.firstChild.innerHTML='战斗结束'+result2WinnerText;
 				}
 				ui.update();
 				dialog.add(ui.create.div('.placeholder'));
@@ -29822,18 +29826,125 @@
 					game.playAudio('effect','tie');
 				}
 			}
+			var winnerId;
+			var tableStatistics;
+			if(_status.connectMode&&(game.players.length||game.dead.length)){
+				// game statistics
+				var playersStatisticsKey='players_statistics';
+				var playersStatistics=lib.storage[playersStatisticsKey]
+				if(!playersStatistics){
+					playersStatistics={};
+				}
+				var clients=game.players.concat(game.dead);
+				tableStatistics=document.createElement('table');
+				tr=document.createElement('tr');
+				tr.appendChild(document.createElement('td'));
+				td=document.createElement('td');
+				td.innerHTML='身份';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='战况';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='胜场';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='负场';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='胜率';
+				tr.appendChild(td);
+				tableStatistics.appendChild(tr);
+
+				for(i=0;i<clients.length;i++){
+					var nameol='无名玩家';
+					if(clients[i].nickname){
+						nameol=clients[i].nickname;
+					}
+					if(!playersStatistics[nameol]){
+						playersStatistics[nameol]={
+							'numWin':0,
+							'numLose':0,
+							'winRate':'0%',
+							'lastID':'',
+						}
+					}
+					var playerIdentity=clients[i].identity;
+					var playerWin=game.checkOnlineResult(clients[i]);
+					if(playerWin&&(!winnerId||playerIdentity=='zhong')) winnerId=playerIdentity;
+					if(nameol!='无名玩家'){
+						playersStatistics[nameol]['lastID']=playerIdentity;
+						if(playerWin) playersStatistics[nameol]['numWin']++;
+						else playersStatistics[nameol]['numLose']++;
+						var numTotal=playersStatistics[nameol]['numWin']+playersStatistics[nameol]['numLose'];
+						var winRate=0;
+						if(numTotal>0){
+							winRate=Math.round(100*playersStatistics[nameol]['numWin']/(numTotal));
+						}
+						playersStatistics[nameol]['winRate']=winRate+"%";
+					}
+
+					tr=document.createElement('tr');
+					td=document.createElement('td');
+					td.innerHTML=nameol;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=get.translation(playerIdentity);
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=get.translation(playerWin?'获胜':'-');
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=playersStatistics[nameol]['numWin'];
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=playersStatistics[nameol]['numLose'];
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=playersStatistics[nameol]['winRate'];
+					tr.appendChild(td);
+					tableStatistics.appendChild(tr);
+				}
+				// if this is the server, save it
+				if(!game.online){
+					game.save(playersStatisticsKey,playersStatistics);
+				}
+			}
 			var resultbool=result;
 			if(typeof resultbool!=='boolean'){
 				resultbool=null;
 			}
+			var winnerText='';
+			switch(winnerId){
+				case 'zhu':
+					winnerText='，主公获胜';
+					break;
+				case 'zhong':
+					winnerText='，主忠获胜';
+					break;
+				case 'fan':
+					winnerText='，反贼获胜';
+					break;
+				case 'nei':
+					winnerText='，小内获胜';
+					break;
+				default:
+					break;
+			}
+			var winnerTextServer=result?'':winnerText;
 			if(result===true) result='战斗胜利';
 			if(result===false) result='战斗失败';
 			if(result==undefined) result='战斗结束';
-			dialog=ui.create.dialog(result);
+			dialog=ui.create.dialog(result+winnerTextServer);
 			dialog.forcebutton=true;
 			if(game.addOverDialog){
 				game.addOverDialog(dialog,result);
 			}
+			if(tableStatistics){
+				dialog.add(ui.create.div('.placeholder'));
+				dialog.content.appendChild(tableStatistics);
+			}
+
 			if(typeof _status.coin=='number'&&!_status.connectMode){
 				var coeff=Math.random()*0.4+0.8;
 				var added=0;
@@ -29958,82 +30069,6 @@
 					ui.ladder.innerHTML=game.getLadderName(lib.storage.ladder.current);
 				}
 			}
-			if(_status.connectMode&&(game.players.length||game.dead.length)){
-				// game statistics
-				var playersStatisticsKey='players_statistics';
-				var playersStatistics=lib.storage[playersStatisticsKey]
-				if(!playersStatistics){
-					playersStatistics={};
-				}
-				var clients=game.players.concat(game.dead);
-				table=document.createElement('table');
-				tr=document.createElement('tr');
-				tr.appendChild(document.createElement('td'));
-				td=document.createElement('td');
-				td.innerHTML='身份';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='胜利';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='失败';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='胜率';
-				tr.appendChild(td);
-				table.appendChild(tr);
-
-				for(i=0;i<clients.length;i++){
-					var nameol='无名玩家';
-					if(clients[i].nickname){
-						nameol=clients[i].nickname;
-					}
-					if(!playersStatistics[nameol]){
-						playersStatistics[nameol]={
-							'numWin':0,
-							'numLose':0,
-							'winRate':'0%',
-							'lastID':'',
-						}
-					}
-					if(nameol!='无名玩家'){
-						playersStatistics[nameol]['lastID']=clients[i].identity;
-						if(game.checkOnlineResult(clients[i])) playersStatistics[nameol]['numWin']++;
-						else playersStatistics[nameol]['numLose']++;
-						var numTotal=playersStatistics[nameol]['numWin']+playersStatistics[nameol]['numLose'];
-						var winRate=0;
-						if(numTotal>0){
-							winRate=Math.round(100*playersStatistics[nameol]['numWin']/(numTotal));
-						}
-						playersStatistics[nameol]['winRate']=winRate+"%";
-					}
-
-					tr=document.createElement('tr');
-					td=document.createElement('td');
-					td.innerHTML=nameol;
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=get.translation(clients[i].identity);
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=playersStatistics[nameol]['numWin'];
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=playersStatistics[nameol]['numLose'];
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=playersStatistics[nameol]['winRate'];
-					tr.appendChild(td);
-					table.appendChild(tr);
-				}
-				dialog.add(ui.create.div('.placeholder'));
-				dialog.content.appendChild(table);
-				// if this is the server, save it
-				if(!game.online){
-					game.save(playersStatisticsKey,playersStatistics);
-				}
-			}
-
 			if(game.players.length){
 				table=document.createElement('table');
 				tr=document.createElement('tr');
@@ -30226,7 +30261,7 @@
 			var clients=game.players.concat(game.dead);
 			for(var i=0;i<clients.length;i++){
 				if(clients[i].isOnline2()){
-					clients[i].send(game.over,dialog.content.innerHTML,game.checkOnlineResult(clients[i]));
+					clients[i].send(game.over,dialog.content.innerHTML,game.checkOnlineResult(clients[i]),winnerText);
 				}
 			}
 
