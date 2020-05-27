@@ -11061,8 +11061,9 @@
 					ui.create.connectPlayers(game.ip);
 					if(!window.isNonameServer){
 						var me=game.connectPlayers[0];
+						var winRate=game.getWinRateByNickname(lib.config.connect_nickname);
 						me.setIdentity('zhu');
-						me.initOL(lib.config.connect_nickname,lib.config.connect_avatar);
+						me.initOL(lib.config.connect_nickname,lib.config.connect_avatar,winRate);
 						me.playerid='1';
 						game.onlinezhu='1';
 					}
@@ -15848,25 +15849,19 @@
 					this.update();
 					return this;
 				},
-				initOL:function(name,character){
+				initOL:function(name,character,winRate='0%'){
 					this.node.avatar.setBackground(character,'character');
 					this.node.avatar.show();
 					this.node.name.innerHTML=get.verticalStr(name);
 					this.nickname=name;
 					this.avatar=character;
 					this.node.nameol.innerHTML='';
-
-					// game statistics
-					var numRate='0%';
-					var playersStatistics=lib.storage['players_statistics']
-					if(playersStatistics&&name&&playersStatistics[name]&&playersStatistics[name]['numRate']){
-						numRate=playersStatistics[name]['numRate'];
-					}
-					this.node.intro.innerHTML=numRate;
+					this.node.intro.innerHTML=winRate;
 				},
 				uninitOL:function(){
 					this.node.avatar.hide();
 					this.node.name.innerHTML='';
+					this.node.intro.innerHTML='';
 					this.node.identity.firstChild.innerHTML='';
 					delete this.nickname;
 					delete this.avatar;
@@ -25213,7 +25208,8 @@
 							if(game.connectPlayers[i].classList.contains('unselectable2')) continue;
 							if(game.connectPlayers[i]!=game.me&&!game.connectPlayers[i].playerid){
 								game.connectPlayers[i].playerid=this.id;
-								game.connectPlayers[i].initOL(this.nickname,this.avatar);
+								var winRate=game.getWinRateByNickname(this.nickname);
+								game.connectPlayers[i].initOL(this.nickname,this.avatar,winRate);
 								game.connectPlayers[i].ws=this;
 								break;
 							}
@@ -26069,9 +26065,9 @@
 						else{
 							game.connectPlayers[i].classList.remove('unselectable2');
 							if(map[i]){
-								game.connectPlayers[i].initOL(map[i][0],map[i][1]);
+								game.connectPlayers[i].initOL(map[i][0],map[i][1],map[i][3]);
 								game.connectPlayers[i].playerid=map[i][2];
-								if(map[i][3]=='zhu'){
+								if(map[i][4]=='zhu'){
 									game.connectPlayers[i].setIdentity('zhu');
 									if(map[i][2]==game.onlineID){
 										game.onlinezhu=true;
@@ -26442,13 +26438,14 @@
 			for(var i=0;i<game.connectPlayers.length;i++){
 				var player=game.connectPlayers[i];
 				if(player.playerid){
+					var winRate=game.getWinRateByNickname(player.nickname);
 					if(!game.onlinezhu){
 						game.onlinezhu=player.playerid;
 						game.send('server','changeAvatar',player.nickname,player.avatar);
 						_status.onlinenickname=player.nickname;
 						_status.onlineavatar=player.avatar;
 					}
-					map[i]=[player.nickname,player.avatar,player.playerid];
+					map[i]=[player.nickname,player.avatar,player.playerid,winRate];
 					if(player.playerid==game.onlinezhu){
 						map[i].push('zhu');
 					}
@@ -26492,7 +26489,7 @@
 			if(_status.event&&_status.event.createDialog&&_status.event.createDialog.length){
 				eventName=_status.event.createDialog[0];
 			}
-			if(!eventName&&_status.event&&_status.event._args&&_status.event._args.length&&_status.event._args[0].length&&_status.event._args[0][0].length>1&&_status.event._args[0][0][1].length){
+			if(!eventName&&_status.event&&_status.event._args&&_status.event._args[0]&&_status.event._args[0][0]&&_status.event._args[0][0][1]&&_status.event._args[0][0][1][0]){
 				eventName=_status.event._args[0][0][1][0];
 			}
 			if(!eventName) return num;
@@ -26512,6 +26509,16 @@
 					break;
 			}
 			return num;
+		},
+		getWinRateByNickname:function(nickname){
+			var winRate='0%';
+			if(nickname&&!game.online){ // if this is the server
+				var playersStatistics=lib.storage['players_statistics']
+				if(playersStatistics&&nickname&&playersStatistics[nickname]&&playersStatistics[nickname]['winRate']){
+					winRate=playersStatistics[nickname]['winRate'];
+				}
+			}
+			return winRate;
 		},
 		countChoose:function(clear){
 			if(_status.imchoosing){
@@ -29985,7 +29992,7 @@
 						playersStatistics[nameol]={
 							'numWin':0,
 							'numLose':0,
-							'numRate':'0%',
+							'winRate':'0%',
 						}
 					}
 					if(nameol!='无名玩家'){
@@ -29993,11 +30000,11 @@
 						if(game.checkOnlineResult(clients[i])) playersStatistics[nameol]['numWin']++;
 						else playersStatistics[nameol]['numLose']++;
 						var numTotal=playersStatistics[nameol]['numWin']+playersStatistics[nameol]['numLose'];
-						var numRate=0;
+						var winRate=0;
 						if(numTotal>0){
-							numRate=(playersStatistics[nameol]['numWin']/(numTotal));
+							winRate=Math.round(100*playersStatistics[nameol]['numWin']/(numTotal));
 						}
-						playersStatistics[nameol]['numRate']=(numRate*100).toFixed(2)+"%";
+						playersStatistics[nameol]['winRate']=winRate+"%";
 					}
 
 					tr=document.createElement('tr');
@@ -30014,7 +30021,7 @@
 					td.innerHTML=playersStatistics[nameol]['numLose'];
 					tr.appendChild(td);
 					td=document.createElement('td');
-					td.innerHTML=playersStatistics[nameol]['numRate'];
+					td.innerHTML=playersStatistics[nameol]['winRate'];
 					tr.appendChild(td);
 					table.appendChild(tr);
 				}

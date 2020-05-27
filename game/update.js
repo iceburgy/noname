@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.05.29.1',
+	version:'2020.05.29.2',
 	update:'1.9.98.7',
 	changeLog:[
 		'缩短选将时间',
@@ -17,6 +17,7 @@ window.noname_update={
 		'character/yijiang.js',
 		'game/config.js',
 		'game/game.js',
+		'layout/default/layout.css',
 		'layout/long2/layout.css',
 		'layout/newlayout/global.css',
 		'layout/nova/layout.css',
