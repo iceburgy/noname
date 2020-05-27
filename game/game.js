@@ -29958,13 +29958,13 @@
 					ui.ladder.innerHTML=game.getLadderName(lib.storage.ladder.current);
 				}
 			}
-			// game statistics
-			var playersStatisticsKey='players_statistics';
-			var playersStatistics=lib.storage[playersStatisticsKey]
-			if(!playersStatistics){
-				playersStatistics={};
-			}
 			if(_status.connectMode&&(game.players.length||game.dead.length)){
+				// game statistics
+				var playersStatisticsKey='players_statistics';
+				var playersStatistics=lib.storage[playersStatisticsKey]
+				if(!playersStatistics){
+					playersStatistics={};
+				}
 				var clients=game.players.concat(game.dead);
 				table=document.createElement('table');
 				tr=document.createElement('tr');
@@ -29993,6 +29993,7 @@
 							'numWin':0,
 							'numLose':0,
 							'winRate':'0%',
+							'lastID':'',
 						}
 					}
 					if(nameol!='无名玩家'){
@@ -30027,10 +30028,11 @@
 				}
 				dialog.add(ui.create.div('.placeholder'));
 				dialog.content.appendChild(table);
+				// if this is the server, save it
+				if(!game.online){
+					game.save(playersStatisticsKey,playersStatistics);
+				}
 			}
-			game.broadcastAll(function(key,val){
-				game.save(key,val);
-			},playersStatisticsKey,playersStatistics);
 
 			if(game.players.length){
 				table=document.createElement('table');
