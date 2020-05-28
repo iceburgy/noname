@@ -27,6 +27,11 @@ html{
 	background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));
 	border-radius: 8px;
 }
+.clsleaderboard{
+	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px !important;
+	background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)) !important;
+	border-radius: 8px !important;
+}
 #arena.mobile.textequip:not(.chess) .player[data-position='0'] .equips{
 	background-image: none;
 	box-shadow: rgba(0, 0, 0, 0.2) -1px 0px 0px 0px;

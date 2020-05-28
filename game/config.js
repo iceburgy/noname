@@ -233,5 +233,6 @@ window.config={
 		// ['jiushi','kuiwei'],
 		['zishu','xinfu_songsang'],
 		['zishu','shenxing'],
-	]
+	],
+	players_statistics:{}
 };

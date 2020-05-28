@@ -33,6 +33,11 @@ html{
 	color:rgba(77, 60, 51,0.8);
 	text-shadow:none;
 }
+.clsleaderboard{
+	background:url('wood2.png') !important;
+	color:rgba(77, 60, 51,0.8) !important;
+	text-shadow:none !important;
+}
 .popup-container>.menu.visual>.dashedmenubutton{
 	color:rgba(77, 60, 51,0.8);
 	text-shadow: none;

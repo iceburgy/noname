@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.05.29.2',
+	version:'2020.05.29.3',
 	update:'1.9.98.7',
 	changeLog:[
 		'缩短选将时间',
@@ -23,6 +23,9 @@ window.noname_update={
 		'layout/nova/layout.css',
 		'mode/connect.js',
 		'mode/identity.js',
+		'theme/music/style.css',
+		'theme/simple/style.css',
+		'theme/woodden/style.css',
 		'extension/十周年UI/decadeLayout.css',
 		'extension/十周年UI/extension.js',
 		'extension/十周年UI/layout.css',
