@@ -3728,6 +3728,28 @@
 						},
 						clear:true
 					},
+					reset_leaderboard:{
+						name:'重置胜率',
+						clear:true,
+						onclick:function(){
+							if(this.innerHTML=='<span>确认重置</span>'){
+								clearTimeout(this.confirmTimeout);
+								game.saveConfig('players_statistics',{});
+								this.innerHTML='<span>重置成功</span>';
+								var that=this;
+								setTimeout(function(){
+									that.innerHTML='<span>重置胜率</span>';
+								},1000);
+							}
+							else{
+								this.innerHTML='<span>确认重置</span>';
+								var that=this;
+								this.confirmTimeout=setTimeout(function(){
+									that.innerHTML='<span>重置胜率</span>';
+								},1000);
+							}
+						}
+					},
 					update:function(config,map){
 						if(lib.device||lib.node){
 							map.redownload_game.show();
@@ -29891,6 +29913,18 @@
 				tr.appendChild(td);
 				tableStatistics.appendChild(tr);
 
+				clients.sort((a, b) => {
+					var aWin=game.checkOnlineResult(a);
+					var bWin=game.checkOnlineResult(b);
+					if(aWin==bWin){
+						if(a.identity==b.identity) return a.nickname<=b.nickname?-1:1;
+						else if(a.identity=='zhu') return -1;
+						else if(b.identity=='zhu') return 1;
+						else return a.identity<=b.identity?-1:1;
+					}else{
+						return aWin?-1:1;
+					}
+				});
 				for(i=0;i<clients.length;i++){
 					var nameol='无名玩家';
 					if(clients[i].nickname){
