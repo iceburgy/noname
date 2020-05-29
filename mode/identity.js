@@ -4036,7 +4036,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'chooseToRespondBegin'},
 				filter:function (event,player){
 					var bool=false;
-					var skillm=lib.character[player.name1][3];
+					var mainName=player.name1?player.name1:player.name;
+					var skillm=lib.character[mainName][3];
 					var skillv=lib.character[player.name2][3];
 					if(player.isUnseen(0)){
 						for(var i=0;i<skillm.length;i++){
@@ -4060,7 +4061,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function (){
 					"step 0"
 					var choice=[];
-					var skillm=lib.character[player.name1][3];
+					var mainName=player.name1?player.name1:player.name;
+					var skillm=lib.character[mainName][3];
 					var skillv=lib.character[player.name2][3];
 					if(player.isUnseen(0)){
 						for(var i=0;i<skillm.length;i++){

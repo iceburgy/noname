@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.05.29.4',
+	version:'2020.05.29.5',
 	update:'1.9.98.7',
 	changeLog:[
 		'缩短选将时间',
