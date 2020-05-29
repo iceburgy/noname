@@ -2027,72 +2027,94 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 					// chosenChars for each player: [[zhu1, zhu2], [p1_1, p1_2], ...]
 					// index is based on distance from zhu
-					event.chosenCharsZhu=[];
+					event.chosenChars=new Array(game.players.length);
+					for(var i=0;i<game.players.length;i++) event.chosenChars[i]=[];
 					// choose char 1
-					var list;
-					if(event.zhongmode){
-						list=event.list.randomGets(8);
-					}
-					else{
-						var choiceZhu=5;
-						if(lib.configOL.choice_zhu){
-							choiceZhu=parseInt(lib.configOL.choice_zhu);
+					var list=[];
+					var selectButton=(1);
+
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]==game.zhu){
+							var choiceZhu=5;
+							if(lib.configOL.choice_zhu){
+								choiceZhu=parseInt(lib.configOL.choice_zhu);
+							}
+							var str='选择角色1';
+							if(game.players[i].special_identity){
+								str+='（'+get.translation(game.players[i].special_identity)+'）';
+							}
+							list.push([game.players[i],[str,[event.list.randomRemove(choiceZhu),'character']],selectButton,true]);
 						}
-						list=event.list.randomGets(choiceZhu);
 					}
-					var next=game.zhu.chooseButton(true);
-					next.set('selectButton',1);
-					next.set('createDialog',['选择角色1',[list,'character']]);
+					game.me.chooseButtonOL(list,function(player,result){
+						if(game.online||player==game.me) {
+							player.init(result.links[0]);
+							player.chosenChar1=result.links[0];
+						}
+					});
 					"step 1"
-					var chosenChar1=result.links[0];
-					event.list.remove(chosenChar1);
-					event.list2.remove(chosenChar1);
-					event.chosenCharsZhu.push(chosenChar1);
+					for(var i in result){
+						var chosenChar1=result[i].links[0];
+						event.chosenChars[0].push(chosenChar1);
+					}
 					// choose char 2
-					var list;
-					if(event.zhongmode){
-						list=event.list.randomGets(8);
-					}
-					else{
-						var choiceZhu=5;
-						if(lib.configOL.choice_zhu){
-							choiceZhu=parseInt(lib.configOL.choice_zhu);
+					var list=[];
+					var selectButton=(1);
+
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]==game.zhu){
+							var choiceZhu=5;
+							if(lib.configOL.choice_zhu){
+								choiceZhu=parseInt(lib.configOL.choice_zhu);
+							}
+							var str='选择角色2';
+							if(game.players[i].special_identity){
+								str+='（'+get.translation(game.players[i].special_identity)+'）';
+							}
+							list.push([game.players[i],[str,[event.list.randomRemove(choiceZhu),'character']],selectButton,true]);
 						}
-						list=event.list.randomGets(choiceZhu);
 					}
-					var next=game.zhu.chooseButton(true);
-					next.set('selectButton',1);
-					next.set('createDialog',['选择角色2',[list,'character']]);
+					game.me.chooseButtonOL(list,function(player,result){
+						if(game.online||player==game.me) {
+							player.init(player.chosenChar1,result.links[0]);
+						}
+					});
 					"step 2"
-					var chosenChar2=result.links[0];
-					event.list.remove(chosenChar2);
-					event.list2.remove(chosenChar2);
-					event.chosenCharsZhu.push(chosenChar2);
+					for(var i in result){
+						var chosenChar2=result[i].links[0];
+						event.chosenChars[0].push(chosenChar2);
+					}
 					// determine main and vice character
-					var next=game.zhu.chooseButton(true);
-					next.set('selectButton',2);
-					next.set('createDialog',['选择主副将',[event.chosenCharsZhu,'character']]);
-					next.set('callback',function(player,result){
-						// this determines the current user will see full character and group info or not
-						player.init(result.links[0],result.links[1],false);
-						player.group='unknown';
-						player.classList.add('unseen');
-						player.classList.add('unseen2');
+					var list=[];
+					var selectButton=(2);
+
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]==game.zhu){
+							var str='选择主副将';
+							if(game.players[i].special_identity){
+								str+='（'+get.translation(game.players[i].special_identity)+'）';
+							}
+							list.push([game.players[i],[str,[event.chosenChars[0],'character']],selectButton,true]);
+						}
+					}
+					game.me.chooseButtonOL(list,function(player,result){
+						if(game.online||player==game.me) {
+							// this determines the current user will see full character and group info or not
+							player.init(result.links[0],result.links[1],false);
+						}
 					});
 					"step 3"
 					if(game.me!=game.zhu){
-						// this determines the other online users will see full character and group info or not
-						game.zhu.init(result.links[0],result.links[1],false)
-						// game.zhu.init will be called from host and is broadcasting
-						// avoid exposing zhu character and group after making selection
-						game.zhu.group='unknown';
-						game.zhu.classList.add('unseen');
-						game.zhu.classList.add('unseen2');
+						for(var i in result){
+							// this determines the other online users will see full character and group info or not
+							game.zhu.init(result[i].links[0],result[i].links[1],false)
+							// game.zhu.init will be called from host and is broadcasting
+							// avoid exposing zhu character and group after making selection
+							game.zhu.group='unknown';
+							game.zhu.classList.add('unseen');
+							game.zhu.classList.add('unseen2');
+						}
 					}
-					event.list.remove(game.zhu.name);
-					event.list.remove(game.zhu.name2);
-					event.list2.remove(game.zhu.name);
-					event.list2.remove(game.zhu.name2);
 
 					if(game.players.length>4){
 						game.zhu.maxHp++;
@@ -2173,8 +2195,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},game.zhu);
 					"step 6"
 					// other players to choose character1
-					event.chosenCharsOthers=new Array(game.players.length);
-					for(var i=0;i<game.players.length;i++) event.chosenCharsOthers[i]=[];
 					var list=[];
 					var selectButton=(1);
 
@@ -2233,12 +2253,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							list.push([game.players[i],[str,[event.list.randomRemove(num+num3),'character']],selectButton,true]);
 						}
 					}
-					game.me.chooseButtonOL(list,function(player,result){});
+					game.me.chooseButtonOL(list,function(player,result){
+						if(game.online||player==game.me) {
+							player.init(result.links[0]);
+							player.chosenChar1=result.links[0];
+						}
+					});
 					"step 7"
 					for(var i in result){
 						var chosenChar1=result[i].links[0];
 						var chosenCharsIndex=get.distance(game.zhu, lib.playerOL[i], 'absolute');
-						event.chosenCharsOthers[chosenCharsIndex].push(chosenChar1);
+						event.chosenChars[chosenCharsIndex].push(chosenChar1);
 					}
 					// other players to choose character2
 					var list=[];
@@ -2299,12 +2324,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							list.push([game.players[i],[str,[event.list.randomRemove(num+num3),'character']],selectButton,true]);
 						}
 					}
-					game.me.chooseButtonOL(list,function(player,result){});
+					game.me.chooseButtonOL(list,function(player,result){
+						if(game.online||player==game.me) {
+							player.init(player.chosenChar1,result.links[0]);
+						}
+					});
 					"step 8"
 					for(var i in result){
 						var chosenChar2=result[i].links[0];
 						var chosenCharsIndex=get.distance(game.zhu, lib.playerOL[i], 'absolute');
-						event.chosenCharsOthers[chosenCharsIndex].push(chosenChar2);
+						event.chosenChars[chosenCharsIndex].push(chosenChar2);
 					}
 					// other players to determine main and vice character
 					var list=[];
@@ -2317,7 +2346,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.chosenCharsOthers[chosenCharsIndex],'character']],selectButton,true]);
+							list.push([game.players[i],[str,[event.chosenChars[chosenCharsIndex],'character']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
