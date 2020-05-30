@@ -26517,14 +26517,23 @@
 			if(!eventName) return num;
 			switch(eventName){
 				case '选择角色1':
+					if(lib.configOL.choose_timeout_char_1){
+						num=lib.configOL.choose_timeout_char_1;
+					}
+					break;
 				case '选择角色2':
-					if(lib.configOL.choose_char_timeout){
-						num=lib.configOL.choose_char_timeout;
+					if(lib.configOL.choose_timeout_char_2){
+						num=lib.configOL.choose_timeout_char_2;
 					}
 					break;
 				case '选择主副将':
-					if(lib.configOL.choose_main_vice_timeout){
-						num=lib.configOL.choose_main_vice_timeout;
+					if(lib.configOL.choose_timeout_main_vice){
+						num=lib.configOL.choose_timeout_main_vice;
+					}
+					break;
+				case '请选择神武将的势力':
+					if(lib.configOL.choose_timeout_shen_group){
+						num=lib.configOL.choose_timeout_shen_group;
 					}
 					break;
 				default:
@@ -34610,31 +34619,56 @@
 									connect:true,
 									frequent:true
 								};
-								infoconfig.connect_choose_char_timeout={
-									name:'选择角色时限',
-									init:'30',
+								infoconfig.connect_choose_timeout_char_1={
+									name:'选择角色1时限',
+									init:'20',
 									item:{
 										'10':'10秒',
-										'15':'15秒',
 										'20':'20秒',
-										'25':'25秒',
 										'30':'30秒',
+										'40':'40秒',
+										'50':'50秒',
 										'60':'60秒',
 										'90':'90秒',
 									},
 									connect:true,
 									frequent:true
 								};
-								infoconfig.connect_choose_main_vice_timeout={
+								infoconfig.connect_choose_timeout_char_2={
+									name:'选择角色2时限',
+									init:'40',
+									item:{
+										'10':'10秒',
+										'20':'20秒',
+										'30':'30秒',
+										'40':'40秒',
+										'50':'50秒',
+										'60':'60秒',
+										'90':'90秒',
+									},
+									connect:true,
+									frequent:true
+								};
+								infoconfig.connect_choose_timeout_main_vice={
 									name:'选择主副将时限',
-									init:'5',
+									init:'10',
 									item:{
 										'5':'5秒',
 										'10':'10秒',
 										'15':'15秒',
-										'30':'30秒',
-										'60':'60秒',
-										'90':'90秒',
+										'20':'20秒',
+									},
+									connect:true,
+									frequent:true
+								};
+								infoconfig.connect_choose_timeout_shen_group={
+									name:'选择神势力时限',
+									init:'10',
+									item:{
+										'5':'5秒',
+										'10':'10秒',
+										'15':'15秒',
+										'20':'20秒',
 									},
 									connect:true,
 									frequent:true
