@@ -3099,7 +3099,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					draw:{
 						trigger:{player:'phaseDrawBegin2'},
 						forced:true,
-						popup:false,
 						onremove:true,
 						filter:function(event,player){
 							return typeof player.storage.fumian_draw=='number';
@@ -11590,7 +11589,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_anxu_info:'出牌阶段限一次，你可以选择两名手牌数不同的其他角色，令其中手牌少的角色获得手牌多的角色的一张手牌并展示之。然后若此牌不为黑桃，则你摸一张牌。',
 			zongxuan_info:'当你的牌因弃置而进入弃牌堆时，你可以将其按任意顺序置于牌堆顶',
 			zhiyan_info:'结束阶段，你可以令一名角色摸一张牌并展示之，若为装备牌，其使用此牌并回复一点体力。',
-			miji_info:'结束阶段，若你已受伤，则可以摸X张牌，然后可以将等量的牌交给一名其他角色（X为你已损失的体力值）。',
+			miji_info:'结束阶段，若你已受伤，则可以摸X（X为你已损失的体力值）张牌，然后2选1：1）自己留着。2）将等量的手牌交给任意名其他角色。',
 			zhenlie_info:'当你成为其他角色使用牌的目标后，你可以失去一点体力并令此牌对你无效，然后弃置对方一张牌。',
 			chengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于13的牌',
 			oldchengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于12的牌',
