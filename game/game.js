@@ -15874,6 +15874,7 @@
 							this._inits[i](this);
 						}
 					}
+					if(!game.observe&&this==game.me) this.showGiveup();
 					this.update();
 					return this;
 				},
