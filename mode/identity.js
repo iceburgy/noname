@@ -308,6 +308,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			event.trigger('gameStart');
 
 			var players=get.players(lib.sort.position);
+
+			// name hidden players with position
+			game.broadcastAll(function(player){
+				for(var i=0;i<game.players.length;i++){
+					game.players[i].name='unknown'+get.distance(player,game.players[i],'absolute');
+					game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[game.players[i].name]),game.players[i]);
+				}
+			},game.zhu);
+
 			var info=[];
 			for(var i=0;i<players.length;i++){
 				info.push({
