@@ -2574,11 +2574,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(info.mode.unseen) this.classList.add('unseen');
 					if(info.mode.unseen2) this.classList.add('unseen2');
 					if(!info.name) return;
-					// if(info.name.indexOf('unknown')==0){
-					// 	if(this==game.me){
-					// 		lib.translate[info.name]+='（你）';
-					// 	}
-					// }
 					this.init(info.name1,info.name2,false);
 					this.name1=info.name1;
 					this.name=info.name;
