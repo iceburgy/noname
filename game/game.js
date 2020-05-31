@@ -16312,6 +16312,8 @@
 						identityShown:this.identityShown,
 						identityNode:[this.node.identity.innerHTML,this.node.identity.dataset.color],
 						identity:this.identity,
+						skills:this.skills?this.skills.slice(0):[],
+						hiddenSkills:this.hiddenSkills?this.hiddenSkills.slice(0):[],
 						dead:this.isDead(),
 						linked:this.isLinked(),
 						turnedover:this.isTurnedOver(),
@@ -25884,6 +25886,13 @@
 							player.side=info.side;
 							player.phaseNumber=info.phaseNumber,
 							player.setNickname();
+							for(var si=0;si<info.skills.length;si++){
+								player.addSkill(info.skills[si]);
+							}
+							for(var si=0;si<info.hiddenSkills.length;si++){
+								player.hiddenSkills.add(info.hiddenSkills[si]);
+								player.addSkillTrigger(info.hiddenSkills[si],true);
+							}
 							if(info.dead){
 								player.classList.add('dead');
 								if(lib.config.die_move){
@@ -30392,6 +30401,14 @@
 			for(var i=0;i<clients.length;i++){
 				if(clients[i].isOnline2()){
 					clients[i].send(game.over,dialog.content.innerHTML,game.checkOnlineResult(clients[i]),winnerText);
+				}
+			}
+
+			// notify observers
+			var observers=lib.node.observing;
+			if(observers&&observers.length){
+				for(var i=0;i<observers.length;i++){
+					observers[i].send(game.over,dialog.content.innerHTML,undefined,winnerText);
 				}
 			}
 
