@@ -2431,7 +2431,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					for(var i=0;i<game.players.length;i++){
-						game.players[i].showGiveup();
 						// game.zhu has been set at above and it should be skipped here
 						if(game.players[i]==game.zhu) continue;
 
