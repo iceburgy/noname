@@ -13118,6 +13118,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
+					if(player.name2=='simalang'){
+						if(player.isUnseen(1)){
+							return false;
+						}
+					}else{
+						if(player.isUnseen(0)){
+							return false;
+						}
+					}
 					return event.player.countCards('h')<=1;
 				},
 				direct:true,
@@ -13492,11 +13501,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			aocai:{
 				audio:2,
-				trigger:{player:['chooseToUseBegin','chooseToRespondBegin']},
+				trigger:{player:'chooseToRespondBegin'},
 				frequent:true,
 				filter:function(event,player){
 					if(event.responded) return false;
-					return _status.currentPhase!==player&&event.parent.name!='_wuxie';
+					return _status.currentPhase!==player;
 				},
 				content:function(){
 					"step 0"
@@ -13530,6 +13539,75 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
+				group:'aocai2',
+			},
+			aocai2:{
+				enable:'chooseToUse',
+				filter:function(event,player){
+					return _status.currentPhase!==player&&event.type!='wuxie'&&event.type!='trickuse';
+				},
+				onChooseToUse:function(event){
+					if(!game.online){
+						var cards=[];
+						if(ui.cardPile.childNodes.length<2){
+							var discardcards=get.cards(2);
+							game.cardsDiscard(discardcards);
+						}
+						for(var i=0;i<2;i++){
+							if(ui.cardPile.childNodes.length>i) cards.push(ui.cardPile.childNodes[i]);
+						}
+						event.set('aocaicards',cards);
+					}
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						if(player.name2=='zhugeke'){
+							if(player.isUnseen(1)){
+								player.showCharacter(1);
+							}
+						}else{
+							if(player.isUnseen(0)){
+								player.showCharacter(0);
+							}
+						}
+						return ui.create.dialog('傲才：选择一张卡牌使用',event.aocaicards);
+					},
+					filter:function(button,player){
+						var evt=_status.event.getParent();
+						if(evt&&evt.filterCard){
+							return get.type(button.link)=='basic'&&evt.filterCard(button.link,player,evt);
+						}
+						return false;
+					},
+					check:function(button){
+						return 1;
+					},
+					backup:function(links,player){
+						return {
+							audio:'aocai',
+							filterCard:function(){
+								return false;
+							},
+							selectCard:-1,
+							viewAs:links[0],
+						}
+					},
+					prompt:function(links,player){
+						return '选择'+get.translation(links)+'的目标';
+					}
+				},
+				ai:{
+					order:11,
+					respondShan:true,
+					respondSha:true,
+					save:true,
+					result:{
+						player:function(player){
+							if(_status.event.dying) return get.attitude(player,_status.event.dying);
+							return 1;
+						}
+					}
+				}
 			},
 			hongyuan:{
 				trigger:{player:'phaseDrawBegin2'},
@@ -13968,9 +14046,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			baobian:{
 				audio:2,
+				enable:'phaseUse',
 				trigger:{player:['phaseBefore','changeHp']},
 				forced:true,
 				popup:false,
+				filter:function(event,player){
+					if(event.name=='chooseToUse'){
+						if(player.name2=='xiahouba'){
+							if(player.isUnseen(1)){
+								return true;
+							}
+						}else{
+							if(player.isUnseen(0)){
+								return true;
+							}
+						}
+						return false;
+					}
+					return true;
+				},
 				init:function(player){
 					if(game.online) return;
 					if(player.name2=='xiahouba'){
@@ -14018,7 +14112,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},player,'baobian');
 					var list=[];
 					if(player.hp<=3){
-						if(trigger.num!=undefined&&trigger.num<0&&player.hp-trigger.num>1) player.logSkill('baobian');
+						if(trigger&&trigger.num!=undefined&&trigger.num<0&&player.hp-trigger.num>1) player.logSkill('baobian');
 						list.push('retiaoxin');
 					}
 					if(player.hp<=2){

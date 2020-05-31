@@ -15403,6 +15403,12 @@
 					},player,player.isLinked());
 					game.addVideo('link',player,player.isLinked());
 				},
+				showCharacter:function(){
+					'step 0'
+					event.trigger('showCharacterEnd');
+					'step 1'
+					event.trigger('showCharacterAfter');
+				},
 			},
 			player:{
 				//新函数

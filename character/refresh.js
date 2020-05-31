@@ -32,7 +32,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_machao:['male','shu',4,['mashu','retieji']],
 			re_xushu:['male','shu',4,['zhuhai','qianxin']],
 			re_zhouyu:['male','wu',3,['reyingzi','refanjian']],
-			re_lvmeng:['male','wu',4,['keji','qinxue','botu']],
+			re_lvmeng:['male','wu',4,['keji','qinxue']],
 			re_ganning:['male','wu',4,['qixi','fenwei']],
 			re_luxun:['male','wu',3,['reqianxun','relianying']],
 			re_daqiao:['female','wu',3,['reguose','liuli']],
@@ -2604,7 +2604,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				usable:1,
 				filter:function (event,player){
-					if(event.parent.parent.name=='phaseDraw') return false;
+					var curEvent=event;
+					while(curEvent&&curEvent.name!='phaseDraw') curEvent=curEvent.parent;
+					if(curEvent&&curEvent.name=='phaseDraw') return false;
 					return event.cards&&event.cards.length>0
 				},
 				content:function (){
