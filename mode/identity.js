@@ -2564,12 +2564,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			player:{
-				yexinbilu:function(){
-					game.broadcastAll(function(player){
-						player.showIdentity();
-					},this);
-					this.gainMaxHp();
-					this.recover();
+				getModeState:function(){
+					return {
+						unseen:this.isUnseen(0),
+						unseen2:this.isUnseen(1),
+					}
+				},
+				setModeState:function(info){
+					if(info.mode.unseen) this.classList.add('unseen');
+					if(info.mode.unseen2) this.classList.add('unseen2');
+					if(!info.name) return;
+					this.init(info.name1,info.name2,false);
+					this.name1=info.name1;
+					this.name=info.name;
+					this.node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[this.name].slice(0,3)),this);
+					if(info.identityShown){
+						this.setIdentity(info.identity);
+						this.node.identity.classList.remove('guessing');
+					}
+					else if(this!=game.me){
+						this.node.identity.firstChild.innerHTML='猜';
+						this.node.identity.dataset.color='unknown';
+						this.node.identity.classList.add('guessing');
+					}
 				},
 				$dieAfter:function(){
 					if(_status.video) return;
@@ -4065,8 +4082,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'chooseToRespondBegin'},
 				filter:function (event,player){
 					var bool=false;
-					var mainName=player.name1?player.name1:player.name;
-					var skillm=lib.character[mainName][3];
+					var skillm=lib.character[player.name1][3];
 					var skillv=lib.character[player.name2][3];
 					if(player.isUnseen(0)){
 						for(var i=0;i<skillm.length;i++){
