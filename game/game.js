@@ -29868,10 +29868,16 @@
 			}
 			var winnerId;
 			var tableStatistics;
+			var winnerText='';
 			if(_status.connectMode&&(game.players.length||game.dead.length)){
 				// game statistics
 				/* lib.config.players_statistics
 				{
+					identity:{
+						zhuzhong:0,
+						fan:0,
+						nei:0,
+					},
 					local:{
 						nickname:{
 							'numWin':0,
@@ -29908,26 +29914,6 @@
 					playersStatistics={};
 				}
 				var clients=game.players.concat(game.dead);
-				tableStatistics=document.createElement('table');
-				tr=document.createElement('tr');
-				tr.appendChild(document.createElement('td'));
-				td=document.createElement('td');
-				td.innerHTML='身份';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='战况';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='胜场';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='负场';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='胜率';
-				tr.appendChild(td);
-				tableStatistics.appendChild(tr);
-
 				clients.sort((a, b) => {
 					var aWin=game.checkOnlineResult(a);
 					var bWin=game.checkOnlineResult(b);
@@ -29990,63 +29976,89 @@
 						}
 						playersStatistics[nameol]['winRate']=winRate+"%";
 					}
-
-					tr=document.createElement('tr');
-					td=document.createElement('td');
-					td.innerHTML=nameol;
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=get.translation(playerIdentity);
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=get.translation(playerWin?'获胜':'-');
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=playersStatistics[nameol]['numWin'];
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=playersStatistics[nameol]['numLose'];
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=playersStatistics[nameol]['winRate'];
-					tr.appendChild(td);
-					tableStatistics.appendChild(tr);
 				}
+
+				// gather identity statistics
+				var identityStatisticsKey='identity';
+				var identityStatistics=playersStatisticsRoot[identityStatisticsKey];
+				if(!identityStatistics){
+					identityStatistics={
+						zhuzhong:0,
+						fan:0,
+						nei:0,
+					};
+				}
+
+				switch(winnerId){
+					case 'zhu':
+						winnerText='，主公获胜';
+						identityStatistics.zhuzhong++;
+						break;
+					case 'zhong':
+						winnerText='，主忠获胜';
+						identityStatistics.zhuzhong++;
+						break;
+					case 'fan':
+						winnerText='，反贼获胜';
+						identityStatistics.fan++;
+						break;
+					case 'nei':
+						winnerText='，内奸获胜';
+						identityStatistics.nei++;
+						break;
+					default:
+						break;
+				}
+
+				tableStatistics=document.createElement('table');
+				tr=document.createElement('tr');
+				tr.appendChild(document.createElement('td'));
+				td=document.createElement('td');
+				td.innerHTML='主忠';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='反贼';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='内奸';
+				tr.appendChild(td);
+				tableStatistics.appendChild(tr);
+
+				tr=document.createElement('tr');
+				td=document.createElement('td');
+				td.innerHTML='胜场';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML=identityStatistics.zhuzhong;
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML=identityStatistics.fan;
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML=identityStatistics.nei;
+				tr.appendChild(td);
+				tableStatistics.appendChild(tr);
+
 				playersStatisticsRoot[playersStatisticsKeyLocal]=playersStatistics
+				playersStatisticsRoot[identityStatisticsKey]=identityStatistics
 				game.saveConfig(playersStatisticsKeyRoot,playersStatisticsRoot);
 				var hostZone=game.me.nickname;
 				if(hostZone){
-					game.broadcast(function(zoneKey,val){
+					game.broadcast(function(zoneKey,zoneVal,idStats){
 						var statsRootKey='players_statistics';
 						var statsRoot=lib.config[statsRootKey];
 						if(!statsRoot){
 							statsRoot={};
 						}
-						statsRoot[zoneKey]=val;
+						statsRoot[zoneKey]=zoneVal;
+						statsRoot['identity']=idStats;
 						game.saveConfig(statsRootKey,statsRoot);
-					},hostZone,playersStatistics);
+					},hostZone,playersStatistics,identityStatistics);
 				}
 			}
 			var resultbool=result;
 			if(typeof resultbool!=='boolean'){
 				resultbool=null;
-			}
-			var winnerText='';
-			switch(winnerId){
-				case 'zhu':
-					winnerText='，主公获胜';
-					break;
-				case 'zhong':
-					winnerText='，主忠获胜';
-					break;
-				case 'fan':
-					winnerText='，反贼获胜';
-					break;
-				case 'nei':
-					winnerText='，内奸获胜';
-					break;
-				default:
-					break;
 			}
 			var winnerTextServer=result?'':winnerText;
 			if(result===true) result='战斗胜利';
@@ -33160,14 +33172,14 @@
 		},
 		toggleLeaderBoard:function(){
 			if(game.leaderBoardDialog){
-				ui.leaderBoardDialog.innerHTML='查看胜率';
+				ui.leaderBoardDialog.innerHTML='查看战况';
 				game.leaderBoardDialog.close();
 				delete game.leaderBoardDialog;
 				return;
 			}
-			ui.leaderBoardDialog.innerHTML='关闭胜率';
+			ui.leaderBoardDialog.innerHTML='关闭战况';
 			var tableStatistics, tr, td, dialog;
-			var tableHeader='排行榜';
+			var tableHeader='战况';
 			dialog=ui.create.dialog(tableHeader,'hidden');
 			dialog.classList.add('clsleaderboard');
 			dialog.forcebutton=true;
@@ -33177,99 +33189,47 @@
 			if(!playersStatisticsRoot){
 				playersStatisticsRoot={};
 			}
-			var hostZones=Object.keys(playersStatisticsRoot);
-			for(var k=0;k<hostZones.length;k++){
-				var hostZone=hostZones[k];
-				var p=document.createElement('p');
-				p.innerHTML='本地';
-				if(hostZone!='local') {
-					 p.innerHTML=hostZone+'区';
-				}
-				dialog.content.appendChild(p);
-
-				var playersStatistics=playersStatisticsRoot[hostZone];
-				if(!playersStatistics){
-					playersStatistics={};
-				}
-
-				// sort by winRate, returns [[k1, val1],[k2, val2]]
-				var sortedStats=game.sortProperties(playersStatistics);
-
-				tableStatistics=document.createElement('table');
-				tr=document.createElement('tr');
-				tr.appendChild(document.createElement('td'));
-				td=document.createElement('td');
-				td.innerHTML='胜场';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='负场';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='胜率';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='主公';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='忠臣';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='反贼';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='内奸';
-				tr.appendChild(td);
-				tableStatistics.appendChild(tr);
-				
-				for(var i=0;i<sortedStats.length;i++){
-					var playerNickname=sortedStats[i][0];
-					if(playerNickname=='无名玩家') continue;
-					tr=document.createElement('tr');
-					td=document.createElement('td');
-					td.innerHTML=playerNickname;
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=sortedStats[i][1]['numWin'];
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=sortedStats[i][1]['numLose'];
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=sortedStats[i][1]['winRate'];
-					tr.appendChild(td);
-					td=document.createElement('td');
-					var zhuWin=sortedStats[i][1]['zhuWin'];
-					var zhuLose=sortedStats[i][1]['zhuLose'];
-					var zhuTotal=zhuWin+zhuLose;
-					var zhuRate=sortedStats[i][1]['zhuRate'];
-					td.innerHTML=zhuWin+'/'+zhuTotal+'='+zhuRate;
-					tr.appendChild(td);
-					td=document.createElement('td');
-					var zhongWin=sortedStats[i][1]['zhongWin'];
-					var zhongLose=sortedStats[i][1]['zhongLose'];
-					var zhongTotal=zhongWin+zhongLose;
-					var zhongRate=sortedStats[i][1]['zhongRate'];
-					td.innerHTML=zhongWin+'/'+zhongTotal+'='+zhongRate;
-					tr.appendChild(td);
-					td=document.createElement('td');
-					var fanWin=sortedStats[i][1]['fanWin'];
-					var fanLose=sortedStats[i][1]['fanLose'];
-					var fanTotal=fanWin+fanLose;
-					var fanRate=sortedStats[i][1]['fanRate'];
-					td.innerHTML=fanWin+'/'+fanTotal+'='+fanRate;
-					tr.appendChild(td);
-					td=document.createElement('td');
-					var neiWin=sortedStats[i][1]['neiWin'];
-					var neiLose=sortedStats[i][1]['neiLose'];
-					var neiTotal=neiWin+neiLose;
-					var neiRate=sortedStats[i][1]['neiRate'];
-					td.innerHTML=neiWin+'/'+neiTotal+'='+neiRate;
-					tr.appendChild(td);
-					tableStatistics.appendChild(tr);
-				}
-				dialog.content.appendChild(tableStatistics);
-				dialog.add(ui.create.div('.placeholder'));
+			var identityStatisticsKey='identity';
+			var identityStatistics=playersStatisticsRoot[identityStatisticsKey];
+			if(!identityStatistics){
+				identityStatistics={
+					zhuzhong:0,
+					fan:0,
+					nei:0,
+				};
 			}
+
+			tableStatistics=document.createElement('table');
+			tr=document.createElement('tr');
+			tr.appendChild(document.createElement('td'));
+			td=document.createElement('td');
+			td.innerHTML='主忠';
+			tr.appendChild(td);
+			td=document.createElement('td');
+			td.innerHTML='反贼';
+			tr.appendChild(td);
+			td=document.createElement('td');
+			td.innerHTML='内奸';
+			tr.appendChild(td);
+			tableStatistics.appendChild(tr);
+
+			tr=document.createElement('tr');
+			td=document.createElement('td');
+			td.innerHTML='胜场';
+			tr.appendChild(td);
+			td=document.createElement('td');
+			td.innerHTML=identityStatistics.zhuzhong;
+			tr.appendChild(td);
+			td=document.createElement('td');
+			td.innerHTML=identityStatistics.fan;
+			tr.appendChild(td);
+			td=document.createElement('td');
+			td.innerHTML=identityStatistics.nei;
+			tr.appendChild(td);
+			tableStatistics.appendChild(tr);
+			dialog.content.appendChild(tableStatistics);
+			dialog.add(ui.create.div('.placeholder'));
+
 			game.leaderBoardDialog=dialog;
 			game.leaderBoardDialog.open();
 		},
@@ -42478,7 +42438,7 @@
 				ui.system2=ui.create.div('#system2',ui.system);
 
 				ui.replay=ui.create.system('重来',game.reload,true);
-				ui.leaderBoardDialog=ui.create.system('查看胜率',game.toggleLeaderBoard,true);
+				ui.leaderBoardDialog=ui.create.system('查看战况',game.toggleLeaderBoard,true);
 				ui.changeLogDialog=ui.create.system('查看版本',game.toggleChangeLog,true);
 				ui.replay.id='restartbutton';
 				ui.config2=ui.create.system('选项',ui.click.config);

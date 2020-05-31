@@ -1907,13 +1907,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						isAssignRepeated=false;
 						for(i=0;i<game.players.length;i++){
 							var nameol=game.players[i].nickname;
-							if(!nameol) {
-								console.log('warning: player missing nickname!');
-							}
-							else if(nameol=='无名玩家'){
-								console.log('warning: player with bad nickname 无名玩家!');
-							}
-							else if(playersStatistics&&playersStatistics[nameol]&&playersStatistics[nameol]['lastID']){
+							if(nameol&&nameol!='无名玩家'&&playersStatistics&&playersStatistics[nameol]&&playersStatistics[nameol]['lastID']){
 								var lastID=playersStatistics[nameol]['lastID'];
 								if(lastID=='zhu'&&identityList[i]=='zhu'||lastID=='nei'&&identityList[i]=='nei'){
 									isAssignRepeated=true;
