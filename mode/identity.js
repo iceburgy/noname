@@ -2615,6 +2615,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						this.node.identity.firstChild.innerHTML='猜';
 						this.node.identity.dataset.color='unknown';
 						this.node.identity.classList.add('guessing');
+						if(decadeUI&&decadeUI.config.campIdentityImageMode){
+							this.setIdentity('cai');
+						}
 					}
 				},
 				$dieAfter:function(){
