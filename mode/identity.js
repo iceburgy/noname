@@ -407,6 +407,27 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				return state;
 			},
+			getNextValidCharacters:function(mainChar,numOfChars,charPool){
+				var nextValidCharacters=[];
+				if(mainChar&&lib.config['forbid_double']&&lib.config['forbid_double'][mainChar]){
+					var forbidChars=lib.config['forbid_double'][mainChar];
+					for(var i=0;i<numOfChars;i++){
+						var candiChar=undefined;
+						do{
+							candiChar=charPool.randomRemove(1)[0];
+						}while(charPool.length&&forbidChars.includes(candiChar));
+						if(!forbidChars.includes(candiChar)){
+							nextValidCharacters.push(candiChar);
+						}else{
+							console.log('===exhausted all characters without avoiding forbid, pool length: '+nextValidCharacters.length);
+							return nextValidCharacters;
+						}
+					}
+				}else{
+					nextValidCharacters=charPool.randomRemove(numOfChars);
+				}
+				return nextValidCharacters;
+			},
 			updateState:function(state){
 				for(var i in state){
 					var player=lib.playerOL[i];
@@ -2074,7 +2095,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.list.randomRemove(choiceZhu),'character']],selectButton,true]);
+							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[0][0],choiceZhu,event.list);
+							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2324,7 +2346,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.list.randomRemove(num+num3),'character']],selectButton,true]);
+							var chosenCharsIndex=get.distance(game.zhu, game.players[i], 'absolute');
+							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[chosenCharsIndex][0],num+num3,event.list);
+							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){

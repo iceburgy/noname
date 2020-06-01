@@ -3674,6 +3674,19 @@
 						'<button style="width:40px">确定</button></div>',
 						clear:true,
 					},
+//					init_forbid_lib:{
+//						name:'初始化禁将表',
+//						onclick:function(){
+//							ui.init_forbid_lib_button.classList.toggle('hidden');
+//						},
+//						clear:true
+//					},
+//					init_forbid_lib_button:{
+//						name:'<div style="white-space:nowrap;width:calc(100% - 10px)">'+
+//						'<input type="file" style="width:calc(100% - 40px)">'+
+//						'<button style="width:40px">确定</button></div>',
+//						clear:true,
+//					},
 					export_data:{
 						name:'导出游戏设置',
 						onclick:function(){
@@ -3750,6 +3763,86 @@
 							}
 						}
 					},
+					import_forbid_lib:{
+						name:'导入禁将表',
+						clear:true,
+						onclick:function(){
+							this.innerHTML='<span>导入中...</span>';
+
+							var httpReq = new XMLHttpRequest();
+							var url='https://api.dropboxapi.com/2/paper/docs/download';
+							httpReq.open("GET",url,false);
+							httpReq.setRequestHeader('Authorization','Bearer wzahoqHWjoQAAAAAAAAAFV2iwzrw_BFSgaena__5iraqztOyTepnnUc5J1S-73FM');
+							httpReq.setRequestHeader('Dropbox-API-Arg',"{\"doc_id\": \"gO8sAY4eYAlF2OQ6QPk5T\",\"export_format\": \"markdown\"}");
+							httpReq.send();
+							var forbidMapRaw=httpReq.responseText.split('\n');
+							forbidMapRaw.splice(0, 1);
+					        forbidMapRaw=forbidMapRaw.join('\n');
+							var forbidMap = JSON.parse(forbidMapRaw);
+
+							var parseDataKey=function(dataKey){
+								// sample longKey: "步骘(BuZhi)"
+								var dataKey=dataKey.split("(");
+								var roleName=dataKey[0];
+								var dataKey=dataKey[1].split(")");
+								var roleKey=dataKey[0];
+								return [roleName,roleKey];
+							}
+							var simplifyForbidMap=function(forbidMap){
+								var simpleForbidMap={};
+								for(var key in forbidMap){
+									var parsedKeys=parseDataKey(key);
+									simpleForbidMap[parsedKeys[1]]=[];
+									for(var val of forbidMap[key]){
+										var parsedVals=parseDataKey(val);
+										simpleForbidMap[parsedKeys[1]].push(parsedVals[1]);
+									}
+								}
+								return simpleForbidMap;
+							}
+
+							var simpleForbidMap=simplifyForbidMap(forbidMap);
+							game.saveConfig('forbid_double',simpleForbidMap);
+
+							var that=this;
+							setTimeout(function(){
+								that.innerHTML='<span>导入成功</span>';
+								setTimeout(function(){
+									that.innerHTML='<span>导入禁将表</span>';
+								},1000);
+							},1000);
+						}
+					},
+					export_role_lib:{
+						name:'导出武将池',
+						onclick:function(){
+							var data={};
+							var libCharacter={};
+							for(var i=0;i<lib.configOL.characterPack.length;i++){
+								var pack=lib.characterPack[lib.configOL.characterPack[i]];
+								for(var j in pack){
+									if(lib.character[j]) libCharacter[j]=pack[j];
+								}
+							}
+							for(i in libCharacter){
+								if(lib.filter.characterDisabled(i,libCharacter)) continue;
+								var charName=get.translation(i);
+								var charKey=charName+'('+i+')';
+								data[charKey]=[];
+								var charInfo=lib.character[i];
+								var skills=charInfo[3];
+								for(var j=0;j<skills.length;j++){
+									var skillName=get.translation(skills[j]);
+									var skillInfo=get.skillInfoTranslation(skills[j]);
+									var skillIntro=skillName+'--'+skillInfo;
+									data[charKey].push(skillIntro);
+								}
+							}
+							game.export(JSON.stringify(data),'noname-rolelib'+(new Date()).toLocaleString()+'.json');
+						},
+						clear:true
+					},
+
 					update:function(config,map){
 						if(lib.device||lib.node){
 							map.redownload_game.show();
@@ -23999,10 +24092,6 @@
 				return true;
 			},
 			characterDisabled:function(i,libCharacter){
-				if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) return true;
-				if(lib.character[i][4]&&lib.character[i][4].contains('unseen')) return true;
-				if(lib.config.forbidai.contains(i)) return true;
-				if(lib.characterFilter[i]&&!lib.characterFilter[i](get.mode())) return true;
 				if(_status.connectMode){
 					if(lib.configOL.banned.contains(i)) return true;
 					var double_character=false;
@@ -35299,6 +35388,151 @@
 										}
 									}
 								}
+//								else if(j=='init_forbid_lib_button'){
+//									ui.init_forbid_lib_button=cfgnode;
+//									cfgnode.hide();
+//									cfgnode.querySelector('button').onclick=function(){
+//										var fileToLoad=this.previousSibling.files[0];
+//										if(fileToLoad){
+//											var fileReader = new FileReader();
+//											fileReader.onload = function(fileLoadedEvent)
+//											{
+//												var data = fileLoadedEvent.target.result;
+//												if(!data) return;
+//												try{
+//													data=JSON.parse(data);
+//													if(!data||typeof data!='object'){
+//														throw('err');
+//													}
+//												}
+//												catch(e){
+//													console.log(e);
+//													alert('导入失败');
+//													return;
+//												}
+//												alert('导入成功');
+//												var parseDataKey=function(dataKey){
+//													// sample longKey: "步骘(BuZhi)"
+//													var dataKey=dataKey.split("(");
+//													var roleName=dataKey[0];
+//													var dataKey=dataKey[1].split(")");
+//													var roleKey=dataKey[0];
+//													return [roleName,roleKey];
+//												}
+//												var roleLib={};
+//												var libCharacter={};
+//												for(var i1=0;i1<lib.configOL.characterPack.length;i1++){
+//													var pack=lib.characterPack[lib.configOL.characterPack[i1]];
+//													for(var j1 in pack){
+//														if(lib.character[j1]) libCharacter[j1]=pack[j1];
+//													}
+//												}
+//												for(i1 in libCharacter){
+//													if(lib.filter.characterDisabled(i1,libCharacter)) continue;
+//													var charName=get.translation(i1);
+//													var charKey=charName+'('+i1+')';
+//													roleLib[charKey]=[];
+//													var charInfo=libCharacter[i1];
+//													var skills=charInfo[3];
+//													for(var j1=0;j1<skills.length;j1++){
+//														var skillName=get.translation(skills[j1]);
+//														var skillInfo=get.skillInfoTranslation(skills[j1]);
+//														var skillIntro=skillName+'--'+skillInfo;
+//														roleLib[charKey].push(skillIntro);
+//													}
+//												}
+//
+//												// "步骘(BuZhi)"
+//												var charLibLeftKey = new Map(); // "步骘"
+//												var charLibRightKey = new Map(); // "BuZhi"
+//												for(var longKey in roleLib){
+//													var parsedKeys=parseDataKey(longKey);
+//													charLibLeftKey[parsedKeys[0]]=parsedKeys[1];
+//													charLibRightKey[parsedKeys[1]]=parsedKeys[0];
+//												}
+//// format values
+//												var formalizedData = new Map();
+//												var decomp=function(compStr, dmt){
+//													var res=[];
+//													for(var curDmt of dmt){
+//														if(compStr.indexOf(curDmt)>=0){
+//															var splitStrs=compStr.split(curDmt);
+//															for(var splitStr of splitStrs){
+//																res=res.concat(decomp(splitStr,dmt));
+//															}
+//															return res;
+//														}
+//													}
+//													return [compStr];
+//												}
+//
+//												for(var dataKey in data){
+//													// sample data entry: "步骘(BuZhi)": "郭嘉、凌统、孙尚香、SP孙尚香",
+//													var parsedKeys=parseDataKey(dataKey);
+//													var roleName=parsedKeys[0];
+//													var roleKey=parsedKeys[1];
+//
+//													var banList=data[dataKey];
+//													var dmt=['，',',','、'];
+//
+//													var banList=decomp(banList, dmt);
+//													var banListFormal=[];
+//
+//													for(var banRole of banList){
+//														var banRolejie='界'+banRole;
+//														var banRolenoamp=banRole.replace('&','');
+//														if(banRolejie in charLibLeftKey){
+//                                                        	banListFormal.push(banRolejie+'('+charLibLeftKey[banRolejie]+')');
+//                                                        }
+//                                                        else if(banRolenoamp in charLibLeftKey){
+//                                                        	banListFormal.push(banRolenoamp+'('+charLibLeftKey[banRolenoamp]+')');
+//                                                        }
+//                                                        else if(banRole in charLibLeftKey){
+//															banListFormal.push(banRole+'('+charLibLeftKey[banRole]+')');
+//														}
+//														else{
+//															banListFormal.push(banRole+'(missing)');
+//														}
+//													}
+//													formalizedData[dataKey]=banListFormal;
+//												}
+//												game.export(JSON.stringify(formalizedData),'noname-forbidlib-val-formalized'+(new Date()).toLocaleString()+'.json');
+//
+//// format keys
+////												var formalizedData = new Map();
+////												for(var dataKey in data){
+////													// sample data entry: "步骘(BuZhi)": "郭嘉、凌统、孙尚香、SP孙尚香",
+////													var formalizedCharKey=dataKey;
+////													var parsedKeys=parseDataKey(dataKey);
+////													var roleName=parsedKeys[0];
+////													var roleKey=parsedKeys[1];
+////
+////													var banRolejie='界'+roleName;
+////													var banRolenoamp=roleName.replace('&','');
+////													if(banRolejie in charLibLeftKey){
+////														formalizedCharKey=banRolejie+'('+charLibLeftKey[banRolejie]+')';
+////													}
+////													else if(banRolenoamp in charLibLeftKey){
+////														formalizedCharKey=banRolenoamp+'('+charLibLeftKey[banRolenoamp]+')';
+////													}
+////													else if(roleName in charLibLeftKey){
+////														formalizedCharKey=roleName+'('+charLibLeftKey[roleName]+')';
+////													}
+////													else if(roleKey.toLowerCase() in charLibRightKey){
+////														formalizedCharKey=charLibRightKey[roleKey.toLowerCase()]+'('+roleKey.toLowerCase()+')';
+////													}
+////													if(formalizedCharKey!=dataKey){
+////														formalizedData[formalizedCharKey]=data[dataKey];
+////														delete data[dataKey];
+////													}
+////												}
+////												game.export(JSON.stringify(data),'noname-key-rem'+(new Date()).toLocaleString()+'.json');
+////												game.export(JSON.stringify(formalizedData),'noname-key-formatted'+(new Date()).toLocaleString()+'.json');
+//											};
+//											fileReader.readAsText(fileToLoad, "UTF-8");
+//										}
+//									}
+//								}
 								else if(j=='import_music'){
 									cfgnode.querySelector('button').onclick=function(){
 										if(_status.music_importing) return;
