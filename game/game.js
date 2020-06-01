@@ -25962,6 +25962,9 @@
 							player.side=info.side;
 							player.phaseNumber=info.phaseNumber,
 							player.setNickname();
+							if(player.name.startsWith('unknown')&&player.node.zoneCamp){
+								player.node.zoneCamp.node.avatarDefaultName.innerHTML = get.verticalStr(lib.translate[player.name]);
+							}
 							for(var si=0;si<info.skills.length;si++){
 								player.addSkill(info.skills[si]);
 							}
