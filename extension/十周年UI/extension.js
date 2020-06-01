@@ -230,7 +230,7 @@ content:function(config, pack){
 					var cur;
 					for (var i = 0; i < game.players.length; i++) {
 						cur = game.players[i];
-						if (!cur.node.seat) cur.node.seat = decadeUI.dialog.create('seat', cur);
+						if (window.decadeUI&&!cur.node.seat) cur.node.seat = decadeUI.dialog.create('seat', cur);
 						cur.node.seat.innerHTML = get.cnNumber(get.distance(firstAction, cur, 'absolute') + 1, true);
 					}
 				}, game.boss);
@@ -243,10 +243,11 @@ content:function(config, pack){
 					var cur;
 					for (var i = 0; i < game.players.length; i++) {
 						cur = game.players[i];
-						if (!cur.node.seat) cur.node.seat = decadeUI.dialog.create('seat', cur);
-						
-						cur.seat = get.distance(firstAction, cur, 'absolute') + 1;
-						cur.node.seat.innerHTML = get.cnNumber(cur.seat, true);
+						if (window.decadeUI&&!cur.node.seat) {
+							cur.node.seat = decadeUI.dialog.create('seat', cur);
+							cur.seat = get.distance(firstAction, cur, 'absolute') + 1;
+							cur.node.seat.innerHTML = get.cnNumber(cur.seat, true);
+						}
 					}
 				}, player);
 				
@@ -996,7 +997,7 @@ content:function(config, pack){
 				        continue;
 				    
 				    if (nodes[i].classList.contains('card')){
-				        decadeUI.layout.clearout(nodes[i]);
+				        if(window.decadeUI) decadeUI.layout.clearout(nodes[i]);
 					}else{
 					    nodes[i].delete();
 					}
