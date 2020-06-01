@@ -314,6 +314,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].name='unknown'+get.distance(player,game.players[i],'absolute');
 					game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[game.players[i].name]),game.players[i]);
+					if(game.players[i].node.zoneCamp){
+						game.players[i].node.zoneCamp.node.avatarDefaultName.innerHTML = get.verticalStr(lib.translate[game.players[i].name]);
+					}
 				}
 			},game.zhu);
 
