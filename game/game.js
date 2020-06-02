@@ -30451,10 +30451,9 @@
 			}
 
 			// notify observers
-			var observers=lib.node.observing;
-			if(observers&&observers.length){
-				for(var i=0;i<observers.length;i++){
-					observers[i].send(game.over,dialog.content.innerHTML,undefined,winnerText);
+			if(lib.node&&lib.node.observing&&lib.node.observing.length){
+				for(var i=0;i<lib.node.observing.length;i++){
+					lib.node.observing[i].send(game.over,dialog.content.innerHTML,undefined,winnerText);
 				}
 			}
 
