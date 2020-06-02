@@ -1944,7 +1944,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								var lastID=playersStatistics[nameol]['lastID'];
 								if(lastID=='zhu'&&identityList[i]=='zhu'||lastID=='nei'&&identityList[i]=='nei'){
 									isAssignRepeated=true;
-									console.log('info: player '+nameol+', lastID '+lastID+', repetition detected at attempt '+assignAttempts);
 									break;
 								}
 							}

@@ -7884,7 +7884,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt('hongde'),'令一名其他角色摸一张牌',function(card,player,target){
 						return target!=player;
 					}).set('ai',function(target){
-						return get.attitude(player,target);
+						return get.attitude(_status.event.player,target);
 					});
 					'step 1'
 					if(result.bool){

@@ -1726,7 +1726,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						next.player=player;
 						next.setContent(lib.skill.pindi_clear.content);
 					}
-					player.syncStorage();
+					player.syncStorage('pindi_target');
+					player.syncStorage('pindi_type');
 					if(target.countCards('he')==0) event._result={index:0};
 					else{
  					player.chooseControlList([
@@ -2787,7 +2788,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					game.log(event.current,'选择了',card);
 					game.delay();
-					if(event.togain.length) event.goto(5);
+					event.goto(5);
 				}
 			},
 			fuzhu:{

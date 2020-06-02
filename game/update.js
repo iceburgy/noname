@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.06.05.3',
+	version:'2020.06.05.4',
 	update:'1.9.98.7',
 	changeLog:[
 		'修复断线重连以及旁观时出现游戏异常',
@@ -12,6 +12,7 @@ window.noname_update={
 		'郡兵可以被动发动',
 		'删除吕蒙额外技能：博图',
 		'夏侯霸亮将无技能',
+		'修复曹节惠民窗口关不掉，宏德ai，品第报错',
 		'更多更新历史信息请查看：https://bit.ly/wumingsha',
 	],
 	files:[

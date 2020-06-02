@@ -17198,7 +17198,6 @@
 							game.addVideo('storage',this,[skill,JSON.parse(JSON.stringify(this.storage[skill]))]);
 						}
 						catch(e){
-							console.log(this.storage[skill]);
 						}
 					}
 				},
