@@ -3465,14 +3465,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			xiaoneizhibi:{
-				limited:true,
 				audio:'shangyi',
 				enable:'phaseUse',
 				filter:function(event,player){
 					var useful=game.hasPlayer(function(current){
                     	return current!=player&&current.isUnseen(2);
                     });
-                    if(!useful) player.awakenSkill('xiaoneizhibi');
+                    if(!useful) {
+						game.broadcastAll(function(player){
+							player.removeSkill('xiaoneizhibi');
+						},player);
+                    }
                     return useful;
 				},
 				filterTarget:function(card,player,target){
@@ -3489,7 +3492,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					content=[str+'武将',[nameToView,'character']];
 					game.log(player,'观看了',target,'的武将');
 					player.chooseControl('ok').set('dialog',content);
-					player.awakenSkill('xiaoneizhibi');
+					game.broadcastAll(function(player){
+						player.removeSkill('xiaoneizhibi');
+					},player);
 				},
 				ai:{
 					order:10,
