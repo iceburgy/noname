@@ -744,10 +744,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=player.maxHp-player.countCards('h');
 					if(num>0) player.draw(num);
 					player.removeSkill('drlt_jueyan');
-                    player.addSkill('drlt_huairou');
-                    game.broadcast(function(player){
-                        player.addSkill('drlt_huairou');
-                    },player);
+					player.addSkill('drlt_huairou');
+					game.broadcast(function(player){
+						player.addSkill('drlt_huairou');
+					},player);
 				},
 			},
 			"drlt_huairou":{
@@ -2771,10 +2771,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.zhiji=true;
 					if(player.hp>player.maxHp) player.hp=player.maxHp;
 					player.update();
-                    player.addSkill('reguanxing');
-                    game.broadcast(function(player){
-                        player.addSkill('reguanxing');
-                    },player);
+					player.addSkill('reguanxing');
+					game.broadcast(function(player){
+						player.addSkill('reguanxing');
+					},player);
 				}
 			},
 			xiangle:{
@@ -3868,38 +3868,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										}
 									}
 								}
-
-								// if(event.triggername=='phaseZhunbeiBegin'){
-								// 	(function(){
-								// 		var skills=[link];
-								// 		var list=[];
-								// 		game.expandSkills(skills);
-								// 		var triggerevent=event._trigger;
-								// 		var name='phaseZhunbeiBegin';
-								// 		for(i=0;i<skills.length;i++){
-								// 			var trigger=get.info(skills[i]).trigger;
-								// 			if(trigger){
-								// 				var add=false;
-								// 				if(player==triggerevent.player&&trigger.player){
-								// 					if(typeof trigger.player=='string'){
-								// 						if(trigger.player==name) add=true;
-								// 					}
-								// 					else if(trigger.player.contains(name)) add=true;
-								// 				}
-								// 				if(trigger.global){
-								// 					if(typeof trigger.global=='string'){
-								// 						if(trigger.global==name) add=true;
-								// 					}
-								// 					else if(trigger.global.contains(name)) add=true;
-								// 				}
-								// 				if(add&&player.isOut()==false) list.push(skills[i]);
-								// 			}
-								// 		}
-								// 		for(var i=0;i<list.length;i++){
-								// 			game.createTrigger('phaseZhunbeiBegin',list[i],player,triggerevent);
-								// 		}
-								// 	}());
-								// }
 							}
 						}
 						if(type!='ai'){

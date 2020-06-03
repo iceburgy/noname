@@ -3878,29 +3878,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(card,player,target,current){
  						if(player!=target||!player.isPhaseUsing()) return;
  						if(get.subtype(card)=='equip1'&&!get.cardtag(card,'gifts')){
-  						var range0=player.getAttackRange();
-  						var range=0;
-  						var info=get.info(card);
-  						if(info&&info.distance&&info.distance.attackFrom){
-  							range-=info.distance.attackFrom;
-  						}
-  						if(player.getEquip(1)){
-  							var num=0;
-  							var info=get.info(player.getEquip(1));
-  							if(info&&info.distance&&info.distance.attackFrom){
-  								num-=info.distance.attackFrom;
-  							}
-  							range0-=num;
-  						}
-  						range0+=range;
-  						var delta=range0-(player.getHistory('useCard').length+player.getHistory('respond').length);
-  						if(delta<0) return;
-  						var num=player.countCards('h',function(card){
-  							return (get.cardtag(card,'gifts')||get.subtype(card)!='equip1')&&player.getUseValue(card)>0;
-  						});
-  						if(delta==2&&num>0) return [1,3];
-  						if(num>=delta) return 'zeroplayertarget';
-  					}
+						var range0=player.getAttackRange();
+						var range=0;
+						var info=get.info(card);
+						if(info&&info.distance&&info.distance.attackFrom){
+							range-=info.distance.attackFrom;
+						}
+						if(player.getEquip(1)){
+							var num=0;
+							var info=get.info(player.getEquip(1));
+							if(info&&info.distance&&info.distance.attackFrom){
+								num-=info.distance.attackFrom;
+							}
+							range0-=num;
+						}
+						range0+=range;
+						var delta=range0-(player.getHistory('useCard').length+player.getHistory('respond').length);
+						if(delta<0) return;
+						var num=player.countCards('h',function(card){
+							return (get.cardtag(card,'gifts')||get.subtype(card)!='equip1')&&player.getUseValue(card)>0;
+						});
+						if(delta==2&&num>0) return [1,3];
+						if(num>=delta) return 'zeroplayertarget';
+					}
 						},
 					},
 				}
@@ -10317,11 +10317,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(zhu&&zhu.isZhu){
 						var names=[zhu.name1,zhu.name2];
 						for(var i=0;i<names.length;i++){
-						    var name=names[i];
-                            while(name.indexOf('_')!=-1){
-                                name=name.slice(name.indexOf('_')+1);
-                            }
-                            if(name.indexOf('liubei')==0) return false;
+							var name=names[i];
+							while(name.indexOf('_')!=-1){
+								name=name.slice(name.indexOf('_')+1);
+							}
+							if(name.indexOf('liubei')==0) return false;
 						}
 					}
 					return !player.storage.danji&&player.countCards('h')>player.hp;
@@ -10331,10 +10331,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseMaxHp();
 					player.addSkill('mashu');
 					player.addSkill('nuzhan');
-                    game.broadcast(function(player){
-                        player.addSkill('mashu');
-                        player.addSkill('nuzhan');
-                    },player);
+					game.broadcast(function(player){
+						player.addSkill('mashu');
+						player.addSkill('nuzhan');
+					},player);
 					player.awakenSkill('danji');
 				}
 			},
@@ -11365,10 +11365,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover(2-player.hp);
 					}
 					"step 2"
-                    player.addSkill('retiaoxin');
-                    game.broadcast(function(player){
-                        player.addSkill('retiaoxin');
-                    },player);
+					player.addSkill('retiaoxin');
+					game.broadcast(function(player){
+						player.addSkill('retiaoxin');
+					},player);
 					player.storage.kunfen=true;
 					player.awakenSkill('fengliang');
 				},
@@ -12323,10 +12323,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainMaxHp();
 					player.recover();
 					player.removeSkill('liangzhu');
-                    player.addSkill('xiaoji');
-                    game.broadcast(function(player){
-                        player.addSkill('xiaoji');
-                    },player);
+					player.addSkill('xiaoji');
+					game.broadcast(function(player){
+						player.addSkill('xiaoji');
+					},player);
 					player.awakenSkill('fanxiang');
 				},
 			},
@@ -14490,10 +14490,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					player.addSkill('benghuai');
 					player.addSkill('weizhong');
-                    game.broadcast(function(player){
-                        player.addSkill('benghuai');
-                        player.addSkill('weizhong');
-                    },player);
+					game.broadcast(function(player){
+						player.addSkill('benghuai');
+						player.addSkill('weizhong');
+					},player);
 					player.storage.juyi=true;
 					player.awakenSkill('juyi');
 				}
