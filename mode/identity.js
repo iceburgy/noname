@@ -328,7 +328,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					identity:players[i].identity
 				});
 				if(players[i].identity=='nei'&&players.length>4){
-					game.addGlobalSkill('woshixiaonei');
+					players[i].hiddenSkills.add('woshixiaonei');
+					players[i].addSkillTrigger('woshixiaonei',true);
 				}
 				if(players[i].identity=='zhu'&&players.length>=6&&players.length%2==0){
 					game.broadcastAll(function(player){
@@ -2569,7 +2570,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			sheshen_info:'锁定技，主公处于濒死状态即将死亡时，令主公+1体力上限，回复体力至X点（X为你的体力值数），获得你的所有牌，然后你死亡',
 			yexinbilu:'野心毕露',
 			woshixiaonei:'我是小内',
-			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）回复一点体力，摸2张牌，增加一点体力上限；2）回复一点体力，摸3张牌。（响应打出牌事件时，只能默认为选项一）',
+			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）增加一点体力上限，然后回复一点体力并且摸2张牌；2）获得限定技‘知己知彼’，然后回复一点体力并且摸2张牌。（知己知彼：村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废）',
+			xiaoneizhibi:'知己知彼',
+			xiaoneizhibi_info:'村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废',
 			zhikezhugong:'制克主公',
 			zhikezhugong_info:'村规主公限定技：如果场上玩家数是6人或者更多，而且为偶数，则主公在第一回合内可以2选1：1）准备阶段使用一次手气卡；2）如果没有对其他玩家使用牌，可以跳过弃牌阶段',
 			zhikezhugong_zhihengzg:'制衡主公',
@@ -3408,13 +3411,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:'yeyan',
 				enable:'chooseToUse',
 				trigger:{player:'chooseToRespondBegin'},
-				init:function(player){
-					player.storage.woshixiaonei=false;
-				},
-				filter:function(event,player){
-					if(player.storage.woshixiaonei) return false;
-					return player.identity=='nei';
-				},
 				skillAnimation:'legend',
 				animationColor:'thunder',
 				filterTarget:function(card,player,target){
@@ -3422,26 +3418,27 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.storage.woshixiaonei=true;
+					player.awakenSkill('woshixiaonei');
 					player.chooseControlList(true,function(event,player){
-						return 0;
+						return Math.floor(Math.random()*2);
 					},
-					['回复一点体力，摸2张牌，增加一点体力上限','回复一点体力，摸3张牌']);
+					['增加一点体力上限，然后回复一点体力并且摸2张牌','获得限定技‘知己知彼’，然后回复一点体力并且摸2张牌。（知己知彼：村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废）']);
 
 					'step 1'
 					if(result.index==0 || result.index==1){
 						if(result.index==0){
 							player.gainMaxHp();
-							player.draw(2);
 						}
 						else if(result.index==1){
-							player.draw(3);
+							game.broadcastAll(function(player){
+								player.addSkill('xiaoneizhibi');
+							},player);
 						}
 						player.recover();
+						player.draw(2);
 						game.broadcastAll(function(player){
 							player.showIdentity();
 						},player);
-						game.removeGlobalSkill('woshixiaonei');
 					}
 					// event hierarchy:
 					// thisskillname/useSkill/chooseToUse/sha - huihewai, need redo
@@ -3466,6 +3463,42 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+			},
+			xiaoneizhibi:{
+				limited:true,
+				audio:'shangyi',
+				enable:'phaseUse',
+				filter:function(event,player){
+					var useful=game.hasPlayer(function(current){
+                    	return current!=player&&current.isUnseen(2);
+                    });
+                    if(!useful) player.awakenSkill('xiaoneizhibi');
+                    return useful;
+				},
+				filterTarget:function(card,player,target){
+					if(player==target) return false;
+					return (target.isUnseen(2));
+				},
+				content:function(){
+					"step 0"
+					var content;
+					var str=get.translation(target)+'的';
+					var nameToView=[];
+					if(target.isUnseen(0)) nameToView.push(target.name1);
+					if(target.isUnseen(1)) nameToView.push(target.name2);
+					content=[str+'武将',[nameToView,'character']];
+					game.log(player,'观看了',target,'的武将');
+					player.chooseControl('ok').set('dialog',content);
+					player.awakenSkill('xiaoneizhibi');
+				},
+				ai:{
+					order:10,
+					result:{
+						player:function(player,target){
+							return 1;
+						}
+					}
+				}
 			},
 			zhikezhugong:{
 				audio:false,
@@ -4031,7 +4064,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				priority:10,
 				content:function(){
 					"step 0"
-					if(get.info(trigger.skill).silent){
+					if(get.info(trigger.skill).silent||trigger.skill=='woshixiaonei'){
 						event.finish();
 					}
 					else{
