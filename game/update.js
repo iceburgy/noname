@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.06.05.6',
+	version:'2020.06.05.7',
 	update:'1.9.98.7',
 	changeLog:[
 		'修复断线重连以及旁观时出现游戏异常',
@@ -18,6 +18,7 @@ window.noname_update={
 	],
 	files:[
 		'card/extra.js',
+		'character/mobile.js',
 		'character/refresh.js',
 		'character/shenhua.js',
 		'character/sp.js',

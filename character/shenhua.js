@@ -744,7 +744,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=player.maxHp-player.countCards('h');
 					if(num>0) player.draw(num);
 					player.removeSkill('drlt_jueyan');
-                    game.broadcastAll(function(player){
+                    player.addSkill('drlt_huairou');
+                    game.broadcast(function(player){
                         player.addSkill('drlt_huairou');
                     },player);
 				},
@@ -2770,7 +2771,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.zhiji=true;
 					if(player.hp>player.maxHp) player.hp=player.maxHp;
 					player.update();
-                    game.broadcastAll(function(player){
+                    player.addSkill('reguanxing');
+                    game.broadcast(function(player){
                         player.addSkill('reguanxing');
                     },player);
 				}

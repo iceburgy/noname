@@ -16339,6 +16339,31 @@
 					}
 				},
 				getState:function(){
+					var skills=[];
+					var hiddenSkills=[];
+					var tempSkills=[];
+					var allSkills=[];
+					if(this.skills) allSkills=allSkills.concat(this.skills);
+					if(this.hiddenSkills) allSkills=allSkills.concat(this.hiddenSkills);
+					if(this.tempSkills) allSkills=allSkills.concat(this.tempSkills);
+					if(this.skills&&this.skills.length){
+						for(var sk of this.skills){
+							if(game.isSubSkill(sk,allSkills)) continue;
+							skills.push(sk);
+						}
+					}
+					if(this.hiddenSkills&&this.hiddenSkills.length){
+						for(var sk of this.hiddenSkills){
+							if(game.isSubSkill(sk,allSkills)) continue;
+							hiddenSkills.push(sk);
+						}
+					}
+					if(this.tempSkills&&this.tempSkills.length){
+						for(var sk of this.tempSkills){
+							if(game.isSubSkill(sk,allSkills)) continue;
+							tempSkills.push(sk);
+						}
+					}
 					var state={
 						hp:this.hp,
 						maxHp:this.maxHp,
@@ -16360,8 +16385,9 @@
 						identityShown:this.identityShown,
 						identityNode:[this.node.identity.innerHTML,this.node.identity.dataset.color],
 						identity:this.identity,
-						skills:this.skills?this.skills.slice(0):[],
-						hiddenSkills:this.hiddenSkills?this.hiddenSkills.slice(0):[],
+						skills:skills,
+						hiddenSkills:hiddenSkills,
+						tempSkills:tempSkills,
 						dead:this.isDead(),
 						linked:this.isLinked(),
 						turnedover:this.isTurnedOver(),
@@ -25932,13 +25958,6 @@
 							if(player.name.startsWith('unknown')&&player.node.zoneCamp){
 								player.node.zoneCamp.node.avatarDefaultName.innerHTML = get.verticalStr(lib.translate[player.name]);
 							}
-							for(var si=0;si<info.skills.length;si++){
-								player.addSkill(info.skills[si]);
-							}
-							for(var si=0;si<info.hiddenSkills.length;si++){
-								player.hiddenSkills.add(info.hiddenSkills[si]);
-								player.addSkillTrigger(info.hiddenSkills[si],true);
-							}
 							if(info.dead){
 								player.classList.add('dead');
 								if(lib.config.die_move){
@@ -25979,6 +25998,16 @@
 									info.judges[i].node.background.innerHTML=lib.translate[info.views[i]+'_bg']||get.translation(info.views[i])[0]
 								}
 								player.node.judges.appendChild(info.judges[i]);
+							}
+							for(var si=0;si<info.skills.length;si++){
+								player.addSkill(info.skills[si]);
+							}
+							for(var si=0;si<info.hiddenSkills.length;si++){
+								player.hiddenSkills.add(info.hiddenSkills[si]);
+								player.addSkillTrigger(info.hiddenSkills[si],true);
+							}
+							for(var si=0;si<info.tempSkills.length;si++){
+								player.addTempSkill(info.tempSkills[si]);
 							}
 							ui.updatej(player);
 							if(!player.setModeState){
@@ -26192,6 +26221,14 @@
 		phaseName:['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'],
 	};
 	var game={
+		isSubSkill:function(skill,allSkills){
+			for(var parSkill of allSkills){
+				if(lib.skill[parSkill]&&lib.skill[parSkill].group&&lib.skill[parSkill].group.includes(skill)){
+					return true;
+				}
+			}
+			return false;
+		},
 		getGlobalHistory:function(key,filter){
 			if(!key) return _status.globalHistory[_status.globalHistory.length-1];
 			if(!filter) return _status.globalHistory[_status.globalHistory.length-1][key];

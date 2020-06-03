@@ -10329,7 +10329,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.storage.danji=true;
 					player.loseMaxHp();
-                    game.broadcastAll(function(player){
+					player.addSkill('mashu');
+					player.addSkill('nuzhan');
+                    game.broadcast(function(player){
                         player.addSkill('mashu');
                         player.addSkill('nuzhan');
                     },player);
@@ -11363,7 +11365,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover(2-player.hp);
 					}
 					"step 2"
-                    game.broadcastAll(function(player){
+                    player.addSkill('retiaoxin');
+                    game.broadcast(function(player){
                         player.addSkill('retiaoxin');
                     },player);
 					player.storage.kunfen=true;
@@ -12320,7 +12323,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainMaxHp();
 					player.recover();
 					player.removeSkill('liangzhu');
-                    game.broadcastAll(function(player){
+                    player.addSkill('xiaoji');
+                    game.broadcast(function(player){
                         player.addSkill('xiaoji');
                     },player);
 					player.awakenSkill('fanxiang');
@@ -14066,7 +14070,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				init:function(player){
-					if(game.online) return;
 					if(player.name2=='xiahouba'){
 						if(player.isUnseen(1)){
 							return;
@@ -14076,9 +14079,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return;
 						}
 					}
-					game.broadcastAll(function(player,skillName){
-						player.removeAdditionalSkill(skillName);
-					},player,'baobian');
+					player.removeAdditionalSkill('baobian');
+					game.broadcast(function(player){
+						player.removeAdditionalSkill('baobian');
+					},player);
 					var list=[];
 					if(player.hp<=3){
 						//if(trigger.num!=undefined&&trigger.num<0&&player.hp-trigger.num>1) player.logSkill('baobian');
@@ -14091,9 +14095,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.push('xinshensu');
 					}
 					if(list.length){
-						game.broadcastAll(function(player,skillName,list){
-							player.addAdditionalSkill(skillName,list);
-						},player,'baobian',list);
+						player.addAdditionalSkill('baobian',list);
+						game.broadcast(function(player,list){
+							player.addAdditionalSkill('baobian',list);
+						},player,list);
 					}
 				},
 				derivation:['retiaoxin','new_repaoxiao','xinshensu'],
@@ -14107,9 +14112,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return;
 						}
 					}
-					game.broadcastAll(function(player,skillName){
-						player.removeAdditionalSkill(skillName);
-					},player,'baobian');
+					player.removeAdditionalSkill('baobian');
+					game.broadcast(function(player){
+						player.removeAdditionalSkill('baobian');
+					},player);
 					var list=[];
 					if(player.hp<=3){
 						if(trigger&&trigger.num!=undefined&&trigger.num<0&&player.hp-trigger.num>1) player.logSkill('baobian');
@@ -14122,9 +14128,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.push('xinshensu');
 					}
 					if(list.length){
-						game.broadcastAll(function(player,skillName,list){
-							player.addAdditionalSkill(skillName,list);
-						},player,'baobian',list);
+						player.addAdditionalSkill('baobian',list);
+						game.broadcast(function(player,list){
+							player.addAdditionalSkill('baobian',list);
+						},player,list);
 					}
 				},
 				ai:{
@@ -14481,7 +14488,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num>0){
 						player.draw(num);
 					}
-                    game.broadcastAll(function(player){
+					player.addSkill('benghuai');
+					player.addSkill('weizhong');
+                    game.broadcast(function(player){
                         player.addSkill('benghuai');
                         player.addSkill('weizhong');
                     },player);

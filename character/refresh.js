@@ -133,7 +133,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ['rehuoji','bazhen'].randomGet();
 					};
 					'step 6'
-                    game.broadcastAll(function(player,skill){
+					player.addSkillLog(result.control);;
+                    game.broadcast(function(player,skill){
                         player.addSkillLog(skill);
                     },player,result.control);
 				},
@@ -705,11 +706,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					player.recover();
 					game.log(player,'获得了技能','#g【思蜀】','和','#g【激将】');
-                    game.broadcastAll(function(player){
+                    player.addSkill('sishu');
+                    game.broadcast(function(player){
                         player.addSkill('sishu');
                     },player);
 					if(player.hasSkill('olruoyu')){
-                        game.broadcastAll(function(player){
+                        player.addSkill('jijiang');
+                        game.broadcast(function(player){
                             player.addSkill('jijiang');
                         },player);
 					}
@@ -879,7 +882,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.loseMaxHp();
 					player.recover();
-                    game.broadcastAll(function(player){
+					player.addSkill('reyingzi');
+					player.addSkill('gzyinghun');
+                    game.broadcast(function(player){
                         player.addSkill('reyingzi');
                         player.addSkill('gzyinghun');
                     },player);
@@ -3814,7 +3819,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.storage.qinxue=true;
 					player.loseMaxHp();
-                    game.broadcastAll(function(player){
+                    player.addSkill('gongxin');
+                    game.broadcast(function(player){
                         player.addSkill('gongxin');
                     },player);
 					player.awakenSkill('qinxue');
@@ -4643,7 +4649,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.awakenSkill('qianxin');
-                    game.broadcastAll(function(player){
+                    player.addSkill('jianyan');
+                    game.broadcast(function(player){
                         player.addSkill('jianyan');
                     },player);
 					player.loseMaxHp();
