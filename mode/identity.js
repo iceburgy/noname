@@ -3465,6 +3465,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			xiaoneizhibi:{
+				limited:true,
 				audio:'shangyi',
 				enable:'phaseUse',
 				filter:function(event,player){
