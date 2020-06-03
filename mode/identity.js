@@ -3469,14 +3469,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				filter:function(event,player){
 					var useful=game.hasPlayer(function(current){
-                    	return current!=player&&current.isUnseen(2);
-                    });
-                    if(!useful) {
+						return current!=player&&current.isUnseen(2);
+					});
+					if(!useful) {
 						game.broadcastAll(function(player){
 							player.removeSkill('xiaoneizhibi');
 						},player);
-                    }
-                    return useful;
+					}
+					return useful;
 				},
 				filterTarget:function(card,player,target){
 					if(player==target) return false;
