@@ -729,10 +729,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(suits.length>3) suits.length=3;
 					player.removeAdditionalSkill(skill);
+					game.broadcast(function(player,skill){
+						player.removeAdditionalSkill(skill);
+					},player,skill)
+					var additionalSkills=[];
 					switch(suits.length){
-						case 1:player.addAdditionalSkill(skill,['reyingzi']);break;
-						case 2:player.addAdditionalSkill(skill,['reyingzi','qixi']);break;
-						case 3:player.addAdditionalSkill(skill,['reyingzi','qixi','xuanfeng']);break;
+						case 1:additionalSkills=['reyingzi'];break;
+						case 2:additionalSkills=['reyingzi','qixi'];break;
+						case 3:additionalSkills=['reyingzi','qixi','xuanfeng'];break;
+					}
+					if(additionalSkills.length){
+						player.addAdditionalSkill(skill,additionalSkills);
+						game.broadcast(function(player,skill,additionalSkills){
+							player.addAdditionalSkill(skill,additionalSkills);
+						},player,skill,additionalSkills)
 					}
 				},
 				ai:{

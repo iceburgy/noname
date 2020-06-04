@@ -2609,11 +2609,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					this.name1=info.name1;
 					this.name=info.name;
 					this.node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[this.name].slice(0,3)),this);
-					if(info.identityShown){
+					if(info.identityShown||(!game.observe&&this==game.me)){
 						this.setIdentity(info.identity);
 						this.node.identity.classList.remove('guessing');
 					}
-					else if(this!=game.me){
+					else if(game.observe||this!=game.me){
 						this.node.identity.firstChild.innerHTML='猜';
 						this.node.identity.dataset.color='unknown';
 						this.node.identity.classList.add('guessing');
@@ -2622,6 +2622,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								this.setIdentity('cai');
 							}
 						}
+					}
+					if (window.decadeUI&&info&&info.seat) {
+						if (!this.node.seat) this.node.seat = decadeUI.dialog.create('seat', this);
+						this.node.seat.innerHTML = get.cnNumber(info.seat, true);
 					}
 				},
 				$dieAfter:function(){

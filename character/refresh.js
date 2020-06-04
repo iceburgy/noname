@@ -133,9 +133,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ['rehuoji','bazhen'].randomGet();
 					};
 					'step 6'
-                    game.broadcastAll(function(player,skill){
-                        player.addSkillLog(skill);
-                    },player,result.control);
+					game.broadcastAll(function(player,skill){
+						player.addSkillLog(skill);
+					},player,result.control);
 				},
 				ai:{
 					order:1,
@@ -705,13 +705,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					player.recover();
 					game.log(player,'获得了技能','#g【思蜀】','和','#g【激将】');
-                    game.broadcastAll(function(player){
-                        player.addSkill('sishu');
-                    },player);
+					game.broadcastAll(function(player){
+						player.addSkill('sishu');
+					},player);
 					if(player.hasSkill('olruoyu')){
-                        game.broadcastAll(function(player){
-                            player.addSkill('jijiang');
-                        },player);
+						game.broadcastAll(function(player){
+							player.addSkill('jijiang');
+						},player);
 					}
 					else{
 						player.addAdditionalSkill('olruoyu','jijiang');
@@ -879,10 +879,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.loseMaxHp();
 					player.recover();
-                    game.broadcastAll(function(player){
-                        player.addSkill('reyingzi');
-                        player.addSkill('gzyinghun');
-                    },player);
+					game.broadcastAll(function(player){
+						player.addSkill('reyingzi');
+						player.addSkill('gzyinghun');
+					},player);
 					game.log(player,'获得了技能','#g【英姿】','和','#g【英魂】');
 					player.awakenSkill(event.name);
 					player.storage[event.name]=true;
@@ -901,35 +901,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							if(player.hasZhuSkill('olzhiba')&&!player.hasSkill('olzhiba3')&&target.group=='wu'){
 								if(player.countCards('h',function(card){
- 								var val=get.value(card);
- 								if(val<0) return true;
- 								if(val<=5){
- 									return card.number>=12;
- 								}
- 								if(val<=6){
- 									return card.number>=13;
- 								}
- 								return false;
- 							})>0) return -1;
- 							return 0;
+								var val=get.value(card);
+								if(val<0) return true;
+								if(val<=5){
+									return card.number>=12;
+								}
+								if(val<=6){
+									return card.number>=13;
+								}
+								return false;
+							})>0) return -1;
+							return 0;
 							}
 							else{
 								if(player.countCards('h','du')&&get.attitude(player,target)<0) return -1;
- 							if(player.countCards('h')<=player.hp) return 0;
- 							var maxnum=0;
- 							var cards2=target.getCards('h');
- 							for(var i=0;i<cards2.length;i++){
- 								if(cards2[i].number>maxnum){
- 									maxnum=cards2[i].number;
- 								}
- 							}
- 							if(maxnum>10) maxnum=10;
- 							if(maxnum<5&&cards2.length>1) maxnum=5;
- 							var cards=player.getCards('h');
- 							for(var i=0;i<cards.length;i++){
- 								if(cards[i].number<maxnum) return 1;
- 							}
- 							return 0;
+							if(player.countCards('h')<=player.hp) return 0;
+							var maxnum=0;
+							var cards2=target.getCards('h');
+							for(var i=0;i<cards2.length;i++){
+								if(cards2[i].number>maxnum){
+									maxnum=cards2[i].number;
+								}
+							}
+							if(maxnum>10) maxnum=10;
+							if(maxnum<5&&cards2.length>1) maxnum=5;
+							var cards=player.getCards('h');
+							for(var i=0;i<cards.length;i++){
+								if(cards[i].number<maxnum) return 1;
+							}
+							return 0;
 							}
 						},
 					},
@@ -3814,9 +3814,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.storage.qinxue=true;
 					player.loseMaxHp();
-                    game.broadcastAll(function(player){
-                        player.addSkill('gongxin');
-                    },player);
+					game.broadcastAll(function(player){
+						player.addSkill('gongxin');
+					},player);
 					player.awakenSkill('qinxue');
 				}
 			},
@@ -4643,9 +4643,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.awakenSkill('qianxin');
-                    game.broadcastAll(function(player){
-                        player.addSkill('jianyan');
-                    },player);
+					game.broadcastAll(function(player){
+						player.addSkill('jianyan');
+					},player);
 					player.loseMaxHp();
 				}
 			},
