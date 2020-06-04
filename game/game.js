@@ -26223,8 +26223,11 @@
 	var game={
 		isSubSkill:function(skill,allSkills){
 			for(var parSkill of allSkills){
-				if(lib.skill[parSkill]&&lib.skill[parSkill].group&&lib.skill[parSkill].group.includes(skill)){
-					return true;
+				if(lib.skill[parSkill]&&lib.skill[parSkill].group&&lib.skill[parSkill].group.length){
+					if(Array.isArray(lib.skill[parSkill].group)) {
+						if(lib.skill[parSkill].group.includes(skill)) return true;
+					}
+					else if(lib.skill[parSkill].group==skill) return true;
 				}
 			}
 			return false;
