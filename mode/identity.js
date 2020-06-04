@@ -2570,7 +2570,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			sheshen_info:'锁定技，主公处于濒死状态即将死亡时，令主公+1体力上限，回复体力至X点（X为你的体力值数），获得你的所有牌，然后你死亡',
 			yexinbilu:'野心毕露',
 			woshixiaonei:'我是小内',
-			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）增加一点体力上限，然后回复一点体力并且摸2张牌；2）获得限定技‘知己知彼’，然后回复一点体力并且摸2张牌。（知己知彼：村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废）',
+			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）增加一点体力上限，然后回复一点体力并且摸2张牌；2）获得限定技‘知己知彼’，然后回复一点体力并且摸3张牌。（知己知彼：村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废）',
 			xiaoneizhibi:'知己知彼',
 			xiaoneizhibi_info:'村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废',
 			zhikezhugong:'制克主公',
@@ -3426,20 +3426,23 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.chooseControlList(true,function(event,player){
 						return Math.floor(Math.random()*2);
 					},
-					['增加一点体力上限，然后回复一点体力并且摸2张牌','获得限定技‘知己知彼’，然后回复一点体力并且摸2张牌。（知己知彼：村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废）']);
+					['增加一点体力上限，然后回复一点体力并且摸2张牌','获得限定技‘知己知彼’，然后回复一点体力并且摸3张牌。（知己知彼：村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废）']);
 
 					'step 1'
 					if(result.index==0 || result.index==1){
+						var toDraw;
 						if(result.index==0){
+							toDraw=2;
 							player.gainMaxHp();
 						}
 						else if(result.index==1){
+							toDraw=3;
 							game.broadcastAll(function(player){
 								player.addSkill('xiaoneizhibi');
 							},player);
 						}
 						player.recover();
-						player.draw(2);
+						player.draw(toDraw);
 						game.broadcastAll(function(player){
 							player.showIdentity();
 						},player);
