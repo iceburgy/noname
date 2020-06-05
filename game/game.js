@@ -3728,91 +3728,6 @@
 						},
 						clear:true
 					},
-					oneclick_reset_server:{
-						name:'一键重置服务器',
-						clear:true,
-						onclick:function(){
-							if(this.innerHTML=='<span>确认重置</span>'){
-								clearTimeout(this.confirmTimeout);
-
-								// 1. reset leaderboard
-								game.saveConfig('players_statistics',{});
-
-								// 2. import_forbid_lib
-								game.importForbidLib();
-
-								// 3. import_dropbox_config
-								game.importDropboxConfig();
-
-								this.innerHTML='<span>重置成功</span>';
-								var that=this;
-								setTimeout(function(){
-									that.innerHTML='<span>一键重置服务器</span>';
-									game.reload();
-								},1000);
-							}
-							else{
-								this.innerHTML='<span>确认重置</span>';
-								var that=this;
-								this.confirmTimeout=setTimeout(function(){
-									that.innerHTML='<span>一键重置服务器</span>';
-								},1000);
-							}
-						}
-					},
-					reset_leaderboard:{
-						name:'重置胜率',
-						clear:true,
-						onclick:function(){
-							if(this.innerHTML=='<span>确认重置</span>'){
-								clearTimeout(this.confirmTimeout);
-								game.saveConfig('players_statistics',{});
-								this.innerHTML='<span>重置成功</span>';
-								var that=this;
-								setTimeout(function(){
-									that.innerHTML='<span>重置胜率</span>';
-								},1000);
-							}
-							else{
-								this.innerHTML='<span>确认重置</span>';
-								var that=this;
-								this.confirmTimeout=setTimeout(function(){
-									that.innerHTML='<span>重置胜率</span>';
-								},1000);
-							}
-						}
-					},
-					import_forbid_lib:{
-						name:'导入禁将表',
-						clear:true,
-						onclick:function(){
-							this.innerHTML='<span>导入中...</span>';
-							game.importForbidLib();
-							var that=this;
-							setTimeout(function(){
-								that.innerHTML='<span>导入成功</span>';
-								setTimeout(function(){
-									that.innerHTML='<span>导入禁将表</span>';
-								},1000);
-							},1000);
-						}
-					},
-					import_dropbox_config:{
-						name:'导入dropbox游戏设置',
-						clear:true,
-						onclick:function(){
-							this.innerHTML='<span>导入中...</span>';
-							game.importDropboxConfig();
-							var that=this;
-							setTimeout(function(){
-								that.innerHTML='<span>导入成功</span>';
-								setTimeout(function(){
-									that.innerHTML='<span>导入dropbox游戏设置</span>';
-									game.reload();
-								},1000);
-							},1000);
-						}
-					},
 					export_role_lib:{
 						name:'导出武将池',
 						onclick:function(){
@@ -3861,6 +3776,92 @@
 							game.export(JSON.stringify(data),'noname-bannedrolelib'+(new Date()).toLocaleString()+'.json');
 						},
 						clear:true
+					},
+					oneclick_reset_server:{
+						name:'一键完成以下设置',
+						clear:true,
+						onclick:function(){
+							if(this.innerHTML=='<span>确认设置</span>'){
+								this.innerHTML='<span>设置中...</span>';
+								clearTimeout(this.confirmTimeout);
+
+								var that=this;
+								setTimeout(function(){
+									// 1. reset leaderboard
+									game.saveConfig('players_statistics',{});
+
+									// 2. import_forbid_lib
+									game.importForbidLib();
+
+									// 3. import_dropbox_config
+									game.importDropboxConfig();
+
+									that.innerHTML='<span>设置成功</span>';
+									setTimeout(function(){
+										game.reload();
+									},1000);
+								},1000);
+							}
+							else{
+								this.innerHTML='<span>确认设置</span>';
+								var that=this;
+								this.confirmTimeout=setTimeout(function(){
+									that.innerHTML='<span>一键完成以下设置</span>';
+								},1000);
+							}
+						}
+					},
+					reset_leaderboard:{
+						name:'重置战况',
+						clear:true,
+						onclick:function(){
+							if(this.innerHTML=='<span>确认重置</span>'){
+								clearTimeout(this.confirmTimeout);
+								game.saveConfig('players_statistics',{});
+								this.innerHTML='<span>重置成功</span>';
+								var that=this;
+								setTimeout(function(){
+									that.innerHTML='<span>重置战况</span>';
+								},1000);
+							}
+							else{
+								this.innerHTML='<span>确认重置</span>';
+								var that=this;
+								this.confirmTimeout=setTimeout(function(){
+									that.innerHTML='<span>重置战况</span>';
+								},1000);
+							}
+						}
+					},
+					import_forbid_lib:{
+						name:'导入禁将表',
+						clear:true,
+						onclick:function(){
+							this.innerHTML='<span>导入中...</span>';
+							game.importForbidLib();
+							var that=this;
+							setTimeout(function(){
+								that.innerHTML='<span>导入成功</span>';
+								setTimeout(function(){
+									that.innerHTML='<span>导入禁将表</span>';
+								},1000);
+							},1000);
+						}
+					},
+					import_dropbox_config:{
+						name:'导入dropbox游戏设置',
+						clear:true,
+						onclick:function(){
+							this.innerHTML='<span>导入中...</span>';
+							game.importDropboxConfig();
+							var that=this;
+							setTimeout(function(){
+								that.innerHTML='<span>导入成功</span>';
+								setTimeout(function(){
+									game.reload();
+								},1000);
+							},1000);
+						}
 					},
 
 					update:function(config,map){
