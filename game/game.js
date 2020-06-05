@@ -3728,6 +3728,38 @@
 						},
 						clear:true
 					},
+					oneclick_reset_server:{
+						name:'一键重置服务器',
+						clear:true,
+						onclick:function(){
+							if(this.innerHTML=='<span>确认重置</span>'){
+								clearTimeout(this.confirmTimeout);
+
+								// 1. reset leaderboard
+								game.saveConfig('players_statistics',{});
+
+								// 2. import_forbid_lib
+								game.importForbidLib();
+
+								// 3. import_dropbox_config
+								game.importDropboxConfig();
+
+								this.innerHTML='<span>重置成功</span>';
+								var that=this;
+								setTimeout(function(){
+									that.innerHTML='<span>一键重置服务器</span>';
+									game.reload();
+								},1000);
+							}
+							else{
+								this.innerHTML='<span>确认重置</span>';
+								var that=this;
+								this.confirmTimeout=setTimeout(function(){
+									that.innerHTML='<span>一键重置服务器</span>';
+								},1000);
+							}
+						}
+					},
 					reset_leaderboard:{
 						name:'重置胜率',
 						clear:true,
@@ -3755,47 +3787,28 @@
 						clear:true,
 						onclick:function(){
 							this.innerHTML='<span>导入中...</span>';
-
-							var httpReq = new XMLHttpRequest();
-							var url='https://api.dropboxapi.com/2/paper/docs/download';
-							httpReq.open("GET",url,false);
-							httpReq.setRequestHeader('Authorization','Bearer wzahoqHWjoQAAAAAAAAAFV2iwzrw_BFSgaena__5iraqztOyTepnnUc5J1S-73FM');
-							httpReq.setRequestHeader('Dropbox-API-Arg',"{\"doc_id\": \"gO8sAY4eYAlF2OQ6QPk5T\",\"export_format\": \"markdown\"}");
-							httpReq.send();
-							var forbidMapRaw=httpReq.responseText.split('\n');
-							forbidMapRaw.splice(0, 1);
-					        forbidMapRaw=forbidMapRaw.join('\n');
-							var forbidMap = JSON.parse(forbidMapRaw);
-
-							var parseDataKey=function(dataKey){
-								// sample longKey: "步骘(BuZhi)"
-								var dataKey=dataKey.split("(");
-								var roleName=dataKey[0];
-								var dataKey=dataKey[1].split(")");
-								var roleKey=dataKey[0];
-								return [roleName,roleKey];
-							}
-							var simplifyForbidMap=function(forbidMap){
-								var simpleForbidMap={};
-								for(var key in forbidMap){
-									var parsedKeys=parseDataKey(key);
-									simpleForbidMap[parsedKeys[1]]=[];
-									for(var val of forbidMap[key]){
-										var parsedVals=parseDataKey(val);
-										simpleForbidMap[parsedKeys[1]].push(parsedVals[1]);
-									}
-								}
-								return simpleForbidMap;
-							}
-
-							var simpleForbidMap=simplifyForbidMap(forbidMap);
-							game.saveConfig('forbid_double',simpleForbidMap);
-
+							game.importForbidLib();
 							var that=this;
 							setTimeout(function(){
 								that.innerHTML='<span>导入成功</span>';
 								setTimeout(function(){
 									that.innerHTML='<span>导入禁将表</span>';
+								},1000);
+							},1000);
+						}
+					},
+					import_dropbox_config:{
+						name:'导入dropbox游戏设置',
+						clear:true,
+						onclick:function(){
+							this.innerHTML='<span>导入中...</span>';
+							game.importDropboxConfig();
+							var that=this;
+							setTimeout(function(){
+								that.innerHTML='<span>导入成功</span>';
+								setTimeout(function(){
+									that.innerHTML='<span>导入dropbox游戏设置</span>';
+									game.reload();
 								},1000);
 							},1000);
 						}
@@ -33838,6 +33851,92 @@
 		phaseNumber:0,
 		roundNumber:0,
 		shuffleNumber:0,
+		importForbidLib:function(){
+			var httpReq = new XMLHttpRequest();
+			var url='https://api.dropboxapi.com/2/paper/docs/download';
+			httpReq.open("GET",url,false);
+			httpReq.setRequestHeader('Authorization','Bearer wzahoqHWjoQAAAAAAAAAFV2iwzrw_BFSgaena__5iraqztOyTepnnUc5J1S-73FM');
+			httpReq.setRequestHeader('Dropbox-API-Arg',"{\"doc_id\": \"gO8sAY4eYAlF2OQ6QPk5T\",\"export_format\": \"markdown\"}");
+			httpReq.send();
+			var forbidMapRaw=httpReq.responseText.split('\n');
+			forbidMapRaw.splice(0, 1);
+			forbidMapRaw=forbidMapRaw.join('\n');
+			var forbidMap = JSON.parse(forbidMapRaw);
+
+			var parseDataKey=function(dataKey){
+				// sample longKey: "步骘(BuZhi)"
+				var dataKey=dataKey.split("(");
+				var roleName=dataKey[0];
+				var dataKey=dataKey[1].split(")");
+				var roleKey=dataKey[0];
+				return [roleName,roleKey];
+			}
+			var simplifyForbidMap=function(forbidMap){
+				var simpleForbidMap={};
+				for(var key in forbidMap){
+					var parsedKeys=parseDataKey(key);
+					simpleForbidMap[parsedKeys[1]]=[];
+					for(var val of forbidMap[key]){
+						var parsedVals=parseDataKey(val);
+						simpleForbidMap[parsedKeys[1]].push(parsedVals[1]);
+					}
+				}
+				return simpleForbidMap;
+			}
+
+			var simpleForbidMap=simplifyForbidMap(forbidMap);
+			game.saveConfig('forbid_double',simpleForbidMap);
+		},
+		importDropboxConfig:function(){
+			var httpReq = new XMLHttpRequest();
+			var url='https://api.dropboxapi.com/2/paper/docs/download';
+			httpReq.open("GET",url,false);
+			httpReq.setRequestHeader('Authorization','Bearer wzahoqHWjoQAAAAAAAAAFV2iwzrw_BFSgaena__5iraqztOyTepnnUc5J1S-73FM');
+			httpReq.setRequestHeader('Dropbox-API-Arg',"{\"doc_id\": \"WZrX5OlvtR250X9hzDDY7\",\"export_format\": \"markdown\"}");
+			httpReq.send();
+			var data=httpReq.responseText.split('\n');
+			data.splice(0, 1);
+			data=data.join('\n');
+			if(!data) return;
+			try{
+				data=JSON.parse(lib.init.decode(data));
+				if(!data||typeof data!='object'){
+					throw('err');
+				}
+				if(lib.db&&(!data.config||!data.data)){
+					throw('err');
+				}
+			}
+			catch(e){
+				console.log(e);
+				alert('导入失败');
+				return;
+			}
+			if(!lib.db){
+				var noname_inited=localStorage.getItem('noname_inited');
+				var onlineKey=localStorage.getItem(lib.configprefix+'key');
+				localStorage.clear();
+				if(noname_inited){
+					localStorage.setItem('noname_inited',noname_inited);
+				}
+				if(onlineKey){
+					localStorage.setItem(lib.configprefix+'key',onlineKey);
+				}
+				for(var i in data){
+					localStorage.setItem(i,data[i]);
+				}
+			}
+			else{
+				for(var i in data.config){
+					game.putDB('config',i,data.config[i]);
+					lib.config[i]=data.config[i];
+				}
+				for(var i in data.data){
+					game.putDB('data',i,data.data[i]);
+				}
+			}
+			lib.init.background();
+		},
 	};
 	var ui={
 		updates:[],
