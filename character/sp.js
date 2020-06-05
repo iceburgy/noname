@@ -160,7 +160,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hetaihou:['female','qun',3,['zhendu','qiluan']],
 			kongrong:['male','qun',3,['lirang','mingshi']],
 			dingfeng:['male','wu',4,['fenxun','duanbing']],
-			panfeng:['male','qun',4,['kuangfu']],
+			panfeng:['male','qun',4,['xinkuangfu']],
 			bianfuren:['female','wei',3,['wanwei','yuejian']],
 			shamoke:['male','shu',4,['gzjili']],
 			liqueguosi:['male','qun',4,['xiongsuan']],
@@ -14643,6 +14643,59 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else trigger.player.discard(event.card);
 				}
 			},
+			xinkuangfu:{
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					if(player==target) return player.countCards('e',function(card){
+						return lib.filter.cardDiscardable(card,player);
+					})>0;
+					return target.countDiscardableCards(player,'e')>0;
+				},
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current.countCards('e')>0;
+					});
+				},
+				content:function(){
+					'step 0'
+					if(player==target) player.chooseToDiscard('e',true);
+					else player.discardPlayerCard(target,'e',true);
+					'step 1'
+					player.chooseUseTarget('sha',true,false,'nodistance');
+					'step 2'
+					var bool=game.hasPlayer2(function(current){
+						return current.getHistory('damage',function(evt){
+							return evt.getParent(4)==event;
+						}).length>0
+					});
+					if(player==target&&bool) player.draw(2);
+					else if(player!=target&&!bool) player.chooseToDiscard('h',2,true);
+				},
+				ai:{
+					order:function(){
+						return get.order({name:'sha'})+0.3;
+					},
+					result:{
+						target:function(player,target){
+							var att=get.attitude(player,target);
+							var max=0;
+							var min=1;
+							target.countCards('e',function(card){
+								var val=get.value(card);
+								if(val>max) max=val;
+								if(val<min) min=val;
+							});
+							if(att>0&&min<=0) return target.hasSkillTag('noe')?3:1;
+							if(att<0&&max>0){
+								if(target.hasSkillTag('noe')) return max>6?(-max/3):0;
+								return -max;
+							}
+							return 0;
+						},
+					},
+				},
+			},
 			"xinfu_langxi":{
 				audio:2,
 				trigger:{
@@ -17547,6 +17600,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			juedi_info:'锁定技，准备阶段，若你的武将牌上有「引兵」牌，你选择一项：1.移去「引兵」牌，将手牌补至体力上限数；2.将「引兵」牌交给一名体力值不大于你的其他角色，其回复1点体力并摸等量的牌。',
 			kuangfu:'狂斧',
 			kuangfu_info:'当你使用【杀】造成伤害时，你可以选择一项：弃置其装备区内的一张牌，或将其装备区内的一张牌移动到你的装备区内。',
+			xinkuangfu:'狂斧',
+			xinkuangfu_info:'出牌阶段限一次，你可选择：1，弃置装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】造成伤害，你摸两张牌。2，弃置一名其他角色装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】未造成伤害，你弃置两张牌。',
 			xintan:'心惔',
 			xintan_info:'出牌阶段限一次，你可以移去两张「焚」并选择一名角色，该角色失去一点体力。',
 			fentian:'焚天',
