@@ -2005,6 +2005,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.special_identity=map;
 					}
 
+					game.broadcastAll(function(){
+						ui.create.moonlight();
+					});
+
 					game.zhu.setIdentity();
 					game.zhu.identityShown=true;
 					game.zhu.isZhu=(game.zhu.identity=='zhu');
