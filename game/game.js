@@ -16401,6 +16401,7 @@
 						skills:skills,
 						hiddenSkills:hiddenSkills,
 						tempSkills:tempSkills,
+						moonlightCount:this.moonlightCount,
 						dead:this.isDead(),
 						linked:this.isLinked(),
 						turnedover:this.isTurnedOver(),
@@ -26028,6 +26029,10 @@
 							for(var si=0;si<info.tempSkills.length;si++){
 								player.addTempSkill(info.tempSkills[si]);
 							}
+							if(!game.observe&&player==game.me&&!ui.moonlight) {
+								player.moonlightCount=info.moonlightCount;
+								ui.create.moonlight(player.moonlightCount);
+							}
 							ui.updatej(player);
 							if(!player.setModeState){
 								if(!game.getIdentityList&&info.identityNode){
@@ -26627,6 +26632,7 @@
 		},
 		useMoonlight:function(player,time){
 			if(player!=game.me){
+				player.moonlightCount--;
 				player.showTimer(time*1000);
 			}
 			game.broadcast(function(player,time){
@@ -41259,11 +41265,12 @@
 					}
 				},true);
 			},
-			moonlight:function(){
+			moonlight:function(moonlightCount){
 				if(ui.moonlight) return;
-				var moonlightCount=parseInt(lib.configOL.moonlight_count);
-				var moonlightPrefix='月光宝盒x';
-				ui.moonlight=ui.create.system(moonlightPrefix+moonlightCount,function(){
+				var moonlightPrefix='月光宝盒';
+				var moonlightDelimiter='x';
+				var moonlightText=moonlightPrefix+(moonlightCount?(moonlightDelimiter+moonlightCount):'');
+				ui.moonlight=ui.create.system(moonlightText,function(){
 					if(ui.moonlight.classList.contains('hidden')||!_status.countDown) return;
 					var moonlightTime=parseInt(lib.configOL.moonlight_time);
 					game.timerCurrent+=moonlightTime;
@@ -41277,15 +41284,19 @@
 						game.useMoonlight(game.me,game.timerTime);
 					}
 
-					var remainCount=parseInt(ui.moonlight.innerHTML.split('x')[1])-1;
-					if(remainCount){
-						ui.moonlight.innerHTML=moonlightPrefix+remainCount;
+					game.me.moonlightCount--;
+					if(game.me.moonlightCount){
+						ui.moonlight.innerHTML=moonlightPrefix+moonlightDelimiter+game.me.moonlightCount;
 					}
 					else{
-						ui.moonlight.innerHTML=moonlightPrefix.split('x')[0];
+						ui.moonlight.innerHTML=moonlightPrefix;
 						ui.moonlight.hide();
 					}
 				});
+				if(!moonlightCount){
+					ui.moonlight.innerHTML=moonlightPrefix;
+					ui.moonlight.hide();
+				}
 			},
 			groupControl:function(dialog){
 				return ui.create.control('wei','shu','wu','qun','western','key',function(link,node){
