@@ -33967,6 +33967,49 @@
 			}
 			lib.init.background();
 		},
+		uploadDropboxConfig:function(){
+			var httpReq = new XMLHttpRequest();
+			var url='https://api.dropboxapi.com/2/paper/docs/download';
+			httpReq.open("GET",url,false);
+			httpReq.setRequestHeader('Authorization','Bearer wzahoqHWjoQAAAAAAAAAFV2iwzrw_BFSgaena__5iraqztOyTepnnUc5J1S-73FM');
+			httpReq.setRequestHeader('Dropbox-API-Arg',"{\"doc_id\": \"WZrX5OlvtR250X9hzDDY7\",\"export_format\": \"markdown\"}");
+			httpReq.send();
+			var revision=JSON.parse(httpReq.getResponseHeader("Dropbox-Api-Result")).revision;
+
+			var httpReqUpdate = new XMLHttpRequest();
+			var urlUpdate='https://api.dropboxapi.com/2/paper/docs/update';
+			httpReqUpdate.open("POST",urlUpdate,false);
+			httpReqUpdate.setRequestHeader("Authorization","Bearer wzahoqHWjoQAAAAAAAAAFV2iwzrw_BFSgaena__5iraqztOyTepnnUc5J1S-73FM");
+			httpReqUpdate.setRequestHeader("Content-Type","application/octet-stream");
+			httpReqUpdate.setRequestHeader("Dropbox-API-Arg","{\"doc_id\": \"WZrX5OlvtR250X9hzDDY7\",\"doc_update_policy\": \"overwrite_all\",\"revision\":"+revision+",\"import_format\": \"markdown\"}");
+
+			var data;
+			var uploadConfig=function(data){
+				var title='config19987';
+				var content=lib.init.encode(JSON.stringify(data));
+				httpReqUpdate.send("# "+title+"\n"+content);
+				console.log(httpReqUpdate.status);
+			}
+			if(!lib.db){
+				data={};
+				for(var i in localStorage){
+					if(i.indexOf(lib.configprefix)==0){
+						data[i]=localStorage[i];
+					}
+				}
+				uploadConfig(data);
+			}
+			else{
+				game.getDB('config',null,function(data1){
+					game.getDB('data',null,function(data2){
+						uploadConfig({
+							config:data1,
+							data:data2
+						});
+					});
+				});
+			}
+		},
 	};
 	var ui={
 		updates:[],
