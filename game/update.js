@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.06.05.11',
+	version:'2020.06.05.12',
 	update:'1.9.98.7',
 	changeLog:[
 		'开启月光宝盒',

@@ -16402,7 +16402,7 @@
 						skills:skills,
 						hiddenSkills:hiddenSkills,
 						tempSkills:tempSkills,
-						moonlightCount:this.moonlightCount,
+						mlBalance:this.mlBalance,
 						dead:this.isDead(),
 						linked:this.isLinked(),
 						turnedover:this.isTurnedOver(),
@@ -25435,10 +25435,10 @@
 						},player);
 					}
 				},
-				moonlight:function(time){
+				moonlight:function(time,isStop){
 					var player=lib.playerOL[this.id];
 					if(player){
-						game.useMoonlight(player,time);
+						game.useMoonlight(player,time,isStop);
 					}
 				},
 				unauto:function(){
@@ -26031,8 +26031,8 @@
 								player.addTempSkill(info.tempSkills[si]);
 							}
 							if(!game.observe&&player==game.me&&!ui.moonlight) {
-								player.moonlightCount=info.moonlightCount;
-								ui.create.moonlight(player.moonlightCount);
+								player.mlBalance=info.mlBalance;
+								ui.create.moonlight(player.mlBalance);
 							}
 							ui.updatej(player);
 							if(!player.setModeState){
@@ -26619,11 +26619,29 @@
 			if(game.timerTime<=0) return;
 			game.timerCurrent=game.timerTime;
 			ui.timer.set(game.timerCurrent,1);
+			var moonlightTime=parseInt(lib.configOL.moonlight_time);
+			var moonlightActivated=false;
 			_status.countDown=setInterval(function(){
-				if(--game.timerCurrent){
+				if(--game.timerCurrent>0){
 					ui.timer.set(game.timerCurrent,game.timerCurrent/game.timerTime);
 				}
+				else if(game.me.mlBalance){
+					if(!moonlightActivated){
+						moonlightActivated=true;
+
+						if(game.online){
+							game.send('moonlight',game.me.mlBalance);
+						}
+						else{
+							game.useMoonlight(game.me,game.me.mlBalance);
+						}
+					}
+					game.me.mlBalance--;
+					ui.click.moonlight();
+					ui.timer.set(game.me.mlBalance,game.me.mlBalance/moonlightTime);
+				}
 				else{
+					game.send('moonlight',0,true);
 					ui.timer.set(0,0);
 					clearInterval(_status.countDown);
 					delete _status.countDown;
@@ -26631,9 +26649,13 @@
 				}
 			},1000);
 		},
-		useMoonlight:function(player,time){
+		useMoonlight:function(player,time,isStop){
+			if(isStop){
+				player.mlBalance=time;
+				return;
+			}
 			if(player!=game.me){
-				player.moonlightCount--;
+				player.mlBalance=time;
 				player.showTimer(time*1000);
 			}
 			game.broadcast(function(player,time){
@@ -26784,6 +26806,7 @@
 		},
 		stopCountChoose:function(){
 			if(_status.countDown){
+				game.send('moonlight',game.me.mlBalance,true);
 				clearInterval(_status.countDown);
 				delete _status.countDown;
 				ui.timer.hide();
@@ -34820,19 +34843,6 @@
 									connect:true,
 									frequent:true
 								};
-								infoconfig.connect_moonlight_count={
-									name:'月光宝盒个数',
-									init:'5',
-									item:{
-										'1':'1个',
-										'2':'2个',
-										'3':'3个',
-										'4':'4个',
-										'5':'5个',
-									},
-									connect:true,
-									frequent:true
-								};
 								infoconfig.connect_choose_timeout_char_1={
 									name:'选择角色1时限',
 									init:'20',
@@ -41266,36 +41276,16 @@
 					}
 				},true);
 			},
-			moonlight:function(moonlightCount){
+			moonlight:function(moonlightBalance){
 				if(ui.moonlight) return;
 				var moonlightPrefix='月光宝盒';
 				var moonlightDelimiter='x';
-				var moonlightText=moonlightPrefix+(moonlightCount?(moonlightDelimiter+moonlightCount):'');
-				ui.moonlight=ui.create.system(moonlightText,function(){
-					if(ui.moonlight.classList.contains('hidden')||!_status.countDown) return;
-					var moonlightTime=parseInt(lib.configOL.moonlight_time);
-					game.timerCurrent+=moonlightTime;
-					game.timerTime=game.timerCurrent;
-					game.me.showTimer(game.timerTime*1000);
-
-					if(game.online){
-						game.send('moonlight',game.timerTime);
-					}
-					else{
-						game.useMoonlight(game.me,game.timerTime);
-					}
-
-					game.me.moonlightCount--;
-					if(game.me.moonlightCount){
-						ui.moonlight.innerHTML=moonlightPrefix+moonlightDelimiter+game.me.moonlightCount;
-					}
-					else{
-						ui.moonlight.innerHTML=moonlightPrefix;
-						ui.moonlight.hide();
-					}
-				});
-				if(!moonlightCount){
-					ui.moonlight.innerHTML=moonlightPrefix;
+				var moonlightText=moonlightPrefix+(moonlightBalance?(moonlightDelimiter+moonlightBalance):'');
+				ui.moonlight=ui.create.system(moonlightText,ui.click.moonlight);
+				ui.moonlight.classList.add('glow');
+				if(!moonlightBalance){
+					ui.moonlight.classList.remove('glow');
+					ui.moonlight.innerHTML='月光宝盒';
 					ui.moonlight.hide();
 				}
 			},
@@ -46886,6 +46876,23 @@
 							player.setNickname(player.nickname);
 						},game.me);
 					}
+				}
+			},
+			moonlight:function(){
+				var mlBalance=parseInt(game.me.mlBalance);
+				var moonlightPrefix='月光宝盒';
+				var moonlightDelimiter='x';
+				var moonlightText=moonlightPrefix+(mlBalance?(moonlightDelimiter+mlBalance):'');
+				if(ui.moonlight.classList.contains('hidden')||!_status.countDown) return;
+
+				if(mlBalance){
+					ui.moonlight.innerHTML=moonlightPrefix+moonlightDelimiter+mlBalance;
+					ui.moonlight.classList.add('glow');
+				}
+				else{
+					ui.moonlight.classList.remove('glow');
+					ui.moonlight.innerHTML=moonlightPrefix;
+					ui.moonlight.hide();
 				}
 			},
 			wuxie:function(){
