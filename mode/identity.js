@@ -1955,7 +1955,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						console.log('info: still end up with repeated identity assignment after '+assignAttemptsMax+' attempts!');
 					}
 
-					var moonlightCount=parseInt(lib.configOL.moonlight_count);
+					var moonlightTime=parseInt(lib.configOL.moonlight_time);
 					for(i=0;i<game.players.length;i++){
 						game.players[i].identity=identityList[i];
 						game.players[i].setIdentity('cai');
@@ -1974,14 +1974,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						game.players[i].identityShown=false;
-						game.broadcastAll(function(player,moonlightCount){
+						game.broadcastAll(function(player,moonlightTime){
 							if(!game.online||game.me==player){
-								player.moonlightCount=moonlightCount;
+								player.mlBalance=moonlightTime;
 								if(game.me==player) {
-									ui.create.moonlight(moonlightCount);
+									ui.create.moonlight(moonlightTime);
 								}
 							}
-						},game.players[i],moonlightCount);
+						},game.players[i],moonlightTime);
 					}
 					if(lib.configOL.special_identity&&!event.zhongmode&&game.players.length==8){
 						var map={};
