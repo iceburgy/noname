@@ -14108,8 +14108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return;
 						}
 					}
-					player.removeAdditionalSkill('baobian');
-					game.broadcast(function(player){
+					game.broadcastAll(function(player){
 						player.removeAdditionalSkill('baobian');
 					},player);
 					var list=[];
@@ -14124,8 +14123,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.push('xinshensu');
 					}
 					if(list.length){
-						player.addAdditionalSkill('baobian',list);
-						game.broadcast(function(player,list){
+						game.broadcastAll(function(player,list){
 							player.addAdditionalSkill('baobian',list);
 						},player,list);
 					}

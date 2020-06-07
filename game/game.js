@@ -19975,7 +19975,7 @@
 						if(!info) return;
 						if(!nobroadcast){
 							game.broadcast(function(player,skill){
-								player.addSkill(skill);
+								player.skills.add(skill);
 							},this,skill);
 						}
 						this.skills.add(skill);

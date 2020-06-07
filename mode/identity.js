@@ -2079,7 +2079,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.list.randomRemove(choiceZhu),'character']],selectButton,true]);
+							list.push([game.players[i],[str,[['guanzhang','re_heqi','ol_pangtong','xiahouba','dengai'],'character']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2108,7 +2108,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[0][0],choiceZhu,event.list);
-							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,true]);
+							list.push([game.players[i],[str,[['guanzhang','re_heqi','ol_pangtong','xiahouba','dengai'],'character']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2287,7 +2287,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.list.randomRemove(num+num3),'character']],selectButton,true]);
+							list.push([game.players[i],[str,[['guanzhang','re_heqi','ol_pangtong','xiahouba','dengai'],'character']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2360,7 +2360,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							var chosenCharsIndex=get.distance(game.zhu, game.players[i], 'absolute');
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[chosenCharsIndex][0],num+num3,event.list);
-							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,true]);
+							list.push([game.players[i],[str,[['guanzhang','re_heqi','ol_pangtong','xiahouba','dengai'],'character']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){

@@ -7341,12 +7341,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageSource'},
 				forced:true,
 				filter:function(event,player){
-					if(!player.hasSkill('fuhun3')&&event.getParent().skill=='fuhun') {
-                        var tempEvent=event;
-                        while(tempEvent&&tempEvent.name!='phaseUse') tempEvent=tempEvent.parent;
-                        if(tempEvent&&tempEvent.name=='phaseUse') return true;
-					}
-                    return false;
+					if(_status.currentPhase!=player) return false;
+					if(player.hasSkill('fuhun3')) return false;
+					return event.getParent().skill=='fuhun';
 				},
 				content:function(){
 					player.addTempSkill('new_rewusheng');
