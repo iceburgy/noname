@@ -2084,7 +2084,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					game.me.chooseButtonOL(list,function(player,result){
 						if(game.online||player==game.me) {
-							player.init(result.links[0]);
+							player.init(result.links[0],false);
 							player.chosenChar1=result.links[0];
 						}
 					});
@@ -2113,7 +2113,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					game.me.chooseButtonOL(list,function(player,result){
 						if(game.online||player==game.me) {
-							player.init(player.chosenChar1,result.links[0]);
+							player.init(player.chosenChar1,result.links[0],false);
 						}
 					});
 					"step 2"
@@ -2292,7 +2292,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					game.me.chooseButtonOL(list,function(player,result){
 						if(game.online||player==game.me) {
-							player.init(result.links[0]);
+							player.init(result.links[0],false);
 							player.chosenChar1=result.links[0];
 						}
 					});
@@ -2365,7 +2365,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					game.me.chooseButtonOL(list,function(player,result){
 						if(game.online||player==game.me) {
-							player.init(player.chosenChar1,result.links[0]);
+							player.init(player.chosenChar1,result.links[0],false);
 						}
 					});
 					"step 8"

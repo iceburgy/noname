@@ -3787,14 +3787,14 @@
 
 								var that=this;
 								setTimeout(function(){
-									// 1. reset leaderboard
-									game.saveConfig('players_statistics',{});
+									// 1. import_dropbox_config
+									game.importDropboxConfig();
 
 									// 2. import_forbid_lib
 									game.importForbidLib();
 
-									// 3. import_dropbox_config
-									game.importDropboxConfig();
+									// 3. reset leaderboard
+									game.saveConfig('players_statistics',{});
 
 									that.innerHTML='<span>设置成功</span>';
 									setTimeout(function(){
@@ -3809,6 +3809,36 @@
 									that.innerHTML='<span>一键完成以下设置</span>';
 								},1000);
 							}
+						}
+					},
+					import_dropbox_config:{
+						name:'导入dropbox游戏设置',
+						clear:true,
+						onclick:function(){
+							this.innerHTML='<span>导入中...</span>';
+							game.importDropboxConfig();
+							var that=this;
+							setTimeout(function(){
+								that.innerHTML='<span>导入成功</span>';
+								setTimeout(function(){
+									game.reload();
+								},1000);
+							},1000);
+						}
+					},
+					import_forbid_lib:{
+						name:'导入禁将表',
+						clear:true,
+						onclick:function(){
+							this.innerHTML='<span>导入中...</span>';
+							game.importForbidLib();
+							var that=this;
+							setTimeout(function(){
+								that.innerHTML='<span>导入成功</span>';
+								setTimeout(function(){
+									that.innerHTML='<span>导入禁将表</span>';
+								},1000);
+							},1000);
 						}
 					},
 					reset_leaderboard:{
@@ -3831,36 +3861,6 @@
 									that.innerHTML='<span>重置战况</span>';
 								},1000);
 							}
-						}
-					},
-					import_forbid_lib:{
-						name:'导入禁将表',
-						clear:true,
-						onclick:function(){
-							this.innerHTML='<span>导入中...</span>';
-							game.importForbidLib();
-							var that=this;
-							setTimeout(function(){
-								that.innerHTML='<span>导入成功</span>';
-								setTimeout(function(){
-									that.innerHTML='<span>导入禁将表</span>';
-								},1000);
-							},1000);
-						}
-					},
-					import_dropbox_config:{
-						name:'导入dropbox游戏设置',
-						clear:true,
-						onclick:function(){
-							this.innerHTML='<span>导入中...</span>';
-							game.importDropboxConfig();
-							var that=this;
-							setTimeout(function(){
-								that.innerHTML='<span>导入成功</span>';
-								setTimeout(function(){
-									game.reload();
-								},1000);
-							},1000);
 						}
 					},
 
@@ -19975,7 +19975,7 @@
 						if(!info) return;
 						if(!nobroadcast){
 							game.broadcast(function(player,skill){
-								player.skills.add(skill);
+								player.addSkill(skill);
 							},this,skill);
 						}
 						this.skills.add(skill);
@@ -41303,21 +41303,31 @@
 				if(ui.giveup) return;
 				if(!lib.config.show_giveup) return;
 				ui.giveup=ui.create.system('投降',function(){
-					var player=game.me;
-					this.remove();
-					if(game.online){
-						game.send('giveup',player);
+					if(this.innerHTML=='<span>确认</span>'){
+						clearTimeout(this.confirmTimeout);
+						var player=game.me;
+						this.remove();
+						if(game.online){
+							game.send('giveup',player);
+						}
+						else{
+							_status.event.next.length=0;
+							game.createEvent('giveup',false).setContent(function(){
+								game.log(player,'投降');
+								player.popup('投降');
+								player.die('nosource');
+							}).player=player;
+						}
+						if(_status.paused&&_status.imchoosing&&!_status.auto){
+							ui.click.auto();
+						}
 					}
 					else{
-						_status.event.next.length=0;
-						game.createEvent('giveup',false).setContent(function(){
-							game.log(player,'投降');
-							player.popup('投降');
-							player.die('nosource');
-						}).player=player;
-					}
-					if(_status.paused&&_status.imchoosing&&!_status.auto){
-						ui.click.auto();
+						this.innerHTML='<span>确认</span>';
+						var that=this;
+						this.confirmTimeout=setTimeout(function(){
+							that.innerHTML='<span>投降</span>';
+						},1000);
 					}
 				},true);
 			},
