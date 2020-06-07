@@ -33987,7 +33987,7 @@
 			var uploadConfig=function(data){
 				var title='config19987';
 				var content=lib.init.encode(JSON.stringify(data));
-				httpReqUpdate.send("# "+title+"\n"+content);
+				httpReqUpdate.send(title+"\n"+content);
 				console.log(httpReqUpdate.status);
 			}
 			if(!lib.db){
