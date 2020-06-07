@@ -3242,7 +3242,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				derivation:'jixi',
 				content:function(){
 					player.loseMaxHp();
-					player.addSkill('jixi');
+					game.broadcastAll(function(player){
+						player.addSkill('jixi');
+					},player);
 					player.storage.zaoxian=true;
 					player.awakenSkill('zaoxian');
 				}
