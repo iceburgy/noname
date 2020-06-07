@@ -388,7 +388,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				filter:function(event,player){
-					return get.position(event.result.card,true)=='o';
+					return get.position(event.result.card,true)=='o'||get.position(event.result.card,true)=='d';
 				},
 				content:function(){
 					player.gain(trigger.result.card,'gain2');
