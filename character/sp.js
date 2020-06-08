@@ -13502,7 +13502,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			aocai:{
 				audio:2,
 				trigger:{player:'chooseToRespondBegin'},
-				frequent:true,
 				filter:function(event,player){
 					if(event.responded) return false;
 					return _status.currentPhase!==player;
@@ -13522,7 +13521,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 1"
 					if(result.bool){
-						game.log(player,'傲才发动成功');
+						if(game.online){
+							game.send('logSkill',player,'aocai');
+						}
+						else{
+							player.logSkill('aocai');
+						}
 						trigger.untrigger();
 						trigger.responded=true;
 						result.links[0].remove();
@@ -13569,6 +13573,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.isUnseen(0)){
 								player.showCharacter(0);
 							}
+						}
+						if(game.online){
+							game.send('logSkill',player,'aocai');
+						}
+						else{
+							player.logSkill('aocai');
 						}
 						return ui.create.dialog('傲才：选择一张卡牌使用',event.aocaicards);
 					},
