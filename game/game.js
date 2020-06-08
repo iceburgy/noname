@@ -25441,6 +25441,11 @@
 						game.useMoonlight(player,time,isStop);
 					}
 				},
+				logSkill:function(player,skill){
+					if(player&&skill){
+						player.logSkill(skill);
+					}
+				},
 				unauto:function(){
 					var player=lib.playerOL[this.id];
 					if(player){
