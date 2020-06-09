@@ -3896,7 +3896,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wanlan_info:'限定技，当一名角色进入濒死状态时，你可以弃置所有手牌并令其回复体力至1点，然后对当前回合角色造成1点伤害。',
 			re_jikang:"手杀嵇康",
 			old_bulianshi:'手杀步练师',
-			old_caochun:'旧曹纯',
 			shenpei:'审配',
 			re_wangyun:'手杀王允',
 			relianji:'连计',
