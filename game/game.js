@@ -33879,11 +33879,12 @@
 			var forbidMap = JSON.parse(forbidMapRaw);
 
 			var parseDataKey=function(dataKey){
-				// sample longKey: "步骘(BuZhi)"
+				// sample dataKey: "步骘(BuZhi)"
 				var dataKey=dataKey.split("(");
 				var roleName=dataKey[0];
 				var dataKey=dataKey[1].split(")");
 				var roleKey=dataKey[0];
+				if(!lib.character[roleKey]) throw "unknown character: "+roleKey;
 				return [roleName,roleKey];
 			}
 			var simplifyForbidMap=function(forbidMap){
