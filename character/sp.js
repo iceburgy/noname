@@ -13730,7 +13730,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						event.card=result.links[0];
-						player.respond(event.card,'highlight').nopopup=true;
+						player.respond(event.card,'highlight','huanshi','noOrdering').nopopup=true;
 					}
 					else{
 						event.finish();
