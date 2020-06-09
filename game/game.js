@@ -11269,7 +11269,7 @@
 							return;
 						}
 						else{
-							player.lose(event.card,'visible');
+							player.lose(event.card,'visible',ui.ordering);
 							player.$phaseJudge(event.card);
 							event.cancelled=false;
 							event.trigger('phaseJudge');
