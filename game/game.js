@@ -3731,28 +3731,8 @@
 					export_role_lib:{
 						name:'导出武将池',
 						onclick:function(){
-							var data={};
-							var libCharacter={};
-							for(var i=0;i<lib.configOL.characterPack.length;i++){
-								var pack=lib.characterPack[lib.configOL.characterPack[i]];
-								for(var j in pack){
-									if(lib.character[j]) libCharacter[j]=pack[j];
-								}
-							}
-							for(i in libCharacter){
-								if(lib.filter.characterDisabled(i,libCharacter)) continue;
-								var charName=get.translation(i);
-								var charKey=charName+'('+i+')';
-								data[charKey]=[];
-								var charInfo=lib.character[i];
-								var skills=charInfo[3];
-								for(var j=0;j<skills.length;j++){
-									var skillName=get.translation(skills[j]);
-									var skillInfo=get.skillInfoTranslation(skills[j]);
-									var skillIntro=skillName+'--'+skillInfo;
-									data[charKey].push(skillIntro);
-								}
-							}
+							var charactersOLList=get.charactersOL();
+							var data=game.buildRoleLibFromCharacters(charactersOLList);
 							game.export(JSON.stringify(data),'noname-rolelib'+(new Date()).toLocaleString()+'.json');
 						},
 						clear:true
@@ -3769,7 +3749,7 @@
 								}
 							}
 							for(i in libCharacter){
-								if(lib.filter.characterDisabled(i,libCharacter)) {
+								if(lib.filter.characterDisabled(i,libCharacter)||lib.connectBanned.contains(i)) {
 									data.push(get.translation(i));
 								}
 							}
@@ -33994,6 +33974,7 @@
 				var content=lib.init.encode(JSON.stringify(data));
 				httpReqUpdate.send(title+"\n"+content);
 				console.log(httpReqUpdate.status);
+				console.log('Uploaded game config');
 			}
 			if(!lib.db){
 				data={};
@@ -34014,6 +33995,49 @@
 					});
 				});
 			}
+		},
+		uploadDropboxRoleLib:function(){
+			var httpReq = new XMLHttpRequest();
+			var url='https://api.dropboxapi.com/2/paper/docs/download';
+			httpReq.open("GET",url,false);
+			httpReq.setRequestHeader('Authorization','Bearer wzahoqHWjoQAAAAAAAAAFV2iwzrw_BFSgaena__5iraqztOyTepnnUc5J1S-73FM');
+			httpReq.setRequestHeader('Dropbox-API-Arg',"{\"doc_id\": \"UQrFsr20jVBKgsJPDBoBj\",\"export_format\": \"markdown\"}");
+			httpReq.send();
+			var revision=JSON.parse(httpReq.getResponseHeader("Dropbox-Api-Result")).revision;
+
+			var httpReqUpdate = new XMLHttpRequest();
+			var urlUpdate='https://api.dropboxapi.com/2/paper/docs/update';
+			httpReqUpdate.open("POST",urlUpdate,false);
+			httpReqUpdate.setRequestHeader("Authorization","Bearer wzahoqHWjoQAAAAAAAAAFV2iwzrw_BFSgaena__5iraqztOyTepnnUc5J1S-73FM");
+			httpReqUpdate.setRequestHeader("Content-Type","application/octet-stream");
+			httpReqUpdate.setRequestHeader("Dropbox-API-Arg","{\"doc_id\": \"UQrFsr20jVBKgsJPDBoBj\",\"doc_update_policy\": \"overwrite_all\",\"revision\":"+revision+",\"import_format\": \"markdown\"}");
+
+			var charactersOLList=get.charactersOL();
+			var data=game.buildRoleLibFromCharacters(charactersOLList);
+			var title='wujiangBaseMap';
+			var content=JSON.stringify(data,null,4);
+			httpReqUpdate.send(title+"\n"+content);
+			console.log(httpReqUpdate.status);
+			console.log('Uploaded total roles: '+Object.keys(data).length);
+
+			game.uploadDropboxConfig();
+		},
+		buildRoleLibFromCharacters:function(charList){
+			var data={};
+			for(var i of charList){
+				var charName=get.translation(i);
+				var charKey=charName+'('+i+')';
+				data[charKey]=[];
+				var charInfo=lib.character[i];
+				var skills=charInfo[3];
+				for(var j=0;j<skills.length;j++){
+					var skillName=get.translation(skills[j]);
+					var skillInfo=get.skillInfoTranslation(skills[j]);
+					var skillIntro=skillName+'--'+skillInfo;
+					data[charKey].push(skillIntro);
+				}
+			}
+			return data;
 		},
 	};
 	var ui={
