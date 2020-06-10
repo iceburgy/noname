@@ -35,12 +35,15 @@ content:function(config, pack){
 			duoRPath.setAttribute('d', 'M0 0 H1 Q1 0.065 0.9 0.065 Q1 0.065 1 0.11 V0.96 Q1 1 0.9 1 H0 Z');
 
 			this.initOverride();
+			return this;
 		},
 		initOverride:function(){
 		    var base = {
 				ui:{
 					create:{
 						cards: ui.create.cards,
+						volume: ui.create.volume,
+						chat: ui.create.chat,
 					},
 				},
 				get:{
@@ -218,7 +221,7 @@ content:function(config, pack){
 				
 				dialog.style.top = idealtop + 'px';
 			};
-
+			
 			game.updateRoundNumber = function(){
 				game.broadcastAll(function(num1, num2){
 					if(ui.cardPileNumber) ui.cardPileNumber.innerHTML = '牌堆' + num2 + ' 第' + num1 +'轮';
@@ -237,7 +240,7 @@ content:function(config, pack){
 				
 				return base.game.bossPhaseLoop.apply(this, arguments);
 			};
-
+			
 			game.phaseLoop = function(player){
 				game.broadcastAll(function(firstAction){
 					var cur;
@@ -365,23 +368,21 @@ content:function(config, pack){
 								}
 							}
 						}
+						
 						var selectableCards = false;
 						if (range[0] != range[1] || range[0] > 1) auto = false;
 						for (i = 0; i < cards.length; i++) {
 							if (lib.config.cardtempname != 'off') {
 								var cardname = get.name(cards[i]);
-								if (cards[i].name != cardname) {
-									if (!cards[i]._tempName) {
-										cards[i]._tempName = ui.create.div('.tempname', cards[i]);
-									} 
+								var cardnature = get.nature(cards[i]);
+								if (cards[i].name != cardname || ((cardnature || cards[i].nature) && cards[i].nature != cardnature)) {
+									if (!cards[i]._tempName) cards[i]._tempName = ui.create.div('.tempname', cards[i]);
 									
 									var tempname = get.translation(cardname);
-									var nature = get.nature(cards[i]);
-									
-									if (nature) {
-										cards[i]._tempName.dataset.nature = nature;
+									if (cardnature) {
+										cards[i]._tempName.dataset.nature = cardnature;
 										if (cardname == 'sha') {
-											tempname = get.translation(nature) + tempname;
+											tempname = get.translation(cardnature) + tempname;
 										}
 									}
 									
@@ -389,6 +390,7 @@ content:function(config, pack){
 									cards[i]._tempName.tempname = tempname;
 								}
 							}
+							
 							var nochess = true;
 							if (!lib.filter.cardAiIncluded(cards[i])) {
 								nochess = false;
@@ -555,9 +557,13 @@ content:function(config, pack){
 							else if (typeof info.enable == 'string') enable = (info.enable == event.name);
 							if (enable) {
 								if (info.filter) {
-									if (info.filterCard && info.selectCard && info.selectCard < 1) if (ui.handSpecial) ui.handSpecial.ignored = true;
+									if (info.filterCard && (!info.selectCard || info.selectCard > 0)) if (ui.handSpecial) ui.handSpecial.countIn = true;
 									enable = info.filter(event, player);
-									if (ui.handSpecial) ui.handSpecial.ignored = false;
+									ui.handSpecial.countIn = false;
+									
+									// if (info.filterCard && info.selectCard && info.selectCard < 1) 
+									// enable = info.filter(event, player);
+									// if (ui.handSpecial) ui.handSpecial.ignored = false;
 								} 
 								if (info.viewAs && event.filterCard && !event.filterCard(info.viewAs, player, event)) enable = false;
 								if (info.viewAs && info.viewAsFilter && info.viewAsFilter(player) == false) enable = false;
@@ -742,6 +748,12 @@ content:function(config, pack){
 				if (!decadeUI.config.playerLineEffect) return gameLinexyFunction.apply(this, arguments);
 				decadeUI.effect.line(path);
 			};
+			
+			// ui.click.chat = function(){
+				
+				
+				// return chatBox;
+			// };
 			
 			ui.click.intro = function(e){
 				if (this.classList.contains('infohidden') || _status.dragged) return;
@@ -983,6 +995,32 @@ content:function(config, pack){
 				}
 			};
 			
+			ui.click.volumn = function(){
+				var setting = ui.create.dialog('hidden');
+				setting.listen(function(e) {
+					e.stopPropagation();
+				});
+				
+				var backVolume = decadeUI.component.slider(0, 8, parseInt(lib.config.volumn_background));
+				var gameVolume = decadeUI.component.slider(0, 8, parseInt(lib.config.volumn_audio));
+				
+				backVolume.onchange = function(){
+					game.saveConfig('volumn_background', backVolume.value);
+					ui.backgroundMusic.volume = backVolume.value / 8;
+				};
+				
+				gameVolume.onchange = function(){
+					game.saveConfig('volumn_audio', gameVolume.value);
+				};
+				
+				setting.add('背景音量');
+				setting.content.appendChild(backVolume);
+				setting.add('游戏音量');
+				setting.content.appendChild(gameVolume);
+				setting.add(ui.create.div('.placeholder'));
+				return setting;
+			};
+			
 			ui.create.pause = function(){
 				var dialog = createPauseFunction.call(this);
 				dialog.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
@@ -1026,6 +1064,7 @@ content:function(config, pack){
 				ui.arena.classList.remove('mobile');
 				
 				decadeUI.config.update();
+				// ui.arena.appendChild(ui.cardPile);
 			    return result;
 			};
 			
@@ -1238,11 +1277,35 @@ content:function(config, pack){
 
 				return card;
 			};
-
+			
 			ui.create.cards = function(){
 				var retval = base.ui.create.cards.apply(this, arguments);
 				game.updateRoundNumber();
 				return retval;
+			};
+			
+			ui.create.chat = function(){
+				var chatBox = ui.arena.appendChild(decadeUI.component.chatBox());
+				for (var i = 0; i < lib.chatHistory.length; i++) {
+					chatBox.addEntry(lib.chatHistory[i]);
+				}
+				
+				_status.addChatEntry = chatBox.addEntry;
+				Object.defineProperties(_status, {
+					addChatEntry: {
+						configurable: true,
+						get:function(){
+							return chatBox.addEntry;
+						},
+						set:function(value){
+							chatBox.overrideEntry = value;
+						}
+					},
+				});
+				
+				var retVal = base.ui.create.chat.apply(this, arguments);
+				chatBox.addEntry._origin = chatBox;
+				return retVal;
 			};
 			
 			lib.init.cssstyles = function(){
@@ -2289,7 +2352,10 @@ content:function(config, pack){
 						break;
 					
 					case 'guozhan':
-				        this.group = identity;
+				        if (identity == 'ye' && get.is.jun(this)) {
+							this.identity = identity = lib.character[this.name1][1];
+						}
+						this.group = identity;
 				        break;
 				    case 'versus':
 						this.finalSide = this.side;
@@ -2589,6 +2655,9 @@ content:function(config, pack){
 								case 'fire':
 									name = 'huo' + name;
 									break;
+								// case 'kami':
+									// name = 'shen' + name;
+									// break;
 							}
 						}
 						
@@ -2735,7 +2804,8 @@ content:function(config, pack){
 			lib.element.player.countCards = function(hej, filter){
 				var count = 0;
 				var event = _status.event;
-				if (event.name == 'chooseToUse' && event.player == this && !ui.handSpecial.ignored) {
+				// if (event.name == 'chooseToUse' && event.player == this && !ui.handSpecial.ignored) {
+				if (event.name == 'chooseToUse' && event.player == this && ui.handSpecial.countIn) {
 					hej = (typeof hej == 'string') ? hej : 'h';
 					if (hej.indexOf('h') >= 0) {
 						var muniu = this.getEquip(5);
@@ -3013,8 +3083,8 @@ content:function(config, pack){
 		
 		},
 		dialog:{
-			create:function(className, parentNode, tagNameOptional){
-				var element = !tagNameOptional ? document.createElement('div') : document.createElement(tagNameOptional);
+			create:function(className, parentNode, tagName){
+				var element = !tagName ? document.createElement('div') : document.createElement(tagName);
 				for(var i in decadeUI.dialog){
 					if (decadeUI.dialog[i]) element[i] = decadeUI.dialog[i];
 				}
@@ -4312,8 +4382,6 @@ content:function(config, pack){
 	};
 
 	
-	
-	
 	decadeUI.config = config;
 	decadeUI.config.update = function(){
 	    ui.arena.dataset.skillMarkColor = decadeUI.config.skillMarkColor;
@@ -4372,7 +4440,7 @@ precontent:function(){
 			
 			var filePath, ok;
 			var fonts = ['shousha', 'xingkai', 'xinwei'];
-			var scripts = ['skill', 'content', 'effect'];
+			var scripts = ['component', 'skill', 'content', 'effect'];
 			
 			var onload = function(){
 				this.remove();
@@ -4385,7 +4453,6 @@ precontent:function(){
 			
 			for (var i = 0; i < scripts.length; i++) {
 				ok = false;
-				
 				filePath = decadeUIPath + scripts[i] + '.js';
 				try {
 					var script = document.createElement('script');
@@ -4601,16 +4668,16 @@ package:{
     },
     intro:
     '<p style="color:rgb(200,200,000); font-size:12px; line-height:14px; text-shadow: 0 0 2px black;">' +
-    '有bug请联系作者，目前置顶牌弃置后的牌有虾皮' + '<br>' +
-	'1.9.98.5.1.2：<br>' +
-	'- 优化了常用的字体预加载；<br>' +
-	'- 修正了血条显示，如3/Infinity，3/∞，NaN显示为×；<br>' +
-	'- 修正出牌记录阻挡牌堆牌数记录显示；<br>' +
+    '有bug请先关闭UI重试下，不行再联系作者，目前有些置牌堆顶丢弃的牌不会消失有虾皮。' + '<br>' +
+	'1.9.99.3.0.1：<br>' +
+	'- 修复界/曹植的【落英】AI不获得牌的问题； <br>' +
+	'- 修复界曹植的【落英】配音；<br>' +
+	'- 修复视为卡牌名称的问题；<br>' +
     '</p>',
     author:"短歌 QQ464598631",
     diskURL:"",
     forumURL:"",
-    version:"1.9.98.5.1.2",
+    version:"1.9.99.3.0.1",
 },
 files:{
     "character":[],
@@ -4726,4 +4793,35 @@ editable: false
 - 优化了常用的字体预加载；
 - 修正了血条显示，如3/Infinity，3/∞，NaN显示为×；
 - 修正出牌记录阻挡牌堆牌数记录显示；
+1.9.98.7.0.1:
+- 新增联机模式聊天框（暂时没弄表情），美化音量条；
+- 修复国战诸葛亮师徒观星牌数问题；
+- 修复【纵玄】其他人能观看移动的牌问题；
+- 修复类似陈琳【颂词】AI因【木牛流马】计算目标手牌不正常的问题；
+- 可能修复先亮的野副将，后变成君主将还是野的问题；
+1.9.98.7.0.2:
+- 修复联机模式创建房间自动开始的BUG；
+1.9.99.2.0.1:
+- 新增了曹植【落英】技能显示框；
+- 修复了国战野势力仍为原势力问题；
+- 修正了圆角大小会影响角色；
+- 优化了幻化之战目标信息遮挡；
+- 优化了AI观星技能没有合适的改判牌不全下的问题；
+1.9.99.2.0.2:
+- 新增了枣恭介(DIY包)技能【设控】、界曹植【落英】的UI； 
+- 修复了曹植【落英】技能因游戏速度过快而不能获得牌的问题；
+- 修正了1点血量上限血条框的高度问题；
+1.9.99.3.0.1:
+- 修复界/曹植的【落英】AI不获得牌的问题；
+- 修复界曹植的【落英】配音；
+- 修复视为卡牌名称的问题；
+
+
+
+
+
+
+
+
+
 */
