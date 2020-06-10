@@ -40167,7 +40167,21 @@
 											files=update.dev;
 										}
 										else if(Array.isArray(update.files)&&update.update&&!dev){
-											files=update.files.slice(0);
+											var version1=version.split('.');
+											var version2=update.update.split('.');
+											for(var i=0;i<version1.length&&i<version2.length;i++){
+												if(version2[i]>version1[i]){
+													files=false;break;
+												}
+												else if(version1[i]>version2[i]){
+													files=update.files.slice(0);break;
+												}
+											}
+											if(files===null){
+												if(version1.length>=version2.length){
+													files=update.files.slice(0);
+												}
+											}
 										}
 										var str;
 										if(dev){
