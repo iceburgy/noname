@@ -1,6 +1,6 @@
 window.noname_update={
-	version:'2020.06.12.2',
-	update:'2020.06.12.2',
+	version:'2020.06.12.3',
+	update:'2020.06.12.3',
 	changeLog:[
 		'更新到无名杀官方最新版',
 		'更新到十周年UI最新版',
