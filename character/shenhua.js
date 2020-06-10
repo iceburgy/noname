@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connectBanned:['zuoci'],
 		characterSort:{
 			shenhua:{
-				shenhua_feng:["sp_zhangjiao","re_yuji","old_zhoutai","old_caoren","re_xiahouyuan","xiaoqiao","huangzhong","weiyan"],
+				shenhua_feng:["sp_zhangjiao","re_yuji","old_zhoutai","old_caoren","re_xiahouyuan","re_xiaoqiao","huangzhong","re_weiyan"],
 				shenhua_huo:['dianwei','xunyu','pangtong','sp_zhugeliang','taishici','yanwen','re_yuanshao','pangde'],
 				shenhua_lin:['caopi','xuhuang','menghuo','zhurong','re_lusu','sunjian','dongzhuo','jiaxu'],
 				shenhua_shan:['dengai','zhanghe','liushan','jiangwei','zhangzhang','sunce','caiwenji','zuoci'],
@@ -21,8 +21,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pangde:['male','qun',4,['mashu','mengjin']],
 			re_xiahouyuan:['male','wei',4,['xinshensu']],
 			huangzhong:['male','shu',4,['liegong']],
-			weiyan:['male','shu',4,['kuanggu']],
-			xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
+			re_weiyan:['male','shu',4,['xinkuanggu','qimou']],
+			re_xiaoqiao:['female','wu',3,['retianxiang','hongyan']],
 			sp_zhangjiao:['male','qun',3,['releiji','guidao','huangtian'],['zhu']],
 			re_yuji:["male","qun",3,["xinfu_guhuo"],["forbidai"]],
 			// yuji:['male','qun',3,['guhuo']],
@@ -165,7 +165,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						event.target=result.targets[0];
 						player.logSkill('zhengrong',target);
-						player.choosePlayerCard(target,'he').ai=get.buttonValue;
+						player.choosePlayerCard(target,'he',true).ai=get.buttonValue;
 					}
 					else event.finish();
 					'step 2'
@@ -1667,18 +1667,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:'成',
 				intro:{
 					content:function(storage,player,skill){
-						if(player.storage.nzry_chenglve==true) return '出牌阶段限一次，你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制';
-						return '出牌阶段限一次，你可以摸一张牌，然后弃置两张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制';
+						var str=player.storage.nzry_chenglve?'出牌阶段限一次，你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制':'出牌阶段限一次，你可以摸一张牌，然后弃置两张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制';
+						if(player.storage.nzry_chenglve1){
+							str+='<br><li>当前花色：';
+							str+=get.translation(player.storage.nzry_chenglve1);
+						}
+						return str;
 					},
 				},
 				enable:"phaseUse",
 				usable:1,
 				audio:2,
-				//filter:function(event,player){
-				//	var num=1;
-				//	if(player.storage.nzry_chenglve==true) num=0;
-				//	return player.countCards('h')>=num;
-				//},
 				content:function(){
 					'step 0'
 					if(player.storage.nzry_chenglve==true){
@@ -1692,9 +1691,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					'step 1'
 					if(result.bool){
-						player.storage.nzry_chenglve1=result.cards;
-						player.syncStorage('nzry_chenglve1');
-						player.addTempSkill('nzry_chenglve1',{player:'phaseAfter'});
+						player.storage.nzry_chenglve1=[];
+						for(var i=0;i<result.cards.length;i++){
+							player.storage.nzry_chenglve1.add(get.suit(result.cards[i],player));
+						}
+						player.markSkill('nzry_chenglve');
+						player.addTempSkill('nzry_chenglve1');
 					};
 				},
 				ai:{
@@ -1712,16 +1714,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					cardUsable:function(card,player){
 						var cards=player.storage.nzry_chenglve1;
 						for(var i=0;i<cards.length;i++){
-							if(get.suit(cards[i])==get.suit(card)) return Infinity;
+							if(cards[i]==get.suit(card)) return Infinity;
 						};
 					},
 					targetInRange:function(card,player){
 						var cards=player.storage.nzry_chenglve1;
 						for(var i=0;i<cards.length;i++){
-							if(get.suit(cards[i])==get.suit(card)) return true;
+							if(cards[i]==get.suit(card)) return true;
 						};
 					}
 				},
+				onremove:true,
 			},
 			"nzry_shicai":{
 				audio:"nzry_shicai_2",
@@ -1901,6 +1904,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:2,
 						enable:'phaseUse',
 						usable:1,
+						delay:false,
 						filter:function(event,player){
 							return game.hasPlayer(function(current){
 								return current!=player&&
@@ -2013,7 +2017,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						discard:false,
 						line:true,
-						prepare:'give',
+						lose:false,
+						delay:false,
 						position:'he',
 						filterCard:true,
 						filterTarget:function(card,player,target){
@@ -2027,7 +2032,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							player.storage.nzry_shenshi=true;
-							target.gain(cards,player);
+							target.gain(cards,player,'giveAuto');
 							target.damage('nocard');
 							'step 1'
 							if(!target.isAlive()){
@@ -2655,7 +2660,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				audio:'kuanggu',
-				audioname:['re_weiyan'],
+				audioname:['re_weiyan','ol_weiyan'],
 				content:function(){
 					'step 0'
 					event.num=trigger.num;
@@ -5855,7 +5860,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			kuanggu:{
 				audio:2,
-				audioname:['re_weiyan'],
+				audioname:['re_weiyan','ol_weiyan'],
 				trigger:{source:'damageSource'},
 				forced:true,
 				filter:function(event,player){
@@ -5867,7 +5872,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			tianxiang:{
 				audio:2,
-				audioname:['daxiaoqiao','re_xiaoqiao'],
+				audioname:['daxiaoqiao','re_xiaoqiao','ol_xiaoqiao'],
 				trigger:{player:'damageBegin3'},
 				direct:true,
 				filter:function(event,player){
@@ -5956,7 +5961,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			retianxiang:{
 				audio:'tianxiang',
-				audioname:['daxiaoqiao','re_xiaoqiao'],
+				audioname:['daxiaoqiao','re_xiaoqiao','ol_xiaoqiao'],
 				trigger:{player:'damageBegin4'},
 				direct:true,
 				filter:function(event,player){
@@ -6387,8 +6392,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				mod:{
-					maxHandcard:function(player,num){
-						if(get.mode()!='guozhan'&&player.storage.buqu&&player.storage.buqu.length) return num-player.hp+player.storage.buqu.length;
+					maxHandcardBase:function(player,num){
+						if(get.mode()!='guozhan'&&player.storage.buqu&&player.storage.buqu.length) return player.storage.buqu.length;
 					},
 				},
 				ai:{
@@ -6627,11 +6632,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				discard:false,
+				lose:false,
+				delay:false,
 				line:true,
 				direct:true,
 				prepare:function(cards,player,targets){
 					targets[0].logSkill('huangtian');
-					player.$give(cards,targets[0]);
 				},
 				prompt:function(){
 					var player=_status.event.player;
@@ -6660,7 +6666,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//usable:1,
 				//forceaudio:true,
 				content:function(){
-					target.gain(cards,player);
+					target.gain(cards,player,'giveAuto');
 					target.addTempSkill('huangtian3','phaseUseEnd');
 				},
 				ai:{
@@ -7373,8 +7379,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			re_xiahouyuan:'夏侯渊',
 			re_huangzhong:'界黄忠',
-			re_weiyan:'界魏延',
-			re_xiaoqiao:'界小乔',
+			re_weiyan:'魏延',
+			re_xiaoqiao:'小乔',
 			
 			gz_xiahouyuan:'夏侯渊',
 			gz_huangzhong:'黄忠',
@@ -7393,8 +7399,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoren:'界曹仁',
 			huangzhong:'黄忠',
 			sp_zhangjiao:'张角',
-			weiyan:'魏延',
-			xiaoqiao:'小乔',
+			weiyan:'旧魏延',
+			xiaoqiao:'旧小乔',
 			zhoutai:'界周泰',
 			zhangjiao:'张角',
 			yuji:'于吉',
