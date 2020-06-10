@@ -19,6 +19,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 				infohide: undefined,
 				confirmed: undefined,
 				doubleSwitch: undefined,
+				orderCardsList: [[],[]],
 				finishing: undefined,
 				finished: undefined,
 				finishTime:function(time){
@@ -66,7 +67,6 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 					if (_status.event.result) _status.event.result.bool = this.confirmed === true;
 					else _status.event.result = { bool: this.confirmed === true }
 					
-					
 					game.broadcastAll(function(){
 						if (!window.decadeUI && decadeUI.eventDialog) return;
 						decadeUI.eventDialog.close();
@@ -80,6 +80,18 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 					var x, y;
 					for (var i = 0; i < this.cards.length; i++) {
 						cards = this.cards[i];
+						if (this.orderCardsList[i].length) {
+							cards.sort(function(a, b){
+								var aIndex = guanXing.orderCardsList[i].indexOf(a);
+								var bIndex = guanXing.orderCardsList[i].indexOf(b);
+								
+								aIndex = aIndex >= 0 ? aIndex : guanXing.orderCardsList[i].length;
+								bIndex = bIndex >= 0 ? bIndex : guanXing.orderCardsList[i].length;
+								return aIndex - bIndex;
+								return 
+							});
+						}
+						
 						y = 'calc(' + (i * 100) + '% + ' + (i * 10) + 'px)';
 						for (var j = 0; j < cards.length; j++) {
 							x = 'calc(' + (j * 100) + '% + ' + (j * 10) + 'px)';
@@ -161,6 +173,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 					this.onMoved();
 				},
 				move:function(card, indexTo, moveDown){
+					debugger;
 					var dim = moveDown ? 1 : 0;
 					var dim2 = dim;
 					var index = this.cardToIndex(card, dim);
@@ -188,6 +201,45 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 					}
 					
 					return -1;
+				},
+				lockCardsOrder:function(isBottom){
+					var orders;
+					var cards;
+					
+					if (isBottom) {
+						cards = this.cards[1];
+						this.orderCardsList[1] = [];
+						orders = this.orderCardsList[1];
+					} else {
+						cards = this.cards[0];
+						this.orderCardsList[0] = [];
+						orders = this.orderCardsList[0];
+					}
+					
+					if (cards.length) {
+						for (var i = 0; i < cards.length; i++) {
+							orders.push(cards[i]);
+						}
+					}
+				},
+				unlockCardsOrder:function(isBottom){
+					if (isBottom) {
+						this.orderCardsList[1] = [];
+					} else {
+						this.orderCardsList[0] = [];
+					}
+				},
+				getCardArrayIndex:function(card){
+					var cards = this.cards;
+					
+					if (cards[0].indexOf(card) >= 0) {
+						return 0;
+					} else if (cards[1].indexOf(card) >= 0) {
+						return 1;
+					} else {
+						return -1;
+					}
+
 				},
 				onMoved:function(){
 					if (typeof this.callback == 'function') {
@@ -251,6 +303,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 				_header2: undefined,
 				_infohide: undefined,
 				_callback: undefined,
+				
 			}
 			
 			for (var key in properties) {
@@ -379,7 +432,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 			}
 			
 			if (cards2) {
-				guanxing.cards[1] = cards2;
+				guanXing.cards[1] = cards2;
 				guanXing.movables[1] = Math.max(cards2.length, guanXing.movables[1]);
 			}
 			

@@ -21,7 +21,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 				var player = event.player;
 				if(player.isUnderControl()) game.modeSwapPlayer(player);
 				
-				var cards = get.cards(game.countPlayer() < 4 ? 3 : 5);
+				var cards = get.cards(num);
 				var guanXing = decadeUI.content.chooseGuanXing(player, cards, cards.length, null, cards.length);
 				game.broadcast(function(player, cards){
 					if (!window.decadeUI) return;
@@ -33,8 +33,11 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 					var cheats = [];
 					var judges = player.node.judges.childNodes;
 
-					if (judges.length) cheats = decadeUI.get.cheatJudgeCards(cards, judges, true);
-					if (cards.length) {
+					if (judges.length) {
+						cheats = decadeUI.get.cheatJudgeCards(cards, judges, true);
+					}
+					
+					if (cards.length && cheats.length == judges.length) {
 						for (var i = 0; i >= 0 && i < cards.length; i++) {
 							if (get.value(cards[i], player) >= 5) {
 								cheats.push(cards[i]);
@@ -120,9 +123,11 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 						judges = player.node.judges.childNodes;
 					}
 					
-					if (judges.length > 0) cheats = decadeUI.get.cheatJudgeCards(cards, judges, friend != null);
+					if (judges.length) {
+						cheats = decadeUI.get.cheatJudgeCards(cards, judges, friend != null);
+					}
 						
-					if (cards.length > 0) {
+					if (cards.length && cheats.length == judges.length) {
 						for (var i = 0; i >= 0 && i < cards.length; i++) {
 							if (friend) {
 								if (get.value(cards[i], friend) >= 5) {
@@ -312,11 +317,9 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 					event.switchToAuto();
 				}
 				'step 1'
-				game.cardsDiscard(event.cards1);
 				if (event.result && event.result.bool) {
+					game.cardsDiscard(event.cards1);
 					player.gain(event.cards2, 'log', 'gain2');
-				} else {
-					game.cardsDiscard(event.cards2);
 				}
 			},
 			ai: {
@@ -580,7 +583,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 						cards = decadeUI.get.bestValueCards(cards, friend);
 					} else {
 						cards.sort(function(a, b){
-							get.value(a, target) - get.value(b, target);
+							get.value(a, next) - get.value(b, next);
 						});
 					}
 
@@ -682,25 +685,27 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 				}
 				
 				if (!cards.length) return;
-				var zongxuan = decadeUI.content.chooseGuanXing(player, cards, cards.length, null, cards.length, false);
-				zongxuan.caption = '【纵玄】';
-				zongxuan.header1 = '弃牌堆';
-				zongxuan.header2 = '牌堆顶';
-				zongxuan.callback = function(){ return this.cards[1].length > 0; };
+				var dialog = decadeUI.content.chooseGuanXing(player, cards, cards.length, null, cards.length);
+				dialog.caption = '【纵玄】';
+				dialog.header1 = '弃牌堆';
+				dialog.header2 = '牌堆顶';
+				dialog.lockCardsOrder(0);
+				dialog.callback = function(){ return this.cards[1].length > 0; };
 				game.broadcast(function(player, cards, callback){
 					if (!window.decadeUI) return;
 					var zongxuan = decadeUI.content.chooseGuanXing(player, cards, cards.length);
-					zongxuan.caption = '【纵玄】';
-					zongxuan.header1 = '弃牌堆';
-					zongxuan.header2 = '牌堆顶';
-					zongxuan.callback = callback;
-				}, player, cards, zongxuan.callback);
+					dialog.caption = '【纵玄】';
+					dialog.header1 = '弃牌堆';
+					dialog.header2 = '牌堆顶';
+					dialog.lockCardsOrder(0);
+					dialog.callback = callback;
+				}, player, cards, dialog.callback);
 				
 				event.switchToAuto = function(){
 					var parent = event.parent;
 					while (parent != null && parent.name != 'phaseDiscard') parent = parent.parent;
 					
-					var cards = zongxuan.cards[0].concat();
+					var cards = dialog.cards[0].concat();
 					var cheats = [];
 					var next = player.getNext();
 					var hasFriend = get.attitude(player, next) > 0;
@@ -732,8 +737,8 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 					var time = 500;
 					for (var i = 0; i < cheats.length; i++) {
 						setTimeout(function(card, index, finished){
-							zongxuan.move(card, index, 1);
-							if (finished) zongxuan.finishTime(1000);
+							dialog.move(card, index, 1);
+							if (finished) dialog.finishTime(1000);
 						}, time, cheats[i], i, (i >= cheats.length - 1));
 						time += 500;
 					}
@@ -756,7 +761,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 				for (var i = 0; i < cards.length; i++) {
 					ui.cardPile.insertBefore(cards[i], first);
 				}
-				debugger;
+				
 				cards = event.cards1;
 				for (var i = 0; i < cards.length; i++) {
 					ui.discardPile.appendChild(cards[i]);
@@ -765,7 +770,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 				game.log(player, '将' + get.cnNumber(event.num2) + '张牌置于牌堆顶');
 			},
 		},
-		identity_junshi:{
+		identity_junshi: {
 			name:'军师',
 			mark:true,
 			silent:true,
@@ -845,17 +850,17 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 				}
 				
 				var cards = get.cards(num);
-				var dianhua = decadeUI.content.chooseGuanXing(player, cards, cards.length);
-				dianhua.caption = '【悟心】';
+				var dialog = decadeUI.content.chooseGuanXing(player, cards, cards.length);
+				dialog.caption = '【悟心】';
 				game.broadcast(function(player, cards, callback){
 					if (!window.decadeUI) return;
-					var dianhua = decadeUI.content.chooseGuanXing(player, cards, cards.length);
-					dianhua.caption = '【悟心】';
-					dianhua.callback = callback;
-				}, player, cards, dianhua.callback);
+					var dialog = decadeUI.content.chooseGuanXing(player, cards, cards.length);
+					dialog.caption = '【悟心】';
+					dialog.callback = callback;
+				}, player, cards, dialog.callback);
 				
 				event.switchToAuto = function(){
-					var cards = dianhua.cards[0].concat();
+					var cards = dialog.cards[0].concat();
 					var cheats = [];
 					
 					var next = player.getNext();
@@ -867,7 +872,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 						cards = decadeUI.get.bestValueCards(cards, friend);
 					} else {
 						cards.sort(function(a, b){
-							get.value(a, target) - get.value(b, target);
+							get.value(a, next) - get.value(b, next);
 						});
 					}
 
@@ -875,8 +880,8 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 					var time = 500;
 					for (var i = 0; i < cards.length; i++) {
 						setTimeout(function(card, index, finished){
-							dianhua.move(card, index, 0);
-							if (finished) dianhua.finishTime(1000);
+							dialog.move(card, index, 0);
+							if (finished) dialog.finishTime(1000);
 						}, time, cards[i], i, i >= cards.length - 1);
 						time += 500;
 					}
@@ -894,10 +899,165 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 				}
 			},
 		},
+		luoying: {
+			group: ['luoying_discard', 'luoying_judge'],
+			subfrequent: ['judge'],
+			subSkill: {
+				discard: {
+					audio: 2,
+					trigger: {
+						global: 'loseAfter'
+					},
+					filter: function(event, player) {
+						if (event.type != 'discard') return false;
+						if (event.player == player) return false;
+						for (var i = 0; i < event.cards2.length; i++) {
+							if (get.suit(event.cards2[i], event.player) == 'club' && get.position(event.cards2[i], true) == 'd') {
+								return true;
+							}
+						}
+						return false;
+					},
+					// direct: true,
+					content: function() {
+						"step 0"
+						if (trigger.delay == false) game.delay();
+						"step 1"
+						var cards = [];
+						for (var i = 0; i < trigger.cards2.length; i++) {
+							var card = trigger.cards2[i];
+							if (get.suit(card, trigger.player) == 'club' && get.position(card, true) == 'd') {
+								cards.push(card);
+								clearTimeout(card.timeout);
+								card.classList.remove('removing');
+								// 防止因为限制结算速度，而导致牌提前进入弃牌堆
+							}
+						}
+						
+						var dialog = decadeUI.content.chooseGuanXing(player, cards, cards.length, null, cards.length, false);
+						dialog.caption = '【落英】';
+						dialog.header1 = '弃牌堆';
+						dialog.header2 = '获得牌';
+						dialog.tip = '请选择要获得的牌';
+						dialog.lockCardsOrder(0);
+						dialog.callback = function(){ return true; };
+						game.broadcast(function(player, cards, callback){
+							if (!window.decadeUI) return;
+							var dialog = decadeUI.content.chooseGuanXing(player, cards, cards.length, null, cards.length, false);
+							dialog.caption = '【落英】';
+							dialog.header1 = '弃牌堆';
+							dialog.header2 = '获得牌';
+							dialog.tip = '请选择要获得的牌';
+							dialog.lockCardsOrder(0);
+							dialog.callback = callback;
+						}, player, cards, dialog.callback);
+						
+						event.switchToAuto = function(){
+							var cards = dialog.cards[0].concat();
+							var time = 500;
+							for (var i = 0; i < cards.length; i++) {
+								if (get.value(cards[i], player) < 0) continue;
+								setTimeout(function(card, index, finished){
+									dialog.move(card, index, 1);
+									if (finished) dialog.finishTime(1000);
+								}, time, cards[i], i, i >= cards.length - 1);
+								time += 500;
+							}
+						}
+						
+						if (event.isOnline()) {
+							event.player.send(function(){
+								if (!window.decadeUI && decadeUI.eventDialog) _status.event.finish();
+							}, event.player);
+							
+							event.player.wait();
+							decadeUI.game.wait();
+						} else if (!event.isMine()) {
+							event.switchToAuto();
+						}
+						"step 2"
+						game.cardsDiscard(event.cards1);
+						if (event.cards2) {
+							// player.logSkill(event.name);
+							player.gain(event.cards2, 'gain2', 'log');
+						}
+					},
+				},
+				judge: {
+					audio: 2,
+					trigger: {
+						global: 'cardsDiscardAfter'
+					},
+					// direct: true,
+					check: function(event, player) {
+						return event.cards[0].name != 'du';
+					},
+					filter: function(event, player) {
+						var evt = event.getParent().relatedEvent;
+						if (!evt || evt.name != 'judge') return;
+						if (evt.player == player) return false;
+						if (get.position(event.cards[0], true) != 'd') return false;
+						return (get.suit(event.cards[0]) == 'club');
+					},
+					content: function() {
+						"step 0"
+						var cards = trigger.cards;
+						
+						var dialog = decadeUI.content.chooseGuanXing(player, cards, cards.length, null, cards.length, false);
+						dialog.caption = '【落英】';
+						dialog.header1 = '弃牌堆';
+						dialog.header2 = '获得牌';
+						dialog.tip = '请选择要获得的牌';
+						dialog.lockCardsOrder(0);
+						dialog.callback = function(){ return true; };
+						game.broadcast(function(player, cards, callback){
+							if (!window.decadeUI) return;
+							var dialog = decadeUI.content.chooseGuanXing(player, cards, cards.length, null, cards.length, false);
+							dialog.caption = '【落英】';
+							dialog.header1 = '弃牌堆';
+							dialog.header2 = '获得牌';
+							dialog.tip = '请选择要获得的牌';
+							dialog.lockCardsOrder(0);
+							dialog.callback = callback;
+						}, player, cards, dialog.callback);
+						
+						event.switchToAuto = function(){
+							var cards = dialog.cards[0].concat();
+							var time = 500;
+							for (var i = 0; i < cards.length; i++) {
+								if (get.value(cards[i], player) < 0) continue;
+								setTimeout(function(card, index, finished){
+									dialog.move(card, index, 1);
+									if (finished) dialog.finishTime(1000);
+								}, time, cards[i], i, i >= cards.length - 1);
+								time += 500;
+							}
+						}
+						
+						if (event.isOnline()) {
+							event.player.send(function(){
+								if (!window.decadeUI && decadeUI.eventDialog) _status.event.finish();
+							}, event.player);
+							
+							event.player.wait();
+							decadeUI.game.wait();
+						} else if (!event.isMine()) {
+							event.switchToAuto();
+						}
+						"step 1"
+						game.cardsDiscard(event.cards1);
+						if (event.cards2) {
+							// player.logSkill(event.name);
+							player.gain(event.cards2, 'gain2', 'log');
+						}
+					}
+				},
+			}
+		},
 	};
 	
-	var inheritSkill = {
-		xz_xunxun:{
+	decadeUI.inheritSkill = {
+		xz_xunxun: {
 			audio: 2,
 			trigger: {
 				player: 'phaseDrawBegin1'
@@ -910,15 +1070,127 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 			},
 			content: decadeUI.skill.xunxun.content,
 		},
-	}
-	
-	for (var skill in inheritSkill) {
-		decadeUI.skill[skill] = inheritSkill[skill];
+		reluoying: {
+			subSkill: {
+				discard: {
+					audio: 'reluoying',
+					trigger: {
+						global: 'loseAfter'
+					},
+					filter: decadeUI.skill.luoying.subSkill.discard.filter,
+					// direct: true,
+					content: decadeUI.skill.luoying.subSkill.discard.content,
+				},
+				judge: {
+					audio: 'reluoying',
+					trigger: {
+						global: 'cardsDiscardAfter'
+					},
+					// direct: true,
+					check: decadeUI.skill.luoying.subSkill.judge.check,
+					filter: decadeUI.skill.luoying.subSkill.judge.filter,
+					content: decadeUI.skill.luoying.subSkill.judge.content,
+				}
+			}
+		},
+		nk_shekong: {
+			content:function(){
+				'step 0'
+				event.cardsx = cards.slice(0);
+				var num = get.cnNumber(cards.length);
+				var trans = get.translation(player);
+				var prompt = ('弃置' + num + '张牌，然后' + trans + '摸一张牌');
+				if (cards.length > 1) prompt += ('；或弃置一张牌，然后' + trans + '摸' + num + '张牌');
+				var next = target.chooseToDiscard(prompt, 'he', true);
+				next.numx = cards.length;
+				next.selectCard = function() {
+					if (ui.selected.cards.length > 1) return _status.event.numx;
+					return [1, _status.event.numx];
+				};
+				next.complexCard = true;
+				next.ai = function(card) {
+					if (ui.selected.cards.length == 0 || (_status.event.player.countCards('he',
+					function(cardxq) {
+						return get.value(cardxq) < 7;
+					}) >= _status.event.numx)) return 7 - get.value(card);
+					return - 1;
+				};
+				'step 1'
+				if (result.bool) {
+					if (result.cards.length == cards.length) player.draw();
+					else player.draw(cards.length);
+					event.cardsx.addArray(result.cards);
+					for (var i = 0; i < event.cardsx.length; i++) {
+						if (get.position(event.cardsx[i]) != 'd') event.cardsx.splice(i--, 1);
+					}
+				} else event.finish();
+				'step 2'
+				if (event.cardsx.length) {
+					var cards = event.cardsx;
+					var dialog = decadeUI.content.chooseGuanXing(player, cards, cards.length);
+					dialog.caption = '【设控】';
+					game.broadcast(function(player, cards, callback){
+						if (!window.decadeUI) return;
+						var dialog = decadeUI.content.chooseGuanXing(player, cards, cards.length);
+						dialog.caption = '【设控】';
+						dialog.callback = callback;
+					}, player, cards, dialog.callback);
+					
+					event.switchToAuto = function(){
+						var cards = dialog.cards[0].concat();
+						var cheats = [];
+						var judges;
+						
+						var next = player.getNext();
+						var friend = (get.attitude(player, next) < 0) ? null : next;
+						
+						if (judges.length > 0) cheats = decadeUI.get.cheatJudgeCards(cards, judges, friend != null);
+						
+						if (friend) {
+							cards = decadeUI.get.bestValueCards(cards, friend);
+						} else {
+							cards.sort(function(a, b){
+								get.value(a, next) - get.value(b, next);
+							});
+						}
+
+						cards = cheats.concat(cards);
+						var time = 500;
+						for (var i = 0; i < cards.length; i++) {
+							setTimeout(function(card, index, finished){
+								dialog.move(card, index, 0);
+								if (finished) dialog.finishTime(1000);
+							}, time, cards[i], i, i >= cards.length - 1);
+							time += 500;
+						}
+					}
+					
+					if (event.isOnline()) {
+						event.player.send(function(){
+							if (!window.decadeUI && decadeUI.eventDialog) _status.event.finish();
+						}, event.player);
+						
+						event.player.wait();
+						decadeUI.game.wait();
+					} else if (!event.isMine()) {
+						event.switchToAuto();
+					}
+				} else event.finish();
+			}
+		},
 	}
 	
 	if (!_status.connectMode) {
 		for (var key in decadeUI.skill) {
 			if (lib.skill[key]) lib.skill[key] = decadeUI.skill[key];
+		}
+		
+		for (var key in decadeUI.inheritSkill) {
+			if (lib.skill[key]) {
+				 for (var j in decadeUI.inheritSkill[key]) {
+					lib.skill[key][j] = decadeUI.inheritSkill[key][j]
+				 }
+			}
 		}
 		
 		var muniuSkill = lib.skill['muniu_skill'];
