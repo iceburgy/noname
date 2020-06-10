@@ -3807,7 +3807,7 @@
 						}
 					},
 					import_forbid_lib:{
-						name:'导入禁将表',
+						name:'导入dropbox禁将表',
 						clear:true,
 						onclick:function(){
 							this.innerHTML='<span>导入中...</span>';
@@ -3816,7 +3816,7 @@
 							setTimeout(function(){
 								that.innerHTML='<span>导入成功</span>';
 								setTimeout(function(){
-									that.innerHTML='<span>导入禁将表</span>';
+									that.innerHTML='<span>导入dropbox禁将表</span>';
 								},1000);
 							},1000);
 						}

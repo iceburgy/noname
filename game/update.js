@@ -1,6 +1,6 @@
 window.noname_update={
-	version:'2020.06.12.4',
-	update:'2020.06.12.4',
+	version:'2020.06.12.5',
+	update:'2020.06.12.5',
 	changeLog:[
 		'更新到无名杀官方最新版',
 		'更新到十周年UI最新版',
@@ -10,7 +10,6 @@ window.noname_update={
 		'傲才发动时和发动成功都加入提示',
 		'投降前需确认',
 		'修复限定技在选将时可以看见',
-		'修复郭嘉判定牌被诸葛瑾改了以后不能获得',
 		'更多更新历史信息请查看：https://bit.ly/wumingsha',
 	],
 	files:[

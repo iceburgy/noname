@@ -194,5 +194,5 @@ window.noname_source_list=[
 	'extension/十周年UI/identity.css',
 	'extension/十周年UI/layout.css',
 	'extension/十周年UI/player.css',
-	'extension/十周年UI/skill.css',
+	'extension/十周年UI/skill.js',
 ];
