@@ -181,6 +181,7 @@ window.config={
 			dierestart:true
 		},
 	},
+	players_statistics:{},
 	current_mode:{},
 	customforbid:[],
 	forbid:[
@@ -232,6 +233,8 @@ window.config={
 		// ['jiushi','kuiwei'],
 		['zishu','xinfu_songsang'],
 		['zishu','shenxing'],
-	],
-	players_statistics:{}
+		['akane_quanqing','lianying'],
+		['akane_quanqing','relianying'],
+		['akane_quanqing','shangshi'],
+	]
 };
