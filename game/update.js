@@ -1,7 +1,8 @@
 window.noname_update={
-	version:'2020.06.12',
-	update:'1.9.98.7',
+	version:'2020.06.12.1',
+	update:'2020.06.12.1',
 	changeLog:[
+		'更新到无名杀官方最新版',
 		'修复：托管南蛮打出装备和判定牌',
 		'修复：缓释判定牌不能被甄姬，郭嘉获得',
 		'加入：旧曹纯，皇甫嵩，旧吴懿，杜畿，樊稠，张济，郭汜，神刘备，神陆逊',
@@ -14,6 +15,7 @@ window.noname_update={
 	files:[
 		'card/extra.js',
 		'character/mobile.js',
+		'character/old.js',
 		'character/refresh.js',
 		'character/shenhua.js',
 		'character/sp.js',
