@@ -179,7 +179,6 @@ window.noname_source_list=[
 	'node_modules/ultron/test.js',
 	'node_modules/options/package.json',
 	'node_modules/options/lib/options.js',
-
 	'extension/十周年UI/animations.css',
 	'extension/十周年UI/card.css',
 	'extension/十周年UI/component.css',
@@ -195,4 +194,11 @@ window.noname_source_list=[
 	'extension/十周年UI/layout.css',
 	'extension/十周年UI/player.css',
 	'extension/十周年UI/skill.js',
+	'extension/十周年UI/image/card/boss_mengpohuihun.webp',
+	'extension/十周年UI/image/card/gubuzifeng.webp',
+	'extension/十周年UI/image/card/jinwuluorigong.webp',
+	'extension/十周年UI/image/card/juechenjinge.webp',
+	'extension/十周年UI/image/card/lingsheji.webp',
+	'extension/十周年UI/image/card/shanrangzhaoshu.webp',
+	'extension/十周年UI/image/card/xingtianpojunfu.webp',
 ];
