@@ -3564,30 +3564,6 @@
 			others:{
 				name:'其它',
 				config:{
-					// reset_database:{
-					// 	name:'重置游戏',
-					// 	onclick:function(){
-					// 		var node=this;
-					// 		if(node._clearing){
-					// 			if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
-					// 			game.reload();
-					// 			return;
-					// 		}
-					// 		node._clearing=true;
-					// 		node.innerHTML='单击以确认 (3)';
-					// 		setTimeout(function(){
-					// 			node.innerHTML='单击以确认 (2)';
-					// 			setTimeout(function(){
-					// 				node.innerHTML='单击以确认 (1)';
-					// 				setTimeout(function(){
-					// 					node.innerHTML='重置游戏录像';
-					// 					delete node._clearing;
-					// 				},1000);
-					// 			},1000);
-					// 		},1000);
-					// 	},
-					// 	clear:true
-					// },
 					reset_game:{
 						name:'重置游戏设置',
 						onclick:function(){
@@ -47342,87 +47318,6 @@
 				ui.click.touchpop();
 				e.stopPropagation();
 			},
-			// forcetouch:function(){
-			// 	if(_status.force||_status.dragged){
-			// 		clearInterval(_status.forcetouchinterval);
-			// 		delete _status.forcetouchinterval;
-			// 		return;
-			// 	}
-			// 	window.ForceTouch.getForceTouchData(function(ForceTouchData){
-			// 		if(ForceTouchData.touches[0]){
-			// 			var force = parseFloat(ForceTouchData.touches[0].force);
-			// 			if(force > 0.2){
-			// 				_status.force=true;
-			// 				var taptic=false;
-			// 				if(_status.longpressing){
-			// 					delete _status.longpressing._waitingfordrag;
-			// 					ui.click.touchpop();
-			// 					ui.click.longpresscallback.call(_status.longpressing);
-			// 					taptic=true;
-			// 				}
-			// 				else if(!_status.forceright){
-			// 					_status.forceright=true;
-			// 					setTimeout(function(){
-			// 						_status.forceright=false;
-			// 					},600);
-			// 					if(_status.mousedragging){
-			// 						_status.mousedragging=null;
-			// 						_status.mouseleft=false;
-			// 						_status.mousedragorigin=null;
-			// 						_status.dragstatuschanged=false;
-			// 						game.uncheck();
-			// 						game.check();
-			// 					}
-			// 					switch(lib.config.pressure_click){
-			// 						case 'pause':ui.click.pause();break;
-			// 						case 'auto':ui.click.auto();break;
-			// 						case 'config':ui.click.config();break;
-			// 					}
-			// 					taptic=true;
-			// 				}
-			// 				if(taptic&&lib.config.pressure_taptic){
-			// 					if(window.TapticEngine){
-			// 						window.TapticEngine.generateTapticFeedback();
-			// 					}
-			// 					else{
-			// 						game.vibrate(50);
-			// 					}
-			// 				}
-			// 			}
-			// 		}
-			// 	});
-			// },
-			// pressurepause:function(force,event){
-			// 	if(!_status.force&&!_status.mousedragging&&force>=0.5&&!_status.forceright){
-			// 		_status.force=true;
-			// 		_status.forceright=true;
-			// 		setTimeout(function(){
-			// 			_status.forceright=false;
-			// 		},600);
-			// 		switch(lib.config.pressure_click){
-			// 			case 'pause':ui.click.pause();break;
-			// 			case 'auto':ui.click.auto();break;
-			// 			case 'config':ui.click.config();break;
-			// 		}
-			// 	}
-			// },
-			// rightpressure:function(force, event){
-			// 	if(force>0){
-			// 		_status.force=true;
-			// 	}
-			// 	if(force>=0.5){
-			// 		if(_status.mousedragging){
-			// 			_status.mousedragging=null;
-			// 			_status.mouseleft=false;
-			// 			_status.mousedragorigin=null;
-			// 			_status.dragstatuschanged=false;
-			// 			game.uncheck();
-			// 			game.check();
-			// 		}
-			// 		ui.click.rightplayer.call(this,event);
-			// 		_status.clickedplayer=false;
-			// 	}
-			// },
 			rightplayer:function(e){
 				if(this._nopup) return false;
 				if(_status.clickedplayer){
