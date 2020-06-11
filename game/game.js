@@ -3786,6 +3786,31 @@
 						},
 						clear:true
 					},
+					force_update_cungui_version:{
+						name:'强制更新村规游戏版本',
+						onclick:function(){
+							var node=this;
+							if(node._clearing){
+								ui.click.configMenu();
+								lib.version='0';
+								game.checkForUpdate(null);
+								return;
+							}
+							node._clearing=true;
+							node.firstChild.innerHTML='单击以确认 (3)';
+							setTimeout(function(){
+								node.firstChild.innerHTML='单击以确认 (2)';
+								setTimeout(function(){
+									node.firstChild.innerHTML='单击以确认 (1)';
+									setTimeout(function(){
+										node.firstChild.innerHTML='强制更新村规游戏版本';
+										delete node._clearing;
+									},1000);
+								},1000);
+							},1000);
+						},
+						clear:true
+					},
 					oneclick_reset_server:{
 						name:'一键完成以下设置',
 						clear:true,
