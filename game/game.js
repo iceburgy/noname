@@ -3728,6 +3728,35 @@
 						},
 						clear:true
 					},
+					sync_connect_role_lib_to_single:{
+						name:'同步联机武将池到单机',
+						onclick:function(){
+							if(this.innerHTML=='<span>确认同步</span>'){
+								clearTimeout(this.confirmTimeout);
+
+								var charactersOLList=get.charactersOL();
+								lib.config.banned=[];
+								for(var craw in lib.character){
+									if(!charactersOLList.contains(craw)) lib.config.banned.push(craw);
+								}
+								game.saveConfig('identity_banned',lib.config.banned);
+
+								this.innerHTML='<span>同步成功</span>';
+								var that=this;
+								setTimeout(function(){
+									that.innerHTML='<span>同步联机武将池到单机</span>';
+								},1000);
+							}
+							else{
+								this.innerHTML='<span>确认同步</span>';
+								var that=this;
+								this.confirmTimeout=setTimeout(function(){
+									that.innerHTML='<span>同步联机武将池到单机</span>';
+								},1000);
+							}
+						},
+						clear:true
+					},
 					export_role_lib:{
 						name:'导出武将池',
 						onclick:function(){
