@@ -173,7 +173,6 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 					this.onMoved();
 				},
 				move:function(card, indexTo, moveDown){
-					debugger;
 					var dim = moveDown ? 1 : 0;
 					var dim2 = dim;
 					var index = this.cardToIndex(card, dim);
