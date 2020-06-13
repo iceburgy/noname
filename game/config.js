@@ -151,7 +151,7 @@ window.config={
 			swap:true,
 			change_identity:true,
 			battle_number:3,
-			double_hp:'pingjun',
+			double_hp:'zuidashangxianzuixiaotili',
 		},
 		identity:{
 			identity:[
