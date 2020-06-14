@@ -2456,7 +2456,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				content:function(){
-					player.addMark('nzry_junlve',trigger.num);
+					game.broadcastAll(function(player,trigger){
+						player.addMark('nzry_junlve',trigger.num);
+					},player,trigger);
 				},
 			},
 			"nzry_cuike":{
@@ -2500,7 +2502,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var players=game.players.slice(0).sortBySeat();
 						player.line(players);
-						player.removeMark('nzry_junlve',player.countMark('nzry_junlve'));
+						game.broadcastAll(function(player){
+							player.removeMark('nzry_junlve',player.countMark('nzry_junlve'));
+						},player);
 						for(var i=0;i<players.length;i++){
 							if(players[i]!=player) players[i].damage();
 						};
@@ -2541,7 +2545,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('nzry_dinghuo');
 					player.storage.nzry_dinghuo=true;
 					'step 1'
+					game.broadcastAll(function(player){
 						player.removeMark('nzry_junlve',player.countMark('nzry_junlve'));
+					},player);
 					for(var i=0;i<targets.length;i++){
 						targets[i].discard(targets[i].getCards('e'));
 					}

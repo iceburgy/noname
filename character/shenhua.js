@@ -1691,11 +1691,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					'step 1'
 					if(result.bool){
-						player.storage.nzry_chenglve1=[];
-						for(var i=0;i<result.cards.length;i++){
-							player.storage.nzry_chenglve1.add(get.suit(result.cards[i],player));
-						}
-						player.markSkill('nzry_chenglve');
+						game.broadcastAll(function(player,result){
+							player.storage.nzry_chenglve1=[];
+							for(var i=0;i<result.cards.length;i++){
+								player.storage.nzry_chenglve1.add(get.suit(result.cards[i],player));
+							}
+							player.markSkill('nzry_chenglve');
+						},player,result);
 						player.addTempSkill('nzry_chenglve1');
 					};
 				},
@@ -1724,7 +1726,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						};
 					}
 				},
-				onremove:true,
+				onremove:function(player){
+					game.broadcastAll(function(player){
+						player.storage.nzry_chenglve1=undefined;
+						player.markSkill('nzry_chenglve');
+					},player);
+				},
 			},
 			"nzry_shicai":{
 				audio:"nzry_shicai_2",
