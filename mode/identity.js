@@ -4174,14 +4174,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var skillv=lib.character[player.name2][3];
 					if(player.isUnseen(0)){
 						for(var i=0;i<skillm.length;i++){
-							if(get.is.locked(skillm[i])){
+							if(!lib.nonLockSkills.contains(skillm[i])&&get.is.locked(skillm[i])){
 								bool=true;
 							}
 						}
 					}
 					if(player.isUnseen(1)){
 						for(var i=0;i<skillv.length;i++){
-							if(get.is.locked(skillv[i])){
+							if(!lib.nonLockSkills.contains(skillv[i])&&get.is.locked(skillv[i])){
 								bool=true;
 							}
 						}
@@ -4199,14 +4199,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var skillv=lib.character[player.name2][3];
 					if(player.isUnseen(0)){
 						for(var i=0;i<skillm.length;i++){
-							if(skillm[i]!='baobian'&&get.is.locked(skillm[i])&&!choice.contains('明置主将')){
+							if(!lib.nonLockSkills.contains(skillm[i])&&get.is.locked(skillm[i])&&!choice.contains('明置主将')){
 								choice.push("明置主将");
 							}
 						}
 					}
 					if(player.isUnseen(1)){
 						for(var i=0;i<skillv.length;i++){
-							if(skillv[i]!='baobian'&&get.is.locked(skillv[i])&&!choice.contains('明置副将')){
+							if(!lib.nonLockSkills.contains(skillv[i])&&get.is.locked(skillv[i])&&!choice.contains('明置副将')){
 								choice.push("明置副将");
 							}
 						}

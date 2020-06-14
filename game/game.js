@@ -39,6 +39,7 @@
 		canvasUpdates:[],
 		video:[],
 		skilllist:[],
+		nonLockSkills:['baobian','shanjia2'],
 		connectBanned:[],
 		characterIntro:{},
 		characterTitle:{},

@@ -7583,7 +7583,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					player.storage.shanjia=num;
-					if(num>0) player.markSkill('shanjia');
+					if(num>0 && (player.name2=='old_caochun'&&!player.isUnseen(1) || player.name2!='old_caochun'&&!player.isUnseen(0))) {
+						player.markSkill('shanjia');
+					}
 				},
 				audio:2,
 				intro:{
@@ -7594,7 +7596,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				group:'shanjia2',
 				trigger:{player:'phaseUseBegin'},
-				frequent:true,
 				filter:function(event,player){
 					lib.skill.shanjia.sync(player);
 					return player.storage.shanjia>0;
