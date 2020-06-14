@@ -731,7 +731,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					else{
 						var next=target.chooseToRespond({name:'sha'});
 						next.set('ai',function(card){
-							// fix bug: ai can respond nanman with equip and judge card
+							// fix bug: ai can respond with equip and judge card
 							if(card&&get.position(card)=='j') return 0;
 							if(card&&get.name(card)!='sha') return 0;
 
@@ -797,6 +797,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					else{
 						var next=target.chooseToRespond({name:'shan'});
 						next.set('ai',function(card){
+							// fix bug: ai can respond with equip and judge card
+							if(card&&get.position(card)=='j') return 0;
+							if(card&&get.name(card)!='shan') return 0;
+
 							var evt=_status.event.getParent();
 							if(get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
 							if(evt.player.hasSkillTag('notricksource')) return 0;

@@ -4199,14 +4199,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var skillv=lib.character[player.name2][3];
 					if(player.isUnseen(0)){
 						for(var i=0;i<skillm.length;i++){
-							if(get.is.locked(skillm[i])&&!choice.contains('明置主将')){
+							if(skillm[i]!='baobian'&&get.is.locked(skillm[i])&&!choice.contains('明置主将')){
 								choice.push("明置主将");
 							}
 						}
 					}
 					if(player.isUnseen(1)){
 						for(var i=0;i<skillv.length;i++){
-							if(get.is.locked(skillv[i])&&!choice.contains('明置副将')){
+							if(skillv[i]!='baobian'&&get.is.locked(skillv[i])&&!choice.contains('明置副将')){
 								choice.push("明置副将");
 							}
 						}
