@@ -3709,13 +3709,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return num-player.storage.jishe;
 					}
 				},
-				group:['jishe2','jishe3']
+				group:['jishe2','jishe3','jishe4']
 			},
 			jishe2:{
 				trigger:{player:'phaseAfter'},
 				silent:true,
 				content:function(){
 					player.storage.jishe=0;
+					player.unmarkSkill('jishe4');
 				}
 			},
 			jishe3:{
@@ -3757,6 +3758,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					expose:0.3
 				}
+			},
+			jishe4:{
+				trigger:{player:'chooseToUseBefore'},
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '可发动'+storage+'次极奢';
+					}
+				},
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					return true;
+				},
+				content:function(){
+					player.storage.jishe4=player.getHandcardLimit();
+					player.markSkill('jishe4');
+				},
 			},
 			lianhuo:{
 				audio:2,
@@ -5733,6 +5751,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.draw(2);
 					player.addTempSkill('jigong2');
+					player.addTempSkill('jigong3');
 				}
 			},
 			jigong2:{
@@ -5743,6 +5762,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 0;
 					}
 				}
+			},
+			jigong3:{
+				trigger:{source:'damageEnd'},
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '造成'+storage+'点伤害';
+					}
+				},
+				init:function(player){
+					player.storage.jigong3=0;
+					player.markSkill('jigong3');
+				},
+				content:function(){
+					player.storage.jigong3=player.getStat().damage;
+					player.markSkill('jigong3');
+				},
+				onremove:function(player){
+					player.unmarkSkill('jigong3');
+				},
 			},
 			shifei:{
 				audio:2,
@@ -11281,6 +11320,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huisheng:'贿生',
 			huisheng_info:'当你受到其他角色对你造成的伤害时，你可以令其观看你任意数量的牌并令其选择一项：1.获得这些牌中的一张，防止此伤害，然后你不能再对其发动〖贿生〗；2.弃置等量的牌',
 			jishe:'极奢',
+			jishe4:'极奢',
 			jishe_info:'出牌阶段限20次，若你的手牌上限大于0，你可以摸一张牌，然后你本回合的手牌上限-1。结束阶段开始时，若你没有手牌，则你可以横置至多X名角色的武将牌（X为你的体力值）',
 			lianhuo:'链祸',
 			lianhuo_info:'锁定技，当你受到火焰伤害时，若你的武将牌处于横置状态且此伤害不为连环伤害，则此伤害+1',
@@ -11368,6 +11408,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinzhongyong:'忠勇',
 			xinzhongyong_info:'当你使用的【杀】结算完毕后，你可以将此【杀】或目标角色使用的【闪】交给一名该角色以外的其他角色，以此法获得红色牌的角色可以对你攻击范围内的角色使用一张【杀】',
 			jigong:'急攻',
+			jigong3:'急攻',
 			jigong_info:'出牌阶段开始时，你可以摸两张牌。若如此做，你本回合的手牌上限改为X（X为你此阶段造成的伤害点数之和）。',
 			shifei:'饰非',
 			shifei_info:'当你需要使用或打出【闪】时，你可以令当前回合角色摸一张牌，然后若其手牌数不为全场最多，则你弃置全场手牌数最多（或之一）角色的一张牌，视为你使用或打出了一张【闪】。',

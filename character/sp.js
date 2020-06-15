@@ -9007,6 +9007,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'useCardToPlayered'
 				},
 				direct:true,
+				intro:{
+					content:function(storage){
+						return '已发动过'+storage+'次奇制';
+					}
+				},
 				filter:function(event,player){
 					if(!event.targets) return false;
 					if(!event.isFirstTarget) return false;
@@ -9033,6 +9038,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.getHistory('custom').push({qizhi:true});
+						var num=player.getHistory('custom',function(evt){
+							return evt.qizhi==true;
+						}).length;
+						player.storage.qizhi=num;
+						player.markSkill('qizhi');
 						if(!event.isMine()&&!_status.connectMode) game.delay();
 						player.logSkill('qizhi',result.targets);
 						player.discardPlayerCard(result.targets[0],true,'he');
@@ -9069,6 +9079,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(dh>0){
 						player.chooseToDiscard(dh,true);
 					}
+					player.unmarkSkill('qizhi');
+				},
+				oncancel:function(event,player){
+					player.unmarkSkill('qizhi');
 				}
 			},
 			mouduan:{
