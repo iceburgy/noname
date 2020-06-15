@@ -3769,6 +3769,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(_status.currentPhase!=player) return false;
+					if(!game.isCharacterSeen(player,'cenhun')) return false;
 					return true;
 				},
 				content:function(){

@@ -13342,15 +13342,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
-					if(player.name2=='simalang'){
-						if(player.isUnseen(1)){
-							return false;
-						}
-					}else{
-						if(player.isUnseen(0)){
-							return false;
-						}
-					}
+					if(_status.currentPhase!==player&&!game.isCharacterSeen(player,'simalang')) return false;
 					return event.player.countCards('h')<=1;
 				},
 				direct:true,
@@ -13786,14 +13778,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				chooseButton:{
 					dialog:function(event,player){
-						if(player.name2=='zhugeke'){
-							if(player.isUnseen(1)){
-								player.showCharacter(1);
-							}
-						}else{
-							if(player.isUnseen(0)){
-								player.showCharacter(0);
-							}
+						var index=game.getCharacterIndex(player,'zhugeke');
+						if(index>=0&&player.isUnseen(index)){
+							player.showCharacter(index);
 						}
 						if(game.online){
 							game.send('logSkill',player,'aocai');
@@ -14283,29 +14270,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				filter:function(event,player){
 					if(event.name=='chooseToUse'){
-						if(player.name2=='xiahouba'){
-							if(player.isUnseen(1)){
-								return true;
-							}
-						}else{
-							if(player.isUnseen(0)){
-								return true;
-							}
-						}
+						if(!game.isCharacterSeen(player,'xiahouba')) return true;
 						return false;
 					}
 					return true;
 				},
 				init:function(player){
-					if(player.name2=='xiahouba'){
-						if(player.isUnseen(1)){
-							return;
-						}
-					}else{
-						if(player.isUnseen(0)){
-							return;
-						}
-					}
+					if(!game.isCharacterSeen(player,'xiahouba')) return;
 					player.removeAdditionalSkill('baobian');
 					game.broadcast(function(player){
 						player.removeAdditionalSkill('baobian');
@@ -14330,15 +14301,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				derivation:['retiaoxin','new_repaoxiao','xinshensu'],
 				content:function(){
-					if(player.name2=='xiahouba'){
-						if(player.isUnseen(1)){
-							return;
-						}
-					}else{
-						if(player.isUnseen(0)){
-							return;
-						}
-					}
+					if(!game.isCharacterSeen(player,'xiahouba')) return;
 					game.broadcastAll(function(player){
 						player.removeAdditionalSkill('baobian');
 					},player);

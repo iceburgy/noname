@@ -26356,6 +26356,22 @@
 		phaseName:['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'],
 	};
 	var game={
+		// main: 0, vice 1, not foun -1
+		getCharacterIndex:function(player,character){
+			if(player.name2&&player.name2==character){
+				return 1;
+			}else if(player.name1&&player.name1==character||player.name&&player.name==character){
+				return 0;
+			}
+			return -1;
+		},
+		isCharacterSeen:function(player,character){
+			var index=game.getCharacterIndex(player,character);
+			if(index>=0&&!player.isUnseen(index)){
+				return true;
+			}
+			return false;
+		},
 		isSubSkill:function(skill,allSkills){
 			for(var parSkill of allSkills){
 				if(lib.skill[parSkill]&&lib.skill[parSkill].group&&lib.skill[parSkill].group.length){
