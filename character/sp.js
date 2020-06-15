@@ -7266,7 +7266,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						prompt:'将一张闪当杀使用或打出',
 						onuse:function(result,player){
-							player.storage.fanghun--;
+							game.broadcastAll(function(player){
+								player.storage.fanghun--;
+							},player);
 							if(!player.storage.fanghun||player.storage.fanghun<0){
 								player.storage.fanghun=0;
 								player.unmarkSkill('fanghun');
@@ -7310,7 +7312,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},
 						onuse:function(result,player){
-							player.storage.fanghun--;
+							game.broadcastAll(function(player){
+								player.storage.fanghun--;
+							},player);
 							if(!player.storage.fanghun||player.storage.fanghun<0){
 								player.storage.fanghun=0;
 								player.unmarkSkill('fanghun');
