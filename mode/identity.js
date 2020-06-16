@@ -2174,6 +2174,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<list.length;i++){
 							list[i]=['','','group_'+list[i]];
 						}
+						var choose_shen_time=lib.configOL.choose_timeout
+						if(lib.configOL.choose_timeout_shen_group){
+							choose_shen_time=lib.configOL.choose_timeout_shen_group;
+						}
+						for(var i=0;i<game.players.length;i++){
+							game.players[i].showTimer(parseInt(choose_shen_time)*1000);
+						}
 						game.zhu.chooseButton(['请选择神武将的势力',[list,'vcard']],true).set('ai',function(){
 							return Math.random();
 						});
@@ -2421,6 +2428,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						for(var i=0;i<shen.length;i++){
 							shen[i]=[shen[i],['请选择神武将的势力',[list,'vcard']],1,true];
+						}
+						var choose_shen_time=lib.configOL.choose_timeout
+						if(lib.configOL.choose_timeout_shen_group){
+							choose_shen_time=lib.configOL.choose_timeout_shen_group;
+						}
+						for(var i=0;i<game.players.length;i++){
+							game.players[i].showTimer(parseInt(choose_shen_time)*1000);
 						}
 						game.me.chooseButtonOL(shen,function(player,result){
 							if(player==game.me) {
