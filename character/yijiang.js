@@ -5422,7 +5422,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.isPhaseUsing();
 				},
-				content:function(){},
+				content:function(){
+					if(!player.hasSkill('benxi2')){
+						player.addTempSkill('benxi2');
+					}
+					player.storage.benxi2=player.countUsed();
+					player.markSkill('benxi2');
+				},
 				mod:{
 					globalFrom:function(from,to,distance){
 						if(_status.currentPhase==from){
@@ -5451,6 +5457,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				}
+			},
+			benxi2:{
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '已使用'+storage+'张牌';
+					}
+				},
+				content:function(){},
+				onremove:function(player){
+					player.unmarkSkill('benxi2');
+				},
 			},
 			sidi:{
 				audio:2,
@@ -11389,6 +11407,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yonglve:'勇略',
 			yonglve_info:'一名其他角色的判定阶段开始时，若其在你攻击范围内，则你可以弃置其判定区里的一张牌，视为对该角色使用一张【杀】。若此【杀】未造成伤害，你摸一张牌。',
 			benxi:'奔袭',
+			benxi2:'奔袭',
 			benxi_info:'锁定技，你的回合内，你每使用一次牌后，你的进攻距离+1直到回合结束；你的回合内，若你与所有角色的距离均为1，你无视其他角色的防具，且你使用的【杀】可额外指定一个目标',
 			xinbenxi:'奔袭',
 			xinbenxi_info:'锁定技，当你于回合内使用牌时，你本回合计算与其他角色的距离-1。你的回合内，若你至场上所有其他角色的距离均不大于1，则当你使用【杀】或普通锦囊牌选择唯一目标后，你选择至多两项：1.为此牌多指定一个目标；2.令此牌无视防具；3.令此牌不可被抵消；4.你因此牌造成伤害时摸一张牌。',
