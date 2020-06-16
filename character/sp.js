@@ -13492,7 +13492,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('ai',function(target){
 						return get.attitude(_status.event.player,target);
 					});
-					"step 1"
+					"step 2"
 					if(result.bool){
 						event.count--;
 						player.logSkill('shushen',result.targets);
