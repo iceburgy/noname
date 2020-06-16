@@ -10473,6 +10473,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.draw(2);
 				},
 				audio:'jingce',
+				group:['xinjingce2'],
+			},
+			xinjingce2:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				silent:true,
+				content:function(){
+					player.addTempSkill('xinjingce3');
+				},
+			},
+			xinjingce3:{
+				trigger:{player:'chooseToUseBefore'},
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '已使用'+storage+'张牌';
+					}
+				},
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					if(!game.isCharacterSeen(player,'re_guohuai')) return false;
+					return true;
+				},
+				content:function(){
+					player.storage.xinjingce3=player.countUsed(null,true);
+					player.markSkill('xinjingce3');
+				},
+				onremove:function(player){
+					player.unmarkSkill('xinjingce2');
+				},
 			},
 			oldchengxiang:{
 				audio:'chengxiang',
@@ -11592,6 +11621,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pojun:'破军',
 			jingce:'精策',
 			xinjingce:'精策',
+			xinjingce3:'精策',
 			chengxiang:'称象',
 			oldchengxiang:'称象',
 			renxin:'仁心',
