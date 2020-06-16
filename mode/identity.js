@@ -4139,6 +4139,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						else{
 							event.name=bool1?player.name1:player.name2;
 						}
+						if(_status.connectMode){
+							var choose_time=lib.configOL.choose_timeout
+							for(var i=0;i<game.players.length;i++){
+								game.players[i].showTimer(parseInt(choose_time)*1000);
+							}
+						}
 						var info=get.info(trigger.skill);
 						var next=player.chooseBool('是否明置'+get.translation(event.name)+'以发动【'+get.translation(trigger.skill)+'】？');
 						next.set('yes',!info.check||info.check(trigger._trigger,player));
