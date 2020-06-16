@@ -4909,7 +4909,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jinjiu:{
 				mod:{
 					cardname:function(card,player){
-						if(card.name=='jiu') return 'sha';
+						if(game.isCharacterSeen(player,'gaoshun')&&card.name=='jiu') return 'sha';
 					},
 				},
 				ai:{
@@ -4922,6 +4922,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['useCard1','respond']},
 				firstDo:true,
 				forced:true,
+				silent:true,
 				filter:function(event,player){
 					return event.card.name=='sha'&&!event.skill&&
 					event.cards.length==1&&event.cards[0].name=='jiu';
