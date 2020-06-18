@@ -2181,6 +2181,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<game.players.length;i++){
 							game.players[i].showTimer(parseInt(choose_shen_time)*1000);
 						}
+						game.me._hide_all_timer=true;
 						game.zhu.chooseButton(['请选择神武将的势力',[list,'vcard']],true).set('ai',function(){
 							return Math.random();
 						});
@@ -2436,6 +2437,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<game.players.length;i++){
 							game.players[i].showTimer(parseInt(choose_shen_time)*1000);
 						}
+						game.me._hide_all_timer=true;
 						game.me.chooseButtonOL(shen,function(player,result){
 							if(player==game.me) {
 								player.groupshen=result.links[0][2].slice(6);
@@ -4144,6 +4146,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							for(var i=0;i<game.players.length;i++){
 								game.players[i].showTimer(parseInt(choose_time)*1000);
 							}
+							game.me._hide_all_timer=true;
 						}
 						var info=get.info(trigger.skill);
 						var next=player.chooseBool('是否明置'+get.translation(event.name)+'以发动【'+get.translation(trigger.skill)+'】？');

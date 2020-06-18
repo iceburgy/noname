@@ -1699,6 +1699,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							delete player.storage.pindi_target;
 							delete player.storage.pindi_type;
+							player.unmarkSkill('pindi2');
 						}
 					}
 				},
@@ -1762,7 +1763,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.sgn(att);
 						}
 					}
-				}
+				},
+				group:['pindi2']
+			},
+			pindi2:{
+				trigger:{player:'chooseToUseBefore'},
+				silent:true,
+				intro:{
+					content:function(storage){
+						if(storage&&storage.length)	return '发动品第可弃类别：'+get.translation(storage);
+						else return '品第已用完'
+					}
+				},
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					if(!game.isCharacterSeen(player,'chenqun')) return false;
+					return true;
+				},
+				content:function(){
+					var typeList=['basic','trick','equip'];
+					for(var i=0;i<typeList.length;i++){
+						if(player.storage.pindi_type&&player.storage.pindi_type.contains(typeList[i])){
+							typeList.splice(i,1);
+							i--;
+						}
+					}
+					player.storage.pindi2=typeList.slice(0);
+					player.markSkill('pindi2');
+					player.updateMarks('pindi2');
+				},
 			},
 			funan:{
 				audio:2,
@@ -10975,6 +11004,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.draw();
 				},
+				group:['jianying2'],
+			},
+			jianying2:{
+				trigger:{player:'useCard'},
+				silent:true,
+				filter:function(event,player){
+					if(!player.isPhaseUsing()) return false;
+					if(!game.isCharacterSeen(player,'yj_jushou')) return false;
+					return true;
+				},
+				content:function(){
+					game.broadcastAll(function(player,trigger){
+						if(player.hasSkill('jianying3')){
+							player.removeSkill('jianying3');
+						}
+						var realCard=trigger.cards[0];
+						var vcard=game.createCard(realCard.name,realCard.suit,realCard.number,realCard.nature);
+						player.storage.jianying3=vcard;
+						player.addTempSkill('jianying3');
+					},player,trigger);
+				},
+				subSkill:{
+					clear:{
+						trigger:{player:'phaseAfter'},
+						silent:true,
+						content:function(){
+							delete player.storage.jianying3;
+						}
+					}
+				},
+			},
+			jianying3:{
+				silent:true,
+				mark:'card',
+				intro:{
+					content:'card',
+				},
+				content:function(){},
 			},
 			zzhenggong:{
 				trigger:{player:'damageEnd'},
@@ -11302,6 +11369,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinanguo:'安国',
 			xinanguo_info:'出牌阶段限一次，你可以选择一名其他角色，若其手牌数为全场最少，其摸一张牌；体力值为全场最低，回复1点体力；装备区内牌数为全场最少，随机使用一张装备牌。然后若该角色有未执行的效果且你满足条件，你执行之。',
 			pindi:'品第',
+			pindi2:'品第',
 			pindi_info:'出牌阶段，你可以弃置一张牌并选择一名其他角色（不能弃置相同类型牌且不能指定相同的角色），然后令其执行一项：摸X张牌；弃置X张牌（X为本回合此技能发动次数）。若其已受伤，你横置。',
 			funan_jiexun:'诫训',
 			bizhuan:'辟撰',
@@ -11534,6 +11602,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shibei:'矢北',
 			shibei_info:'锁定技，当你受到伤害后：若此伤害是你本回合第一次受到的伤害，则你回复1点体力；否则你失去1点体力。',
 			jianying:'渐营',
+			jianying3:'渐营',
 			jianying_info:'当你于出牌阶段内使用与此阶段你使用的上一张牌点数或花色相同的牌时，你可以摸一张牌',
 			xinenyuan:'恩怨',
 			xinenyuan2:'恩怨',

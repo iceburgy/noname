@@ -1700,6 +1700,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},player,result);
 						player.addTempSkill('nzry_chenglve1');
 					};
+					if(!player.storage.nzry_shicai3){
+						player.storage.nzry_shicai3=['basic','trick','equip'];
+						var history=player.getHistory('useCard');
+						for(var i=0;i<history.length;i++){
+							var index = player.storage.nzry_shicai3.indexOf(get.type(history[i].card));
+							if (index !== -1) player.storage.nzry_shicai3.splice(index, 1);
+						}
+						player.markSkill('nzry_shicai3');
+					}
 				},
 				ai:{
 					order:2.7,
@@ -1806,7 +1815,54 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					game.updateRoundNumber();
 					player.draw();
-				},	
+					if(!player.storage.nzry_shicai3){
+						player.storage.nzry_shicai3=['basic','trick','equip'];
+						var history=player.getHistory('useCard');
+						for(var i=0;i<history.length;i++){
+							var index = player.storage.nzry_shicai3.indexOf(get.type(history[i].card));
+							if (index !== -1) player.storage.nzry_shicai3.splice(index, 1);
+						}
+						player.markSkill('nzry_shicai3');
+					}
+				},
+				group:['nzry_shicai2','nzry_shicai3'],
+			},
+			nzry_shicai2:{
+				trigger:{global:'phaseBegin'},
+				silent:true,
+				filter:function(event,player){
+					if(!game.isCharacterSeen(player,'xuyou')) return false;
+					return true;
+				},
+				content:function(){
+					player.storage.nzry_shicai3=['basic','trick','equip'];
+					player.markSkill('nzry_shicai3');
+				}
+			},
+			nzry_shicai3:{
+				trigger:{player:'useCardAfter'},
+				silent:true,
+				intro:{
+					content:function(storage){
+							if(storage&&storage.length) return '发动恃才可用类别：'+get.translation(storage);
+							else return '恃才已用完'
+					}
+				},
+				filter:function(event,player){
+					if(!game.isCharacterSeen(player,'xuyou')) return false;
+					return true;
+				},
+				content:function(){
+					if(!player.storage.nzry_shicai3){
+						player.storage.nzry_shicai3=['basic','trick','equip'];
+					}
+					var history=player.getHistory('useCard');
+					for(var i=0;i<history.length;i++){
+						var index = player.storage.nzry_shicai3.indexOf(get.type(history[i].card));
+						if (index !== -1) player.storage.nzry_shicai3.splice(index, 1);
+					}
+					player.markSkill('nzry_shicai3');
+				},
 			},
 			"nzry_cunmu":{
 				audio:2,
@@ -1816,7 +1872,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				content:function(){
 					trigger.bottom=true;
-				},	
+					if(!player.storage.nzry_shicai3){
+						player.storage.nzry_shicai3=['basic','trick','equip'];
+						var history=player.getHistory('useCard');
+						for(var i=0;i<history.length;i++){
+							var index = player.storage.nzry_shicai3.indexOf(get.type(history[i].card));
+							if (index !== -1) player.storage.nzry_shicai3.splice(index, 1);
+						}
+						player.markSkill('nzry_shicai3');
+					}
+				},
 			},
 			"nzry_mingren":{
 				audio:"nzry_mingren_1",
@@ -7124,6 +7189,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_chenglve":"成略",
 			"nzry_chenglve_info":"转换技，出牌阶段限一次，①你可以摸一张牌，然后弃置两张手牌。②你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制",
 			"nzry_shicai":"恃才",
+			"nzry_shicai3":"恃才",
 			"nzry_shicai_info":"当你使用牌时，若此牌与你本回合使用的牌类型均不同（包括装备牌），则你可以将此牌置于牌堆顶，然后摸一张牌",
 			"nzry_cunmu":"寸目",
 			"nzry_cunmu_info":"锁定技，当你摸牌时，改为从牌堆底摸牌",
