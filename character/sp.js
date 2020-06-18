@@ -4027,28 +4027,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			gzjili:{
 				mod:{
-				aiOrder:function(player,card,num){
-					if(player.isPhaseUsing()&&get.subtype(card)=='equip1'&&!get.cardtag(card,'gifts')){
-						var range0=player.getAttackRange();
-						var range=0;
-						var info=get.info(card);
-						if(info&&info.distance&&info.distance.attackFrom){
-							range-=info.distance.attackFrom;
-						}
-						if(player.getEquip(1)){
-							var num=0;
-							var info=get.info(player.getEquip(1));
+					aiOrder:function(player,card,num){
+						if(player.isPhaseUsing()&&get.subtype(card)=='equip1'&&!get.cardtag(card,'gifts')){
+							var range0=player.getAttackRange();
+							var range=0;
+							var info=get.info(card);
 							if(info&&info.distance&&info.distance.attackFrom){
-								num-=info.distance.attackFrom;
+								range-=info.distance.attackFrom;
 							}
-							range0-=num;
+							if(player.getEquip(1)){
+								var num=0;
+								var info=get.info(player.getEquip(1));
+								if(info&&info.distance&&info.distance.attackFrom){
+									num-=info.distance.attackFrom;
+								}
+								range0-=num;
+							}
+							range0+=range;
+							if(range0==(player.getHistory('useCard').length+player.getHistory('respond').length+2)&&player.countCards('h',function(cardx){
+								return get.subtype(cardx)!='equip1'&&player.getUseValue(cardx)>0;
+							})) return num+10;
 						}
-						range0+=range;
-						if(range0==(player.getHistory('useCard').length+player.getHistory('respond').length+2)&&player.countCards('h',function(cardx){
-							return get.subtype(cardx)!='equip1'&&player.getUseValue(cardx)>0;
-						})) return num+10;
-					}
-				},
+					},
 				},
 				trigger:{player:['useCard','respond']},
 				frequent:true,
@@ -4059,39 +4059,77 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				content:function(){
 					player.draw(player.getAttackRange());
+					if(!player.storage.gzjili3){
+						player.storage.gzjili3=1;
+					}
+					player.storage.gzjili3=player.getHistory('useCard').length+player.getHistory('respond').length;
+					player.markSkill('gzjili3');
 				},
 				ai:{
 					threaten:1.8,
 					effect:{
 						target:function(card,player,target,current){
-						if(player!=target||!player.isPhaseUsing()) return;
-						if(get.subtype(card)=='equip1'&&!get.cardtag(card,'gifts')){
-						var range0=player.getAttackRange();
-						var range=0;
-						var info=get.info(card);
-						if(info&&info.distance&&info.distance.attackFrom){
-							range-=info.distance.attackFrom;
-						}
-						if(player.getEquip(1)){
-							var num=0;
-							var info=get.info(player.getEquip(1));
-							if(info&&info.distance&&info.distance.attackFrom){
-								num-=info.distance.attackFrom;
+							if(player!=target||!player.isPhaseUsing()) return;
+							if(get.subtype(card)=='equip1'&&!get.cardtag(card,'gifts')){
+								var range0=player.getAttackRange();
+								var range=0;
+								var info=get.info(card);
+								if(info&&info.distance&&info.distance.attackFrom){
+									range-=info.distance.attackFrom;
+								}
+								if(player.getEquip(1)){
+									var num=0;
+									var info=get.info(player.getEquip(1));
+									if(info&&info.distance&&info.distance.attackFrom){
+										num-=info.distance.attackFrom;
+									}
+									range0-=num;
+								}
+								range0+=range;
+								var delta=range0-(player.getHistory('useCard').length+player.getHistory('respond').length);
+								if(delta<0) return;
+								var num=player.countCards('h',function(card){
+									return (get.cardtag(card,'gifts')||get.subtype(card)!='equip1')&&player.getUseValue(card)>0;
+								});
+								if(delta==2&&num>0) return [1,3];
+								if(num>=delta) return 'zeroplayertarget';
 							}
-							range0-=num;
-						}
-						range0+=range;
-						var delta=range0-(player.getHistory('useCard').length+player.getHistory('respond').length);
-						if(delta<0) return;
-						var num=player.countCards('h',function(card){
-							return (get.cardtag(card,'gifts')||get.subtype(card)!='equip1')&&player.getUseValue(card)>0;
-						});
-						if(delta==2&&num>0) return [1,3];
-						if(num>=delta) return 'zeroplayertarget';
-					}
 						},
 					},
+				},
+				group:['gzjili2','gzjili3'],
+			},
+			gzjili2:{
+				trigger:{global:'phaseBegin'},
+				silent:true,
+				filter:function(event,player){
+					if(!game.isCharacterSeen(player,'shamoke')) return false;
+					return true;
+				},
+				content:function(){
+					player.storage.gzjili3=1;
+					player.markSkill('gzjili3');
 				}
+			},
+			gzjili3:{
+				trigger:{player:['useCardAfter','respondAfter']},
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '下一张牌序数为：'+storage;
+					}
+				},
+				filter:function(event,player){
+					if(!game.isCharacterSeen(player,'shamoke')) return false;
+					return true;
+				},
+				content:function(){
+					if(!player.storage.gzjili3){
+						player.storage.gzjili3=1;
+					}
+					player.storage.gzjili3=player.getHistory('useCard').length+player.getHistory('respond').length+1;
+					player.markSkill('gzjili3');
+				},
 			},
 			xiongsuan:{
 				limited:true,
@@ -8066,7 +8104,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 0;
 						}
 					}
-				}
+				},
+				group:['dingpan2','dingpan3'],
+			},
+			dingpan2:{
+				trigger:{player:'chooseToUseBefore'},
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '可发动定判的次数'+storage;
+					}
+				},
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					return true;
+				},
+				content:function(){
+					if(get.mode()!='identity') return;
+					var numFan=get.population('fan');
+					var numUsed=player.getStat().skill.dingpan||0;
+					player.storage.dingpan2=numFan-numUsed;
+					player.markSkill('dingpan2');
+				},
+			},
+			dingpan3:{
+				trigger:{player:'phaseAfter'},
+				silent:true,
+				content:function(){
+					delete player.storage.dingpan2;
+					player.unmarkSkill('dingpan2');
+				},
 			},
 			hongde:{
 				audio:2,
@@ -17524,6 +17591,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuejian:'约俭',
 			yuejian_info:'一名角色的弃牌阶段开始时，若其本回合内使用过的牌数小于X，则你可以令其本回合的手牌上限+X。(X为其的体力上限)',
 			gzjili:'蒺藜',
+			gzjili3:'蒺藜',
 			gzjili_info:'当你于一回合内使用或打出第X张牌时，你可以摸X张牌（X为你的攻击范围）。',
 			xiongsuan:'凶算',
 			xiongsuan_info:'限定技，出牌阶段，你可以弃置一张手牌并选择一名角色，对其造成1点伤害，然后你摸三张牌。若该角色有已发动的限定技，则你选择其中一个限定技。此回合结束后，视为该限定技未发动过。',
@@ -17667,6 +17735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hongde:'弘德',
 			hongde_info:'当你一次获得或失去至少两张牌后，你可以令一名其他角色摸一张牌。',
 			dingpan:'定叛',
+			dingpan2:'定叛',
 			dingpan_info_identity:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。（X为场上存活的反贼数）',
 			dingpan_info_versus:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。（X为场上存活的敌方角色数）',
 			dingpan_info:'出牌阶段限一次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。',

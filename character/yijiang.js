@@ -11003,6 +11003,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.draw();
+					if(!player.hasSkill('jianying3')){
+						game.broadcastAll(function(player,trigger){
+							var realCard=trigger.cards[0];
+							var vcard=game.createCard(realCard.name,realCard.suit,realCard.number,realCard.nature);
+							player.storage.jianying3=vcard;
+							player.addTempSkill('jianying3');
+						},player,trigger);
+					}
 				},
 				group:['jianying2'],
 			},

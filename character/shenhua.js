@@ -1844,8 +1844,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				intro:{
 					content:function(storage){
-							if(storage&&storage.length) return '发动恃才可用类别：'+get.translation(storage);
-							else return '恃才已用完'
+						if(storage&&storage.length) return '发动恃才可用类别：'+get.translation(storage);
+						else return '恃才已用完'
 					}
 				},
 				filter:function(event,player){
@@ -2674,8 +2674,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var num=event.map[result.control]||1;
 					player.storage.qimou2=num;
+					player.storage.qimou3=num;
 					player.loseHp(num);
 					player.addTempSkill('qimou2');
+					player.addTempSkill('qimou3');
+					player.markSkill('qimou3');
 				},
 				ai:{
 					order:2,
@@ -2724,6 +2727,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				}
+			},
+			qimou3:{
+				trigger:{player:'useCardAfter'},
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '可额外使用杀的次数'+storage;
+					}
+				},
+				filter:function(event,player){
+					return player.storage.qimou3>0&&get.name(event.card)=='sha';
+				},
+				content:function(){
+					player.storage.qimou3--;
+					player.markSkill('qimou3');
+				},
+				onremove:true,
 			},
 			xinkuanggu:{
 				trigger:{source:'damageSource'},
@@ -7310,6 +7330,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huashen2:'化身',
 			xinsheng:'新生',
 			qimou:'奇谋',
+			qimou3:'谋',
 			xinqiangxi:'强袭',
 			xinjushou:'据守',
 			xinjiewei:'解围',
