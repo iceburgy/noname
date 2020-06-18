@@ -12817,6 +12817,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					player.storage.qiangwu=result.number;
 					player.addTempSkill('qiangwu3','phaseUseEnd');
+					game.broadcastAll(function(player,result){
+						var realCard=result;
+						var vcard=game.createCard(realCard.name,realCard.suit,realCard.number,realCard.nature);
+						player.storage.qiangwu4=vcard;
+						player.addTempSkill('qiangwu4');
+					},player,result);
 				},
 				ai:{
 					result:{
@@ -12852,6 +12858,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.stat[player.stat.length-1].card.sha--;
 					}
 				},
+			},
+			qiangwu4:{
+				silent:true,
+				mark:'card',
+				intro:{
+					content:'card',
+				},
+				content:function(){},
 			},
 			zhendu:{
 				audio:2,
@@ -17945,6 +17959,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shenxian:'甚贤',
 			oldshenxian:'甚贤',
 			qiangwu:'枪舞',
+			qiangwu4:'枪舞',
 			moukui:'谋溃',
 			moukui2:'谋溃',
 			lirang:'礼让',
