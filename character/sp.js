@@ -8108,32 +8108,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['dingpan2','dingpan3'],
 			},
 			dingpan2:{
-				trigger:{player:'chooseToUseBefore'},
+				trigger:{player:['chooseToUseBefore','phaseAfter']},
+				silent:true,
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					if(!game.isCharacterSeen(player,'buzhi')) return false;
+					return true;
+				},
+				content:function(){
+					if(trigger.name=='chooseToUse'){
+						var numFan=get.population('fan');
+						var numUsed=player.getStat().skill.dingpan||0;
+						var dingpanCount=numFan-numUsed;
+						if(dingpanCount>=0){
+							player.storage.dingpan3=dingpanCount;
+							player.markSkill('dingpan3');
+						}
+					}else{
+						delete player.storage.dingpan3;
+						player.unmarkSkill('dingpan3');
+					}
+				},
+			},
+			dingpan3:{
 				silent:true,
 				intro:{
 					content:function(storage){
 						return '可发动定判的次数'+storage;
 					}
 				},
-				filter:function(event,player){
-					if(_status.currentPhase!=player) return false;
-					return true;
-				},
-				content:function(){
-					if(get.mode()!='identity') return;
-					var numFan=get.population('fan');
-					var numUsed=player.getStat().skill.dingpan||0;
-					player.storage.dingpan2=numFan-numUsed;
-					player.markSkill('dingpan2');
-				},
-			},
-			dingpan3:{
-				trigger:{player:'phaseAfter'},
-				silent:true,
-				content:function(){
-					delete player.storage.dingpan2;
-					player.unmarkSkill('dingpan2');
-				},
+				content:function(){},
 			},
 			hongde:{
 				audio:2,
@@ -17735,7 +17739,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hongde:'弘德',
 			hongde_info:'当你一次获得或失去至少两张牌后，你可以令一名其他角色摸一张牌。',
 			dingpan:'定叛',
-			dingpan2:'定叛',
+			dingpan3:'定叛',
 			dingpan_info_identity:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。（X为场上存活的反贼数）',
 			dingpan_info_versus:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。（X为场上存活的敌方角色数）',
 			dingpan_info:'出牌阶段限一次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。',

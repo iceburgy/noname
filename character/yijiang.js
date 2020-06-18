@@ -1699,7 +1699,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							delete player.storage.pindi_target;
 							delete player.storage.pindi_type;
-							player.unmarkSkill('pindi2');
 						}
 					}
 				},
@@ -1767,7 +1766,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['pindi2']
 			},
 			pindi2:{
-				trigger:{player:'chooseToUseBefore'},
+				trigger:{player:['chooseToUseBefore','phaseAfter']},
 				silent:true,
 				intro:{
 					content:function(storage){
@@ -1781,16 +1780,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				content:function(){
-					var typeList=['basic','trick','equip'];
-					for(var i=0;i<typeList.length;i++){
-						if(player.storage.pindi_type&&player.storage.pindi_type.contains(typeList[i])){
-							typeList.splice(i,1);
-							i--;
+					if(trigger.name=='chooseToUse'){
+						var typeList=['basic','trick','equip'];
+						for(var i=0;i<typeList.length;i++){
+							if(player.storage.pindi_type&&player.storage.pindi_type.contains(typeList[i])){
+								typeList.splice(i,1);
+								i--;
+							}
 						}
+						player.storage.pindi2=typeList.slice(0);
+						player.markSkill('pindi2');
+						player.updateMarks('pindi2');
+					}else{
+						delete player.storage.pindi_target;
+						delete player.storage.pindi_type;
+						player.unmarkSkill('pindi2');
 					}
-					player.storage.pindi2=typeList.slice(0);
-					player.markSkill('pindi2');
-					player.updateMarks('pindi2');
 				},
 			},
 			funan:{
@@ -10505,14 +10510,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['xinjingce2'],
 			},
 			xinjingce2:{
-				trigger:{player:'phaseZhunbeiBegin'},
-				silent:true,
-				content:function(){
-					player.addTempSkill('xinjingce3');
-				},
-			},
-			xinjingce3:{
-				trigger:{player:'chooseToUseBefore'},
+				trigger:{player:['chooseToUseBefore','phaseAfter']},
 				silent:true,
 				intro:{
 					content:function(storage){
@@ -10525,11 +10523,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				content:function(){
-					player.storage.xinjingce3=player.countUsed(null,true);
-					player.markSkill('xinjingce3');
-				},
-				onremove:function(player){
-					player.unmarkSkill('xinjingce2');
+					if(trigger.name=='chooseToUse'){
+						player.storage.xinjingce2=player.countUsed(null,true);
+						player.markSkill('xinjingce2');
+					}else{
+						delete player.storage.xinjingce2;
+						player.unmarkSkill('xinjingce2');
+					}
 				},
 			},
 			oldchengxiang:{
@@ -11698,7 +11698,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pojun:'破军',
 			jingce:'精策',
 			xinjingce:'精策',
-			xinjingce3:'精策',
+			xinjingce2:'精策',
 			chengxiang:'称象',
 			oldchengxiang:'称象',
 			renxin:'仁心',
