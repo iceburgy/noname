@@ -339,6 +339,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 			}
 		},
 		xinfu_zuilun: {
+			group:['xinfu_zuilun2','xinfu_zuilun3'],
 			audio: 2,
 			trigger: {
 				player: 'phaseJieshuBegin',

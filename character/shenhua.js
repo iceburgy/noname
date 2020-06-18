@@ -524,6 +524,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"xinfu_zuilun":{
+				group:['xinfu_zuilun2','xinfu_zuilun3'],
 				audio:2,
 				trigger:{
 					player:"phaseJieshuBegin",
@@ -595,6 +596,46 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseHp();
 					result.targets[0].loseHp();
 				},
+			},
+			xinfu_zuilun2:{
+				trigger:{player:['chooseToUseBefore','phaseAfter']},
+				silent:true,
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					if(!game.isCharacterSeen(player,'zhugezhan')) return false;
+					return true;
+				},
+				content:function(){
+					if(trigger.name=='chooseToUse'){
+						var str=[];
+						if(player.getHistory('lose',function(evt){
+							return evt.type=='discard';
+						}).length==0) {
+							str.push('未弃置过牌');
+						}
+						if(player.isMinHandcard()) {
+							str.push('手牌最少');
+						}
+						if(player.getStat('damage')) {
+							str.push('造成过伤害');
+						}
+						player.storage.xinfu_zuilun3=str;
+						player.markSkill('xinfu_zuilun3');
+					}else{
+						delete player.storage.xinfu_zuilun3;
+						player.unmarkSkill('xinfu_zuilun3');
+					}
+				},
+			},
+			xinfu_zuilun3:{
+				silent:true,
+				intro:{
+					content:function(storage){
+						if(storage&&storage.length) return '满足的条件：'+storage;
+						else return '不满足任何条件'
+					}
+				},
+				content:function(){},
 			},
 			"xinfu_fuyin":{
 				trigger:{
@@ -7242,6 +7283,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"kongsheng2":"箜声",
 			"kongsheng2_info":"",
 			"xinfu_zuilun":"罪论",
+			"xinfu_zuilun3":"罪论",
 			"xinfu_zuilun_info":"结束阶段，你可以观看牌堆顶三张牌，你每满足以下一项便保留一张，然后以任意顺序放回其余的牌：1.你于此回合内造成过伤害；2.你于此回合内未弃置过牌；3.手牌数为全场最少。若均不满足，你与一名其他角色失去一点体力。",
 			"xinfu_fuyin":"父荫",
 			"xinfu_fuyin_info":"锁定技，你每回合第一次成为【杀】或【决斗】的目标后，若你的手牌数小于等于该角色，此牌对你无效。",
