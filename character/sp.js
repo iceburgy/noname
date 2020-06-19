@@ -15808,6 +15808,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.draw();
 					'step 1'
+					if(player.storage.xinfu_lianpian3==undefined) player.storage.xinfu_lianpian3=3;
+					player.storage.xinfu_lianpian3--;
 					event.card=result[0];
 					var ablers=player.getLastUsed(1).targets.slice(0);
 					for(var i=0;i<ablers.length;i++){
@@ -15847,6 +15849,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 				},
+				group:['xinfu_lianpian2','xinfu_lianpian3'],
+			},
+			xinfu_lianpian2:{
+				trigger:{player:['chooseToUseBefore','phaseAfter']},
+				silent:true,
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					if(!game.isCharacterSeen(player,'xf_sufei')) return false;
+					return true;
+				},
+				content:function(){
+					if(player.storage.xinfu_lianpian3==undefined) player.storage.xinfu_lianpian3=3;
+					if(trigger.name=='chooseToUse'){
+						if(player.storage.xinfu_lianpian3>=0) player.markSkill('xinfu_lianpian3');
+					}else{
+						delete player.storage.xinfu_lianpian3;
+						player.unmarkSkill('xinfu_lianpian3');
+					}
+				},
+			},
+			xinfu_lianpian3:{
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '可发动联翩的次数'+storage;
+					}
+				},
+				content:function(){},
 			},
 			"xinfu_lingren":{
 				usable:1,
@@ -17220,6 +17250,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_jianji":"谏计",
 			"xinfu_jianji_info":"出牌阶段限一次，你可以令一名其他角色摸一张牌。然后该角色可以使用此牌。",
 			"xinfu_lianpian":"联翩",
+			"xinfu_lianpian3":"联翩",
 			"xinfu_lianpian_info":"出牌阶段限三次。当你对一名角色连续使用牌时，你可以摸一张牌，然后可以将一张牌交给该角色。",
 			
 			"xinfu_lingren":"凌人",

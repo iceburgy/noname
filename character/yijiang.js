@@ -1889,6 +1889,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							target.draw(event.num1);
 						}
 						player.addMark('jiexun',1,false);
+						player.storage.jiexun2=player.countMark('jiexun');
+						player.markSkill('jiexun2');
 					}
 					else{
 						event.finish();
@@ -1902,10 +1904,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 3'
 					if(result.bool&&result.autochoose&&result.cards.length==result.rawcards.length){
+						delete player.storage.jiexun2;
+						player.unmarkSkill('jiexun2');
 						player.removeSkill('jiexun');
 						player.addSkill('funan_jiexun');
 					}
 				}
+			},
+			jiexun2:{
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '已发动诫训的次数'+storage;
+					}
+				},
+				content:function(){},
 			},
 			zhuandui:{
 				shaRelated:true,
@@ -11411,6 +11424,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			funan:'复难',
 			funan_info:'其他角色使用或打出牌响应你使用的牌时，你可令其获得你使用的牌（其本回合不能使用或打出这些牌），然后你获得其使用或打出的牌。',
 			jiexun:'诫训',
+			jiexun2:'诫训',
 			jiexun_info:'结束阶段，你可令一名其他角色摸等同于场上方块牌数的牌，然后弃置X张牌（X为此前该技能发动过的次数）。若有角色因此法弃置了所有牌，则你失去〖诫训〗，然后你发动〖复难〗时，无须令对方获得你使用的牌',
 			shouxi:'守玺',
 			shouxi_info:'当你成为【杀】的目标后，你可声明一种未以此法声明过的基本牌或锦囊牌的牌名。若使用者弃置一张你声明的牌，其获得你的一张牌；若否，则此【杀】对你无效',

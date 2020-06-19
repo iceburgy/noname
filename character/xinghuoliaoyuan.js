@@ -1104,7 +1104,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.draw(cards.length);
 					player.storage.xinfu_duanfa+=cards.length;
 				},
-				group:"xinfu_duanfa_clear",
+				group:['xinfu_duanfa_clear','xinfu_duanfa2','xinfu_duanfa3'],
 				subSkill:{
 					clear:{
 						trigger:{
@@ -1125,6 +1125,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player:1,
 					},
 				},
+			},
+			xinfu_duanfa2:{
+				trigger:{player:['chooseToUseBefore','phaseAfter']},
+				silent:true,
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					if(!game.isCharacterSeen(player,'zhoufang')) return false;
+					return true;
+				},
+				content:function(){
+					var duanfaRemain=player.maxHp-player.storage.xinfu_duanfa;
+					if(trigger.name=='chooseToUse'&&duanfaRemain>0){
+						player.storage.xinfu_duanfa3=duanfaRemain;
+						player.markSkill('xinfu_duanfa3');
+					}else if(player.storage.xinfu_duanfa3){
+						delete player.storage.xinfu_duanfa3;
+						player.unmarkSkill('xinfu_duanfa3');
+					}
+				},
+			},
+			xinfu_duanfa3:{
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '可发动断发的次数'+storage;
+					}
+				},
+				content:function(){},
 			},
 			"xinfu_youdi":{
 				audio:2,
@@ -1592,6 +1620,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"yingshi_die":"应势",
 			"yingshi_die_info":"",
 			"xinfu_duanfa":"断发",
+			"xinfu_duanfa3":"断发",
 			"xinfu_duanfa_info":"出牌阶段，你可以弃置任意张黑色牌，然后摸等量的牌。（每回合内限X张，X为你的体力上限）",
 			"xinfu_youdi":"诱敌",
 			"xinfu_youdi_info":"结束阶段开始时，你可以令一名其他角色弃置你的一张手牌，若此牌：不为黑色，你摸一张牌。不为【杀】，你获得该角色的一张牌。",
