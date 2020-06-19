@@ -2067,7 +2067,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++) event.chosenChars[i]=[];
 					// choose char 1
 					var list=[];
-					var selectButton=(1);
+					var selectButton=1;
 
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==game.zhu){
@@ -2087,6 +2087,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.init(result.links[0],false);
 							player.chosenChar1=result.links[0];
 						}
+					}).set('switchToAuto',function(){
+						_status.event.result='ai';
+					}).set('processAI',function(){
+						var buttons=_status.event.dialog.buttons;
+						return {
+							bool:true,
+							links:[buttons[Math.floor(Math.random()*buttons.length)].link],
+						}
 					});
 					"step 1"
 					for(var i in result){
@@ -2095,7 +2103,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					// choose char 2
 					var list=[];
-					var selectButton=(1);
+					var selectButton=1;
 
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==game.zhu){
@@ -2115,6 +2123,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(game.online||player==game.me) {
 							player.init(player.chosenChar1,result.links[0],false);
 						}
+					}).set('switchToAuto',function(){
+						_status.event.result='ai';
+					}).set('processAI',function(){
+						var buttons=_status.event.dialog.buttons;
+						return {
+							bool:true,
+							links:[buttons[Math.floor(Math.random()*buttons.length)].link],
+						}
 					});
 					"step 2"
 					for(var i in result){
@@ -2123,7 +2139,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					// determine main and vice character
 					var list=[];
-					var selectButton=(2);
+					var selectButton=2;
 
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==game.zhu){
@@ -2241,7 +2257,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 6"
 					// other players to choose character1
 					var list=[];
-					var selectButton=(1);
+					var selectButton=1;
 
 					var num,num2=0;
 					if(event.zhongmode){
@@ -2303,6 +2319,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.init(result.links[0],false);
 							player.chosenChar1=result.links[0];
 						}
+					}).set('switchToAuto',function(){
+						_status.event.result='ai';
+					}).set('processAI',function(){
+						var buttons=_status.event.dialog.buttons;
+						return {
+							bool:true,
+							links:[buttons[Math.floor(Math.random()*buttons.length)].link],
+						}
 					});
 					"step 7"
 					for(var i in result){
@@ -2312,7 +2336,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					// other players to choose character2
 					var list=[];
-					var selectButton=(1);
+					var selectButton=1;
 
 					var num,num2=0;
 					if(event.zhongmode){
@@ -2375,6 +2399,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(game.online||player==game.me) {
 							player.init(player.chosenChar1,result.links[0],false);
 						}
+					}).set('switchToAuto',function(){
+						_status.event.result='ai';
+					}).set('processAI',function(){
+						var buttons=_status.event.dialog.buttons;
+						return {
+							bool:true,
+							links:[buttons[Math.floor(Math.random()*buttons.length)].link],
+						}
 					});
 					"step 8"
 					for(var i in result){
@@ -2384,7 +2416,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					// other players to determine main and vice character
 					var list=[];
-					var selectButton=(2);
+					var selectButton=2;
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=game.zhu){
 							var chosenCharsIndex=get.distance(game.zhu, game.players[i], 'absolute');
@@ -2457,12 +2489,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var result2=event.result2;
 					game.broadcast(function(result,result2){
 						for(var i in result){
-							if(!lib.playerOL[i].name){
-								lib.playerOL[i].init(result[i][0],result[i][1],false);
-								lib.playerOL[i].group='unknown';
-								lib.playerOL[i].classList.add('unseen');
-								lib.playerOL[i].classList.add('unseen2');
-							}
+							lib.playerOL[i].init(result[i][0],result[i][1],false);
+							lib.playerOL[i].group='unknown';
+							lib.playerOL[i].classList.add('unseen');
+							lib.playerOL[i].classList.add('unseen2');
 							if(result2[i]&&result2[i].links) {
 							    lib.playerOL[i].groupshen=result2[i].links[0][2].slice(6);
 							}
