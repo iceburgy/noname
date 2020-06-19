@@ -8116,15 +8116,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				content:function(){
-					if(trigger.name=='chooseToUse'){
-						var numFan=get.population('fan');
-						var numUsed=player.getStat().skill.dingpan||0;
-						var dingpanCount=numFan-numUsed;
-						if(dingpanCount>=0){
-							player.storage.dingpan3=dingpanCount;
-							player.markSkill('dingpan3');
-						}
-					}else{
+					var numFan=get.population('fan');
+					var numUsed=player.getStat().skill.dingpan||0;
+					var dingpanCount=numFan-numUsed;
+					if(trigger.name=='chooseToUse'&&dingpanCount>0){
+						player.storage.dingpan3=dingpanCount;
+						player.markSkill('dingpan3');
+					}else if(player.storage.dingpan3){
 						delete player.storage.dingpan3;
 						player.unmarkSkill('dingpan3');
 					}
