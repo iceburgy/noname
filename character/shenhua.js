@@ -1611,7 +1611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mod:{
 					playerEnabled:function(card,player,target){
 						var info=get.info(card);
-						if(target!=player&&(!info||!info.singleCard||!ui.selected.targets.length)&&player.isPhaseUsing()&&!target.inRange(player)) return false;
+						if(target!=player&&(!info||!info.singleCard||!ui.selected.targets.length)&&player.isPhaseUsing()&&target!=player&&!target.inRange(player)) return false;
 					},
 				},
 				trigger:{
@@ -1621,14 +1621,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					return (player.getHistory('useCard',function(evt){
 						return evt.getParent('phaseUse')==event;
-					}).length<game.countPlayer(function(current){return !current.inRange(player)}))&&game.hasPlayer(function(target){
-						return !target.inRange(player)&&target.countDiscardableCards(player,'he');
+					}).length<game.countPlayer(function(current){return current!=player&&!current.inRange(player)}))&&game.hasPlayer(function(target){
+						return target!=player&&!target.inRange(player)&&target.countDiscardableCards(player,'he');
 					});
 				},
 				content:function(){
 					'step 0'
 					player.chooseTarget("请选择〖掣政〗的目标","弃置一名攻击范围内不包含你的角色的一张牌",true,function(card,player,target){
-						return !target.inRange(player)&&target.countDiscardableCards(player,'he');
+						return target!=player&&!target.inRange(player)&&target.countDiscardableCards(player,'he');
 					}).ai=function(target){
 						return -get.attitude(player,target);
 					};
@@ -1638,6 +1638,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.discardPlayerCard(result.targets[0],'he',1,true);
 					};
 				},
+				group:['nzry_zhizheng2','nzry_zhizheng3'],
+			},
+			nzry_zhizheng2:{
+				trigger:{player:['chooseToUseBefore','phaseAfter']},
+				silent:true,
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					if(!game.isCharacterSeen(player,'sunliang')) return false;
+					return true;
+				},
+				content:function(){
+					var num=player.getHistory('useCard').length||0;
+					if(trigger.name=='chooseToUse'){
+						player.storage.nzry_zhizheng3=num;
+						player.markSkill('nzry_zhizheng3');
+					}else{
+						delete player.storage.nzry_zhizheng3;
+						player.unmarkSkill('nzry_zhizheng3');
+					}
+				},
+			},
+			nzry_zhizheng3:{
+				silent:true,
+				intro:{
+					content:function(storage,player){
+						var willDo=(player.getHistory('useCard',function(evt){
+								return evt.getParent('phaseUse')==event;
+							}).length<game.countPlayer(function(current){return current!=player&&!current.inRange(player)}))&&game.hasPlayer(function(target){
+								return target!=player&&!target.inRange(player)&&target.countDiscardableCards(player,'he');
+							});
+						var str='已使用牌数'+storage;
+						if(willDo) str+='，需要发动掣政';
+						else str+='，无需发动掣政';
+						return str;
+					}
+				},
+				content:function(){},
 			},
 			"nzry_lijun":{
 				unique:true,
@@ -7257,6 +7294,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_kuizhu":"溃诛",
 			"nzry_kuizhu_info":"弃牌阶段结束后，你可以选择一项：令至多X名角色各摸一张牌，或对任意名体力值之和为X的角色造成一点伤害，若不少于2名角色，你须受到一点伤害。（X为你此阶段弃置的牌数）",
 			"nzry_zhizheng":"掣政",
+			"nzry_zhizheng3":"掣政",
 			"nzry_zhizheng_info":"锁定技，你的出牌阶段内，攻击范围内不包含你的其他角色不能成为你使用牌的目标。出牌阶段结束时，若你本阶段内使用的牌数小于这些角色的数量，则你弃置其中一名角色的一张牌。",
 			"nzry_lijun1":"立军",
 			"nzry_lijun":"立军",
