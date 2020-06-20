@@ -3357,7 +3357,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					var curEvent=event;
 					while(curEvent&&curEvent.name!='phaseDraw') curEvent=curEvent.parent;
-					if(curEvent&&curEvent.name=='phaseDraw') return false;
+					if(_status.currentPhase==player&&curEvent&&curEvent.name=='phaseDraw') return false;
 					return event.cards&&event.cards.length>0
 				},
 				content:function (){
