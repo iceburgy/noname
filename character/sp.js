@@ -11590,7 +11590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kunfen:{
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
-				direct:true,
+				forced:true,
 				content:function(){
 					"step 0"
 					if(player.storage.kunfen||
