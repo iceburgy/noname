@@ -3265,9 +3265,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:"paoxiao",
 				inherit:"paoxiao",
 				mod:{
-//					targetInRange:function (card,player){
-//						if(card.name=='sha'&&get.cardCount({name:'sha'},player)>0) return true;
-//					},
+					targetInRange:function (card,player){
+						if(game.hasCharacter(player,'re_zhangfei')&&card.name=='sha'&&get.cardCount({name:'sha'},player)>0) return true;
+					},
 					cardUsable:function (card,player,num){
 						if(card.name=='sha') return Infinity;
 					},

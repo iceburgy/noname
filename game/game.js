@@ -26372,6 +26372,13 @@
 			}
 			return false;
 		},
+		hasCharacter:function(player,character){
+			var index=game.getCharacterIndex(player,character);
+			if(index>=0){
+				return true;
+			}
+			return false;
+		},
 		isSubSkill:function(skill,allSkills){
 			for(var parSkill of allSkills){
 				if(lib.skill[parSkill]&&lib.skill[parSkill].group&&lib.skill[parSkill].group.length){

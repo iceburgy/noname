@@ -12835,10 +12835,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card.name=='sha'&&card.number>player.storage.qiangwu) return num+2;
 					},
 					targetInRange:function(card,player){
-						if(_status.currentPhase==player&&card.name=='sha'&&card.number<player.storage.qiangwu) return true;
+						var cardNumber=card.number;
+						if(!cardNumber&&Array.isArray(card.cards)&&card.cards.length) cardNumber=card.cards[0].number;
+						if(_status.currentPhase==player&&card.name=='sha'&&cardNumber<player.storage.qiangwu) return true;
 					},
 					cardUsable:function(card,player){
-						if(_status.currentPhase==player&&card.name=='sha'&&card.number>player.storage.qiangwu) return Infinity;
+						var cardNumber=card.number;
+						if(!cardNumber&&Array.isArray(card.cards)&&card.cards.length) cardNumber=card.cards[0].number;
+						if(_status.currentPhase==player&&card.name=='sha'&&cardNumber>player.storage.qiangwu) return Infinity;
 					}
 				},
 				trigger:{player:'useCard1'},
