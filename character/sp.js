@@ -15020,11 +15020,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.xinfu_lveming++;
 						event.num=13;
 					};
+
+					event.str=get.translation(target)+'选择的点数为：'+event.num
+					event.dialog=ui.create.dialog(event.str);
+					event.videoId=lib.status.videoId++;
+					game.broadcast('createDialog',event.videoId,event.str);
+					game.pause();
+					setTimeout(function(){
+						game.resume();
+					},3000);
+
+					"step 2"
+					event.dialog.close();
+					game.broadcast('closeDialog',event.videoId);
+					game.log(event.str);
+
 					player.judge(function(card){
+						game.pause();
+						setTimeout(function(){
+							game.resume();
+						},3000);
 						if(card.number==event.num) return 4;
 						return -1;
 					});
-					"step 2"
+					"step 3"
 					if(result.bool==true){
 						target.damage(2);
 					}
