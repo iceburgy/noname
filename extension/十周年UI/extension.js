@@ -2961,11 +2961,15 @@ content:function(config, pack){
             };
             
             lib.element.player.$give = function(card, player, log, init) {
+				if(game.me!=this&&game.me!=player){
+					if(Array.isArray(card)){
+						card=card.length;
+					}
+					else if(card!=''){
+						card=1;
+					}
+				}
                 if (init !== false) {
-                    game.broadcast(function(source, card, player, init) {
-                        source.$give(card, player, false, init);
-                    },
-                    this, card, player, init);
                     if (typeof card == 'number' && card >= 0) {
                         game.addVideo('give', this, [card, player.dataset.position]);
                     } else {
@@ -2980,7 +2984,7 @@ content:function(config, pack){
                 
                 if (get.itemtype(card) == 'cards') {
                     if (log != false && !_status.video) {
-                        game.log(player, '从', this, '获得了', card);
+                        game.lognobroadcast(player, '从', this, '获得了', card);
                     }
                     if (this.$givemod) {
                         this.$givemod(card, player);
@@ -2991,7 +2995,7 @@ content:function(config, pack){
                     }
                 } else if (typeof card == 'number' && card >= 0) {
                     if (log != false && !_status.video) {
-                        game.log(player, '从', this, '获得了' + get.cnNumber(card) + '张牌');
+                        game.lognobroadcast(player, '从', this, '获得了' + get.cnNumber(card) + '张牌');
                     }
                     if (this.$givemod) {
                         this.$givemod(card, player);
@@ -3001,9 +3005,9 @@ content:function(config, pack){
                 } else {
                     if (log != false && !_status.video) {
                         if (get.itemtype(card) == 'card' && log != false) {
-                            game.log(player, '从', this, '获得了', card);
+                            game.lognobroadcast(player, '从', this, '获得了', card);
                         } else {
-                            game.log(player, '从', this, '获得了一张牌');
+                            game.lognobroadcast(player, '从', this, '获得了一张牌');
                         }
                     }
                     if (this.$givemod) {

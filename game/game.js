@@ -22031,22 +22031,21 @@
 				$giveAuto:function(card,player){
 					if(Array.isArray(card)&&card.length==0) return;
 					var args=Array.from(arguments);
-					if(_status.connectMode||(!this.isUnderControl(true)&&!player.isUnderControl(true))){
+					this.$give.apply(this,args);
+					game.broadcast(function(source,args){
+						source.$give.apply(source,args);
+					},this,args);
+				},
+				$give:function(card,player,log,init){
+					if(game.me!=this&&game.me!=player){
 						if(Array.isArray(card)){
 							card=card.length;
 						}
-						else{
+						else if(card!=''){
 							card=1;
 						}
-						args[0]=card;
 					}
-					return this.$give.apply(this,args);
-				},
-				$give:function(card,player,log,init){
 					if(init!==false){
-						game.broadcast(function(source,card,player,init){
-							source.$give(card,player,false,init);
-						},this,card,player,init);
 						if(typeof card=='number'&&card>=0){
 							game.addVideo('give',this,[card,player.dataset.position]);
 						}
@@ -22061,7 +22060,7 @@
 					}
 					if(get.itemtype(card)=='cards'){
 						if(log!=false&&!_status.video){
-							game.log(player,'从',this,'获得了',card);
+							game.lognobroadcast(player,'从',this,'获得了',card);
 						}
 						if(this.$givemod){
 							this.$givemod(card,player);
@@ -22074,7 +22073,7 @@
 					}
 					else if(typeof card=='number'&&card>=0){
 						if(log!=false&&!_status.video){
-							game.log(player,'从',this,'获得了'+get.cnNumber(card)+'张牌');
+							game.lognobroadcast(player,'从',this,'获得了'+get.cnNumber(card)+'张牌');
 						}
 						if(this.$givemod){
 							this.$givemod(card,player);
@@ -22086,10 +22085,10 @@
 					else{
 						if(log!=false&&!_status.video){
 							if(get.itemtype(card)=='card'&&log!=false){
-								game.log(player,'从',this,'获得了',card);
+								game.lognobroadcast(player,'从',this,'获得了',card);
 							}
 							else{
-								game.log(player,'从',this,'获得了一张牌');
+								game.lognobroadcast(player,'从',this,'获得了一张牌');
 							}
 						}
 						if(this.$givemod){
@@ -22103,20 +22102,8 @@
 							else{
 								node=ui.create.div('.card.thrown');
 							}
-							// node.dataset.position=this.dataset.position;
 							node.fixed=true;
 							this.$throwordered(node);
-							// lib.listenEnd(node);
-							// node.hide();
-							// node.style.transitionProperty='left,top,opacity';
-							//
-							// node.style.transform='rotate('+(Math.random()*16-8)+'deg)';
-							//
-							// ui.arena.appendChild(node);
-							// ui.refresh(node);
-							// node.show();
-							// node.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
-							// node.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*80+'px)';
 
 							node.listenTransition(function(){
 								var dx=player.getLeft()+player.offsetWidth/2-52-node.offsetLeft;
@@ -22130,20 +22117,6 @@
 
 								node.delete();
 							});
-							// setTimeout(function(){
-							// 	// node.removeAttribute('style');
-							// 	// node.dataset.position=player.dataset.position;
-							// 	var dx=player.offsetLeft+player.offsetWidth/2-52-node.offsetLeft;
-							// 	var dy=player.offsetTop+player.offsetHeight/2-52-node.offsetTop;
-							// 	if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
-							// 		node.style.transform+=' translate('+dx+'px,'+dy+'px)';
-							// 	}
-							// 	else{
-							// 		node.style.transform='translate('+dx+'px,'+dy+'px)';
-							// 	}
-							//
-							// 	node.delete();
-							// },700);
 						}
 					}
 				},
@@ -32981,6 +32954,103 @@
 			game.broadcast(function(str){
 				game.log(str);
 			},str);
+			if(!_status.video&&!game.online){
+				if(!logvid){
+					logvid=_status.event.getLogv();
+				}
+				if(logvid){
+					game.logv(logvid,'<div class="text center">'+str+'</div>');
+				}
+			}
+			// if(lib.config.title) document.title=str;
+			if(lib.config.show_log!='off'&&!game.chess){
+				var nodeentry=node.cloneNode(true);
+				ui.arenalog.insertBefore(nodeentry,ui.arenalog.firstChild);
+				if(!lib.config.clear_log){
+					while(ui.arenalog.childNodes.length&&ui.arenalog.scrollHeight>ui.arenalog.offsetHeight){
+						ui.arenalog.lastChild.remove();
+					}
+				}
+				if(!lib.config.low_performance){
+					nodeentry.style.transition='all 0s';
+					nodeentry.style.marginBottom=(-nodeentry.offsetHeight)+'px';
+					ui.refresh(nodeentry);
+					nodeentry.style.transition='';
+					nodeentry.style.marginBottom='';
+				}
+				if(lib.config.clear_log){
+					nodeentry.timeout=setTimeout(function(){
+						nodeentry.delete();
+					},1000);
+					for(var i=0;i<ui.arenalog.childElementCount;i++){
+						if(!ui.arenalog.childNodes[i].timeout){
+							ui.arenalog.childNodes[i].remove();
+						}
+					}
+				}
+			}
+		},
+		lognobroadcast:function(){
+			var str='',logvid=null;
+			for(var i=0;i<arguments.length;i++){
+				var itemtype=get.itemtype(arguments[i]);
+				if(itemtype=='player'||itemtype=='players'){
+					if(lib.config.log_highlight){
+						str+='<span class="bluetext">'+get.translation(arguments[i])+'</span>';
+					}
+					else{
+						str+=get.translation(arguments[i]);
+					}
+				}
+				else if(itemtype=='cards'||itemtype=='card'||(typeof arguments[i]=='object'&&arguments[i]&&arguments[i].name)){
+					if(lib.config.log_highlight){
+						str+='<span class="yellowtext">'+get.translation(arguments[i])+'</span>';
+					}
+					else{
+						str+=get.translation(arguments[i]);
+					}
+				}
+				else if(typeof arguments[i]=='object'){
+					if(arguments[i]){
+						if(arguments[i].parentNode==ui.historybar){
+							logvid=arguments[i].logvid;
+						}
+						else{
+							str+=get.translation(arguments[i]);
+						}
+					}
+				}
+				else if(typeof arguments[i]=='string'){
+					if(lib.config.log_highlight){
+						if(arguments[i][0]=='【'&&arguments[i][arguments[i].length-1]=='】'){
+							str+='<span class="greentext">'+get.translation(arguments[i])+'</span>';
+						}
+						else if(arguments[i][0]=='#'){
+							var color='';
+							switch(arguments[i][1]){
+								case 'b':color='blue';break;
+								case 'y':color='yellow';break;
+								case 'g':color='green';break;
+							}
+							str+='<span class="'+color+'text">'+get.translation(arguments[i].slice(2))+'</span>';
+						}
+						else{
+							str+=get.translation(arguments[i]);
+						}
+					}
+					else{
+						str+=get.translation(arguments[i]);
+					}
+				}
+				else{
+					str+=arguments[i];
+				}
+
+			}
+			var node=ui.create.div();
+			node.innerHTML=str;
+			ui.sidebar.insertBefore(node,ui.sidebar.firstChild);
+			game.addVideo('log',null,str);
 			if(!_status.video&&!game.online){
 				if(!logvid){
 					logvid=_status.event.getLogv();
