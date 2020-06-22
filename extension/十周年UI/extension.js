@@ -174,7 +174,7 @@ content:function(config, pack){
 				}
 
 				return 0;
-			},
+			};
 			
 			get.skillState = function(player){
 				var skills = base.get.skillState.apply(this, arguments);
@@ -2959,8 +2959,8 @@ content:function(config, pack){
                     time += 50;
 				}
             };
-            
-            lib.element.player.$give = function(card, player, log, init) {
+
+            lib.element.player.$givenobroadcast = function(card, player, log, init) {
 				if(game.me!=this&&game.me!=player){
 					if(Array.isArray(card)){
 						card=card.length;
@@ -2981,7 +2981,7 @@ content:function(config, pack){
                         }
                     }
                 }
-                
+
                 if (get.itemtype(card) == 'cards') {
                     if (log != false && !_status.video) {
                         game.lognobroadcast(player, '从', this, '获得了', card);
@@ -3019,6 +3019,71 @@ content:function(config, pack){
                         } else {
                             node = ui.create.div('.card.thrown');
                         }
+
+                        node.fixed = true;
+                        this.$throwordered2(node);
+                        node.moveTo = lib.element.card.moveTo;
+                        node.moveDelete = lib.element.card.moveDelete;
+                        node.moveDelete(player);
+                    }
+                }
+            };
+            
+            lib.element.player.$give = function(card, player, log, init) {
+                if (init !== false) {
+                    game.broadcast(function(source, card, player, init) {
+                        source.$give(card, player, false, init);
+                    },
+                    this, card, player, init);
+                    if (typeof card == 'number' && card >= 0) {
+                        game.addVideo('give', this, [card, player.dataset.position]);
+                    } else {
+                        if (get.itemtype(card) == 'card') {
+                            card = [card];
+                        }
+                        if (get.itemtype(card) == 'cards') {
+                            game.addVideo('giveCard', this, [get.cardsInfo(card), player.dataset.position]);
+                        }
+                    }
+                }
+                
+                if (get.itemtype(card) == 'cards') {
+                    if (log != false && !_status.video) {
+                        game.log(player, '从', this, '获得了', card);
+                    }
+                    if (this.$givemod) {
+                        this.$givemod(card, player);
+                    } else {
+                        for (var i = 0; i < card.length; i++) {
+                            this.$give(card[i], player, false, false);
+                        }
+                    }
+                } else if (typeof card == 'number' && card >= 0) {
+                    if (log != false && !_status.video) {
+                        game.log(player, '从', this, '获得了' + get.cnNumber(card) + '张牌');
+                    }
+                    if (this.$givemod) {
+                        this.$givemod(card, player);
+                    } else {
+                        while (card--) this.$give('', player, false, false);
+                    }
+                } else {
+                    if (log != false && !_status.video) {
+                        if (get.itemtype(card) == 'card' && log != false) {
+                            game.log(player, '从', this, '获得了', card);
+                        } else {
+                            game.log(player, '从', this, '获得了一张牌');
+                        }
+                    }
+                    if (this.$givemod) {
+                        this.$givemod(card, player);
+                    } else {
+                        var node;
+                        if (get.itemtype(card) == 'card') {
+                            node = card.copy('card', 'thrown', false);
+                        } else {
+                            node = ui.create.div('.card.thrown');
+                        }
                         
                         node.fixed = true;
                         this.$throwordered2(node);
@@ -3027,7 +3092,7 @@ content:function(config, pack){
                         node.moveDelete(player);
                     }
                 }
-            },
+            };
             
             lib.element.player.$gain2 = function(cards, log){
                 if (log === true) game.log(this, '获得了', cards);

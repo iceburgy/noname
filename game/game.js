@@ -22031,12 +22031,12 @@
 				$giveAuto:function(card,player){
 					if(Array.isArray(card)&&card.length==0) return;
 					var args=Array.from(arguments);
-					this.$give.apply(this,args);
+					this.$givenobroadcast.apply(this,args);
 					game.broadcast(function(source,args){
-						source.$give.apply(source,args);
+						source.$givenobroadcast.apply(source,args);
 					},this,args);
 				},
-				$give:function(card,player,log,init){
+				$givenobroadcast:function(card,player,log,init){
 					if(game.me!=this&&game.me!=player){
 						if(Array.isArray(card)){
 							card=card.length;
@@ -22089,6 +22089,85 @@
 							}
 							else{
 								game.lognobroadcast(player,'从',this,'获得了一张牌');
+							}
+						}
+						if(this.$givemod){
+							this.$givemod(card,player);
+						}
+						else{
+							var node;
+							if(get.itemtype(card)=='card'){
+								node=card.copy('card','thrown',false);
+							}
+							else{
+								node=ui.create.div('.card.thrown');
+							}
+							node.fixed=true;
+							this.$throwordered(node);
+
+							node.listenTransition(function(){
+								var dx=player.getLeft()+player.offsetWidth/2-52-node.offsetLeft;
+								var dy=player.getTop()+player.offsetHeight/2-52-node.offsetTop;
+								if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
+									node.style.transform+=' translate('+dx+'px,'+dy+'px)';
+								}
+								else{
+									node.style.transform='translate('+dx+'px,'+dy+'px)';
+								}
+
+								node.delete();
+							});
+						}
+					}
+				},
+				$give:function(card,player,log,init){
+					if(init!==false){
+						game.broadcast(function(source,card,player,init){
+							source.$give(card,player,false,init);
+						},this,card,player,init);
+						if(typeof card=='number'&&card>=0){
+							game.addVideo('give',this,[card,player.dataset.position]);
+						}
+						else{
+							if(get.itemtype(card)=='card'){
+								card=[card];
+							}
+							if(get.itemtype(card)=='cards'){
+								game.addVideo('giveCard',this,[get.cardsInfo(card),player.dataset.position]);
+							}
+						}
+					}
+					if(get.itemtype(card)=='cards'){
+						if(log!=false&&!_status.video){
+							game.log(player,'从',this,'获得了',card);
+						}
+						if(this.$givemod){
+							this.$givemod(card,player);
+						}
+						else{
+							for(var i=0;i<card.length;i++){
+								this.$give(card[i],player,false,false);
+							}
+						}
+					}
+					else if(typeof card=='number'&&card>=0){
+						if(log!=false&&!_status.video){
+							game.log(player,'从',this,'获得了'+get.cnNumber(card)+'张牌');
+						}
+						if(this.$givemod){
+							this.$givemod(card,player);
+						}
+						else{
+							while(card--) this.$give('',player,false,false);
+						}
+					}
+					else{
+						if(log!=false&&!_status.video){
+							if(get.itemtype(card)=='card'&&log!=false){
+								game.log(player,'从',this,'获得了',card);
+							}
+							else{
+								game.log(player,'从',this,'获得了一张牌');
 							}
 						}
 						if(this.$givemod){
