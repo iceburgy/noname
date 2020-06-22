@@ -15166,10 +15166,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.index==0){
 						var card=target.getCards('hej').randomGet();
 						player.gain(card,target,'giveAuto','bySelf');
-						target.addTempSkill('tanbei_effect2','phaseAfter');
+						game.broadcastAll(function(target){
+							target.addTempSkill('tanbei_effect2','phaseAfter');
+						},target);
 					}
 					else{
-						target.addTempSkill('tanbei_effect1','phaseAfter');
+						game.broadcastAll(function(target){
+							target.addTempSkill('tanbei_effect1','phaseAfter');
+						},target);
 					}
 				},
 				ai:{
@@ -15202,7 +15206,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
-				direct:true,
 				content:function(){
 					var targets=player.getLastUsed(1).targets;
 					var next=player.chooseToUse();
@@ -17237,10 +17240,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_sidao":"伺盗",
 			xinfu_sidaox:'伺盗',
 			"xinfu_sidao_info":"出牌阶段限一次，当你对一名其他角色连续使用两张牌后，你可以将一张手牌当做【顺手牵羊】对其使用。",
-			"tanbei_effect1":"贪狈",
-			"tanbei_effect1_info":"",
-			"tanbei_effect2":"贪狈",
-			"tanbei_effect2_info":"",
+			"tanbei_effect1":"贪狈2",
+			"tanbei_effect1_info":"此回合内对其使用牌没有次数与距离限制",
+			"tanbei_effect2":"贪狈1",
+			"tanbei_effect2_info":"随机获得其区域内的一张牌，本回合内不能对其使用牌",
 			
 			"xinfu_tunan":"图南",
 			"xinfu_tunan_info":"出牌阶段限一次，你可以展示牌堆顶的一张牌并选择一名其他角色，然后该角色选择一项：使用此牌（无距离限制）；或将此牌当普通【杀】使用。",
