@@ -25592,6 +25592,142 @@
 						},player);
 					}
 				},
+				discardPile:function(){
+					for(var i=0;i<lib.node.clients.length;i++){
+						if(lib.node.clients[i].id==this.id){
+							var sender=lib.node.clients[i];
+							var childNodes=[];
+							for(var nodei=0;nodei<ui.discardPile.childNodes.length;nodei++){
+								childNodes.push(ui.discardPile.childNodes[nodei]);
+							}
+							var args=[];
+							args.push(function(childNodes){
+								ui.system.hide();
+								game.pause2();
+								var node=ui.create.pause().animate('start');
+								ui.sidebar3.innerHTML='';
+								if(lib.config.show_discardpile){
+									for(var i=0;i<childNodes.length;i++){
+										var div=ui.create.div(ui.sidebar3);
+										div.innerHTML=get.translation(childNodes[i]);
+										ui.sidebar3.insertBefore(div,ui.sidebar3.firstChild);
+									}
+								}
+								node.appendChild(ui.sidebar);
+								node.appendChild(ui.sidebar3);
+								ui.historybar.classList.add('paused');
+								ui.arena.classList.add('paused');
+								ui.window.classList.add('touchinfohidden');
+								ui.time.hide();
+								if(game.onpause){
+									game.onpause();
+								}
+							});
+							args.push(childNodes);
+							sender.send.apply(sender,args);
+							break;
+						}
+					}
+				},
+				hoverpoppedcardPileButton:function(){
+					for(var i=0;i<lib.node.clients.length;i++){
+						if(lib.node.clients[i].id==this.id){
+							var sender=lib.node.clients[i];
+							var childNodes=[];
+							for(var nodei=0;nodei<ui.discardPile.childNodes.length;nodei++){
+								childNodes.push(ui.discardPile.childNodes[nodei]);
+							}
+							var args=[];
+							args.push(function(childNodes){
+								var hoverButton=ui.cardPileButton;
+								if(hoverButton._uiintro){
+									return;
+								}
+								if(!hoverButton._poppedfunc){
+									return;
+								}
+								game.tempDiscardPileChildNodes=[];
+								for(var nodej=0;nodej<childNodes.length;nodej++){
+									game.tempDiscardPileChildNodes.push(childNodes[nodej]);
+								}
+
+								ui.click.touchpop(hoverButton.forceclick);
+								var uiintro=hoverButton._poppedfunc();
+								if(!uiintro) return;
+								if(ui.currentpopped&&ui.currentpopped._uiintro){
+									ui.currentpopped._uiintro.delete();
+									delete ui.currentpopped._uiintro;
+								}
+								ui.currentpopped=hoverButton;
+								uiintro.classList.add('popped');
+								uiintro.classList.add('hoverdialog');
+								uiintro.classList.add('static');
+								hoverButton._uiintro=uiintro;
+
+								ui.window.appendChild(uiintro);
+								var width=hoverButton._poppedwidth||330;
+								uiintro.style.width=width+'px';
+								if(get.is.phoneLayout()){
+									width*=1.3;
+								}
+
+								if(uiintro._heightfixed){
+									uiintro.style.height=uiintro.content.scrollHeight+'px';
+								}
+								else{
+									var height=hoverButton._poppedheight||uiintro.content.scrollHeight;
+									var height2=ui.window.offsetHeight-260;
+									if(get.is.phoneLayout()){
+										height2=(ui.window.offsetHeight-80)/1.3;
+									}
+									uiintro.style.height=Math.min(height2,height)+'px';
+								}
+								if(get.is.phoneLayout()){
+									uiintro.style.top='70px';
+								}
+								else{
+									uiintro.style.top='50px';
+								}
+								var left=hoverButton.parentNode.offsetLeft+hoverButton.offsetLeft+hoverButton.offsetWidth/2-width/2;
+								if(left<10){
+									left=10;
+								}
+								else if(left+width>ui.window.offsetWidth-10){
+									left=ui.window.offsetWidth-width-10;
+								}
+								uiintro.style.left=left+'px';
+								uiintro._poppedorigin=hoverButton;
+								if(!lib.config.touchscreen){
+									uiintro.addEventListener('mouseleave',ui.click.leavehoverpopped);
+								}
+								ui.click.shortcut(false);
+								if(uiintro._onopen){
+									uiintro._onopen();
+								}
+								if(hoverButton._paused2&&!lib.config.touchscreen){
+									game.pause2();
+									uiintro.classList.add('static');
+									var layer=ui.create.div('.poplayer',ui.window);
+									var clicklayer=function(e){
+										uiintro.delete();
+										layer.remove();
+										game.resume2();
+										e.stopPropagation();
+										return false;
+									}
+									uiintro.style.zIndex=21;
+									layer.onclick=clicklayer;
+									layer.oncontextmenu=clicklayer;
+									uiintro.addEventListener('mouseleave',clicklayer);
+									uiintro.addEventListener('click',clicklayer);
+								}
+							});
+							args.push(childNodes);
+							sender.send.apply(sender,args);
+							break;
+						}
+					}
+				},
 				moonlight:function(time,isStop){
 					var player=lib.playerOL[this.id];
 					if(player){
@@ -44841,19 +44977,21 @@
 				}
 				uiintro.add('剩余 <span style="font-family:'+'xinwei'+'">'+num);
 
-				if(_status.connectMode) return uiintro;
-				uiintro.add('<div class="text center">轮数 <span style="font-family:xinwei">'+game.roundNumber+'</span>&nbsp;&nbsp;&nbsp;&nbsp;洗牌 <span style="font-family:xinwei">'+game.shuffleNumber+'</div>');
 				uiintro.add('<div class="text center">弃牌堆</div>');
-				if(ui.discardPile.childNodes.length){
+				var discardPileChildNodes;
+				if(game.online) discardPileChildNodes=game.tempDiscardPileChildNodes;
+				else discardPileChildNodes=ui.discardPile.childNodes;
+				if(discardPileChildNodes.length){
 					var list=[];
-					for(var i=0;i<ui.discardPile.childNodes.length;i++){
-						list.unshift(ui.discardPile.childNodes[i]);
+					for(var i=0;i<discardPileChildNodes.length;i++){
+						list.unshift(discardPileChildNodes[i]);
 					}
 					uiintro.addSmall([list,'card']);
 				}
 				else{
 					uiintro.add('<div class="text center" style="padding-bottom:3px">无</div>');
 				}
+				delete game.tempDiscardPileChildNodes;
 				return uiintro;
 			},
 			chat:function(){
@@ -45096,6 +45234,11 @@
 				if(!this._poppedfunc){
 					return;
 				}
+				if(game.online&&this.innerText=='牌堆'){
+					game.send('hoverpoppedcardPileButton');
+					return;
+				}
+
 				ui.click.touchpop(this.forceclick);
 				var uiintro=this._poppedfunc();
 				if(!uiintro) return;
@@ -47341,25 +47484,30 @@
 					if(ui.pause.classList.contains('hidden')) return;
 					if(!_status.gameStarted) return;
 				}
-				ui.system.hide();
-				game.pause2();
-				var node=ui.create.pause().animate('start');
-				ui.sidebar3.innerHTML='';
-				if(lib.config.show_discardpile){
-					for(var i=0;i<ui.discardPile.childNodes.length;i++){
-						var div=ui.create.div(ui.sidebar3);
-						div.innerHTML=get.translation(ui.discardPile.childNodes[i]);
-						ui.sidebar3.insertBefore(div,ui.sidebar3.firstChild);
-					}
+				if(game.online){
+					game.send('discardPile');
 				}
-				node.appendChild(ui.sidebar);
-				node.appendChild(ui.sidebar3);
-				ui.historybar.classList.add('paused');
-				ui.arena.classList.add('paused');
-				ui.window.classList.add('touchinfohidden');
-				ui.time.hide();
-				if(game.onpause){
-					game.onpause();
+				else{
+					ui.system.hide();
+					game.pause2();
+					var node=ui.create.pause().animate('start');
+					ui.sidebar3.innerHTML='';
+					if(lib.config.show_discardpile){
+						for(var i=0;i<ui.discardPile.childNodes.length;i++){
+							var div=ui.create.div(ui.sidebar3);
+							div.innerHTML=get.translation(ui.discardPile.childNodes[i]);
+							ui.sidebar3.insertBefore(div,ui.sidebar3.firstChild);
+						}
+					}
+					node.appendChild(ui.sidebar);
+					node.appendChild(ui.sidebar3);
+					ui.historybar.classList.add('paused');
+					ui.arena.classList.add('paused');
+					ui.window.classList.add('touchinfohidden');
+					ui.time.hide();
+					if(game.onpause){
+						game.onpause();
+					}
 				}
 			},
 			resume:function(e){
