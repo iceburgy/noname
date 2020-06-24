@@ -3734,6 +3734,27 @@
 						},
 						clear:true
 					},
+					import_role_lib_by_key:{
+						name:'导入武将池key',
+						onclick:function(){
+							ui.import_role_lib_by_key_button.classList.toggle('hidden');
+						},
+						clear:true
+					},
+					import_role_lib_by_key_button:{
+						name:'<div style="white-space:nowrap;width:calc(100% - 10px)">'+
+						'<input type="file" style="width:calc(100% - 40px)">'+
+						'<button style="width:40px">确定</button></div>',
+						clear:true,
+					},
+					export_role_lib_key_only:{
+						name:'导出武将池key',
+						onclick:function(){
+							var charactersOLList=get.charactersOL();
+							game.export(JSON.stringify(charactersOLList),'noname-rolelib-keyonly'+(new Date()).toLocaleString()+'-'+charactersOLList.length+'.json');
+						},
+						clear:true
+					},
 					export_role_lib:{
 						name:'导出武将池',
 						onclick:function(){
@@ -36047,6 +36068,48 @@
 														game.putDB('data',i,data.data[i]);
 													}
 												}
+												lib.init.background();
+												game.reload();
+											};
+											fileReader.readAsText(fileToLoad, "UTF-8");
+										}
+									}
+								}
+								else if(j=='import_role_lib_by_key_button'){
+									ui.import_role_lib_by_key_button=cfgnode;
+									cfgnode.hide();
+									cfgnode.querySelector('button').onclick=function(){
+										var fileToLoad=this.previousSibling.files[0];
+										if(fileToLoad){
+											var fileReader = new FileReader();
+											fileReader.onload = function(fileLoadedEvent)
+											{
+												var data = fileLoadedEvent.target.result;
+												if(!data) return;
+												try{
+													data=JSON.parse(data);
+													if(!data||typeof data!='object'){
+														throw('err');
+													}
+												}
+												catch(e){
+													console.log(e);
+													alert('导入失败');
+													return;
+												}
+												var delta=[];
+												for(var craw in lib.character){
+													if(!data.contains(craw)&&!lib.configOL.banned.contains(craw)){
+														delta.push(craw);
+														lib.configOL.banned.push(craw);
+													}
+												}
+												if(delta.length){
+													var deltaObj=game.buildRoleLibFromCharacters(delta);
+													game.export(JSON.stringify(deltaObj),'noname-rolelib-delta-'+(new Date()).toLocaleString()+'-'+delta.length+'.json');
+												}
+												game.saveConfig('connect_identity_banned',lib.configOL.banned);
+												alert('导入成功');
 												lib.init.background();
 												game.reload();
 											};
