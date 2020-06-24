@@ -13409,9 +13409,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					target.recover();
 					"step 1"
-					if(target==player){
+					if(target==targets[targets.length-1]){
 						for(var i=0;i<cards.length;i++){
-							if(get.color(cards[i],cards[i].original=='h'?player:false)=='black'){
+							if(get.color(cards[i],player)=='black'){
 								player.loseHp();
 								break;
 							}
