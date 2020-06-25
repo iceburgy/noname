@@ -36109,6 +36109,19 @@
 													game.export(JSON.stringify(deltaObj),'noname-rolelib-delta-'+(new Date()).toLocaleString()+'-'+delta.length+'.json');
 												}
 												game.saveConfig('connect_identity_banned',lib.configOL.banned);
+
+												// check missing roles
+												var missing=[];
+												var charactersOLList=get.charactersOL();
+												for(var prev of data){
+													if(!charactersOLList.contains(prev)){
+														missing.push(prev);
+													}
+												}
+												if(missing.length){
+													game.export(JSON.stringify(missing),'noname-rolelib-missing-'+(new Date()).toLocaleString()+'-'+missing.length+'.json');
+												}
+
 												alert('导入成功');
 												lib.init.background();
 												game.reload();
