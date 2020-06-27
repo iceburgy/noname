@@ -86,7 +86,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			xinxianying:['female','wei',3,['xinzhongjian','xincaishi']],
 			wuxian:['female','shu',3,['fumian','daiyan']],
-			xushi:['female','wu',3,['wengua','fuzhu']],
+			xushi:['female','wu',3,['wengua','wengua2','fuzhu']],
 			caojie:['female','qun',3,['shouxi','huimin']],
 
 			caiyong:['male','qun',3,['bizhuan','tongbo']],
@@ -2886,8 +2886,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				filter:function(event,player){
 					if(player.hasSkill('wengua3')) return false;
+					if(game.hasCharacter(player,'xushi')) return true;
 					return player.countCards('he')&&game.hasPlayer(function(current){
-						return current.hasSkill('wengua');
+						return game.isCharacterSeen(current,'xushi');
 					});
 				},
 				direct:true,
