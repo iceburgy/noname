@@ -7238,11 +7238,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.remove(players[i].name1);
 						list.remove(players[i].name2);
 					}
-					// var dialog=ui.create.dialog();
-					// dialog.add([list.randomGets(5),'character']);
+					// apply cungui jinjiangbiao
+					var charpool=list.randomGets(5);
+					if(_status.connectMode){
+						var zhaoxiangindex=game.getCharacterIndex(player,'zhaoxiang');
+						var othercharname=(zhaoxiangindex==0?player.name2:player.name1);
+						charpool=game.getNextValidCharacters(othercharname,5,list);
+					}
+
 					player.chooseButton(true).set('ai',function(button){
 						return get.rank(button.link,true)-lib.character[button.link][2];
-					}).set('createDialog',['将武将牌替换为一名角色',[list.randomGets(5),'character']]);
+					}).set('createDialog',['将武将牌替换为一名角色',[charpool,'character']]);
 					player.awakenSkill('fuhan');
 					'step 1'
 					event.num=Math.min(event.num,8);
