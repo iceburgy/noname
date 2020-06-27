@@ -11560,6 +11560,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			canshi2:{
+				unique:true,
+				charlotte:true,
+				intro:{
+					content:function(storage){
+						return '当你于此回合内使用基本牌或锦囊牌时，你弃置一张牌';
+					}
+				},
+				mark:true,
+				onremove:true,
 				trigger:{player:'useCard'},
 				forced:true,
 				filter:function(event,player){
