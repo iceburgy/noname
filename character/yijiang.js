@@ -4593,8 +4593,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						target.addSkill('duliang2');
-						target.updateMarks('duliang2');
 						target.storage.duliang2++;
+						target.updateMarks('duliang2');
 						event.finish();
 					}
 					'step 3'
