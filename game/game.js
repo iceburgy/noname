@@ -25479,15 +25479,17 @@
 									var IPComps=pOLIP.split('.');
 									var msg1='欢迎玩家【'+pOLNickname+'】用小号【'+this.nickname+'】双开旁观，IP尾数为：【*.*.'+IPComps[2]+'.'+IPComps[3]+'】';
 									console.log(msg1);
-									console.log(pOLIP);
 									isDup=true;
 									break;
 								}
 							}
+							game.savePlayerInfo(obIP,this.nickname);
 							var msg='欢迎玩家【'+this.nickname+'】加入旁观';
 							if(isDup) msg+='！！';
 							game.log(msg);
-							console.log(msg);
+							console.log('observer joined room');
+							console.log(obIP);
+							console.log(game.getPlayerInfo(obIP));
 							game.broadcastAll(function(msg){
 								alert(msg);
 							},msg);
@@ -25517,6 +25519,13 @@
 							this.avatar=config.avatar;
 							this.nickname=config.nickname;
 						}
+
+						var playerIP=this.ws._socket.remoteAddress;
+						game.savePlayerInfo(playerIP,this.nickname);
+						console.log('player joined room');
+						console.log(playerIP);
+						console.log(game.getPlayerInfo(playerIP));
+
 						for(var i=0;i<game.connectPlayers.length;i++){
 							if(game.connectPlayers[i].classList.contains('unselectable2')) continue;
 							if(game.connectPlayers[i]!=game.me&&!game.connectPlayers[i].playerid){
@@ -26717,6 +26726,120 @@
 				}
 			}
 			return false;
+		},
+		savePlayerInfo:function(playerIP,playerNickname){
+			if(playerNickname){
+				var needSave=false;
+				var playerInfoRootKey='players_info';
+				var playerInfoRoot=lib.config[playerInfoRootKey];
+				if(!playerInfoRoot){
+					playerInfoRoot={};
+					needSave=true;
+				}
+				if(!playerInfoRoot[playerIP]){
+					playerInfoRoot[playerIP]=[];
+					needSave=true;
+				}
+				if(!playerInfoRoot[playerIP].includes(playerNickname)){
+					playerInfoRoot[playerIP].push(playerNickname);
+					needSave=true;
+				}
+				if(needSave){
+					game.saveConfig(playerInfoRootKey,playerInfoRoot);
+				}
+			}
+		},
+		getPlayerInfo:function(playerIP){
+			var playerInfoRootKey='players_info';
+			var playerInfoRoot=lib.config[playerInfoRootKey];
+			if(playerInfoRoot&&playerInfoRoot[playerIP]){
+				return JSON.stringify(playerInfoRoot[playerIP]);
+			}
+			return 'NA';
+		},
+		getAllPlayerInfo:function(){
+			var playerInfoRootKey='players_info';
+			var playerInfoRoot=lib.config[playerInfoRootKey];
+			if(playerInfoRoot){
+				return JSON.stringify(playerInfoRoot);
+			}
+			return 'NA';
+		},
+		syncPlayerInfo:function(){
+			var playerInfoRootKey='players_info';
+			var playerInfoRoot=lib.config[playerInfoRootKey];
+			if(!playerInfoRoot){
+				playerInfoRoot={};
+			}
+
+			var httpReq = new XMLHttpRequest();
+			var url='https://api.dropboxapi.com/2/paper/docs/download';
+			httpReq.open("GET",url,false);
+			httpReq.setRequestHeader('Authorization','Bearer wzahoqHWjoQAAAAAAAAAFV2iwzrw_BFSgaena__5iraqztOyTepnnUc5J1S-73FM');
+			httpReq.setRequestHeader('Dropbox-API-Arg',"{\"doc_id\": \"p2Ef8iI3uhoqDz6FTkXe3\",\"export_format\": \"markdown\"}");
+			httpReq.send();
+			var revision=JSON.parse(httpReq.getResponseHeader("Dropbox-Api-Result")).revision;
+
+			var playerInfoRaw=httpReq.responseText.split('\n');
+			playerInfoRaw.splice(0, 1);
+			playerInfoRaw=playerInfoRaw.join('\n');
+			var playerInfoRemote={};
+			if(playerInfoRaw&&(playerInfoRaw.trim()).length>0){
+				playerInfoRemote=JSON.parse(lib.init.decode(playerInfoRaw));
+			}
+
+			// merge remote values to local
+			console.log('checking download...');
+			for(var remoteKey in playerInfoRemote){
+				if(!(remoteKey in playerInfoRoot)){
+					playerInfoRoot[remoteKey]=[];
+					console.log('downloaded remote key: '+remoteKey);
+				}
+				var remoteVal=playerInfoRemote[remoteKey];
+				for(var rv of remoteVal){
+					if(!playerInfoRoot[remoteKey].includes(rv)){
+						playerInfoRoot[remoteKey].push(rv);
+						console.log('downloaded remote val: '+rv+' of key: '+remoteKey);
+					}
+				}
+			}
+			game.saveConfig(playerInfoRootKey,playerInfoRoot);
+
+			// check if need to upload
+			var needUpload=false;
+			console.log('checking upload...');
+			for(var localKey in playerInfoRoot){
+				if(!(localKey in playerInfoRemote)){
+					console.log('found to-be-uploaded key: '+localKey);
+					needUpload=true;
+				}
+				var localVal=playerInfoRoot[localKey];
+				var remoteVal=playerInfoRemote[localKey];
+				if(!remoteVal) remoteVal=[];
+				for(var lv of localVal){
+					if(!remoteVal.includes(lv)){
+						console.log('found to-be-uploaded val: '+lv+' of key: '+localKey);
+						needUpload=true;
+					}
+				}
+			}
+
+			if(needUpload){
+				console.log('Upload needed...');
+				var httpReqUpdate=new XMLHttpRequest();
+				var urlUpdate='https://api.dropboxapi.com/2/paper/docs/update';
+				httpReqUpdate.open("POST",urlUpdate,false);
+				httpReqUpdate.setRequestHeader("Authorization","Bearer wzahoqHWjoQAAAAAAAAAFV2iwzrw_BFSgaena__5iraqztOyTepnnUc5J1S-73FM");
+				httpReqUpdate.setRequestHeader("Content-Type","application/octet-stream");
+				httpReqUpdate.setRequestHeader("Dropbox-API-Arg","{\"doc_id\": \"p2Ef8iI3uhoqDz6FTkXe3\",\"doc_update_policy\": \"overwrite_all\",\"revision\":"+revision+",\"import_format\": \"markdown\"}");
+
+				var title='playerInfo';
+				//var content=lib.init.encode(JSON.stringify(playerInfoRoot));
+				var content=lib.init.encode(JSON.stringify(playerInfoRoot));
+				httpReqUpdate.send(title+"\n"+content);
+				console.log(httpReqUpdate.status);
+				console.log('Uploaded game config');
+			}
 		},
 		getGlobalHistory:function(key,filter){
 			if(!key) return _status.globalHistory[_status.globalHistory.length-1];
