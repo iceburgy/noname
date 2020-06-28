@@ -25468,6 +25468,37 @@
 					else if(!_status.waitingForPlayer){
 						if(game.phaseNumber&&lib.configOL.observe){
 							this.nickname=config.nickname?config.nickname:'unknown';
+
+							//check cheaters
+							var isCheater=false;
+							var obIP=this.ws._socket.remoteAddress;
+							for(var pOLID in lib.playerOL){
+								if(!lib.playerOL[pOLID].ws||!lib.playerOL[pOLID].ws.ws._socket) continue;
+								var pOLIP=lib.playerOL[pOLID].ws.ws._socket.remoteAddress;
+								if(obIP==pOLIP){
+									// cheater found!
+									var pOLNickname=lib.playerOL[pOLID].nickname
+									var IPComps=pOLIP.split('.');
+									var msg='欢迎玩家【'+pOLNickname+'】用小号【'+this.nickname+'】双开旁观，IP尾数为：【*.*.'+IPComps[2]+'.'+IPComps[3]+'】';
+									game.log(msg);
+									console.log(msg);
+									console.log(pOLIP);
+									game.broadcastAll(function(msg){
+										alert(msg);
+									},msg);
+									isCheater=true;
+									break;
+								}
+							}
+							if(!isCheater){
+								var msg='欢迎玩家【'+this.nickname+'】加入旁观';
+								game.log(msg);
+								console.log(msg);
+								game.broadcastAll(function(msg){
+									alert(msg);
+								},msg);
+							}
+
 							lib.node.observing.push(this);
 							this.send('reinit',lib.configOL,get.arenaState(),game.getState?game.getState():{},game.ip,game.players[0].playerid);
 							if(!ui.showObserveButton){
