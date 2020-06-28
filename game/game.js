@@ -26753,7 +26753,7 @@
 			var playerInfoRootKey='players_info';
 			var playerInfoRoot=lib.config[playerInfoRootKey];
 			if(playerInfoRoot&&playerInfoRoot[playerIP]){
-				return JSON.stringify(playerInfoRoot[playerIP]);
+				return '\n'+JSON.stringify(playerInfoRoot[playerIP],null,4)+'\n';
 			}
 			return 'NA';
 		},
@@ -26761,7 +26761,7 @@
 			var playerInfoRootKey='players_info';
 			var playerInfoRoot=lib.config[playerInfoRootKey];
 			if(playerInfoRoot){
-				return JSON.stringify(playerInfoRoot);
+				return '\n'+JSON.stringify(playerInfoRoot,null,4)+'\n';
 			}
 			return 'NA';
 		},
