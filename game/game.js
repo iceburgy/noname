@@ -25470,6 +25470,7 @@
 							this.nickname=config.nickname?config.nickname:'unknown';
 
 							var obIP=this.ws._socket.remoteAddress;
+							var isDup=false;
 							for(var pOLID in lib.playerOL){
 								if(!lib.playerOL[pOLID].ws||!lib.playerOL[pOLID].ws.ws._socket) continue;
 								var pOLIP=lib.playerOL[pOLID].ws.ws._socket.remoteAddress;
@@ -25479,10 +25480,12 @@
 									var msg1='欢迎玩家【'+pOLNickname+'】用小号【'+this.nickname+'】双开旁观，IP尾数为：【*.*.'+IPComps[2]+'.'+IPComps[3]+'】';
 									console.log(msg1);
 									console.log(pOLIP);
+									isDup=true;
 									break;
 								}
 							}
 							var msg='欢迎玩家【'+this.nickname+'】加入旁观';
+							if(isDup) msg+='！！';
 							game.log(msg);
 							console.log(msg);
 							game.broadcastAll(function(msg){
