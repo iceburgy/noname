@@ -1,11 +1,12 @@
 window.noname_update={
-	version:'2020.06.26.1',
+	version:'2020.06.27',
 	update:'2020.06.13.1',
 	changeLog:[
-		'修复：获得牌不显示牌的信息',
-		'修复：牌堆和游戏记录不显示弃牌堆',
-		'修复：司马朗黑牌对其他人去疾不掉血',
-		'修复：郭汜发动伺盗不亮将，发动贪狈技能效果不显示',
+		'当有旁观者加入时所有人可以收到提示',
+		'修复：徐氏暗将自己回合不能问卦',
+		'修复：赵襄换将不受禁将表限制',
+		'修复：选将时托管，回来后不触发计时器',
+		'增加：孙皓发动残蚀的标记',
 		'更多更新历史信息请查看：https://bit.ly/wumingsha',
 	],
 	files:[
@@ -18,6 +19,7 @@ window.noname_update={
 		'character/shenhua.js',
 		'character/sp.js',
 		'character/standard.js',
+		'character/xinghuoliaoyuan.js',
 		'character/yijiang.js',
 		'game/config.js',
 		'game/game.js',

@@ -2087,14 +2087,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.init(result.links[0],false);
 							player.chosenChar1=result.links[0];
 						}
-					}).set('switchToAuto',function(){
-						_status.event.result='ai';
-					}).set('processAI',function(){
-						var buttons=_status.event.dialog.buttons;
-						return {
-							bool:true,
-							links:[buttons[Math.floor(Math.random()*buttons.length)].link],
-						}
 					});
 					"step 1"
 					for(var i in result){
@@ -2122,14 +2114,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.me.chooseButtonOL(list,function(player,result){
 						if(game.online||player==game.me) {
 							player.init(player.chosenChar1,result.links[0],false);
-						}
-					}).set('switchToAuto',function(){
-						_status.event.result='ai';
-					}).set('processAI',function(){
-						var buttons=_status.event.dialog.buttons;
-						return {
-							bool:true,
-							links:[buttons[Math.floor(Math.random()*buttons.length)].link],
 						}
 					});
 					"step 2"
@@ -2198,9 +2182,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.players[i].showTimer(parseInt(choose_shen_time)*1000);
 						}
 						game.me._hide_all_timer=true;
-						game.zhu.chooseButton(['请选择神武将的势力',[list,'vcard']],true).set('ai',function(){
-							return Math.random();
-						});
+						game.zhu.chooseButton(['请选择神武将的势力',[list,'vcard']],true);
 					}
 					"step 4"
 					if(event.zhuHasShen&&!game.zhu.groupshen){
@@ -2319,14 +2301,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.init(result.links[0],false);
 							player.chosenChar1=result.links[0];
 						}
-					}).set('switchToAuto',function(){
-						_status.event.result='ai';
-					}).set('processAI',function(){
-						var buttons=_status.event.dialog.buttons;
-						return {
-							bool:true,
-							links:[buttons[Math.floor(Math.random()*buttons.length)].link],
-						}
 					});
 					"step 7"
 					for(var i in result){
@@ -2399,14 +2373,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(game.online||player==game.me) {
 							player.init(player.chosenChar1,result.links[0],false);
 						}
-					}).set('switchToAuto',function(){
-						_status.event.result='ai';
-					}).set('processAI',function(){
-						var buttons=_status.event.dialog.buttons;
-						return {
-							bool:true,
-							links:[buttons[Math.floor(Math.random()*buttons.length)].link],
-						}
 					});
 					"step 8"
 					for(var i in result){
@@ -2473,14 +2439,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.me.chooseButtonOL(shen,function(player,result){
 							if(player==game.me) {
 								player.groupshen=result.links[0][2].slice(6);
-							}
-						}).set('switchToAuto',function(){
-							_status.event.result='ai';
-						}).set('processAI',function(){
-							var buttons=_status.event.dialog.buttons;
-							return {
-								bool:true,
-								links:[buttons[Math.floor(Math.random()*buttons.length)].link],
 							}
 						});
 					}
