@@ -25464,29 +25464,31 @@
 						if(game.phaseNumber&&lib.configOL.observe){
 							this.nickname=config.nickname?config.nickname:'unknown';
 
-							var obIP=this.ws._socket.remoteAddress;
-							var isDup=false;
-							for(var pOLID in lib.playerOL){
-								if(!lib.playerOL[pOLID].ws||!lib.playerOL[pOLID].ws.ws._socket) continue;
-								var pOLIP=lib.playerOL[pOLID].ws.ws._socket.remoteAddress;
-								if(obIP==pOLIP){
-									var pOLNickname=lib.playerOL[pOLID].nickname
-									var IPComps=pOLIP.split('.');
-									var msg1='【'+pOLNickname+'】用小号【'+this.nickname+'】双开旁观，IP尾数为：【*.*.'+IPComps[2]+'.'+IPComps[3]+'】';
-									console.log(msg1);
-									isDup=true;
-									break;
+							if(this.ws._socket&&this.ws._socket.remoteAddress){
+								var obIP=this.ws._socket.remoteAddress;
+								var isDup=false;
+								for(var pOLID in lib.playerOL){
+									if(!lib.playerOL[pOLID].ws||!lib.playerOL[pOLID].ws.ws._socket) continue;
+									var pOLIP=lib.playerOL[pOLID].ws.ws._socket.remoteAddress;
+									if(obIP==pOLIP){
+										var pOLNickname=lib.playerOL[pOLID].nickname
+										var IPComps=pOLIP.split('.');
+										var msg1='【'+pOLNickname+'】用小号【'+this.nickname+'】双开旁观，IP尾数为：【*.*.'+IPComps[2]+'.'+IPComps[3]+'】';
+										console.log(msg1);
+										isDup=true;
+										break;
+									}
 								}
-							}
-							game.savePlayerInfo(obIP,this.nickname);
-							var msgconsole='【'+this.nickname+'】【'+obIP+'】加入旁观';
-							console.log(msgconsole);
-							console.log(game.getPlayerInfo(obIP));
+								game.savePlayerInfo(obIP,this.nickname);
+								var msgconsole='【'+this.nickname+'】【'+obIP+'】加入旁观';
+								console.log(msgconsole);
+								console.log(game.getPlayerInfo(obIP));
 
-							var msg='【'+this.nickname+'】加入旁观';
-							game.log(msg);
-							if(isDup&&lib.config.alertDup) {
-								alert(msg);
+								var msg='【'+this.nickname+'】加入旁观';
+								game.log(msg);
+								if(isDup&&lib.config.alertDup) {
+									alert(msg);
+								}
 							}
 
 							lib.node.observing.push(this);
@@ -25524,10 +25526,12 @@
 							this.nickname=config.nickname;
 						}
 
-						var playerIP=this.ws._socket.remoteAddress;
-						game.savePlayerInfo(playerIP,this.nickname);
-						console.log('【'+this.nickname+'】【'+playerIP+'】加入房间');
-						console.log(game.getPlayerInfo(playerIP));
+						if(this.ws._socket&&this.ws._socket.remoteAddress){
+							var playerIP=this.ws._socket.remoteAddress;
+							game.savePlayerInfo(playerIP,this.nickname);
+							console.log('【'+this.nickname+'】【'+playerIP+'】加入房间');
+							console.log(game.getPlayerInfo(playerIP));
+						}
 
 						for(var i=0;i<game.connectPlayers.length;i++){
 							if(game.connectPlayers[i].classList.contains('unselectable2')) continue;
