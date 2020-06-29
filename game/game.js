@@ -25490,7 +25490,7 @@
 
 							var msg='【'+this.nickname+'】加入旁观';
 							game.log(msg);
-							if(isDup&&game.alertDup) {
+							if(isDup&&lib.config.alertDup) {
 								alert(msg);
 							}
 
@@ -26734,6 +26734,10 @@
 				}
 			}
 			return false;
+		},
+		updateAlertDup:function(val){
+			game.saveConfig('alertDup',val);
+			return lib.config.alertDup;
 		},
 		savePlayerInfo:function(playerIP,playerNickname){
 			if(playerNickname){
