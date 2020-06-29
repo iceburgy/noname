@@ -25477,14 +25477,14 @@
 								if(obIP==pOLIP){
 									var pOLNickname=lib.playerOL[pOLID].nickname
 									var IPComps=pOLIP.split('.');
-									var msg1='欢迎玩家【'+pOLNickname+'】用小号【'+this.nickname+'】双开旁观，IP尾数为：【*.*.'+IPComps[2]+'.'+IPComps[3]+'】';
+									var msg1='【'+pOLNickname+'】用小号【'+this.nickname+'】双开旁观，IP尾数为：【*.*.'+IPComps[2]+'.'+IPComps[3]+'】';
 									console.log(msg1);
 									isDup=true;
 									break;
 								}
 							}
 							game.savePlayerInfo(obIP,this.nickname);
-							var msg='欢迎玩家【'+this.nickname+'】加入旁观';
+							var msg='【'+this.nickname+'】【'+obIP+'】加入旁观';
 							if(isDup) {
 								msg+='！！';
 								game.broadcastAll(function(msg){
@@ -25492,8 +25492,7 @@
 								},msg);
 							}
 							game.log(msg);
-							console.log('observer joined room');
-							console.log(obIP);
+							console.log(msg);
 							console.log(game.getPlayerInfo(obIP));
 
 							lib.node.observing.push(this);
@@ -25533,8 +25532,7 @@
 
 						var playerIP=this.ws._socket.remoteAddress;
 						game.savePlayerInfo(playerIP,this.nickname);
-						console.log('player joined room');
-						console.log(playerIP);
+						console.log('【'+this.nickname+'】【'+playerIP+'】加入房间');
 						console.log(game.getPlayerInfo(playerIP));
 
 						for(var i=0;i<game.connectPlayers.length;i++){
@@ -26764,7 +26762,7 @@
 			var playerInfoRootKey='players_info';
 			var playerInfoRoot=lib.config[playerInfoRootKey];
 			if(playerInfoRoot&&playerInfoRoot[playerIP]){
-				return '\n'+JSON.stringify(playerInfoRoot[playerIP],null,4)+'\n';
+				return JSON.stringify(playerInfoRoot[playerIP],null,4);
 			}
 			return 'NA';
 		},
@@ -26772,7 +26770,7 @@
 			var playerInfoRootKey='players_info';
 			var playerInfoRoot=lib.config[playerInfoRootKey];
 			if(playerInfoRoot){
-				return '\n'+JSON.stringify(playerInfoRoot,null,4)+'\n';
+				return JSON.stringify(playerInfoRoot,null,4);
 			}
 			return 'NA';
 		},
