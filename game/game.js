@@ -25485,14 +25485,16 @@
 							}
 							game.savePlayerInfo(obIP,this.nickname);
 							var msg='欢迎玩家【'+this.nickname+'】加入旁观';
-							if(isDup) msg+='！！';
+							if(isDup) {
+								msg+='！！';
+								game.broadcastAll(function(msg){
+									alert(msg);
+								},msg);
+							}
 							game.log(msg);
 							console.log('observer joined room');
 							console.log(obIP);
 							console.log(game.getPlayerInfo(obIP));
-							game.broadcastAll(function(msg){
-								alert(msg);
-							},msg);
 
 							lib.node.observing.push(this);
 							this.send('reinit',lib.configOL,get.arenaState(),game.getState?game.getState():{},game.ip,game.players[0].playerid);
@@ -25500,6 +25502,15 @@
 								game.broadcastAll(function(){
 									ui.showObserveButton=ui.create.system('显示旁观',function(){},true);
 									lib.setPopped(ui.showObserveButton,ui.click.showObserve,220);
+									ui.click.hoverpopped.call(ui.showObserveButton);
+								});
+							}else{
+								game.broadcastAll(function(){
+									if(ui.showObserveButton._uiintro){
+										ui.showObserveButton._uiintro.close();
+										delete ui.showObserveButton._uiintro;
+									}
+									ui.click.hoverpopped.call(ui.showObserveButton);
 								});
 							}
 						}
