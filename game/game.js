@@ -25490,7 +25490,7 @@
 
 							var msg='【'+this.nickname+'】加入旁观';
 							game.log(msg);
-							if(isDup) {
+							if(isDup&&game.alertDup) {
 								alert(msg);
 							}
 
