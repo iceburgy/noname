@@ -25484,16 +25484,15 @@
 								}
 							}
 							game.savePlayerInfo(obIP,this.nickname);
-							var msg='【'+this.nickname+'】【'+obIP+'】加入旁观';
-							if(isDup) {
-								msg+='！！';
-								game.broadcastAll(function(msg){
-									alert(msg);
-								},msg);
-							}
-							game.log(msg);
-							console.log(msg);
+							var msgconsole='【'+this.nickname+'】【'+obIP+'】加入旁观';
+							console.log(msgconsole);
 							console.log(game.getPlayerInfo(obIP));
+
+							var msg='【'+this.nickname+'】加入旁观';
+							game.log(msg);
+							if(isDup) {
+								alert(msg);
+							}
 
 							lib.node.observing.push(this);
 							this.send('reinit',lib.configOL,get.arenaState(),game.getState?game.getState():{},game.ip,game.players[0].playerid);
