@@ -3406,11 +3406,6 @@
 						init:true,
 						unfrequent:true,
 					},
-					show_discardpile:{
-						name:'暂停时显示弃牌堆',
-						init:false,
-						unfrequent:true,
-					},
 					show_extensionmaker:{
 						name:'显示制作扩展',
 						init:true,
@@ -25664,12 +25659,10 @@
 								game.pause2();
 								var node=ui.create.pause().animate('start');
 								ui.sidebar3.innerHTML='';
-								if(lib.config.show_discardpile){
-									for(var i=0;i<childNodes.length;i++){
-										var div=ui.create.div(ui.sidebar3);
-										div.innerHTML=get.translation(childNodes[i]);
-										ui.sidebar3.insertBefore(div,ui.sidebar3.firstChild);
-									}
+								for(var i=0;i<childNodes.length;i++){
+									var div=ui.create.div(ui.sidebar3);
+									div.innerHTML=get.translation(childNodes[i]);
+									ui.sidebar3.insertBefore(div,ui.sidebar3.firstChild);
 								}
 								node.appendChild(ui.sidebar);
 								node.appendChild(ui.sidebar3);
@@ -47845,12 +47838,10 @@
 					game.pause2();
 					var node=ui.create.pause().animate('start');
 					ui.sidebar3.innerHTML='';
-					if(lib.config.show_discardpile){
-						for(var i=0;i<ui.discardPile.childNodes.length;i++){
-							var div=ui.create.div(ui.sidebar3);
-							div.innerHTML=get.translation(ui.discardPile.childNodes[i]);
-							ui.sidebar3.insertBefore(div,ui.sidebar3.firstChild);
-						}
+					for(var i=0;i<ui.discardPile.childNodes.length;i++){
+						var div=ui.create.div(ui.sidebar3);
+						div.innerHTML=get.translation(ui.discardPile.childNodes[i]);
+						ui.sidebar3.insertBefore(div,ui.sidebar3.firstChild);
 					}
 					node.appendChild(ui.sidebar);
 					node.appendChild(ui.sidebar3);
