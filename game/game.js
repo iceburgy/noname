@@ -26774,7 +26774,11 @@
 			}
 			return 'NA';
 		},
-		syncPlayerInfo:function(){
+		syncPlayerInfo:function(passphrase){
+			if(!passphrase||passphrase.length<8){
+				throw ('bad passphrase');
+			}
+
 			var playerInfoRootKey='players_info';
 			var playerInfoRoot=lib.config[playerInfoRootKey];
 			if(!playerInfoRoot){
@@ -26794,7 +26798,8 @@
 			playerInfoRaw=playerInfoRaw.join('\n');
 			var playerInfoRemote={};
 			if(playerInfoRaw&&(playerInfoRaw.trim()).length>0){
-				playerInfoRemote=JSON.parse(lib.init.decode(playerInfoRaw));
+				var plaintext=game.aesDecrypt(playerInfoRaw,passphrase);
+				playerInfoRemote=JSON.parse(plaintext);
 			}
 
 			// merge remote values to local
@@ -26843,12 +26848,26 @@
 				httpReqUpdate.setRequestHeader("Dropbox-API-Arg","{\"doc_id\": \"p2Ef8iI3uhoqDz6FTkXe3\",\"doc_update_policy\": \"overwrite_all\",\"revision\":"+revision+",\"import_format\": \"markdown\"}");
 
 				var title='playerInfo';
-				//var content=lib.init.encode(JSON.stringify(playerInfoRoot));
-				var content=lib.init.encode(JSON.stringify(playerInfoRoot));
+				var content=game.aesEncrypt(JSON.stringify(playerInfoRoot),passphrase);
+
 				httpReqUpdate.send(title+"\n"+content);
 				console.log(httpReqUpdate.status);
 				console.log('Uploaded game config');
 			}
+		},
+		aesEncrypt:function(plaintext,passphrase){
+			var crypto = require('crypto');
+			var mykey = crypto.createCipher('aes-128-cbc', passphrase);
+			var content = mykey.update(plaintext, 'utf8', 'hex')
+			content += mykey.final('hex');
+			return content;
+		},
+		aesDecrypt:function(cipher,passphrase){
+			var crypto = require('crypto');
+			var mykey = crypto.createDecipher('aes-128-cbc', passphrase);
+			var plaintext = mykey.update(cipher, 'hex', 'utf8')
+			plaintext += mykey.final('utf8');
+			return plaintext;
 		},
 		getGlobalHistory:function(key,filter){
 			if(!key) return _status.globalHistory[_status.globalHistory.length-1];
