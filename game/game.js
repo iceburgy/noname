@@ -25481,6 +25481,7 @@
 								}
 								game.savePlayerInfo(obIP,this.nickname);
 								var msgconsole='【'+this.nickname+'】【'+obIP+'】加入旁观';
+								console.log(new Date());
 								console.log(msgconsole);
 								console.log(game.getPlayerInfo(obIP));
 
@@ -25529,6 +25530,7 @@
 						if(this.ws._socket&&this.ws._socket.remoteAddress){
 							var playerIP=this.ws._socket.remoteAddress;
 							game.savePlayerInfo(playerIP,this.nickname);
+							console.log(new Date());
 							console.log('【'+this.nickname+'】【'+playerIP+'】加入房间');
 							console.log(game.getPlayerInfo(playerIP));
 						}
@@ -26832,7 +26834,7 @@
 				if(!remoteVal) remoteVal=[];
 				for(var lv of localVal){
 					if(!remoteVal.includes(lv)){
-						console.log('found to-be-uploaded val: '+lv+' of key: '+localKey);
+						console.log('found to-be-uploaded key: '+localKey+' with val: '+lv);
 						needUpload=true;
 					}
 				}
@@ -26852,7 +26854,7 @@
 
 				httpReqUpdate.send(title+"\n"+content);
 				console.log(httpReqUpdate.status);
-				console.log('Uploaded game config');
+				console.log('Uploaded successfully');
 			}
 		},
 		aesEncrypt:function(plaintext,passphrase){
