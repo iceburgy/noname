@@ -2115,6 +2115,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==game.zhu){
+							game.players[i].trySkillAnimate('换将卡','换将卡',false);
 							var choiceZhu=2;
 							var str='换将卡：X换'+choiceZhu;
 							if(game.players[i].special_identity){
@@ -2180,6 +2181,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==game.zhu){
+							game.players[i].trySkillAnimate('换将卡','换将卡',false);
 							var choiceZhu=2;
 							var str='换将卡：X换'+choiceZhu;
 							if(game.players[i].special_identity){
@@ -2413,6 +2415,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
 						if(event.chosenChars[distanceFromZhu].length==0){
+							game.players[i].trySkillAnimate('换将卡','换将卡',false);
 							var totalChoice=1;
 							if(game.players[i].identity=='nei'){
 								totalChoice=2;
@@ -2539,6 +2542,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
 						if(event.chosenChars[distanceFromZhu].length==1){
+							game.players[i].trySkillAnimate('换将卡','换将卡',false);
 							var totalChoice=1;
 							if(game.players[i].identity=='nei'){
 								totalChoice=2;
