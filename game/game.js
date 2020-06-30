@@ -27308,6 +27308,16 @@
 						num=lib.configOL.choose_timeout_shen_group;
 					}
 					break;
+				case '换将卡：X换1':
+					if(lib.configOL.choose_timeout_change_char_1){
+						num=lib.configOL.choose_timeout_change_char_1;
+					}
+					break;
+				case '换将卡：X换2':
+					if(lib.configOL.choose_timeout_change_char_2){
+						num=lib.configOL.choose_timeout_change_char_2;
+					}
+					break;
 				default:
 					break;
 			}
@@ -35689,6 +35699,30 @@
 										'10':'10秒',
 										'15':'15秒',
 										'20':'20秒',
+									},
+									connect:true,
+									frequent:true
+								};
+								infoconfig.connect_choose_timeout_change_char_1={
+									name:'换将卡X换1时限',
+									init:'10',
+									item:{
+										'10':'10秒',
+										'20':'20秒',
+										'30':'30秒',
+										'40':'40秒',
+									},
+									connect:true,
+									frequent:true
+								};
+								infoconfig.connect_choose_timeout_change_char_2={
+									name:'换将卡X换2时限',
+									init:'20',
+									item:{
+										'10':'10秒',
+										'20':'20秒',
+										'30':'30秒',
+										'40':'40秒',
 									},
 									connect:true,
 									frequent:true

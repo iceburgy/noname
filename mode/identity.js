@@ -2064,8 +2064,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					// chosenChars for each player: [[zhu1, zhu2], [p1_1, p1_2], ...]
 					// index is based on distance from zhu
 					event.chosenChars=new Array(game.players.length);
-					for(var i=0;i<game.players.length;i++) event.chosenChars[i]=[];
-					// choose char 1
+					event.usedChangeChar=new Array(game.players.length);
+					for(var i=0;i<game.players.length;i++){
+						event.chosenChars[i]=[];
+						event.usedChangeChar[i]=false;
+					}
+
+					"step 1"
+					// choose char 1, no use of change char
 					var list=[];
 					var selectButton=1;
 
@@ -2079,7 +2085,42 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.list.randomRemove(choiceZhu),'character']],selectButton,true]);
+							list.push([game.players[i],[str,[event.list.randomRemove(choiceZhu),'character']],false]);
+						}
+					}
+					game.me.chooseButtonOL(list,function(player,result){
+						if(result.links&&(game.online||player==game.me)) {
+							player.init(result.links[0],false);
+							player.chosenChar1=result.links[0];
+						}
+					});
+					"step 2"
+					var isSelectionMade=false;
+					for(var i in result){
+						isSelectionMade=result[i].bool;
+					}
+
+					if(!isSelectionMade){
+						event.usedChangeChar[0]=true;
+						event.goto(3);
+					}
+					else{
+						event.goto(4);
+					}
+
+					"step 3"
+					// choose char 1, again with use of change char
+					var list=[];
+					var selectButton=1;
+
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]==game.zhu){
+							var choiceZhu=2;
+							var str='换将卡：X换'+choiceZhu;
+							if(game.players[i].special_identity){
+								str+='（'+get.translation(game.players[i].special_identity)+'）';
+							}
+							list.push([game.players[i],[str,[event.list.randomRemove(choiceZhu),'character']],true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2088,7 +2129,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.chosenChar1=result.links[0];
 						}
 					});
-					"step 1"
+
+					"step 4"
 					for(var i in result){
 						var chosenChar1=result[i].links[0];
 						event.chosenChars[0].push(chosenChar1);
@@ -2108,15 +2150,52 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[0][0],choiceZhu,event.list);
-							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,true]);
+							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,event.usedChangeChar[0]]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
-						if(game.online||player==game.me) {
+						if(result.links&&(game.online||player==game.me)){
 							player.init(player.chosenChar1,result.links[0],false);
 						}
 					});
-					"step 2"
+
+					"step 5"
+					var isSelectionMade=false;
+					for(var i in result){
+						isSelectionMade=result[i].bool;
+					}
+
+					if(!isSelectionMade){
+						event.usedChangeChar[0]=true;
+						event.goto(6);
+					}
+					else{
+						event.goto(7);
+					}
+
+					"step 6"
+					// choose char 2 again with use of change char
+					var list=[];
+					var selectButton=1;
+
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]==game.zhu){
+							var choiceZhu=2;
+							var str='换将卡：X换'+choiceZhu;
+							if(game.players[i].special_identity){
+								str+='（'+get.translation(game.players[i].special_identity)+'）';
+							}
+							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[0][0],choiceZhu,event.list);
+							list.push([game.players[i],[str,[nextValidCharacters,'character']],true]);
+						}
+					}
+					game.me.chooseButtonOL(list,function(player,result){
+						if(game.online||player==game.me){
+							player.init(player.chosenChar1,result.links[0],false);
+						}
+					});
+
+					"step 7"
 					for(var i in result){
 						var chosenChar2=result[i].links[0];
 						event.chosenChars[0].push(chosenChar2);
@@ -2140,7 +2219,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.init(result.links[0],result.links[1],false);
 						}
 					});
-					"step 3"
+					"step 8"
 					if(game.me!=game.zhu){
 						for(var i in result){
 							// this determines the other online users will see full character and group info or not
@@ -2184,11 +2263,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.me._hide_all_timer=true;
 						game.zhu.chooseButton(['请选择神武将的势力',[list,'vcard']],true);
 					}
-					"step 4"
+					"step 9"
 					if(event.zhuHasShen&&!game.zhu.groupshen){
 						game.zhu.groupshen=result.links[0][2].slice(6);
 					}
-					"step 5"
+					"step 10"
 					// broadcast will exclude sender itself
 					// hence zhu.maxHp++ won't happened repeatedly
 					game.broadcast(function(zhu,name,name2,addMaxHp){
@@ -2236,8 +2315,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.addSkillTrigger(player.hiddenSkills[j],true);
 						}
 					},game.zhu);
-					"step 6"
-					// other players to choose character1
+					"step 11"
+					// other players to choose character1, no use of change char
 					var list=[];
 					var selectButton=1;
 
@@ -2293,22 +2372,75 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.list.randomRemove(num+num3),'character']],selectButton,true]);
+							list.push([game.players[i],[str,[event.list.randomRemove(num+num3),'character']],selectButton,false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
-						if(game.online||player==game.me) {
+						if(result.links&&(game.online||player==game.me)){
 							player.init(result.links[0],false);
 							player.chosenChar1=result.links[0];
 						}
 					});
-					"step 7"
+					"step 12"
+					var isChar1SelectionMadeFully=true;
 					for(var i in result){
-						var chosenChar1=result[i].links[0];
-						var chosenCharsIndex=get.distance(game.zhu, lib.playerOL[i], 'absolute');
-						event.chosenChars[chosenCharsIndex].push(chosenChar1);
+						if(lib.playerOL[i].identity=='zhu'){
+							continue;
+						}
+						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
+						if(!result[i].bool){
+							isChar1SelectionMadeFully=false;
+							event.usedChangeChar[distanceFromZhu]=true;
+						}
+						else{
+							var chosenChar1=result[i].links[0];
+							event.chosenChars[distanceFromZhu].push(chosenChar1);
+						}
 					}
-					// other players to choose character2
+
+					if(!isChar1SelectionMadeFully){
+						event.goto(13);
+					}
+					else{
+						event.goto(14);
+					}
+
+					"step 13"
+					// other players to choose character1, again with use of change char
+					var list=[];
+					var selectButton=1;
+
+					for(var i=0;i<game.players.length;i++){
+						var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
+						if(event.chosenChars[distanceFromZhu].length==0){
+							var totalChoice=1;
+							if(game.players[i].identity=='nei'){
+								totalChoice=2;
+							}
+							var str='换将卡：X换'+totalChoice;
+							if(game.players[i].special_identity){
+								str+='（'+get.translation(game.players[i].special_identity)+'）';
+							}
+							list.push([game.players[i],[str,[event.list.randomRemove(totalChoice),'character']],selectButton,true]);
+						}
+					}
+					game.me.chooseButtonOL(list,function(player,result){
+						if(game.online||player==game.me){
+							player.init(result.links[0],false);
+							player.chosenChar1=result.links[0];
+						}
+					});
+
+					"step 14"
+					for(var i in result){
+						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
+						if(distanceFromZhu>0&&result[i].bool&&event.chosenChars[distanceFromZhu].length==0){
+							var chosenChar1=result[i].links[0];
+							event.chosenChars[distanceFromZhu].push(chosenChar1);
+						}
+					}
+
+					// other players to choose character2, no use of change char
 					var list=[];
 					var selectButton=1;
 
@@ -2364,34 +2496,87 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							var chosenCharsIndex=get.distance(game.zhu, game.players[i], 'absolute');
-							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[chosenCharsIndex][0],num+num3,event.list);
+							var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
+							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[distanceFromZhu][0],num+num3,event.list);
+							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,event.usedChangeChar[distanceFromZhu]]);
+						}
+					}
+					game.me.chooseButtonOL(list,function(player,result){
+						if(result.links&&(game.online||player==game.me)){
+							player.init(player.chosenChar1,result.links[0],false);
+						}
+					});
+
+					"step 15"
+					var isChar2SelectionMadeFully=true;
+					for(var i in result){
+						if(lib.playerOL[i].identity=='zhu'){
+							continue;
+						}
+						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
+						if(!result[i].bool){
+							isChar2SelectionMadeFully=false;
+							event.usedChangeChar[distanceFromZhu]=true;
+						}
+						else{
+							var chosenChar2=result[i].links[0];
+							event.chosenChars[distanceFromZhu].push(chosenChar2);
+						}
+					}
+
+					if(!isChar2SelectionMadeFully){
+						event.goto(16);
+					}
+					else{
+						event.goto(17);
+					}
+
+					"step 16"
+					// other players to choose character2, again with use of change char
+					var list=[];
+					var selectButton=1;
+
+					for(var i=0;i<game.players.length;i++){
+						var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
+						if(event.chosenChars[distanceFromZhu].length==1){
+							var totalChoice=1;
+							if(game.players[i].identity=='nei'){
+								totalChoice=2;
+							}
+							var str='换将卡：X换'+totalChoice;
+							if(game.players[i].special_identity){
+								str+='（'+get.translation(game.players[i].special_identity)+'）';
+							}
+							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[distanceFromZhu][0],totalChoice,event.list);
 							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
-						if(game.online||player==game.me) {
+						if(game.online||player==game.me){
 							player.init(player.chosenChar1,result.links[0],false);
 						}
 					});
-					"step 8"
+
+					"step 17"
 					for(var i in result){
-						var chosenChar2=result[i].links[0];
-						var chosenCharsIndex=get.distance(game.zhu, lib.playerOL[i], 'absolute');
-						event.chosenChars[chosenCharsIndex].push(chosenChar2);
+						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
+						if(distanceFromZhu>0&&result[i].bool&&event.chosenChars[distanceFromZhu].length==1){
+							var chosenChar2=result[i].links[0];
+							event.chosenChars[distanceFromZhu].push(chosenChar2);
+						}
 					}
 					// other players to determine main and vice character
 					var list=[];
 					var selectButton=2;
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=game.zhu){
-							var chosenCharsIndex=get.distance(game.zhu, game.players[i], 'absolute');
+							var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
 
 							var str='选择主副将';
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.chosenChars[chosenCharsIndex],'character']],selectButton,true]);
+							list.push([game.players[i],[str,[event.chosenChars[distanceFromZhu],'character']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2399,7 +2584,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.init(result.links[0],result.links[1],false);
 						}
 					});
-					"step 9"
+					"step 18"
 					var shen=[];
 					for(var i in result){
 						if(result[i]&&result[i].links){
@@ -2442,7 +2627,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						});
 					}
-					"step 10"
+					"step 19"
 					if(!result) result={};
 					var result2=event.result2;
 					game.broadcast(function(result,result2){
