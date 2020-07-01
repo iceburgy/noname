@@ -34732,6 +34732,7 @@
 			else{
 				game.getDB('config',null,function(data1){
 					game.getDB('data',null,function(data2){
+						data1.alertDup=false;
 						uploadConfig({
 							config:data1,
 							data:data2
