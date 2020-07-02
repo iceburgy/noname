@@ -327,9 +327,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					name2:players[i].name2,
 					identity:players[i].identity
 				});
-				if(players[i].identity=='nei'&&players.length>4){
-					players[i].hiddenSkills.add('woshixiaonei');
-					players[i].addSkillTrigger('woshixiaonei',true);
+				if(players[i].identity=='nei'){
+					players[i].hiddenSkills.add('xiaoneibonus');
+					players[i].addSkillTrigger('xiaoneibonus',true);
+					if(players.length>4){
+						players[i].hiddenSkills.add('woshixiaonei');
+						players[i].addSkillTrigger('woshixiaonei',true);
+					}
 				}
 				if(players[i].identity=='zhu'&&players.length>=6&&players.length%2==0){
 					game.broadcastAll(function(player){
@@ -2081,6 +2085,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(lib.configOL.choice_zhu){
 								choiceZhu=parseInt(lib.configOL.choice_zhu);
 							}
+							if(lib.config.xiaoneibonus&&(game.players[i].nickname in lib.config.xiaoneibonus)){
+								choiceZhu++;
+								game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
+							}
 							var str='选择角色1';
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
@@ -2136,7 +2144,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var chosenChar1=result[i].links[0];
 						event.chosenChars[0].push(chosenChar1);
 					}
-					// choose char 2
+					// choose char 2, no use of change char
 					var list=[];
 					var selectButton=1;
 
@@ -2145,6 +2153,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var choiceZhu=5;
 							if(lib.configOL.choice_zhu){
 								choiceZhu=parseInt(lib.configOL.choice_zhu);
+							}
+							if(lib.config.xiaoneibonus&&(game.players[i].nickname in lib.config.xiaoneibonus)){
+								choiceZhu++;
+								delete lib.config.xiaoneibonus[game.players[i].nickname];
+								game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+								game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
 							}
 							var str='选择角色2';
 							if(game.players[i].special_identity){
@@ -2360,7 +2374,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										}
 										break;
 									case 'nei':
-										if(lib.configOL.choice_zhong){
+										if(lib.configOL.choice_nei){
 											num3=parseInt(lib.configOL.choice_nei)-num;
 										}else{
 											num3=num2;
@@ -2369,6 +2383,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									default:
 										break;
 								}
+							}
+							if(lib.config.xiaoneibonus&&(game.players[i].nickname in lib.config.xiaoneibonus)){
+								num3++;
+								game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
 							}
 							var str='选择角色1';
 							if(game.players[i].special_identity){
@@ -2485,7 +2503,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										}
 										break;
 									case 'nei':
-										if(lib.configOL.choice_zhong){
+										if(lib.configOL.choice_nei){
 											num3=parseInt(lib.configOL.choice_nei)-num;
 										}else{
 											num3=num2;
@@ -2494,6 +2512,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									default:
 										break;
 								}
+							}
+							if(lib.config.xiaoneibonus&&(game.players[i].nickname in lib.config.xiaoneibonus)){
+								num3++;
+								delete lib.config.xiaoneibonus[game.players[i].nickname];
+								game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+								game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
 							}
 							var str='选择角色2';
 							if(game.players[i].special_identity){
@@ -2775,6 +2799,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）增加一点体力上限，然后回复一点体力并且摸2张牌；2）获得限定技‘知己知彼’，然后回复一点体力并且摸3张牌。（知己知彼：村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废）',
 			xiaoneizhibi:'知己知彼',
 			xiaoneizhibi_info:'村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废',
+			xiaoneibonus:'主内单挑',
 			zhikezhugong:'制克主公',
 			zhikezhugong_info:'村规主公限定技：如果场上玩家数是6人或者更多，而且为偶数，则主公在第一回合内可以2选1：1）准备阶段使用一次手气卡；2）如果没有对其他玩家使用牌，可以跳过弃牌阶段',
 			zhikezhugong_zhihengzg:'制衡主公',
@@ -3715,6 +3740,39 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			xiaoneibonus:{
+				unique:true,
+				mark:false,
+				frequent:true,
+				limited:true,
+				audio:'jianxiong',
+				trigger:{global:'die'},
+				skillAnimation:'legend',
+				animationColor:'thunder',
+				filter:function (event,player){
+					// activate xiaonei bonus if nei is in 1v1
+					return game.players.length==2&&player.identity=='nei';
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('xiaoneibonus');
+					if(!lib.config.xiaoneibonus){
+						lib.config.xiaoneibonus={};
+					}
+					if(player.nickname&&player.nickname!='无名玩家'&&!(player.nickname in lib.config.xiaoneibonus)){
+						lib.config.xiaoneibonus[player.nickname]=player.nickname;
+						game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+					}
+				},
+				ai:{
+					order:10,
+					result:{
+						player:function(player){
+							return 1;
+						},
+					},
+				},
+			},
 			zhikezhugong:{
 				audio:false,
 				direct:true,
@@ -4279,7 +4337,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				priority:10,
 				content:function(){
 					"step 0"
-					if(get.info(trigger.skill).silent||trigger.skill=='woshixiaonei'){
+					if(get.info(trigger.skill).silent||trigger.skill=='woshixiaonei'||trigger.skill=='xiaoneibonus'){
 						event.finish();
 					}
 					else{

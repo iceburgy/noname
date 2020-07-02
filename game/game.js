@@ -3665,6 +3665,7 @@
 							else{
 								game.getDB('config',null,function(data1){
 									game.getDB('data',null,function(data2){
+										data1.alertDup=false;
 										export_data({
 											config:data1,
 											data:data2
@@ -11184,7 +11185,11 @@
 					ui.create.connectPlayers(game.ip);
 					if(!window.isNonameServer){
 						var me=game.connectPlayers[0];
-						var winRate=game.getWinRateByNickname(lib.config.connect_nickname);
+						//var winRate=game.getWinRateByNickname(lib.config.connect_nickname);
+						var winRate='';
+						if(lib.config.xiaoneibonus&&(lib.config.connect_nickname in lib.config.xiaoneibonus)){
+							winRate='小内奖励';
+						}
 						me.setIdentity('zhu');
 						me.initOL(lib.config.connect_nickname,lib.config.connect_avatar,winRate);
 						me.playerid='1';
@@ -21022,7 +21027,7 @@
 					var name2=this.name2;
 					if(lib.character[name2]&&(!showonly||unseen1)){
 						var skills=game.expandSkills(lib.character[name2][3].slice(0));
-						if(skills.contains(skill)||(unseen0&&!unseen1&&(skill=='woshixiaonei'||skill=='zhikezhugong_zhihengzg'||skill=='zhikezhugong_kejizg'||skill=='anlezhugong'||skill=='xiaoneizhibi'))){
+						if(skills.contains(skill)||(unseen0&&!unseen1&&(skill=='woshixiaonei'||skill=='xiaoneibonus'||skill=='zhikezhugong_zhihengzg'||skill=='zhikezhugong_kejizg'||skill=='anlezhugong'||skill=='xiaoneizhibi'))){
 							if(!noshow&&this.isUnseen(1))
 							    this.showCharacter(1);
 							return 'vice';
@@ -25539,7 +25544,11 @@
 							if(game.connectPlayers[i].classList.contains('unselectable2')) continue;
 							if(game.connectPlayers[i]!=game.me&&!game.connectPlayers[i].playerid){
 								game.connectPlayers[i].playerid=this.id;
-								var winRate=game.getWinRateByNickname(this.nickname);
+								//var winRate=game.getWinRateByNickname(this.nickname);
+								var winRate='';
+								if(lib.config.xiaoneibonus&&(this.nickname in lib.config.xiaoneibonus)){
+									winRate='小内奖励';
+								}
 								game.connectPlayers[i].initOL(this.nickname,this.avatar,winRate);
 								game.connectPlayers[i].ws=this;
 								break;
@@ -26738,6 +26747,15 @@
 			game.saveConfig('alertDup',val);
 			return lib.config.alertDup;
 		},
+		addXiaoneiBonusBySeat:function(seat){
+			if(!lib.config.xiaoneibonus){
+				lib.config.xiaoneibonus={};
+			}
+			if(game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
+				lib.config.xiaoneibonus[game.connectPlayers[seat].nickname]=game.connectPlayers[seat].nickname;
+				game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+			}
+		},
 		savePlayerInfo:function(playerIP,playerNickname){
 			if(playerNickname){
 				var needSave=false;
@@ -27201,7 +27219,11 @@
 			for(var i=0;i<game.connectPlayers.length;i++){
 				var player=game.connectPlayers[i];
 				if(player.playerid){
-					var winRate=game.getWinRateByNickname(player.nickname);
+					//var winRate=game.getWinRateByNickname(player.nickname);
+					var winRate='';
+					if(lib.config.xiaoneibonus&&(player.nickname in lib.config.xiaoneibonus)){
+						winRate='小内奖励';
+					}
 					if(!game.onlinezhu){
 						game.onlinezhu=player.playerid;
 						game.send('server','changeAvatar',player.nickname,player.avatar);

@@ -674,8 +674,8 @@ table {
 .player.connect[data-position='8']>.intro,
 .player.connect[data-position='9']>.intro {
 	bottom: 10px;
-	left: 50px;
-	opacity: 0;
+	left: 40px;
+	opacity: 1;
 	display: block !important;
 }
 #arena #me>div>div>.card {
@@ -1287,7 +1287,7 @@ body>.background.land {
 	position: absolute;
 }
 .intro {
-	width: 20px;
+	width: auto;
 	height: 20px;
 }
 #systembutton {
