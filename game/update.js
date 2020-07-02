@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.07.02',
+	version:'2020.07.02.1',
 	update:'2020.06.13.1',
 	changeLog:[
 		'开启：换将卡，主内X换2，忠反X换1',
