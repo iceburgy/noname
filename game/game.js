@@ -25487,7 +25487,7 @@
 								}
 								game.savePlayerInfo(obIP,this.nickname);
 								var msgconsole='【'+this.nickname+'】【'+obIP+'】加入旁观';
-								console.log(new Date());
+								console.log((new Date()).toLocaleString());
 								console.log(msgconsole);
 								console.log(game.getPlayerInfo(obIP));
 
@@ -25536,7 +25536,7 @@
 						if(this.ws._socket&&this.ws._socket.remoteAddress){
 							var playerIP=this.ws._socket.remoteAddress;
 							game.savePlayerInfo(playerIP,this.nickname);
-							console.log(new Date());
+							console.log((new Date()).toLocaleString());
 							console.log('【'+this.nickname+'】【'+playerIP+'】加入房间');
 							console.log(game.getPlayerInfo(playerIP));
 						}
@@ -26759,24 +26759,22 @@
 		},
 		savePlayerInfo:function(playerIP,playerNickname){
 			if(playerNickname){
-				var needSave=false;
 				var playerInfoRootKey='players_info';
 				var playerInfoRoot=lib.config[playerInfoRootKey];
 				if(!playerInfoRoot){
 					playerInfoRoot={};
-					needSave=true;
 				}
 				if(!playerInfoRoot[playerIP]){
-					playerInfoRoot[playerIP]=[];
-					needSave=true;
+					playerInfoRoot[playerIP]={
+						'lastLogin': (new Date()).toLocaleString(),
+						'nicknames':[],
+					};
 				}
-				if(!playerInfoRoot[playerIP].includes(playerNickname)){
-					playerInfoRoot[playerIP].push(playerNickname);
-					needSave=true;
+				if(!playerInfoRoot[playerIP].nicknames.includes(playerNickname)){
+					playerInfoRoot[playerIP].nicknames.push(playerNickname);
 				}
-				if(needSave){
-					game.saveConfig(playerInfoRootKey,playerInfoRoot);
-				}
+				playerInfoRoot[playerIP].lastLogin=(new Date()).toLocaleString();
+				game.saveConfig(playerInfoRootKey,playerInfoRoot);
 			}
 		},
 		getPlayerInfo:function(playerIP){
@@ -26827,13 +26825,17 @@
 			console.log('checking download...');
 			for(var remoteKey in playerInfoRemote){
 				if(!(remoteKey in playerInfoRoot)){
-					playerInfoRoot[remoteKey]=[];
+					playerInfoRoot[remoteKey]={
+						'lastLogin':'',
+						'nicknames':[],
+					};
 					console.log('downloaded remote key: '+remoteKey);
 				}
 				var remoteVal=playerInfoRemote[remoteKey];
-				for(var rv of remoteVal){
-					if(!playerInfoRoot[remoteKey].includes(rv)){
-						playerInfoRoot[remoteKey].push(rv);
+				for(var rv of remoteVal.nicknames){
+					if(!playerInfoRoot[remoteKey].nicknames.includes(rv)){
+						playerInfoRoot[remoteKey].lastLogin=remoteVal.lastLogin;
+						playerInfoRoot[remoteKey].nicknames.push(rv);
 						console.log('downloaded remote val: '+rv+' of key: '+remoteKey);
 					}
 				}
@@ -26850,9 +26852,14 @@
 				}
 				var localVal=playerInfoRoot[localKey];
 				var remoteVal=playerInfoRemote[localKey];
-				if(!remoteVal) remoteVal=[];
-				for(var lv of localVal){
-					if(!remoteVal.includes(lv)){
+				if(!remoteVal){
+					remoteVal={
+						'lastLogin':'',
+						'nicknames':[],
+					};
+				}
+				for(var lv of localVal.nicknames){
+					if(!remoteVal.nicknames.includes(lv)){
 						console.log('found to-be-uploaded key: '+localKey+' with val: '+lv);
 						needUpload=true;
 					}
@@ -26868,7 +26875,7 @@
 				httpReqUpdate.setRequestHeader("Content-Type","application/octet-stream");
 				httpReqUpdate.setRequestHeader("Dropbox-API-Arg","{\"doc_id\": \"p2Ef8iI3uhoqDz6FTkXe3\",\"doc_update_policy\": \"overwrite_all\",\"revision\":"+revision+",\"import_format\": \"markdown\"}");
 
-				var title='playerInfo';
+				var title='players_info';
 				var content=game.aesEncrypt(JSON.stringify(playerInfoRoot),passphrase);
 
 				httpReqUpdate.send(title+"\n"+content);
