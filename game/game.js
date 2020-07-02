@@ -3665,7 +3665,8 @@
 							else{
 								game.getDB('config',null,function(data1){
 									game.getDB('data',null,function(data2){
-										data1.alertDup=false;
+										delete data1.alertDup;
+										delete data1.players_info;
 										export_data({
 											config:data1,
 											data:data2
@@ -34754,7 +34755,8 @@
 			else{
 				game.getDB('config',null,function(data1){
 					game.getDB('data',null,function(data2){
-						data1.alertDup=false;
+						delete data1.alertDup;
+						delete data1.players_info;
 						uploadConfig({
 							config:data1,
 							data:data2
