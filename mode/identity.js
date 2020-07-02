@@ -3745,7 +3745,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mark:false,
 				frequent:true,
 				limited:true,
-				audio:'jianxiong',
+				audio:false,
 				trigger:{global:'die'},
 				skillAnimation:'legend',
 				animationColor:'thunder',

@@ -25470,50 +25470,71 @@
 						if(game.phaseNumber&&lib.configOL.observe){
 							this.nickname=config.nickname?config.nickname:'unknown';
 
+							var isDup=false;
 							if(this.ws._socket&&this.ws._socket.remoteAddress){
 								var obIP=this.ws._socket.remoteAddress;
-								var isDup=false;
 								for(var pOLID in lib.playerOL){
 									if(!lib.playerOL[pOLID].ws||!lib.playerOL[pOLID].ws.ws._socket) continue;
 									var pOLIP=lib.playerOL[pOLID].ws.ws._socket.remoteAddress;
 									if(obIP==pOLIP){
 										var pOLNickname=lib.playerOL[pOLID].nickname
 										var IPComps=pOLIP.split('.');
-										var msg1='【'+pOLNickname+'】用小号【'+this.nickname+'】双开旁观，IP尾数为：【*.*.'+IPComps[2]+'.'+IPComps[3]+'】';
+										var msg1='【'+pOLNickname+'】用小号【'+this.nickname+'】尝试双开旁观，IP尾数为：【*.*.'+IPComps[2]+'.'+IPComps[3]+'】';
 										console.log(msg1);
 										isDup=true;
 										break;
 									}
 								}
-								game.savePlayerInfo(obIP,this.nickname);
-								var msgconsole='【'+this.nickname+'】【'+obIP+'】加入旁观';
-								console.log((new Date()).toLocaleString());
-								console.log(msgconsole);
-								console.log(game.getPlayerInfo(obIP));
+								if(isDup){
+									game.savePlayerInfo(obIP,this.nickname+'(尝试双开旁观)');
+									var msg='【'+this.nickname+'】【'+obIP+'】尝试双开旁观';
+									console.log((new Date()).toLocaleString());
+									console.log(msg);
+									console.log(game.getPlayerInfo(obIP));
+									if(lib.config.alertDup){
+										alert('【'+this.nickname+'】尝试双开旁观');
+									}
+									var id=banned_info;
+									this.send(function(id){
+										alert('请尊重其他玩家，不要双开旁观');
+										if(game.ws){
+											game.ws.close();
+											game.saveConfig('reconnect_info');
+											game.saveConfig('banned_info',id);
+										}
+									},id);
+									lib.node.banned.push(id);
+								}
+								else{
+									game.savePlayerInfo(obIP,this.nickname);
+									var msgconsole='【'+this.nickname+'】【'+obIP+'】加入旁观';
+									console.log((new Date()).toLocaleString());
+									console.log(msgconsole);
+									console.log(game.getPlayerInfo(obIP));
 
-								var msg='【'+this.nickname+'】加入旁观';
-								game.log(msg);
-								if(isDup&&lib.config.alertDup) {
-									alert(msg);
+									var msg='【'+this.nickname+'】加入旁观';
+									game.log(msg);
 								}
 							}
 
-							lib.node.observing.push(this);
-							this.send('reinit',lib.configOL,get.arenaState(),game.getState?game.getState():{},game.ip,game.players[0].playerid);
-							if(!ui.showObserveButton){
-								game.broadcastAll(function(){
-									ui.showObserveButton=ui.create.system('显示旁观',function(){},true);
-									lib.setPopped(ui.showObserveButton,ui.click.showObserve,220);
-									ui.click.hoverpopped.call(ui.showObserveButton);
-								});
-							}else{
-								game.broadcastAll(function(){
-									if(ui.showObserveButton._uiintro){
-										ui.showObserveButton._uiintro.close();
-										delete ui.showObserveButton._uiintro;
-									}
-									ui.click.hoverpopped.call(ui.showObserveButton);
-								});
+							if(!isDup){
+								lib.node.observing.push(this);
+								this.send('reinit',lib.configOL,get.arenaState(),game.getState?game.getState():{},game.ip,game.players[0].playerid);
+								if(!ui.showObserveButton){
+									game.broadcastAll(function(){
+										ui.showObserveButton=ui.create.system('显示旁观',function(){},true);
+										lib.setPopped(ui.showObserveButton,ui.click.showObserve,220);
+										ui.click.hoverpopped.call(ui.showObserveButton);
+									});
+								}else{
+									game.broadcastAll(function(){
+										if(ui.showObserveButton._uiintro){
+											ui.showObserveButton._uiintro.close();
+											delete ui.showObserveButton._uiintro;
+										}
+										ui.click.hoverpopped.call(ui.showObserveButton);
+									});
+								}
 							}
 						}
 						else{
