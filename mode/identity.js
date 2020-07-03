@@ -2068,10 +2068,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					// chosenChars for each player: [[zhu1, zhu2], [p1_1, p1_2], ...]
 					// index is based on distance from zhu
 					event.chosenChars=new Array(game.players.length);
-					event.usedChangeChar=new Array(game.players.length);
 					for(var i=0;i<game.players.length;i++){
 						event.chosenChars[i]=[];
-						event.usedChangeChar[i]=false;
 					}
 
 					"step 1"
@@ -2109,7 +2107,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					if(!isSelectionMade){
-						event.usedChangeChar[0]=true;
 						event.goto(3);
 					}
 					else{
@@ -2165,7 +2162,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[0][0],choiceZhu,event.list);
-							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,event.usedChangeChar[0]]);
+							list.push([game.players[i],[str,[nextValidCharacters,'character']],false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2181,7 +2178,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					if(!isSelectionMade){
-						event.usedChangeChar[0]=true;
 						event.goto(6);
 					}
 					else{
@@ -2410,7 +2406,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
 						if(!result[i].bool){
 							isChar1SelectionMadeFully=false;
-							event.usedChangeChar[distanceFromZhu]=true;
 						}
 						else{
 							var chosenChar1=result[i].links[0];
@@ -2525,7 +2520,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[distanceFromZhu][0],num+num3,event.list);
-							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,event.usedChangeChar[distanceFromZhu]]);
+							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2543,7 +2538,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
 						if(!result[i].bool){
 							isChar2SelectionMadeFully=false;
-							event.usedChangeChar[distanceFromZhu]=true;
 						}
 						else{
 							var chosenChar2=result[i].links[0];

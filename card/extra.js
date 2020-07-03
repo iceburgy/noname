@@ -583,27 +583,51 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				group:['muniu_skill3','muniu_skill4']
 			},
 			muniu_skill3:{
-				trigger:{player:'chooseToRespondBegin'},
+				trigger:{player:'chooseToRespondBegin',global:'judge'},
 				cardSkill:true,
 				filter:function(event,player){
 					if(event.responded) return false;
 					var muniu=player.getEquip(5);
 					if(!muniu.cards) return false;
 					lib.skill.muniu_skill.sync(muniu);
-					for(var i=0;i<muniu.cards.length;i++){
-						if(event.filterCard(muniu.cards[i],player,event)&&lib.filter.cardRespondable(muniu.cards[i],player,event)) return true;
+					if(event.name=='judge'){
+						if(player.hasSkill('reguicai')){
+							return true;
+						}
+						else if(player.hasSkill('guidao')){
+							for(var i=0;i<muniu.cards.length;i++){
+								if(get.color(muniu.cards[i])=='black') return true;
+							}
+						}
+						return false;
 					}
-					return false;
+					else{
+						for(var i=0;i<muniu.cards.length;i++){
+							if(event.filterCard(muniu.cards[i],player,event)&&lib.filter.cardRespondable(muniu.cards[i],player,event)) return true;
+						}
+						return false;
+					}
 				},
 				direct:true,
 				content:function(){
 					"step 0"
 					player.chooseButton(['木牛流马',player.getEquip(5).cards]).set('filterButton',function(button){
-						var evt=_status.event.getTrigger();
-						if(evt&&evt.filterCard){
-							return evt.filterCard(button.link,_status.event.player,evt)&&lib.filter.cardRespondable(button.link,_status.event.player,evt);
+						if(trigger.name=='judge'){
+							if(player.hasSkill('reguicai')){
+								return true;
+							}
+							else if(player.hasSkill('guidao')){
+								return get.color(button.link)=='black';
+							}
+							return false;
 						}
-						return true;
+						else{
+							var evt=_status.event.getTrigger();
+							if(evt&&evt.filterCard){
+								return evt.filterCard(button.link,_status.event.player,evt)&&lib.filter.cardRespondable(button.link,_status.event.player,evt);
+							}
+							return true;
+						}
 					}).set('ai',function(button){
 						var evt=_status.event.getTrigger();
 						if(evt&&evt.ai){
@@ -616,6 +640,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 1;
 					});
 					"step 1"
+					if(trigger.name=='judge'){
+						if(result.bool){
+							player.respond(result.links,trigger.skill,'highlight','noOrdering');
+						}
+						else{
+							event.finish();
+						}
+					}
+					"step 2"
 					if(result.bool){
 						trigger.untrigger();
 						trigger.responded=true;
@@ -626,6 +659,33 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						game.broadcastAll(function(player){
 							player.updateMarks();
 						},player);
+
+						if(trigger.name=='judge'){
+							if(player.hasSkill('reguicai')){
+								if(trigger.player.judging[0].clone){
+									trigger.player.judging[0].clone.classList.remove('thrownhighlight');
+									game.broadcast(function(card){
+										if(card.clone){
+											card.clone.classList.remove('thrownhighlight');
+										}
+									},trigger.player.judging[0]);
+									game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
+								}
+								game.cardsDiscard(trigger.player.judging[0]);
+								trigger.player.judging[0]=result.links[0];
+								trigger.orderingCards.addArray(result.links);
+								game.log(trigger.player,'的判定牌改为',result.links[0]);
+								game.delay(2);
+							}
+							else if(player.hasSkill('guidao')){
+								player.$gain2(trigger.player.judging[0]);
+								player.gain(trigger.player.judging[0]);
+								trigger.player.judging[0]=result.links[0];
+								trigger.orderingCards.addArray(result.links);
+								game.log(trigger.player,'的判定牌改为',result.links[0]);
+								game.delay(2);
+							}
+						}
 					}
 				},
 				ai:{

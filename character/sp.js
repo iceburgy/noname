@@ -9562,7 +9562,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseEnd'},
 				forced:true,
 				content:function(){
-					player.gain(player.storage.zhenwei2,'gain2','log');
+					player.gain(player.storage.zhenwei2,'gain2','fromStorage','log');
 					delete player.storage.zhenwei2;
 					player.removeSkill('zhenwei2');
 				}

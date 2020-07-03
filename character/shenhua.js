@@ -1439,7 +1439,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				content:function(){
-					player.addMark('nzry_huaiju',3);
+					if(!player.storage.nzry_huaiju){
+						player.storage.nzry_huaiju=0;
+					}
+					player.storage.nzry_huaiju+=3;
+					player.markSkill('nzry_huaiju');
 					player.addSkill('nzry_huaiju_ai');
 				},
 				group:['tachibana_effect'],
@@ -1458,7 +1462,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.line(trigger.player,'green');
 					if(trigger.name=='damage'){
 						trigger.cancel();
-						trigger.player.removeMark('nzry_huaiju',1);
+						trigger.player.storage.nzry_huaiju--;
+						if(trigger.player.storage.nzry_huaiju>0){
+							trigger.player.markSkill('nzry_huaiju');
+						}
+						else{
+							delete trigger.player.storage.nzry_huaiju;
+							trigger.player.unmarkSkill('nzry_huaiju');
+						}
 					}
 					else trigger.num++;
 				},
@@ -1495,11 +1506,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					//player.line(event.target,'green');
 					player.logSkill('nzry_yili',target);
 					if(result.index==1){
-						player.removeMark('nzry_huaiju',1);
+						player.storage.nzry_huaiju--;
+						if(player.storage.nzry_huaiju>0){
+							player.markSkill('nzry_huaiju');
+						}
+						else{
+							delete player.storage.nzry_huaiju;
+							player.unmarkSkill('nzry_huaiju');
+						}
 					}else{
 						player.loseHp();
 					};
-					target.addMark('nzry_huaiju',1);
+					if(!target.storage.nzry_huaiju){
+						target.storage.nzry_huaiju=0;
+					}
+					target.storage.nzry_huaiju++;
+					target.markSkill('nzry_huaiju');
 					target.addSkill('nzry_huaiju_ai');
 				},
 			},
@@ -1516,8 +1538,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.cancel();
-					player.addMark('nzry_huaiju',1);
-				},	
+					if(!player.storage.nzry_huaiju){
+						player.storage.nzry_huaiju=0;
+					}
+					player.storage.nzry_huaiju++;
+					player.markSkill('nzry_huaiju');
+				},
 			},
 			"nzry_kuizhu":{
 				audio:2,
@@ -6670,6 +6696,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['sp_zhangjiao'],
 				trigger:{global:'judge'},
 				filter:function(event,player){
+					if(event.responded) return false;
 					return player.countCards('he',{color:'black'})>0;
 				},
 				direct:true,
@@ -6707,6 +6734,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 2"
 					if(result.bool){
+						trigger.responded=true;
 						player.$gain2(trigger.player.judging[0]);
 						player.gain(trigger.player.judging[0]);
 						trigger.player.judging[0]=result.cards[0];

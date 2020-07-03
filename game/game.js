@@ -15079,10 +15079,18 @@
 					// }
 
 					game.broadcastAll(function(player){
-						if(player.name=='simahui'||player.name1=='simahui'||player.name2=='simahui'){
+						if(game.hasCharacter(player,'simahui')){
 							for(var i=0;i<game.players.length;i++){
 								game.players[i].removeSkill('smh_huoji');
 								game.players[i].removeSkill('smh_lianhuan');
+							}
+						}
+						if(game.hasCharacter(player,'luji')){
+							for(var i=0;i<game.players.length;i++){
+								if(game.players[i].storage.nzry_huaiju){
+									delete game.players[i].storage.nzry_huaiju;
+									game.players[i].unmarkSkill('nzry_huaiju');
+								}
 							}
 						}
 						player.classList.add('dead');
@@ -27360,13 +27368,9 @@
 					}
 					break;
 				case '换将卡：X换1':
-					if(lib.configOL.choose_timeout_change_char_1){
-						num=lib.configOL.choose_timeout_change_char_1;
-					}
-					break;
 				case '换将卡：X换2':
-					if(lib.configOL.choose_timeout_change_char_2){
-						num=lib.configOL.choose_timeout_change_char_2;
+					if(lib.configOL.choose_timeout_change_char){
+						num=lib.configOL.choose_timeout_change_char;
 					}
 					break;
 				default:
@@ -35756,20 +35760,8 @@
 									connect:true,
 									frequent:true
 								};
-								infoconfig.connect_choose_timeout_change_char_1={
-									name:'换将卡X换1时限',
-									init:'10',
-									item:{
-										'10':'10秒',
-										'20':'20秒',
-										'30':'30秒',
-										'40':'40秒',
-									},
-									connect:true,
-									frequent:true
-								};
-								infoconfig.connect_choose_timeout_change_char_2={
-									name:'换将卡X换2时限',
+								infoconfig.connect_choose_timeout_change_char={
+									name:'换将卡时限',
 									init:'20',
 									item:{
 										'10':'10秒',
