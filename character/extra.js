@@ -789,6 +789,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.bool=(result.control=='回复体力');
 						event.num=0;
 						event.players=game.filterPlayer();
+						event.players.sort(lib.sort.seat);
 					}
 					"step 2"
 					if(event.num<event.players.length){
