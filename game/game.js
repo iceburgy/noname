@@ -15926,6 +15926,7 @@
 					// 	if(name[i]!='s'&&name[i]!='p')
 					// 	this.node.name.innerHTML+=name[i]+'<br/>';
 					// }
+					this.maxHp=Math.min(4,maxHp1);
 					if(character2&&lib.character[character2]){
 						var info2=lib.character[character2];
 						if(!info2){
@@ -15942,7 +15943,8 @@
 						var hp2=get.infoHp(info2[2]);
 						var maxHp2=get.infoMaxHp(info2[2]);
 						var double_hp;
-                        double_hp=get.config('double_hp');
+                        //double_hp=get.config('double_hp');
+                        double_hp='zuidashangxianzuixiaotili';
 						switch(double_hp){
 							case 'pingjun':{
 								this.maxHp=Math.floor((maxHp1+maxHp2)/2);
