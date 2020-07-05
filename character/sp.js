@@ -639,7 +639,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}).length>0
 					});
 					if(player==target&&bool) player.draw(2);
-					else if(player!=target&&!bool) player.chooseToDiscard('h',2,true);
+					else if(player!=target&&!bool) player.chooseToDiscard('he',2,true);
 				},
 				ai:{
 					order:function(){
