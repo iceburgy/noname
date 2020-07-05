@@ -15977,6 +15977,9 @@
 								this.hp=hp1+hp2-3;
 							};
 						}
+						var realMaxHp=Math.max(maxHp1,maxHp2);
+						this.maxHpToGain=realMaxHp-4;
+
 						this.node.count.classList.add('p2');
 						skills=skills.concat(info2[3]);
 
