@@ -26776,6 +26776,7 @@
 		},
 		purgeLibConfigData:function(data1,cleanPersonalData){
 			delete data1.alertDup;
+			delete data1.xiaoneibonus;
 			delete data1.players_info;
 			delete data1.players_statistics;
 			if(cleanPersonalData){
