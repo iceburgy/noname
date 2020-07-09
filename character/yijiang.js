@@ -9662,6 +9662,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.cards[0].name!='du';
 						},
 						filter:function(event,player){
+							var evtParent=event.getParent();
+							if(evtParent&&evtParent.triggername=='judge'&&evtParent.player!=player&&get.position(event.cards[0],true)=='d'){
+								return (get.suit(event.cards[0])=='club');
+							}
 							var evt=event.getParent().relatedEvent;
 							if(!evt||evt.name!='judge') return;
 							if(evt.player==player) return false;
