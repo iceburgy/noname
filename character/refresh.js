@@ -2833,7 +2833,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.targets){
 						player.line(result.targets,'green');
-						result.targets[0].gain(event.card,'gain2');
+						player.give(event.card,result.targets[0]);
 						if(!event.same) player.chooseToDiscard(true,'he');
 					}
 				},

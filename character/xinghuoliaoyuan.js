@@ -344,9 +344,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.awakenSkill('xinfu_qiai');
 					player.storage.xinfu_qiai=true;
-					event.current=player.next;
+					if(_status.currentPhase==player){
+						event.current=player.next;
+					}
+					else{
+						event.current=_status.currentPhase;
+					}
 					"step 1"
-					if(!event.current.countCards('he')) event.goto(3);
+					if(!event.current.countCards('he')||event.current==player) event.goto(3);
 					else event.current.chooseCard('交给'+get.translation(player)+'一张牌','he',true).set('ai',function(card){
 						var evt=_status.event.getParent();
 						if(get.attitude(_status.event.player,evt.player)>2){
@@ -361,7 +366,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 3"
 					event.current=event.current.next;
-					if(event.current!=player) event.goto(1);
+					if(event.current!=_status.currentPhase) event.goto(1);
 				},
 			},
 			"xinfu_denglou":{
@@ -801,6 +806,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('xinfu_zengdao');
 					player.$give(cards,target,false);
 					target.storage.xinfu_zengdao2=cards.slice(0);
+					game.cardsGotoSpecial(cards);
 					target.addSkill('xinfu_zengdao2');
 				},
 				ai:{

@@ -1820,6 +1820,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.awakenSkill('yeyan');
 					event.num=0;
+					targets.sort(lib.sort.seat);
 					"step 1"
 					if(cards.length==4) event.goto(2);
 					else {
@@ -2412,7 +2413,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{
 							player:'phaseJieshuBegin',
 						},
-						direct:true,
+						forced:true,
 						filter:function(event,player){
 							return game.hasPlayer(function(current){
 								return current!=player&&!current.isLinked();

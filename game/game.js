@@ -21037,7 +21037,7 @@
 					var name2=this.name2;
 					if(lib.character[name2]&&(!showonly||unseen1)){
 						var skills=game.expandSkills(lib.character[name2][3].slice(0));
-						if(skills.contains(skill)||(unseen0&&!unseen1&&(skill=='woshixiaonei'||skill=='xiaoneibonus'||skill=='zhikezhugong_zhihengzg'||skill=='zhikezhugong_kejizg'||skill=='anlezhugong'||skill=='xiaoneizhibi'))){
+						if(skills.contains(skill)||(unseen0&&!unseen1&&(skill=='woshixiaonei'||skill=='xiaoneibonus'||skill=='zhikezhugong_zhihengzg'||skill=='zhikezhugong_kejizg'||skill=='anlezhugong'||skill=='xiaoneizhibi'||skill=='smh_yeyan'))){
 							if(!noshow&&this.isUnseen(1))
 							    this.showCharacter(1);
 							return 'vice';
