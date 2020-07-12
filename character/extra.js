@@ -2310,7 +2310,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_longnu":{
 				mark:true,
 				locked:true,
-				marktext:'龙',
+				marktext:'怒',
 				intro:{
 					content:function(storage,player,skill){
 						if(player.storage.nzry_longnu==true) return '锁定技，出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷杀且无使用次数限制';
