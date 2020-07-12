@@ -4540,7 +4540,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var num=Math.max(1,player.getDamagedHp());
 					player.chooseTarget('是否发动【誓仇】，令至多'+num+'名其他角色也成为此【杀】的目标？',[1,num],function(card,player,target){
-						return target!=player&&!trigger.targets.contains(target)&&player.canUse({name:'sha'},target);
+						if(game.online){
+							return target!=player&&!this._modparent._trigger.targets.contains(target)&&player.canUse({name:'sha'},target);
+						}
+						else{
+							return target!=player&&!trigger.targets.contains(target)&&player.canUse({name:'sha'},target);
+						}
 					}).ai=function(target){
 						return get.effect(target,{name:'sha'},_status.event.player);
 					};

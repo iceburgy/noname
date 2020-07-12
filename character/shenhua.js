@@ -668,7 +668,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					'1':{
-						audio:2,
+						audio:'drlt_qianjie',
 						trigger:{
 							player:'linkBegin'
 						},
@@ -678,11 +678,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					'2':{
+						audio:'drlt_qianjie',
+						trigger:{player:'addJudgeBefore'},
+						forced:true,
+						filter:function (event,player){
+							return get.type(event.card)=='delay';
+						},
+						priority:15,
+						content:function(){
+							trigger.cancel();
+							for(var i=0;i<trigger.cards.length;i++){
+								trigger.cards[i].discard();
+							}
+						},
 						mod:{
 							targetEnabled:function(card,player,target){
 								if(get.type(card)=='delay') return false;
 							},
 						},
+						ai:{
+							effect:{
+								target:function(card,player,target,current){
+									if(get.type(card)=='delay') return 'zeroplayertarget';
+								},
+							}
+						}
 					},
 					'3':{
 					ai:{noCompareTarget:true,},

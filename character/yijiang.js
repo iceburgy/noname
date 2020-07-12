@@ -9277,14 +9277,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!result.bool) event.finish();
 					else event.cards=result.cards;
 					"step 3"
-					if(event.cards.length>1){
+					if(event.cards.length>=1){
 						player.chooseCardButton('请选择要分配的牌',true,event.cards,[1,event.cards.length]).set('ai',function(button){
 							if(ui.selected.buttons.length==0) return 1;
 							return 0;
 						});
-					}
-					else if(event.cards.length==1){
-						event._result={links:event.cards.slice(0),bool:true};
 					}
 					else{
 						event.finish();
@@ -9294,7 +9291,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.cards.remove(result.links[i]);
 					}
 					event.togive=result.links.slice(0);
-					player.chooseTarget('将'+get.translation(result.links)+'交给一名其他角色',lib.filter.notMe).set('ai',function(target){
+					player.chooseTarget('将'+get.translation(result.links)+'交给一名其他角色',lib.filter.notMe,true).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						if(_status.event.enemy){
 							return -att;

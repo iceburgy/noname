@@ -349,7 +349,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						event.current=_status.currentPhase;
+						if(!event.current.isAlive()){
+							event.current=event.current.next;
+						}
 					}
+					event.firstGiver=event.current;
 					"step 1"
 					if(!event.current.countCards('he')||event.current==player) event.goto(3);
 					else event.current.chooseCard('交给'+get.translation(player)+'一张牌','he',true).set('ai',function(card){
@@ -366,7 +370,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 3"
 					event.current=event.current.next;
-					if(event.current!=_status.currentPhase) event.goto(1);
+					if(event.current!=event.firstGiver) event.goto(1);
 				},
 			},
 			"xinfu_denglou":{
