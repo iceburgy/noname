@@ -723,7 +723,7 @@ content:function(config, pack){
 			
 			game.swapPlayer = function(player, player2){
 			    var result = swapPlayerFunction.call(this, player, player2);
-    			if (game.me && game.me != ui.equipsZone.me) {
+    			if (ui.equipsZone && ui.equipsZone.me && game.me && game.me != ui.equipsZone.me) {
 			        ui.equipsZone.me.appendChild(ui.equipsZone.equips);
 			        ui.equipsZone.me = game.me;
 				    ui.equipsZone.equips = game.me.node.equips;
@@ -735,7 +735,7 @@ content:function(config, pack){
 			
 			game.swapControl = function(player){
     			var result = swapControlFunction.call(this, player);
-    			if (game.me && game.me != ui.equipsZone.me) {
+    			if (ui.equipsZone && ui.equipsZone.me && game.me && game.me != ui.equipsZone.me) {
 			        ui.equipsZone.me.appendChild(ui.equipsZone.equips);
 			        ui.equipsZone.me = game.me;
 				    ui.equipsZone.equips = game.me.node.equips;
@@ -2355,7 +2355,12 @@ content:function(config, pack){
 				        if (identity == 'ye' && get.is.jun(this)) {
 							this.identity = identity = lib.character[this.name1][1];
 						}
-						this.group = identity;
+						if(['zhu','zhong','nei','fan'].includes(identity)){
+							this.group=lib.character[this.name1][1];
+							if(this.group=='shen') this.group=this.groupshen;
+						}else{
+							this.group = identity;
+						}
 				        break;
 				    case 'versus':
 						this.finalSide = this.side;

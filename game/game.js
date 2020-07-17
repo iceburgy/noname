@@ -14471,9 +14471,7 @@
 						else frag2.appendChild(cards[num]);
 					}
 					var addv=function(){
-						if(player==game.me){
-							game.addVideo('gain12',player,[get.cardsInfo(frag1.childNodes),get.cardsInfo(frag2.childNodes)]);
-						}
+						game.addVideo('gain12',player,[get.cardsInfo(frag1.childNodes),get.cardsInfo(frag2.childNodes)]);
 					};
 					var broadcast=function(){
 						game.broadcast(function(player,cards,num){
@@ -28370,12 +28368,17 @@
 
 						game.players[i].classList.add('unseen_v');
 						game.players[i].classList.add('unseen2_v');
-						if(game.players[i]!=game.me){
-							game.players[i].node.identity.firstChild.innerHTML='猜';
-							game.players[i].node.identity.dataset.color='unknown';
+						if(players[i].identity){
+							game.players[i].setIdentity(players[i].identity);
 						}
 						else{
-							game.players[i].setIdentity(game.players[i].group);
+							if(game.players[i]!=game.me){
+								game.players[i].node.identity.firstChild.innerHTML='猜';
+								game.players[i].node.identity.dataset.color='unknown';
+							}
+							else{
+								game.players[i].setIdentity(game.players[i].group);
+							}
 						}
 					}
 				}
@@ -47459,6 +47462,10 @@
 				var custom=_status.event.custom;
 				if(custom.replace.target){
 					custom.replace.target(this,e);
+					return;
+				}
+				if(_status.video){
+					game.swapPlayer(this);
 					return;
 				}
 				if(this.classList.contains('selectable')==false) return;
