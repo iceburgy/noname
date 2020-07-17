@@ -31513,6 +31513,31 @@
 				lib.videos.unshift(newvid);
 				store.put(newvid);
 				ui.create.videoNode(newvid,true);
+				game.broadcast(function(nvstr){
+					var nv=JSON.parse(nvstr);
+					var vinum=parseInt(lib.config.video);
+					var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+					var videos=lib.videos.slice(0);
+					for(var i=0;i<videos.length;i++){
+						if(videos[i].starred){
+							videos.splice(i--,1);
+						}
+					}
+					for(var deletei=0;deletei<5;deletei++){
+						if(videos.length>=vinum){
+							var toremove=videos.pop();
+							lib.videos.remove(toremove);
+							store.delete(toremove.time);
+						}
+						else{
+							break;
+						}
+					}
+
+					lib.videos.unshift(nv);
+					store.put(nv);
+					ui.create.videoNode(nv,true);
+				},JSON.stringify(newvid));
 			}
 			// _status.auto=false;
 			if(ui.auto){
@@ -36512,8 +36537,12 @@
 								(function(){
 									var list=[];
 									for(var i in lib.character){
-										if(lib.character[i][3].length)
-										list.push([i,lib.translate[i]]);
+										if(lib.character[i]&&lib.character[i][3].length){
+											list.push([i,lib.translate[i]]);
+										}
+										else{
+											delete lib.character[i];
+										}
 									}
 
 									list.sort(function(a,b){
@@ -42335,7 +42364,11 @@
 								playButton.listen(function(){
 									var current=this.parentNode.querySelector('.videonode.active');
 									if(current){
-										game.playVideo(current.link.time,current.link.mode);
+										var mode=current.link.mode;
+										if(mode=='identity'){
+											mode='guozhan';
+										}
+										game.playVideo(current.link.time,mode);
 									}
 								});
 								deleteButton.listen(function(){
