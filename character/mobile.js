@@ -2825,7 +2825,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool&&result.targets.length){
 						player.line(result.targets,'green');
 						for(var i=0;i<result.targets.length;i++){
-							result.targets[i].link();
+							if(!result.targets[i].isLinked()){
+								result.targets[i].link();
+							}
 						}
 					}
 				},

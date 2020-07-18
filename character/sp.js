@@ -16708,7 +16708,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 3"
 					if(result.targets.length){
-						result.targets[0].gain(event.togive,'draw');
+						player.give(event.togive,result.targets[0]);
 						player.line(result.targets[0],'green');
 						game.log(result.targets[0],'获得了'+get.cnNumber(event.togive.length)+'张牌');
 						event.goto(1);
