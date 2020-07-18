@@ -30990,7 +30990,13 @@
 						var rolesStatisticsKeyLocal='local';
 						var rolesStatistics=rolesStatisticsRoot[rolesStatisticsKeyLocal];
 						if(rolesStatistics){
-							return rolesStatistics[a].winRate>rolesStatistics[b].winRate?-1:(rolesStatistics[a].winRate<rolesStatistics[b].winRate?1:(a<=b?-1:1));
+							if(rolesStatistics[a].winRate!=rolesStatistics[b].winRate){
+								return rolesStatistics[a].winRate>rolesStatistics[b].winRate?-1:1;
+							}
+							if(rolesStatistics[a].numWin!=rolesStatistics[b].numWin){
+								return rolesStatistics[a].numWin>rolesStatistics[b].numWin?-1:1;
+							}
+							return a<=b?-1:1;
 						}
 					}
 				});
@@ -34502,11 +34508,20 @@
 
         	// sort items by value
         	sortable.sort(function(a, b){
-        		var x=parseFloat(a[1].winRate),
-        			y=parseFloat(b[1].winRate),
-        			k1=a[0],
-        			k2=b[0];
-        		return x>y ? -1 : x<y ? 1 : (k1<k2 ? -1 : k1>k2 ? 1 : 0);
+        		var wra=parseFloat(a[1].winRate),
+        			wrb=parseFloat(b[1].winRate),
+					nwa=parseFloat(a[1].numWin),
+        			nwb=parseFloat(b[1].numWin),
+        			ka=a[0],
+        			kb=b[0];
+
+				if(wra!=wrb){
+					return wra>wrb?-1:1;
+				}
+				if(nwa!=nwb){
+					return nwa>nwb?-1:1;
+				}
+				return ka<=kb?-1:1;
         	});
         	return sortable; // array in format [ [ key1, val1 ], [ key2, val2 ], ... ]
         },
