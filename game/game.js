@@ -12308,7 +12308,9 @@
 						event.dialog.style.display='';
 						event.dialog.open();
 					}
-					game.check();
+					if(event.isMine()||!event.isOnline()){
+						game.check();
+					}
 					if(event.isMine()){
 						game.pause();
 					}
