@@ -2100,6 +2100,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(result.links&&(game.online||player==game.me)) {
 							player.init(result.links[0],false);
 							player.chosenChar1=result.links[0];
+							var info=lib.character[result.links[0]];
+							var skills=info[3];
+							for(var i=0;i<skills.length;i++){
+								player.hiddenSkills.add(skills[i]);
+							}
 						}
 					});
 					"step 2"
@@ -2135,6 +2140,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(game.online||player==game.me) {
 							player.init(result.links[0],false);
 							player.chosenChar1=result.links[0];
+							var info=lib.character[result.links[0]];
+							var skills=info[3];
+							for(var i=0;i<skills.length;i++){
+								player.hiddenSkills.add(skills[i]);
+							}
 						}
 					});
 
@@ -2170,6 +2180,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.me.chooseButtonOL(list,function(player,result){
 						if(result.links&&(game.online||player==game.me)){
 							player.init(player.chosenChar1,result.links[0],false);
+							var info=lib.character[result.links[0]];
+							var skills=info[3];
+							for(var i=0;i<skills.length;i++){
+								player.hiddenSkills.add(skills[i]);
+							}
 						}
 					});
 
@@ -2206,6 +2221,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.me.chooseButtonOL(list,function(player,result){
 						if(game.online||player==game.me){
 							player.init(player.chosenChar1,result.links[0],false);
+							var info=lib.character[result.links[0]];
+							var skills=info[3];
+							for(var i=0;i<skills.length;i++){
+								player.hiddenSkills.add(skills[i]);
+							}
 						}
 					});
 
@@ -2397,6 +2417,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(result.links&&(game.online||player==game.me)){
 							player.init(result.links[0],false);
 							player.chosenChar1=result.links[0];
+							var info=lib.character[result.links[0]];
+							var skills=info[3];
+							for(var i=0;i<skills.length;i++){
+								player.hiddenSkills.add(skills[i]);
+							}
 						}
 					});
 					"step 12"
@@ -2446,6 +2471,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(game.online||player==game.me){
 							player.init(result.links[0],false);
 							player.chosenChar1=result.links[0];
+							var info=lib.character[result.links[0]];
+							var skills=info[3];
+							for(var i=0;i<skills.length;i++){
+								player.hiddenSkills.add(skills[i]);
+							}
 						}
 					});
 
@@ -2528,6 +2558,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.me.chooseButtonOL(list,function(player,result){
 						if(result.links&&(game.online||player==game.me)){
 							player.init(player.chosenChar1,result.links[0],false);
+							var info=lib.character[result.links[0]];
+							var skills=info[3];
+							for(var i=0;i<skills.length;i++){
+								player.hiddenSkills.add(skills[i]);
+							}
 						}
 					});
 
@@ -2578,6 +2613,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.me.chooseButtonOL(list,function(player,result){
 						if(game.online||player==game.me){
 							player.init(player.chosenChar1,result.links[0],false);
+							var info=lib.character[result.links[0]];
+							var skills=info[3];
+							for(var i=0;i<skills.length;i++){
+								player.hiddenSkills.add(skills[i]);
+							}
 						}
 					});
 
