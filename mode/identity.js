@@ -3818,7 +3818,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseControlList(get.prompt('zhikezhugong'),'准备阶段使用一次手气卡','如果没有对其他玩家使用牌，可以跳过弃牌阶段',function(event,player){
-						return Math.floor(Math.random()*2);
+						return 1;
 					});
 					'step 1'
 					if(result.index==0){
