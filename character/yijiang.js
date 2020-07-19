@@ -5703,7 +5703,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					var cards=result.index==0?event.sha:event.shan;
 					event.useSha=false;
-					target.gain(cards,'gain2');
+					player.give(cards,target);
 					for(var i=0;i<cards.length;i++){
 						if(get.color(cards[i])=='red'){
 							event.useSha=true;break;
