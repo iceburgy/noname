@@ -584,6 +584,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			muniu_skill3:{
 				trigger:{player:'chooseToRespondBegin',global:'judge'},
+				priority:-1,
 				cardSkill:true,
 				filter:function(event,player){
 					if(event.responded) return false;
