@@ -3023,8 +3023,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:['phaseZhunbeiBefore','phaseJieshuBefore'],
 				},
 				forced:true,
-				audio:2,
-				group:'xinfu_pdgyingshi2',
+				audio:'xinfu_yinshi',
+				group:['xinfu_pdgyingshi2','xinfu_pdgyingshi3'],
 				priority:15,
 				content:function(){
 					trigger.cancel();
@@ -3042,6 +3042,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.cancel();
 					game.log(player,'跳过了判定阶段');
 				},
+			},
+			xinfu_pdgyingshi3:{
+				audio:'xinfu_yinshi',
+				trigger:{player:'addJudgeBefore'},
+				forced:true,
+				filter:function (event,player){
+					return get.type(event.card)=='delay';
+				},
+				priority:15,
+				content:function(){
+					trigger.cancel();
+					for(var i=0;i<trigger.cards.length;i++){
+						trigger.cards[i].discard();
+					}
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current){
+							if(get.type(card)=='delay') return 'zeroplayertarget';
+						},
+					}
+				}
 			},
 			"pcaudio_wolong_card":{
 				audio:true,
@@ -4051,6 +4073,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"shuijing_card_info":"将一名角色装备区内的防具牌移动到另一名角色对应区域。若场上有存活的司马徽，则改为将1名角色装备区内的1件装备移动到另1角色对应区域。","xinfu_pingcai":"评才",
 			"xinfu_pingcai_info":"出牌阶段限一次，你可以挑选一个宝物并擦拭掉其上面的灰尘。然后，你可以根据宝物类型执行对应的效果。",
 			"xinfu_pdgyingshi":"隐世",
+			"xinfu_pdgyingshi2":"隐世",
+			"xinfu_pdgyingshi3":"隐世",
 			"xinfu_pdgyingshi_info":"锁定技，你始终跳过准备阶段，判定阶段，结束阶段。你不能被选择为延时锦囊牌的目标。",
 			"pcaudio_wolong_card":"卧龙",
 			"pcaudio_wolong_card_info":"",

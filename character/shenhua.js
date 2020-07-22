@@ -2797,12 +2797,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('prompt','失去任意点体力').set('goon',num);
 					'step 1'
 					var num=event.map[result.control]||1;
+					player.storage.defaultCardUsable=player.getCardUsable('sha');
 					player.storage.qimou2=num;
-					player.storage.qimou3=num;
+					player.storage.qimou3=num+player.storage.defaultCardUsable;
 					player.loseHp(num);
 					player.addTempSkill('qimou2');
 					player.addTempSkill('qimou3');
 					player.markSkill('qimou3');
+					player.addTempSkill('qimou4');
 				},
 				ai:{
 					order:2,
@@ -2857,7 +2859,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				intro:{
 					content:function(storage){
-						return '可额外使用杀的次数'+storage;
+						return '可使用杀的次数'+storage;
 					}
 				},
 				filter:function(event,player){
@@ -2866,6 +2868,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.storage.qimou3--;
 					player.markSkill('qimou3');
+				},
+				onremove:true,
+			},
+			qimou4:{
+				trigger:{player:'phaseUseEnd'},
+				silent:true,
+				content:function(){
+					var usedShas=player.getHistory('useCard',function(evt){
+						return evt.card&&evt.card.name=='sha';
+					}).length;
+					player.storage.qimou2-=(usedShas-player.storage.defaultCardUsable);
+					player.storage.qimou3+=player.storage.defaultCardUsable;
 				},
 				onremove:true,
 			},
