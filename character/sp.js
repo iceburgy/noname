@@ -15052,7 +15052,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.pause();
 					setTimeout(function(){
 						game.resume();
-					},3000);
+					},1000);
 
 					"step 2"
 					event.dialog.close();
@@ -15063,7 +15063,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.pause();
 						setTimeout(function(){
 							game.resume();
-						},3000);
+						},1000);
 						if(card.number==event.num) return 4;
 						return -1;
 					});
