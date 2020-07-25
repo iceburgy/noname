@@ -30801,10 +30801,8 @@
 					}
 				});
 				for(i=0;i<clients.length;i++){
-					var nameol='无名玩家';
-					if(clients[i].nickname){
-						nameol=clients[i].nickname;
-					}
+					if(!clients[i].nickname||clients[i].nickname=='无名玩家') continue;
+					var nameol=clients[i].nickname;
 					if(!playersStatistics[nameol]){
 						playersStatistics[nameol]={
 							'numWin':0,
@@ -30866,52 +30864,50 @@
 					var playerIdentity=clients[i].identity;
 					var playerWin=game.checkOnlineResult(clients[i]);
 					if(playerWin&&(!winnerId||playerIdentity=='zhong')) winnerId=playerIdentity;
-					if(nameol!='无名玩家'){
-						playersStatistics[nameol]['lastID']=playerIdentity;
-						if(playerWin){
-							playersStatistics[nameol]['numWin']++;
-							playersStatistics[nameol][playerIdentity+'Win']++;
-						}
-						else{
-							playersStatistics[nameol]['numLose']++;
-							playersStatistics[nameol][playerIdentity+'Lose']++;
-						}
-						var numTotal=playersStatistics[nameol]['numWin']+playersStatistics[nameol]['numLose'];
-						var numTotalById=playersStatistics[nameol][playerIdentity+'Win']+playersStatistics[nameol][playerIdentity+'Lose'];
-						var winRate=0;
-						var winRateById=0;
-						if(numTotal>0){
-							winRate=Math.round(100*playersStatistics[nameol]['numWin']/(numTotal));
-						}
-						if(numTotalById>0){
-							playersStatistics[nameol][playerIdentity+'Rate']=Math.round(100*playersStatistics[nameol][playerIdentity+'Win']/(numTotalById));
-						}
-						playersStatistics[nameol]['winRate']=winRate+"%";
-						// by roles
-						if(playerWin){
-							rolesStatistics[clients[i].name1]['numWin']++;
-							rolesStatistics[clients[i].name1][playerIdentity+'Win']++;
-							rolesStatistics[clients[i].name2]['numWin']++;
-							rolesStatistics[clients[i].name2][playerIdentity+'Win']++;
-						}
-						else{
-							rolesStatistics[clients[i].name1]['numLose']++;
-							rolesStatistics[clients[i].name1][playerIdentity+'Lose']++;
-							rolesStatistics[clients[i].name2]['numLose']++;
-							rolesStatistics[clients[i].name2][playerIdentity+'Lose']++;
-						}
-						var numTotal=rolesStatistics[clients[i].name1]['numWin']+rolesStatistics[clients[i].name1]['numLose'];
-						var numTotalById=rolesStatistics[clients[i].name1][playerIdentity+'Win']+rolesStatistics[clients[i].name1][playerIdentity+'Lose'];
-						var numTotal2=rolesStatistics[clients[i].name2]['numWin']+rolesStatistics[clients[i].name2]['numLose'];
-						var numTotalById2=rolesStatistics[clients[i].name2][playerIdentity+'Win']+rolesStatistics[clients[i].name2][playerIdentity+'Lose'];
-						if(numTotal>0){
-							rolesStatistics[clients[i].name1]['winRate']=Math.round(100*rolesStatistics[clients[i].name1]['numWin']/(numTotal));
-							rolesStatistics[clients[i].name2]['winRate']=Math.round(100*rolesStatistics[clients[i].name2]['numWin']/(numTotal2));
-						}
-						if(numTotalById>0){
-							rolesStatistics[clients[i].name1][playerIdentity+'Rate']=Math.round(100*rolesStatistics[clients[i].name1][playerIdentity+'Win']/(numTotalById));
-							rolesStatistics[clients[i].name2][playerIdentity+'Rate']=Math.round(100*rolesStatistics[clients[i].name2][playerIdentity+'Win']/(numTotalById2));
-						}
+					playersStatistics[nameol]['lastID']=playerIdentity;
+					if(playerWin){
+						playersStatistics[nameol]['numWin']++;
+						playersStatistics[nameol][playerIdentity+'Win']++;
+					}
+					else{
+						playersStatistics[nameol]['numLose']++;
+						playersStatistics[nameol][playerIdentity+'Lose']++;
+					}
+					var numTotal=playersStatistics[nameol]['numWin']+playersStatistics[nameol]['numLose'];
+					var numTotalById=playersStatistics[nameol][playerIdentity+'Win']+playersStatistics[nameol][playerIdentity+'Lose'];
+					var winRate=0;
+					var winRateById=0;
+					if(numTotal>0){
+						winRate=Math.round(100*playersStatistics[nameol]['numWin']/(numTotal));
+					}
+					if(numTotalById>0){
+						playersStatistics[nameol][playerIdentity+'Rate']=Math.round(100*playersStatistics[nameol][playerIdentity+'Win']/(numTotalById));
+					}
+					playersStatistics[nameol]['winRate']=winRate+"%";
+					// by roles
+					if(playerWin){
+						rolesStatistics[clients[i].name1]['numWin']++;
+						rolesStatistics[clients[i].name1][playerIdentity+'Win']++;
+						rolesStatistics[clients[i].name2]['numWin']++;
+						rolesStatistics[clients[i].name2][playerIdentity+'Win']++;
+					}
+					else{
+						rolesStatistics[clients[i].name1]['numLose']++;
+						rolesStatistics[clients[i].name1][playerIdentity+'Lose']++;
+						rolesStatistics[clients[i].name2]['numLose']++;
+						rolesStatistics[clients[i].name2][playerIdentity+'Lose']++;
+					}
+					var numTotal=rolesStatistics[clients[i].name1]['numWin']+rolesStatistics[clients[i].name1]['numLose'];
+					var numTotalById=rolesStatistics[clients[i].name1][playerIdentity+'Win']+rolesStatistics[clients[i].name1][playerIdentity+'Lose'];
+					var numTotal2=rolesStatistics[clients[i].name2]['numWin']+rolesStatistics[clients[i].name2]['numLose'];
+					var numTotalById2=rolesStatistics[clients[i].name2][playerIdentity+'Win']+rolesStatistics[clients[i].name2][playerIdentity+'Lose'];
+					if(numTotal>0){
+						rolesStatistics[clients[i].name1]['winRate']=Math.round(100*rolesStatistics[clients[i].name1]['numWin']/(numTotal));
+						rolesStatistics[clients[i].name2]['winRate']=Math.round(100*rolesStatistics[clients[i].name2]['numWin']/(numTotal2));
+					}
+					if(numTotalById>0){
+						rolesStatistics[clients[i].name1][playerIdentity+'Rate']=Math.round(100*rolesStatistics[clients[i].name1][playerIdentity+'Win']/(numTotalById));
+						rolesStatistics[clients[i].name2][playerIdentity+'Rate']=Math.round(100*rolesStatistics[clients[i].name2][playerIdentity+'Win']/(numTotalById2));
 					}
 				}
 
