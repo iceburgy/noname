@@ -1323,13 +1323,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
-							var num=target.hp-target.countCards('h')-2;
-							if(num>-1) return -0.01;
-							if(target.hp<3) num--;
-							if(target.isTurnedOver()) num/=2;
 							var dist=get.distance(player,target,'absolute');
 							if(dist<1) dist=1;
-							return num/Math.sqrt(dist);
+							return -Math.pow(10,2*(9-dist));
 						}
 					},
 					tag:{
