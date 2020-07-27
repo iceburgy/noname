@@ -3828,6 +3828,47 @@
 							}
 						}
 					},
+					xiaoneijiangli_by_seat:{
+						name:'小内奖励',
+						init:'0',
+						item:{
+							'0':'一号位',
+							'1':'二号位',
+							'2':'三号位',
+							'3':'四号位',
+							'4':'五号位',
+							'5':'六号位',
+							'6':'七号位',
+							'7':'八号位',
+							'8':'九号位',
+							'9':'十号位'
+						},
+						frequent:true,
+						restart:true,
+						onclick:function(seat,label){
+							this.innerHTML=this.innerHTML.replace('小内奖励','奖励中...');
+							game.saveConfig('xiaoneijiangli_by_seat',seat);
+							var result=game.addXiaoneiBonusBySeat(seat);
+							var that=this;
+							if(result){
+								setTimeout(function(){
+									that.innerHTML=that.innerHTML.replace('奖励中...','奖励成功');
+									setTimeout(function(){
+										game.reload();
+									},1000);
+								},1000);
+							}
+							else{
+								setTimeout(function(){
+									that.innerHTML=that.innerHTML.replace('奖励中...',label.innerHTML+'没有人！');
+									setTimeout(function(){
+										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','小内奖励');
+									},1000);
+								},1000);
+							}
+						},
+						intro:'按照座位号发小内奖励卡',
+					},
 					oneclick_reset_server:{
 						name:'一键完成以下设置',
 						clear:true,
@@ -26794,10 +26835,12 @@
 			if(!lib.config.xiaoneibonus){
 				lib.config.xiaoneibonus={};
 			}
-			if(game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
+			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
 				lib.config.xiaoneibonus[game.connectPlayers[seat].nickname]=game.connectPlayers[seat].nickname;
 				game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+				return true;
 			}
+			return false;
 		},
 		savePlayerInfo:function(playerIP,playerNickname){
 			if(playerNickname){
