@@ -10195,9 +10195,28 @@
 					}
 				},
 				cardsDiscard:function(){
+					// handle muniu card used and sync out side of player phase
+					var muniuOwner=get.muniuOwner();
+					var needMuniuSync=false;
+					if(game.needMuniuSync){
+						game.needMuniuSync=false;
+						needMuniuSync=true;
+					}
+					else if(muniuOwner&&muniuOwner!=_status.currentPhase&&cards&&cards.length&&(cards[0].parentNode&&cards[0].parentNode.id&&cards[0].parentNode.id=='special'||cards[0].parentNode&&cards[0].parentNode.classList&&cards[0].parentNode.classList.contains('special'))) needMuniuSync=true;
+
 					game.getGlobalHistory().cardMove.push(event);
 					for(var i=0;i<cards.length;i++){
 						cards[i].discard();
+					}
+
+					if(needMuniuSync){
+						var muniu = muniuOwner.getEquip(5);
+						if (muniu) {
+							lib.skill.muniu_skill.sync(muniu);
+							game.broadcastAll(function(player){
+								player.updateMarks();
+							},muniuOwner);
+						}
 					}
 				},
 				orderingDiscard:function(){
@@ -10208,6 +10227,11 @@
 					if(cards.length) game.cardsDiscard(cards);
 				},
 				cardsGotoOrdering:function(){
+					// handle muniu card used and sync out side of player phase
+					var muniuOwner=get.muniuOwner();
+					game.needMuniuSync=false;
+					if(muniuOwner&&muniuOwner!=_status.currentPhase&&cards&&cards.length&&(cards[0].parentNode&&cards[0].parentNode.id&&cards[0].parentNode.id=='special'||cards[0].parentNode&&cards[0].parentNode.classList&&cards[0].parentNode.classList.contains('special'))) game.needMuniuSync=true;
+
 					game.getGlobalHistory().cardMove.push(event);
 					for(var i=0;i<cards.length;i++){
 						cards[i].goto(ui.ordering);
@@ -49071,6 +49095,14 @@
 		},
 	};
 	var get={
+		muniuOwner:function(){
+			for(var player of game.players){
+				var muniu = player.getEquip(5);
+				if (muniu) {
+					return player;
+				}
+			}
+		},
 		isLuckyStar:function(){
 			if(_status.connectMode) return false;
 			return lib.config.lucky_star==true;
