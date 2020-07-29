@@ -1181,42 +1181,40 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 		},
 	}
 	
-	if (!_status.connectMode) {
-		for (var key in decadeUI.skill) {
-			if (lib.skill[key]) lib.skill[key] = decadeUI.skill[key];
+	for (var key in decadeUI.skill) {
+		if (lib.skill[key]) lib.skill[key] = decadeUI.skill[key];
+	}
+
+	for (var key in decadeUI.inheritSkill) {
+		if (lib.skill[key]) {
+			 for (var j in decadeUI.inheritSkill[key]) {
+				lib.skill[key][j] = decadeUI.inheritSkill[key][j]
+			 }
 		}
-		
-		for (var key in decadeUI.inheritSkill) {
-			if (lib.skill[key]) {
-				 for (var j in decadeUI.inheritSkill[key]) {
-					lib.skill[key][j] = decadeUI.inheritSkill[key][j]
-				 }
+	}
+
+	var muniuSkill = lib.skill['muniu_skill'];
+	if (muniuSkill) {
+		muniuSkill.sync = function(muniu){
+			if(game.online){
+				return;
 			}
-		}
-		
-		var muniuSkill = lib.skill['muniu_skill'];
-		if (muniuSkill) {
-			muniuSkill.sync = function(muniu){
-				if(game.online){
-					return;
+			if(!muniu.cards){
+				muniu.cards=[];
+			}
+			for(var i=0;i<muniu.cards.length;i++){
+				var parent = muniu.cards[i].parentNode;
+				if(!parent || (parent.id != 'special' && !parent.classList.contains('special'))){
+					muniu.cards[i].classList.remove('selected');
+					muniu.cards[i].classList.remove('selectable');
+					muniu.cards[i].classList.remove('un-selectable');
+					muniu.cards.splice(i--,1);
 				}
-				if(!muniu.cards){
-					muniu.cards=[];
-				}
-				for(var i=0;i<muniu.cards.length;i++){
-					var parent = muniu.cards[i].parentNode;
-					if(!parent || (parent.id != 'special' && !parent.classList.contains('special'))){
-						muniu.cards[i].classList.remove('selected');
-						muniu.cards[i].classList.remove('selectable');
-						muniu.cards[i].classList.remove('un-selectable');
-						muniu.cards.splice(i--,1);
-					}
-				}
-				game.broadcast(function(muniu,cards){
-					muniu.cards=cards;
-				},muniu,muniu.cards);
-			};
-		}
+			}
+			game.broadcast(function(muniu,cards){
+				muniu.cards=cards;
+			},muniu,muniu.cards);
+		};
 	}
 });
 

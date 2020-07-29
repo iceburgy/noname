@@ -6399,7 +6399,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:-1,
 				filter:function(event,player){
 					if(player.getStat().skill.zhanjue_draw&&player.getStat().skill.zhanjue_draw>=2) return false;
-					var hs=player.getCards('h');
+					var hs=player.getCards('hs');
 					if(!hs.length) return false;
 					for(var i=0;i<hs.length;i++){
 						var mod2=game.checkMod(hs[i],player,'unchanged','cardEnabled2',player);

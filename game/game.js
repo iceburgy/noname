@@ -10212,7 +10212,7 @@
 					for(var i=0;i<cards.length;i++){
 						cards[i].goto(ui.ordering);
 					}
-				 var evt=event.relatedEvent||event.getParent();
+					var evt=event.relatedEvent||event.getParent();
 					if(!evt.orderingCards) evt.orderingCards=[];
 					if(!event.noOrdering&&!event.cardsOrdered){
 						event.cardsOrdered=true;
@@ -12549,6 +12549,7 @@
 									str+='张';
 									if(event.position=='h'||event.position==undefined) str+='手';
 									if(event.position=='e') str+='装备';
+									if(event.position=='s') str+='特殊';
 									str+='牌';
 								}
 								event.dialog=ui.create.dialog(str);
@@ -16997,6 +16998,16 @@
 										this.node.judges.childNodes[j].tempJudge=this.node.judges.childNodes[j].name;
 										this.node.judges.childNodes[j].name=this.node.judges.childNodes[j].viewAs;
 										cards1.push(this.node.judges.childNodes[j]);
+									}
+								}
+							}
+						}
+						else if(arg1[i]=='s'){
+							var muniu = this.getEquip(5);
+							if (muniu && muniu.cards && muniu.cards.length){
+								for(j=0;j<muniu.cards.length;j++){
+									if(!muniu.cards[j].classList.contains('removing')){
+										cards.push(muniu.cards[j]);
 									}
 								}
 							}
@@ -25859,6 +25870,91 @@
 								}
 							});
 							args.push(childNodes);
+							sender.send.apply(sender,args);
+							break;
+						}
+					}
+				},
+				syncMuniu:function(player){
+					for(var i=0;i<lib.node.clients.length;i++){
+						if(lib.node.clients[i].id==this.id){
+							var sender=lib.node.clients[i];
+							var muniuCardsParentsShouldRemove=[];
+							var muniu = player.getEquip(5);
+							if(!muniu.cards){
+								muniu.cards=[];
+							}
+							for(var ind=0;ind<muniu.cards.length;ind++){
+								var parent=muniu.cards[ind].parentNode;
+								var shouldRemove=!parent || (parent.id != 'special' && (!parent.classList||!parent.classList.contains('special')));
+								muniuCardsParentsShouldRemove.push(shouldRemove);
+							}
+							var muniuCardsParentsShouldRemoveTemp=muniuCardsParentsShouldRemove.slice(0);
+							for(var ind=0;ind<muniu.cards.length;ind++){
+								if(muniuCardsParentsShouldRemoveTemp[ind]){
+									muniu.cards[ind].classList.remove('selected');
+									muniu.cards[ind].classList.remove('selectable');
+									muniu.cards[ind].classList.remove('un-selectable');
+									muniu.cards.splice(ind,1);
+									muniuCardsParentsShouldRemoveTemp.splice(ind,1);
+									ind--
+								}
+							}
+							game.broadcastAll(function(player,muniu,cards){
+								muniu.cards=cards;
+								player.updateMarks();
+							},player,muniu,muniu.cards);
+
+							var args=[];
+							args.push(function(player,muniuCardsParentsShouldRemove){
+								//lib.skill.muniu_skill.sync(muniu);
+								var muniu = player.getEquip(5);
+								if(!muniu.cards){
+									muniu.cards=[];
+								}
+								for(var i=0;i<muniu.cards.length;i++){
+									if(muniuCardsParentsShouldRemove[i]){
+										muniu.cards[i].classList.remove('selected');
+										muniu.cards[i].classList.remove('selectable');
+										muniu.cards[i].classList.remove('un-selectable');
+										muniu.cards.splice(i,1);
+										muniuCardsParentsShouldRemove.splice(i,1);
+										i--;
+									}
+								}
+
+								//ui.handSpecial.reset(player.getEquip(5).cards);
+								var cards=muniu.cards;
+								var elements = ui.handSpecial.cards.childNodes;
+								for (var i = elements.length - 1; i >= 0; i--) {
+									if (cards && cards.contains(elements[i])) continue;
+									ui.special.appendChild(elements[i]);
+								}
+
+								if (cards && cards.length) {
+									for (var i = 0; i < cards.length; i++) {
+										if (cards[i]) ui.handSpecial.cards.appendChild(cards[i]);
+									}
+								}
+
+								if(muniu.cards && muniu.cards.length) ui.handSpecial.show();
+							});
+							args.push(player);
+							args.push(muniuCardsParentsShouldRemove);
+							sender.send.apply(sender,args);
+							break;
+						}
+					}
+				},
+				hideMuniu:function(){
+					for(var i=0;i<lib.node.clients.length;i++){
+						if(lib.node.clients[i].id==this.id){
+							var sender=lib.node.clients[i];
+
+							var args=[];
+							args.push(function(){
+								ui.handSpecial.hide();
+							});
 							sender.send.apply(sender,args);
 							break;
 						}
@@ -50679,6 +50775,7 @@
 			if(card.parentNode.classList.contains('equips')) return 'e';
 			if(card.parentNode.classList.contains('judges')) return 'j';
 			if(card.parentNode.classList.contains('handcards')) return 'h';
+			if(card.parentNode.classList.contains('special')) return 's';
 			if(card.parentNode.id=='cardPile') return 'c';
 			if(card.parentNode.id=='discardPile') return 'd';
 			if(card.parentNode.id=='special') return 's';

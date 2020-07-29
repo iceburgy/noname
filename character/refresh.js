@@ -2543,7 +2543,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				position:'he',
 				viewAs:{name:'shan'},
 				viewAsFilter:function(player){
-					if(!player.countCards('he',{color:'black'})) return false;
+					if(!player.countCards('hes',{color:'black'})) return false;
 				},
 				prompt:'将一张黑色牌当闪打出',
 				check:function(){return 1},
@@ -2618,7 +2618,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					nature:"fire",
 				},
 				viewAsFilter:function (player){
-					if(!player.countCards('he',{color:'red'})) return false;
+					if(!player.countCards('hes',{color:'red'})) return false;
 				},
 				prompt:"将一张红色牌当火攻使用",
 				check:function (card){
@@ -2638,7 +2638,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.color(card)=='black';
 				},
 				viewAsFilter:function (player){
-					return player.countCards('he',{color:'black'})>0;
+					return player.countCards('hes',{color:'black'})>0;
 				},
 				viewAs:{
 					name:"wuxie",
@@ -3118,7 +3118,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				viewAsFilter:function (player){
 					if(get.zhu(player,'shouyue')){
-						if(!player.countCards('he')) return false;
+						if(!player.countCards('hes')) return false;
 					}
 					else{
 						if(!player.countCards('he',{color:'red'})) return false;
@@ -5467,7 +5467,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				discard:false,
 				filter:function(event,player){
-					return player.countCards('he',{suit:'diamond'})>0;
+					return player.countCards('hes',{suit:'diamond'})>0;
 				},
 				prepare:'throw',
 				position:'he',

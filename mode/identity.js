@@ -2101,7 +2101,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.list.randomRemove(choiceZhu),'character']],false]);
+							list.push([game.players[i],[str,[event.list.randomRemove(choiceZhu).concat('re_guanyu','guanzhang','ol_sp_zhugeliang','sp_zhangjiao','re_zhenji','re_zhaoyun','re_huatuo','re_simayi','re_ganning','re_liubei','zhuling'),'character']],false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2182,7 +2182,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[0][0],choiceZhu,event.list);
-							list.push([game.players[i],[str,[nextValidCharacters,'character']],false]);
+							list.push([game.players[i],[str,[nextValidCharacters.concat('re_guanyu','guanzhang','ol_sp_zhugeliang','sp_zhangjiao','re_zhenji','re_zhaoyun','re_huatuo','re_simayi','re_ganning','re_liubei','zhuling'),'character']],false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2418,7 +2418,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.list.randomRemove(num+num3),'character']],selectButton,false]);
+							list.push([game.players[i],[str,[event.list.randomRemove(num+num3).concat('re_guanyu','guanzhang','ol_sp_zhugeliang','sp_zhangjiao','re_zhenji','re_zhaoyun','re_huatuo','re_simayi','re_ganning','re_liubei','zhuling'),'character']],selectButton,false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2560,7 +2560,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[distanceFromZhu][0],num+num3,event.list);
-							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,false]);
+							list.push([game.players[i],[str,[nextValidCharacters.concat('re_guanyu','guanzhang','ol_sp_zhugeliang','sp_zhangjiao','re_zhenji','re_zhaoyun','re_huatuo','re_simayi','re_ganning','re_liubei','zhuling'),'character']],selectButton,false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){

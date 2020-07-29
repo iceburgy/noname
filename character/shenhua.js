@@ -2638,7 +2638,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['ol_pangtong'],
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return player.countCards('h',{suit:'club'})>0;
+					return player.countCards('hs',{suit:'club'})>0;
 				},
 				filterCard:{suit:'club'},
 				viewAs:{name:'tiesuo'},
@@ -4521,7 +4521,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.color(card)=='black';
 				},
 				filter:function(event,player){
-					return player.countCards('he',{type:['basic','equip'],color:'black'})
+					return player.countCards('hes',{type:['basic','equip'],color:'black'})
 				},
 				position:'he',
 				viewAs:{name:'bingliang'},
@@ -4855,7 +4855,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				viewAs:{name:'jiu'},
 				viewAsFilter:function(player){
-					if(!player.countCards('h',{suit:'spade'})) return false;
+					if(!player.countCards('hs',{suit:'spade'})) return false;
 				},
 				prompt:'将一张黑桃手牌当酒使用',
 				check:function(card){

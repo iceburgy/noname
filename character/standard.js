@@ -1416,7 +1416,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterCard:{name:'shan'},
 						viewAs:{name:'sha'},
 						viewAsFilter:function(player){
-							if(!player.countCards('h','shan')) return false;
+							if(!player.countCards('hs','shan')) return false;
 						},
 						prompt:'将一张闪当杀使用或打出',
 						check:function(){return 1},
@@ -1446,7 +1446,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						prompt:'将一张杀当闪使用或打出',
 						check:function(){return 1},
 						viewAsFilter:function(player){
-							if(!player.countCards('h','sha')) return false;
+							if(!player.countCards('hs','sha')) return false;
 						},
 						ai:{
 							respondShan:true,
@@ -1773,7 +1773,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				position:'he',
 				viewAs:{name:'guohe'},
 				viewAsFilter:function(player){
-					if(!player.countCards('he',{color:'black'})) return false;
+					if(!player.countCards('hes',{color:'black'})) return false;
 				},
 				prompt:'将一张黑色牌当过河拆桥使用',
 				check:function(card){return 4-get.value(card)}

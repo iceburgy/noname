@@ -334,16 +334,26 @@ content:function(config, pack){
 					} else {
 						if (ui.handSpecial) ui.handSpecial.hide();
 						var cards = player.getCards(event.position);
-						if (event.name == 'chooseToUse' && !_status.connectMode) {
+						if (event.name == 'chooseToUse'||event.name == 'chooseCard'||event.name == 'chooseToRespond') {
 							var skill = event.skill;
 							var isHand = event.position == undefined || event.position.indexOf('h') != -1;
 							if ((!skill && isHand) || (skill && lib.skill[skill].viewAs && (!lib.skill[skill].selectCard || lib.skill[skill].selectCard > 0) && isHand)) {
 								var muniu = player.getEquip(5);
-								if (muniu && muniu.cards && muniu.cards.length) {
-									lib.skill.muniu_skill.sync(muniu);
-									cards = cards.concat(player.getEquip(5).cards);
-									ui.handSpecial.reset(player.getEquip(5).cards);
-									ui.handSpecial.show();
+								if (muniu) {
+									if(!game.online){
+										if(player==game.me){
+											lib.skill.muniu_skill.sync(muniu);
+											game.broadcastAll(function(player){
+												player.updateMarks();
+											},player);
+											ui.handSpecial.reset(player.getEquip(5).cards);
+											if(muniu.cards && muniu.cards.length) ui.handSpecial.show();
+										}
+									}
+									else{
+										game.send('syncMuniu',player);
+									}
+									if(muniu.cards && muniu.cards.length) cards = cards.concat(player.getEquip(5).cards);
 								}
 							}
 						}
@@ -713,7 +723,12 @@ content:function(config, pack){
 					var args = Array.from(arguments);
 				
 					if ((!args.length || args.contains('card')) && _status.event.player) {
-						ui.handSpecial.hide();
+						if(!game.online){
+							ui.handSpecial.hide();
+						}
+						else{
+							game.send('hideMuniu');
+						}
 					}
 				}
 				

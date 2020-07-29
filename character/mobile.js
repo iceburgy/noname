@@ -2276,7 +2276,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.filterCard({name:'tao'},player,event)){
 						return player.hasCard(function(card){
 							return get.type(card)=='basic';
-						},'h');
+						},'hs');
 					}
 					return false;
 				},
