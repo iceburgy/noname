@@ -17227,6 +17227,16 @@
 									}
 								}
 							}
+							else if(arg1[i]=='s'){
+								var muniu = this.getEquip(5);
+								if (muniu && muniu.cards && muniu.cards.length){
+									for(j=0;j<muniu.cards.length;j++){
+										if(!muniu.cards[j].classList.contains('removing')&&!muniu.cards[j].classList.contains('feichu')){
+											cards.push(muniu.cards[j]);
+										}
+									}
+								}
+							}
 						}
 						if(arguments.length==1){
 							return cards;
@@ -49208,7 +49218,7 @@
 				return true;
 			},
 			pos:function(str){
-				return (str=='h'||str=='e'||str=='j'||str=='he'||str=='hj'||str=='ej'||str=='hej');
+				return (str=='h'||str=='e'||str=='j'||str=='he'||str=='hj'||str=='ej'||str=='hej'||str=='s'||str=='hs'||str=='es'||str=='js'||str=='hes'||str=='hjs'||str=='ejs'||str=='hejs');
 			},
 			locked:function(skill){
 				var info=lib.skill[skill];
@@ -50949,7 +50959,7 @@
 		},
 		selectableCards:function(sort){
 			if(!_status.event.player) return[];
-			var cards=_status.event.player.getCards('hej');
+			var cards=_status.event.player.getCards('hejs');
 			var selectable=[];
 			for(var i=0;i<cards.length;i++){
 				if(cards[i].classList.contains('selectable')&&
