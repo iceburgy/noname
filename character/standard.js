@@ -284,6 +284,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					trigger.source.chooseToDiscard(2).set('ai',function(card){
 						if(card.name=='tao') return -10;
+						if(!get.owner(card)) return -20;
 						if(card.name=='jiu'&&_status.event.player.hp==1) return -10;
 						return get.unuseful(card)+2.5*(5-get.owner(card).hp);
 					});
@@ -624,6 +625,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(ui.selected.cards.length&&ui.selected.cards[0].name=='du') return 0;
 					if(!ui.selected.cards.length&&card.name=='du') return 20;
 					var player=get.owner(card);
+					if(!player) return -20;
 					var num=0;
 					var evt2=_status.event.getParent();
 					var num=0;
@@ -2062,6 +2064,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:2,
 				check:function(card){
 					var player=get.owner(card);
+					if(!player) return -20;
 					if(player.countCards('h')>player.hp)
 						return 8-get.value(card)
 					if(player.hp<player.maxHp)
@@ -2201,6 +2204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						check:function(card){
 							var player=get.owner(card);
+							if(!player) return -20;
 							if(player.countCards('h')>player.hp)
 								return 8-get.value(card)
 							if(player.hp<player.maxHp)

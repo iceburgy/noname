@@ -9525,6 +9525,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:[1,3],
 				check:function(card){
 					var player=get.owner(card);
+					if(!player) return -20;
 					if(get.type(card)=='trick') return 10;
 					if(player.countCards('h')-player.hp-ui.selected.cards.length>0){
 						return 8-get.value(card);
@@ -10326,6 +10327,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				check:function(card){
 					var player=get.owner(card);
+					if(!player) return -20;
 					var players=game.filterPlayer();
 					for(var i=0;i<players.length;i++){
 						if(players[i]!=player&&get.attitude(player,players[i])>3) break;

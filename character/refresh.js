@@ -4132,6 +4132,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(ui.selected.cards.length&&ui.selected.cards[0].name=='du') return 0;
 					if(!ui.selected.cards.length&&card.name=='du') return 20;
 					var player=get.owner(card);
+					if(!player) return -20;
 					if(ui.selected.cards.length>=Math.max(2,player.countCards('h')-player.hp)) return 0;
 					if(player.hp==player.maxHp||player.storage.rerende<0||player.countCards('h')<=1){
 						var players=game.filterPlayer();

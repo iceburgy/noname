@@ -3647,6 +3647,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseToCompare(target,function(card){
 						if(card.name=='du') return 20;
 						var player=get.owner(card);
+						if(!player) return -20;
 						var target=_status.event.getParent().target;
 						if(player!=target&&get.attitude(player,target)>0){
 							return -get.number(card);
