@@ -583,7 +583,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				group:['muniu_skill3','muniu_skill4']
 			},
 			muniu_skill3:{
-				trigger:{player:'chooseToRespondBegin'},
+//				trigger:{player:'chooseToRespondBegin'},
 				cardSkill:true,
 				filter:function(event,player){
 					if(event.responded) return false;
@@ -635,7 +635,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			muniu_skill4:{
-				enable:'chooseToUse',
+//				enable:'chooseToUse',
 				filter:function(event,player){
 					var muniu=player.getEquip(5);
 					if(!muniu.cards) return false;
