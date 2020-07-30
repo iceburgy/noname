@@ -36,8 +36,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhangliao:['male','wei',4,['new_retuxi']],
 			re_xuzhu:['male','wei',4,['new_reluoyi']],
 			re_xiahoudun:['male','wei',4,['reganglie','new_qingjian']],
-			re_zhangfei:['male','shu',4,['new_repaoxiao','new_tishen']],
-			re_zhaoyun:['male','shu',4,['longdan','new_yajiao']],
+			re_zhangfei:['male','shu',4,['olpaoxiao','oltishen']],
+			re_zhaoyun:['male','shu',4,['longdan','olyajiao']],
 			re_guanyu:['male','shu',4,['new_rewusheng','new_yijue']],
 			re_machao:['male','shu',4,['mashu','retieji']],
 			re_xushu:['male','shu',4,['zhuhai','qianxin']],
@@ -2843,6 +2843,190 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.tag(card,'respond')&&player.countCards('h')>1) return [1,0.2];
 						},
 					},
+				},
+			},
+			olyajiao:{
+				audio:'reyajiao',
+				trigger:{player:'loseAfter'},
+				frequent:true,
+				filter:function(event,player){
+					return player!=_status.currentPhase&&event.hs&&event.hs.length>0&&['useCard','respond'].contains(event.getParent().name);
+				},
+				content:function(){
+					"step 0"
+					event.card=get.cards()[0];
+					game.cardsGotoOrdering(event.card);
+					event.videoId=lib.status.videoId++;
+					var judgestr=get.translation(player)+'发动了【涯角】';
+					game.addVideo('judge1',player,[get.cardInfo(event.card),judgestr,event.videoId]);
+					game.broadcastAll(function(player,card,str,id,cardid){
+						var event;
+						if(game.online){
+							event={};
+						}
+						else{
+							event=_status.event;
+						}
+						if(game.chess){
+							event.node=card.copy('thrown','center',ui.arena).animate('start');
+						}
+						else{
+							event.node=player.$throwordered(card.copy(),true);
+						}
+						if(lib.cardOL) lib.cardOL[cardid]=event.node;
+						event.node.cardid=cardid;
+						event.node.classList.add('thrownhighlight');
+						ui.arena.classList.add('thrownhighlight');
+						event.dialog=ui.create.dialog(str);
+						event.dialog.classList.add('center');
+						event.dialog.videoId=id;
+					},player,event.card,judgestr,event.videoId,get.id());
+
+					game.log(player,'展示了',event.card);
+					game.delay(2);
+					if(get.type(event.card,'trick')==get.type(trigger.getParent().card,'trick')){
+						player.chooseTarget('选择获得此牌的角色').set('ai',function(target){
+							var att=get.attitude(_status.event.player,target);
+							if(_status.event.du){
+								if(target.hasSkillTag('nodu')) return 0;
+								return -att;
+							}
+							if(att>0){
+								return att+Math.max(0,5-target.countCards('h'));
+							}
+							return att;
+						}).set('du',event.card.name=='du');
+					}
+					else{
+						event.disbool=true;
+						player.chooseTarget('是否弃置攻击范围内包含你的一名角色区域内的一张牌？',function(card,player,target){
+							return target.inRange(player)&&target.countDiscardableCards(player,'hej')>0;
+						}).set('ai',function(target){
+							var player=_status.event.player;
+							return get.effect(target,{name:'guohe'},player,player);
+						});
+					}
+					"step 1"
+					if(event.disbool){
+						if(result.bool){
+							player.line(result.targets[0],'green');
+							player.discardPlayerCard(result.targets[0],'hej',true);
+						}
+ 					event.dialog.close();
+ 					game.addVideo('judge2',null,event.videoId);
+						game.addVideo('deletenode',player,[get.cardInfo(event.node)]);
+						event.node.delete();
+ 					game.broadcast(function(id,card){
+ 						var dialog=get.idDialog(id);
+ 						if(dialog){
+ 							dialog.close();
+ 						}
+ 						if(card.clone){
+								card.clone.delete();
+							}
+ 						ui.arena.classList.remove('thrownhighlight');
+ 					},event.videoId,event.card);
+ 					ui.arena.classList.remove('thrownhighlight');
+					}
+					else if(result.targets){
+ 					event.dialog.close();
+ 					game.addVideo('judge2',null,event.videoId);
+						player.line(result.targets,'green');
+						result.targets[0].gain(event.card,'log');
+						event.node.moveDelete(result.targets[0]);
+						game.addVideo('gain2',result.targets[0],[get.cardInfo(event.node)]);
+						ui.arena.classList.remove('thrownhighlight');
+						game.broadcast(function(card,target,id){
+							var dialog=get.idDialog(id);
+ 						if(dialog){
+ 							dialog.close();
+ 						}
+							ui.arena.classList.remove('thrownhighlight');
+							if(card.clone){
+								card.clone.moveDelete(target);
+							}
+						},event.card,result.targets[0],event.videoId);
+					}
+					else{
+						game.addVideo('deletenode',player,[get.cardInfo(event.node)]);
+						event.node.delete();
+ 					game.broadcast(function(id){
+ 						var dialog=get.idDialog(id);
+ 						if(dialog){
+ 							dialog.close();
+ 						}
+ 						if(card.clone){
+								card.clone.delete();
+							}
+ 						ui.arena.classList.remove('thrownhighlight');
+ 					},event.videoId,event.card);
+ 					event.dialog.close();
+ 					game.addVideo('judge2',null,event.videoId);
+ 					ui.arena.classList.remove('thrownhighlight');
+					}
+				},
+				ai:{
+					effect:{
+						target:function(card,player){
+							if(get.tag(card,'respond')&&player.countCards('h')>1) return [1,0.2];
+						}
+					}
+				}
+			},
+			olpaoxiao:{
+				audio:"paoxiao",
+				audioname:['re_zhangfei','guanzhang','xiahouba'],
+				trigger:{player:'shaMiss'},
+				forced:true,
+				content:function(){
+					player.addTempSkill('olpaoxiao2');
+					player.addMark('olpaoxiao2',1,false);
+				},
+				mod:{
+					cardUsable:function (card,player,num){
+						if(card.name=='sha') return Infinity;
+					},
+				},
+			},
+			olpaoxiao2:{
+				trigger:{source:'damageBegin1'},
+				forced:true,
+				audio:'paoxiao',
+				audioname:['re_zhangfei','guanzhang','xiahouba'],
+				filter:function(event,player){
+					return event.card&&event.card.name=='sha'&&player.countMark('olpaoxiao2')>0;
+				},
+				onremove:true,
+				content:function(){
+					trigger.num+=player.countMark('olpaoxiao2');
+					player.removeSkill('olpaoxiao2');
+				},
+				intro:{content:'本回合内下一次使用【杀】造成伤害时令伤害值+#'},
+			},
+			oltishen:{
+				audio:'retishen',
+				unique:true,
+				mark:true,
+				skillAnimation:true,
+				animationColor:'soil',
+				limited:true,
+				trigger:{player:'phaseZhunbeiBegin'},
+				filter:function(event,player){
+					if(player.storage.oltishen) return false;
+					return player.isDamaged();
+				},
+				check:function(event,player){
+					if(player.hp<=2||player.getDamagedHp()>2) return true;
+					if(player.getDamagedHp()<=1) return false;
+					return player.getDamagedHp()<game.roundNumber;
+				},
+				content:function(){
+					player.awakenSkill('oltishen');
+					player.recover(player.maxHp-player.hp);
+					player.draw(player.maxHp-player.hp);
+				},
+				intro:{
+					content:'limited'
 				},
 			},
 			"new_liyu":{
@@ -6371,6 +6555,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reganglie_info:'每当你受到1点伤害后，可进行一次判定，若结果为红色，你对伤害来源造成1点伤害，若结果为黑色，你弃置其一张牌。',
 			botu:'博图',
 			botu_info:'回合结束时，若你本回合出牌阶段内使用的牌包含四种花色，则你可以进行一个额外回合。',
+			olyajiao:'涯角',
+			olyajiao_info:'当你于回合外因使用或打出而失去手牌后，你可以展示牌堆顶的一张牌。若这两张牌的类别相同，你可以将展示的牌交给一名角色；若类别不同，你可弃置攻击范围内包含你的角色区域里的一张牌。',
+			olpaoxiao:'咆哮',
+			olpaoxiao2:'咆哮',
+			olpaoxiao_info:'锁定技，你使用【杀】无次数限制。若你使用的【杀】被【闪】抵消，你本回合下一次使用【杀】造成伤害时，此伤害+1。',
+			oltishen:'替身',
+			oltishen_info:'限定技，准备阶段，你可以将体力回复至上限，然后摸X张牌（X为你回复的体力值）。',
 			
 			xin_yuji:'界于吉',
 			re_zuoci:'界左慈',

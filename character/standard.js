@@ -1396,7 +1396,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			longdan:{
 				audio:'longdan_sha',
 				audioname:['re_zhaoyun'],
-				group:['longdan_sha','longdan_shan','longdan_draw'],
+				group:['longdan_sha','longdan_shan','longdan_draw','longdan_jiu','longdan_tao'],
 				subSkill:{
 					draw:{
 						trigger:{player:['useCard','respond']},
@@ -1430,7 +1430,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							respondSha:true,
 							skillTagFilter:function(player){
-								if(!player.countCards('h','shan')) return false;
+								if(!player.countCards('hs','shan')) return false;
 							},
 							order:function(){
 								return get.order({name:'sha'})+0.1;
@@ -1453,7 +1453,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							respondShan:true,
 							skillTagFilter:function(player){
-								if(!player.countCards('h','sha')) return false;
+								if(!player.countCards('hs','sha')) return false;
 							},
 							effect:{
 								target:function(card,player,target,current){
@@ -1461,6 +1461,62 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							},
 							order:4,
+							useful:-1,
+							value:-1
+						}
+					},
+					jiu:{
+						audio:'longdan_sha',
+						audioname:['re_zhaoyun'],
+						enable:['chooseToUse'],
+						filterCard:{name:'tao'},
+						viewAs:{name:'jiu'},
+						viewAsFilter:function(player){
+							if(!player.countCards('hs','tao')) return false;
+						},
+						prompt:'将一张桃当做酒使用',
+						check:function(){return 1},
+						ai:{
+							effect:{
+								target:function(card,player,target,current){
+									if(get.tag(card,'save')&&current<0) return 0.6
+								}
+							},
+							save:true,
+							skillTagFilter:function(player){
+								if(!player.countCards('hs','tao')) return false;
+							},
+							order:function(){
+								return get.order({name:'jiu'})+0.1;
+							},
+							useful:-1,
+							value:-1
+						}
+					},
+					tao:{
+						audio:'longdan_sha',
+						audioname:['re_zhaoyun'],
+						enable:['chooseToUse'],
+						filterCard:{name:'jiu'},
+						viewAs:{name:'tao'},
+						viewAsFilter:function(player){
+							if(!player.countCards('hs','jiu')) return false;
+						},
+						prompt:'将一张酒当做桃使用',
+						check:function(){return 1},
+						ai:{
+							effect:{
+								target:function(card,player,target,current){
+									if(get.tag(card,'save')&&current<0) return 0.6
+								}
+							},
+							save:true,
+							skillTagFilter:function(player){
+								if(!player.countCards('hs','jiu')) return false;
+							},
+							order:function(){
+								return get.order({name:'tao'})+0.1;
+							},
 							useful:-1,
 							value:-1
 						}
@@ -2601,6 +2657,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kongcheng:'空城',
 			kongcheng1:'空城',
 			longdan:'龙胆',
+			longdan_sha:'龙胆杀',
+			longdan_shan:'龙胆闪',
+			longdan_jiu:'龙胆酒',
+			longdan_tao:'龙胆桃',
 			longdan1:'龙胆',
 			longdan2:'龙胆',
 			mashu:'马术',
@@ -2652,7 +2712,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinguanxing_info:'准备阶段，你可以观看牌堆顶的x张牌，并将其以任意顺序置于牌堆项或牌堆底，x为存活角色个数且不超过5',
 			xinguanxing_info_alter:'准备阶段，你可以观看牌堆顶的5张牌（存活角色小于4时改为3张），并将其以任意顺序置于牌堆项或牌堆底，如果你把观星的牌都放在牌堆底，你可以在结束阶段再进行1次观星',
 			kongcheng_info:'锁定技，当你没有手牌时，你不能成为【杀】或【决斗】的目标。',
-			longdan_info:'你可以将【杀】当做【闪】，或将【闪】当做【杀】使用或打出。',
+			longdan_info:'你可以将一张【杀】当做【闪】、【闪】当做【杀】、【酒】当做【桃】、【桃】当做【酒】使用或打出。',
 			mashu_info:'锁定技，你计算与其他角色的距离时-1。',
 			mashu2_info:'锁定技，你计算与其他角色的距离时-1。',
 			feiying_info:'锁定技，其他角色计算与你的距离时+1。',

@@ -25923,14 +25923,13 @@
 								var shouldRemove=!parent || (parent.id != 'special' && (!parent.classList||!parent.classList.contains('special')));
 								muniuCardsParentsShouldRemove.push(shouldRemove);
 							}
-							var muniuCardsParentsShouldRemoveTemp=muniuCardsParentsShouldRemove.slice(0);
 							for(var ind=0;ind<muniu.cards.length;ind++){
-								if(muniuCardsParentsShouldRemoveTemp[ind]){
+								if(muniuCardsParentsShouldRemove[ind]){
 									muniu.cards[ind].classList.remove('selected');
 									muniu.cards[ind].classList.remove('selectable');
 									muniu.cards[ind].classList.remove('un-selectable');
 									muniu.cards.splice(ind,1);
-									muniuCardsParentsShouldRemoveTemp.splice(ind,1);
+									muniuCardsParentsShouldRemove.splice(ind,1);
 									ind--
 								}
 							}
@@ -25940,24 +25939,12 @@
 							},player,muniu,muniu.cards);
 
 							var args=[];
-							args.push(function(player,muniuCardsParentsShouldRemove){
-								//lib.skill.muniu_skill.sync(muniu);
+							args.push(function(player){
+								//ui.handSpecial.reset(player.getEquip(5).cards);
 								var muniu = player.getEquip(5);
 								if(!muniu.cards){
 									muniu.cards=[];
 								}
-								for(var i=0;i<muniu.cards.length;i++){
-									if(muniuCardsParentsShouldRemove[i]){
-										muniu.cards[i].classList.remove('selected');
-										muniu.cards[i].classList.remove('selectable');
-										muniu.cards[i].classList.remove('un-selectable');
-										muniu.cards.splice(i,1);
-										muniuCardsParentsShouldRemove.splice(i,1);
-										i--;
-									}
-								}
-
-								//ui.handSpecial.reset(player.getEquip(5).cards);
 								var cards=muniu.cards;
 								var elements = ui.handSpecial.cards.childNodes;
 								for (var i = elements.length - 1; i >= 0; i--) {
@@ -25974,7 +25961,6 @@
 								if(muniu.cards && muniu.cards.length) ui.handSpecial.show();
 							});
 							args.push(player);
-							args.push(muniuCardsParentsShouldRemove);
 							sender.send.apply(sender,args);
 							break;
 						}

@@ -6731,7 +6731,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['sp_zhangjiao'],
 				trigger:{global:'judge'},
 				filter:function(event,player){
-					return player.countCards('hes',{color:'black'})>0;
+					return player.countCards('hs')>0||player.countCards('e',{color:'black'})>0;
 				},
 				direct:true,
 				content:function(){
