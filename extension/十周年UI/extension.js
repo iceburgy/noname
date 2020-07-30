@@ -334,7 +334,19 @@ content:function(config, pack){
 					} else {
 						if (ui.handSpecial) ui.handSpecial.hide();
 						var cards = player.getCards(event.position);
-						if (event.name == 'chooseToUse'||event.name == 'chooseCard'||event.name == 'chooseToRespond') {
+
+						// account for simayi guicai and zhangjiao guidao
+						var eventTemp=event;
+						var isChangeJudge=false;
+						while(eventTemp&&eventTemp.name&&!eventTemp.name.includes('guicai')&&!eventTemp.name.includes('guidao')){
+							if(!game.online) eventTemp=eventTemp.parent;
+							else eventTemp=eventTemp._modparent;
+						}
+						if(eventTemp&&eventTemp.name&&(eventTemp.name.includes('guicai')||eventTemp.name.includes('guidao'))){
+							isChangeJudge=true;
+						}
+
+						if (event.name == 'chooseToUse'||event.name == 'chooseToRespond'||isChangeJudge) {
 							var skill = event.skill;
 							var isHand = event.position == undefined || event.position.indexOf('h') != -1;
 							if ((!skill && isHand) || (skill && lib.skill[skill].viewAs && (!lib.skill[skill].selectCard || lib.skill[skill].selectCard > 0) && isHand)) {

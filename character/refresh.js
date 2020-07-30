@@ -4371,8 +4371,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'judge'},
 				direct:true,
 				filter:function(event,player){
-					if(event.responded) return false;
-					return player.countCards('he')>0;
+					return player.countCards('hes')>0;
 				},
 				content:function(){
 					"step 0"
