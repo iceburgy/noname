@@ -3870,11 +3870,11 @@
 						intro:'按照座位号发小内奖励卡',
 					},
 					oneclick_reset_server:{
-						name:'一键完成以下设置',
+						name:'一键导入单双禁将表及游戏设置',
 						clear:true,
 						onclick:function(){
-							if(this.innerHTML=='<span>确认设置</span>'){
-								this.innerHTML='<span>设置中...</span>';
+							if(this.innerHTML=='<span>确认导入</span>'){
+								this.innerHTML='<span>导入中...</span>';
 								clearTimeout(this.confirmTimeout);
 
 								var that=this;
@@ -3885,49 +3885,19 @@
 									// 2. import_forbid_lib
 									game.importForbidLib();
 
-									that.innerHTML='<span>设置成功</span>';
+									that.innerHTML='<span>导入成功</span>';
 									setTimeout(function(){
 										game.reload();
 									},1000);
 								},1000);
 							}
 							else{
-								this.innerHTML='<span>确认设置</span>';
+								this.innerHTML='<span>确认导入</span>';
 								var that=this;
 								this.confirmTimeout=setTimeout(function(){
-									that.innerHTML='<span>一键完成以下设置</span>';
+									that.innerHTML='<span>一键导入单双禁将表及游戏设置</span>';
 								},1000);
 							}
-						}
-					},
-					import_dropbox_config:{
-						name:'导入dropbox游戏设置',
-						clear:true,
-						onclick:function(){
-							this.innerHTML='<span>导入中...</span>';
-							game.importDropboxConfig();
-							var that=this;
-							setTimeout(function(){
-								that.innerHTML='<span>导入成功</span>';
-								setTimeout(function(){
-									game.reload();
-								},1000);
-							},1000);
-						}
-					},
-					import_forbid_lib:{
-						name:'导入dropbox禁将表',
-						clear:true,
-						onclick:function(){
-							this.innerHTML='<span>导入中...</span>';
-							game.importForbidLib();
-							var that=this;
-							setTimeout(function(){
-								that.innerHTML='<span>导入成功</span>';
-								setTimeout(function(){
-									that.innerHTML='<span>导入dropbox禁将表</span>';
-								},1000);
-							},1000);
 						}
 					},
 
