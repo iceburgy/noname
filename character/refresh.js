@@ -2932,7 +2932,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
  					event.dialog.close();
  					game.addVideo('judge2',null,event.videoId);
 						player.line(result.targets,'green');
-						result.targets[0].gain(event.card,'log');
+						player.give(event.card,result.targets[0]);
 						event.node.moveDelete(result.targets[0]);
 						game.addVideo('gain2',result.targets[0],[get.cardInfo(event.node)]);
 						ui.arena.classList.remove('thrownhighlight');
