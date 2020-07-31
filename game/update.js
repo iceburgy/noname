@@ -1,16 +1,12 @@
 window.noname_update={
-	version:'2020.07.24',
+	version:'2020.07.31',
 	update:'2020.06.13.1',
 	changeLog:[
-		'feature request：选将时显示已选武将技能',
-		'修复：司马徽称好,周仓忠勇不能触发伊籍急援的bug',
-		'修复：庞德公评才凤雏会让已在铁索中的玩家出锁的bug',
-		'修复：庞德公暗将时可以被兵和乐的bug',
-		'修复：木牛里的闪优先于八卦时机的bug',
-		'修复：木牛里面的闪和无懈AI不会用的bug',
-		'修复：魏延廖化奇谋的多出X张杀的效果在两个出牌阶段都有的bug',
-		'修复：五谷丰登主机可以选前面的玩家已选的牌导致游戏crash的bug',
-		'优化：武将胜率排序优先级：胜率，胜场，名字',
+		'开启：online版界限突破：赵云，张飞',
+		'开启：木牛流马的卡牌界面，不然没法改判和发动转化牌技能',
+		'修复：张角没黑色手牌则判定就没读条了，这不是露馅了吗？？',
+		'缩小拼点窗口，不然一个贼大的窗口扑面而来，其它啥也看不见了',
+		'开启：手动补发小内奖励卡（选项、选项、其他，虽然多个选将框貌似也没毛用）',
 		'更多更新历史信息请查看：https://bit.ly/wumingsha',
 	],
 	files:[
@@ -40,6 +36,7 @@ window.noname_update={
 		'extension/十周年UI/content.js',
 		'extension/十周年UI/decadeLayout.css',
 		'extension/十周年UI/extension.js',
+		'extension/十周年UI/dialog.css',
 		'extension/十周年UI/layout.css',
 		'extension/十周年UI/skill.js',
 	]
