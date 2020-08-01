@@ -23239,15 +23239,26 @@
 					}
 					else{
 						if(_status.event.player!=game.me) return;
+						var isInMuniu=this.parentNode&&(this.parentNode.id=='special'||this.parentNode.classList.contains('special'));
 						if(this._transform&&this.parentNode&&this.parentNode.parentNode&&
-							this.parentNode.parentNode.parentNode==ui.me&&
+							(this.parentNode.parentNode.parentNode==ui.me||isInMuniu)&&
 							(!_status.mousedown||_status.mouseleft)&&
 							(!this.parentNode.parentNode.classList.contains('scrollh')||(game.layout=='long2'||game.layout=='nova'))){
 							if(bool){
-								this.style.transform=this._transform+' translateY(-20px)';
+								if(isInMuniu){
+									this.style.transform='translateY(-20px)';
+								}
+								else{
+									this.style.transform=this._transform+' translateY(-20px)';
+								}
 							}
 							else{
-								this.style.transform=this._transform||'';
+								if(isInMuniu){
+									this.style.transform='';
+								}
+								else{
+									this.style.transform=this._transform||'';
+								}
 							}
 						}
 					}
@@ -32422,7 +32433,7 @@
 				args[i]=arguments[i];
 			}
 			if((args.length==0||args.contains('card'))&&_status.event.player){
-				var cards=_status.event.player.getCards('hej');
+				var cards=_status.event.player.getCards('hejs');
 				for(j=0;j<cards.length;j++){
 					cards[j].classList.remove('selected');
 					cards[j].classList.remove('selectable');
