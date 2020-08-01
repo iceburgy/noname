@@ -26865,7 +26865,15 @@
 		phaseName:['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'],
 	};
 	var game={
-		// main: 0, vice 1, not foun -1
+		getMaxHpToGain(shownMaxHp, otherMaxHp, isOtherUnseen){
+			var baseMaxHp=4;
+			if(!isOtherUnseen){
+				baseMaxHp=Math.max(baseMaxHp,otherMaxHp);
+			}
+			if(shownMaxHp>baseMaxHp) return shownMaxHp-baseMaxHp;
+			else return 0;
+		},
+		// main: 0, vice 1, not found -1
 		getCharacterIndex:function(player,character){
 			if(player.name2&&player.name2==character){
 				return 1;
@@ -31104,6 +31112,7 @@
 				// table by roles
 				var roles=[];
 				for(i=0;i<clients.length;i++){
+					if(!clients[i].nickname||clients[i].nickname=='无名玩家') continue;
 					roles.push(clients[i].name1);
 					roles.push(clients[i].name2);
 				}

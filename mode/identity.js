@@ -395,14 +395,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			game.phaseLoop(_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me);
 		},
 		game:{
-			getMaxHpToGain(shownMaxHp, otherMaxHp, isOtherUnseen){
-				var baseMaxHp=4;
-				if(!isOtherUnseen){
-					baseMaxHp=Math.max(baseMaxHp,otherMaxHp);
-				}
-				if(shownMaxHp>baseMaxHp) return shownMaxHp-baseMaxHp;
-				else return 0;
-			},
 			getState:function(){
 				var state={};
 				for(var i in lib.playerOL){

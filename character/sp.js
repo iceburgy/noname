@@ -6146,6 +6146,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+				group:['xinfenyue2'],
+			},
+			xinfenyue2:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				silent:true,
+				content:function(){
+					player.addTempSkill('xinfenyue3');
+				},
+			},
+			xinfenyue3:{
+				trigger:{player:'chooseToUseBefore'},
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '已发动奋钺次数：'+storage;
+					}
+				},
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					if(!game.isCharacterSeen(player,'huangfusong')) return false;
+					return true;
+				},
+				content:function(){
+					player.storage.xinfenyue3=player.getStat().skill.xinfenyue||0;
+					player.markSkill('xinfenyue3');
+				},
+				onremove:function(player){
+					player.unmarkSkill('xinfenyue3');
+				},
 			},
 			fenyue:{
 				audio:2,
@@ -17532,6 +17561,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuantanyuanshang:'袁谭袁尚',
 			
 			xinfenyue:'奋钺',
+			xinfenyue3:'奋钺',
 			xinfenyue_info:'出牌阶段限X次（X为与你不同阵营的存活角色数），你可以与一名其他角色拼点，若你赢，根据你拼点牌的点数依次执行以下效果：不大于5，你获得其一张牌；不大于9，你获得牌堆里的一张【杀】; 不大于K，视为你对其使用一张雷【杀】。',
 			neifa:'内伐',
 			neifa_info:'出牌阶段开始时，你可以摸两张牌或获得场上的一张牌，然后弃置一张牌。若弃置的牌是基本牌，本回合你不能使用锦囊和装备牌，且【杀】的使用次数+X且目标+1；若弃置的不是基本牌，本回合你不能使用基本牌，且使用普通锦囊牌选择目标时可以增加或减少一个目标，前两次使用装备牌时摸X张牌（X为你发动〖内伐〗弃牌后手牌中不能使用的牌的数量且最多为5）。',
