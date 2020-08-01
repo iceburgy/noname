@@ -1,9 +1,10 @@
 window.noname_update={
-	version:'2020.08.01',
+	version:'2020.08.01.1',
 	update:'2020.06.13.1',
 	changeLog:[
 		'开启：皇甫嵩发动奋钺次数的标记',
 		'修复：诸葛恪傲才窗口丢失的bug',
+		'优化木牛卡牌区操作友好度',
 		'更多更新历史信息请查看：https://bit.ly/wumingsha',
 	],
 	files:[
