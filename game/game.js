@@ -6575,6 +6575,17 @@
 
 					if(typeof time!='number') time=500;
 					this.classList.add('removing');
+					if(game.needMuniuSync){
+						var itemType=get.itemtype(this);
+						if(itemType=='card'){
+							var cardOwner=get.muniuOwner();
+							if(cardOwner&&cardOwner!=game.me){
+								cardOwner.send(function(card){
+									card.classList.add('removing');
+								},this);
+							}
+						}
+					}
 
 					var that=this;
 					this.timeout=setTimeout(function(){
@@ -10183,10 +10194,19 @@
 						if(muniuOwner){
 							var muniu = muniuOwner.getEquip(5);
 							if (muniu) {
-								lib.skill.muniu_skill.sync(muniu);
-								game.broadcastAll(function(player){
-									player.updateMarks();
-								},muniuOwner);
+								if(muniuOwner==game.me){
+									lib.skill.muniu_skill.sync(muniu);
+									game.broadcastAll(function(player){
+										player.updateMarks();
+									},muniuOwner);
+									ui.handSpecial.reset(muniuOwner.getEquip(5).cards);
+									ui.handSpecial.show();
+								}
+								else{
+									muniuOwner.send(function(player){
+										game.send('syncMuniu',player);
+									},muniuOwner);
+								}
 							}
 						}
 					}
@@ -14643,6 +14663,13 @@
 					for(var i=0;i<cards.length;i++){
 						cards[i].style.transform+=' scale(0.2)';
 						cards[i].classList.remove('glow');
+						var cardOwner=get.owner(cards[i]);
+						if(cardOwner&&cardOwner!=game.me){
+							cardOwner.send(function(card){
+								card.style.transform+=' scale(0.2)';
+								card.classList.remove('glow');
+							},cards[i]);
+						}
 						cards[i].recheck();
 						var info=lib.card[cards[i].name];
 						if(info.destroy||cards[i]._destroy){
@@ -19385,7 +19412,7 @@
 							lib.node.torespondtimeout[this.playerid]=setTimeout(function(){
 								player.unwait('ai');
 								player.ws.ws.close();
-							},time+200000);
+							},time+9999000);
 						}
 					}
 				},
@@ -23240,7 +23267,7 @@
 					else{
 						if(_status.event.player!=game.me) return;
 						var isInMuniu=this.parentNode&&(this.parentNode.id=='special'||this.parentNode.classList.contains('special'));
-						if(this._transform&&this.parentNode&&this.parentNode.parentNode&&
+						if((this._transform||isInMuniu)&&this.parentNode&&this.parentNode.parentNode&&
 							(this.parentNode.parentNode.parentNode==ui.me||isInMuniu)&&
 							(!_status.mousedown||_status.mouseleft)&&
 							(!this.parentNode.parentNode.classList.contains('scrollh')||(game.layout=='long2'||game.layout=='nova'))){
@@ -25935,11 +25962,11 @@
 
 								if (cards && cards.length) {
 									for (var i = 0; i < cards.length; i++) {
-										if (cards[i]) ui.handSpecial.cards.appendChild(cards[i]);
+										if (cards[i]&&!ui.handSpecial.cards.contains(cards[i])) ui.handSpecial.cards.appendChild(cards[i]);
 									}
 								}
 
-								if(muniu.cards && muniu.cards.length) ui.handSpecial.show();
+								ui.handSpecial.show();
 							});
 							args.push(player);
 							sender.send.apply(sender,args);
@@ -36178,6 +36205,7 @@
 										'50':'50秒',
 										'60':'60秒',
 										'90':'90秒',
+										'9999':'调试',
 									},
 									connect:true,
 									frequent:true

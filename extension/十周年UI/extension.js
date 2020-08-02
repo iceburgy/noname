@@ -332,7 +332,6 @@ content:function(config, pack){
 					if (ok == false) {
 						game.uncheck('card');
 					} else {
-						if (ui.handSpecial) ui.handSpecial.hide();
 						var cards = player.getCards(event.position);
 
 						// account for simayi guicai and zhangjiao guidao
@@ -359,7 +358,7 @@ content:function(config, pack){
 												player.updateMarks();
 											},player);
 											ui.handSpecial.reset(player.getEquip(5).cards);
-											if(muniu.cards && muniu.cards.length) ui.handSpecial.show();
+											ui.handSpecial.show();
 										}
 									}
 									else{
@@ -731,19 +730,6 @@ content:function(config, pack){
 			        }
 			    }
 			    
-				if (ui.handSpecial) {
-					var args = Array.from(arguments);
-				
-					if ((!args.length || args.contains('card')) && _status.event.player) {
-						if(!game.online){
-							ui.handSpecial.hide();
-						}
-						else{
-							game.send('hideMuniu');
-						}
-					}
-				}
-				
 			    var result = gameUncheckFunction.apply(this, arguments);
 			    return result;
 			};

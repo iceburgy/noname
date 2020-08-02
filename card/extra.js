@@ -11,9 +11,33 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				nomod:true,
 				onEquip:function(){
 					player.markSkill('muniu_skill6');
+
+					if(player==game.me){
+						lib.skill.muniu_skill.sync(this);
+						game.broadcastAll(function(player){
+							player.updateMarks();
+						},player);
+						ui.handSpecial.reset(player.getEquip(5).cards);
+						ui.handSpecial.show();
+					}
+					else{
+						player.send(function(player){
+							game.send('syncMuniu',player);
+						},player);
+					}
 				},
 				forceDie:true,
 				onLose:function(){
+					if (ui.handSpecial) {
+						if(player==game.me){
+							ui.handSpecial.hide();
+						}
+						else{
+							player.send(function(){
+								ui.handSpecial.hide();
+							});
+						}
+					}
 					player.unmarkSkill('muniu_skill6');
 					if((event.getParent(2)&&event.getParent(2).name!='swapEquip')&&event.parent.type!='equip'&&card&&card.cards&&card.cards.length){
 						player.$throw(card.cards,1000);
@@ -519,9 +543,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(muniu.cards==undefined) muniu.cards=[];
 					cards[0].style.transform='';
 					muniu.cards.push(cards[0]);
-					game.broadcast(function(muniu,cards){
+					game.broadcast(function(muniu,cards,card){
+						card.style.transform='';
 						muniu.cards=cards;
-					},muniu,muniu.cards);
+					},muniu,muniu.cards,cards[0]);
 					var players=game.filterPlayer(function(current){
 						if(!current.getEquip(5)&&current!=player&&!current.isTurnedOver()&&
 							get.attitude(player,current)>=3&&get.attitude(current,player)>=3){
