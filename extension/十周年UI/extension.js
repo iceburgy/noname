@@ -1466,6 +1466,7 @@ content:function(config, pack){
 				content:function(){
 					lib.skill._decadeUI_gameStartEffect.played = true;
 					if (!decadeUI.config.gameStartEffect) return;
+					if (!decadeUI.effect) return;
 					decadeUI.effect.gameStart();
 				}
 			};
@@ -1480,6 +1481,7 @@ content:function(config, pack){
 					game.broadcastAll(function(source, player){
 						if (!window.decadeUI) return;
 						if (!decadeUI.config.playerKillEffect) return;
+						if (!decadeUI.effect) return;
 						decadeUI.effect.kill(source, player);
 					}, trigger.source, trigger.player);
 				}
@@ -1860,7 +1862,8 @@ content:function(config, pack){
 				// 更新拼点框
 				game.broadcastAll(function(player, target){
 					if (!window.decadeUI) return;
-					
+					if (!decadeUI.effect) return;
+
 					decadeUI.effectDialog = ui.arena.appendChild(decadeUI.effect.dialog.compare(player, target));
 					decadeUI.delay(400);
 				}, player, target);
@@ -2104,7 +2107,8 @@ content:function(config, pack){
 				// 更新拼点框
 				game.broadcastAll(function(source, target){
 					if (!window.decadeUI) return;
-					
+					if (!decadeUI.effect) return;
+
 					decadeUI.effectDialog = ui.arena.appendChild(decadeUI.effect.dialog.compare(source, target));
 					decadeUI.delay(400);
 				}, player, targets[0]);
