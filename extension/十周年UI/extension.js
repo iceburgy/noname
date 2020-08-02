@@ -773,7 +773,7 @@ content:function(config, pack){
 			
 			game.linexy = function(path){
 				if (!decadeUI.config.playerLineEffect) return gameLinexyFunction.apply(this, arguments);
-				decadeUI.effect.line(path);
+				if (decadeUI.effect) decadeUI.effect.line(path);
 			};
 			
 			// ui.click.chat = function(){
