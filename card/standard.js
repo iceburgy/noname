@@ -1323,7 +1323,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
-							var dist=get.distance(player,target,'absolute');
+							var dist=get.distance(_status.currentPhase,target,'absolute');
 							if(dist<1) dist=1;
 							return -Math.pow(10,2*(9-dist));
 						}
