@@ -6146,35 +6146,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
-				group:['xinfenyue2'],
+				group:['xinfenyue2','xinfenyue3'],
 			},
 			xinfenyue2:{
-				trigger:{player:'phaseZhunbeiBegin'},
+				trigger:{player:['chooseToUseBefore','phaseAfter']},
 				silent:true,
-				content:function(){
-					player.addTempSkill('xinfenyue3');
-				},
-			},
-			xinfenyue3:{
-				trigger:{player:'chooseToUseBefore'},
-				silent:true,
-				intro:{
-					content:function(storage){
-						return '已发动奋钺次数：'+storage;
-					}
-				},
 				filter:function(event,player){
 					if(_status.currentPhase!=player) return false;
 					if(!game.isCharacterSeen(player,'huangfusong')) return false;
 					return true;
 				},
 				content:function(){
-					player.storage.xinfenyue3=player.getStat().skill.xinfenyue||0;
-					player.markSkill('xinfenyue3');
+					if(trigger.name=='chooseToUse'){
+						player.storage.xinfenyue3=player.getStat().skill.xinfenyue||0;
+						player.markSkill('xinfenyue3');
+					}else if(player.storage.xinfenyue3){
+						delete player.storage.xinfenyue3;
+						player.unmarkSkill('xinfenyue3');
+					}
 				},
-				onremove:function(player){
-					player.unmarkSkill('xinfenyue3');
+			},
+			xinfenyue3:{
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '已发动奋钺次数：'+storage;
+					}
 				},
+				content:function(){},
 			},
 			fenyue:{
 				audio:2,
