@@ -1128,7 +1128,7 @@ content:function(config, pack){
 							
 							if (cards && cards.length) {
 								for (var i = 0; i < cards.length; i++) {
-									if (cards[i]) ui.handSpecial.cards.appendChild(cards[i]);
+									if (cards[i]&&!ui.handSpecial.cards.contains(cards[i])) ui.handSpecial.cards.appendChild(cards[i]);
 								}
 							}
 						},
