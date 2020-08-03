@@ -27530,6 +27530,9 @@
 			if(_status.event&&_status.event.createDialog&&_status.event.createDialog.length){
 				eventName=_status.event.createDialog[0];
 			}
+			else if(_status.event.controls&&_status.event.controls.length&&_status.event.controls[0]=='zanbuliangjiang'){
+				eventName='zanbuliangjiang';
+			}
 			if(!eventName&&_status.event&&_status.event._args&&_status.event._args[0]&&_status.event._args[0][0]&&_status.event._args[0][0][1]&&_status.event._args[0][0][1][0]){
 				eventName=_status.event._args[0][0][1][0];
 			}
@@ -27551,6 +27554,8 @@
 					}
 					break;
 				case '请选择神武将的势力':
+				case 'zanbuliangjiang':
+				case '是否亮势力':
 					if(lib.configOL.choose_timeout_shen_group){
 						num=lib.configOL.choose_timeout_shen_group;
 					}

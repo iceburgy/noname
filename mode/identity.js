@@ -2288,6 +2288,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<list.length;i++){
 							list[i]=['','','group_'+list[i]];
 						}
+						// prevent exposing shen wujiang by showing timer for everyone
 						var choose_shen_time=lib.configOL.choose_timeout
 						if(lib.configOL.choose_timeout_shen_group){
 							choose_shen_time=lib.configOL.choose_timeout_shen_group;
@@ -2351,6 +2352,42 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					},game.zhu);
 					"step 11"
+					// zhu choose to show character
+					game.zhu.chooseControl('zanbuliangjiang','明置'+get.translation(game.zhu.name1),
+						'明置'+get.translation(game.zhu.name2),'tongshimingzhi',true).ai=function(event,player){
+						return 0;
+					};
+					"step 12"
+					switch(result.control){
+						case '明置'+get.translation(game.zhu.name1):game.zhu.showCharacter(0);event.goto(15);break;
+						case '明置'+get.translation(game.zhu.name2):game.zhu.showCharacter(1);event.goto(15);break;
+						case 'tongshimingzhi':game.zhu.showCharacter(2);event.goto(15);break;
+						default:
+							game.zhu.trySkillAnimate('不亮将','不亮将',false);
+							break;
+					}
+					"step 13"
+					// zhu choose to show group
+					var list=lib.group.slice(0);
+					list.remove('shen');
+					for(var i=0;i<list.length;i++){
+						list[i]=['','','group_'+list[i]];
+					}
+					game.zhu.chooseButton(['是否亮势力',[list,'vcard']]);
+					"step 14"
+					if(result.bool){
+						var shili=result.links[0][2].slice(6);
+						var shiliTrans=get.translation(shili);
+						game.zhu.trySkillAnimate(shiliTrans,shiliTrans,false);
+						game.zhu.group=shili;
+						game.broadcast(function(player,group){
+							player.group=group;
+						},game.zhu,game.zhu.group);
+					}
+					else{
+						game.zhu.trySkillAnimate('不亮势力','不亮势力',false);
+					}
+					"step 15"
 					// other players to choose character1, no use of change char
 					var list=[];
 					var selectButton=1;
@@ -2425,7 +2462,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					});
-					"step 12"
+					"step 16"
 					var isChar1SelectionMadeFully=true;
 					for(var i in result){
 						if(lib.playerOL[i].identity=='zhu'){
@@ -2442,13 +2479,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					if(!isChar1SelectionMadeFully){
-						event.goto(13);
+						event.goto(17);
 					}
 					else{
-						event.goto(14);
+						event.goto(18);
 					}
 
-					"step 13"
+					"step 17"
 					// other players to choose character1, again with use of change char
 					var list=[];
 					var selectButton=1;
@@ -2480,7 +2517,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					});
 
-					"step 14"
+					"step 18"
 					for(var i in result){
 						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
 						if(distanceFromZhu>0&&result[i].bool&&event.chosenChars[distanceFromZhu].length==0){
@@ -2567,7 +2604,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					});
 
-					"step 15"
+					"step 19"
 					var isChar2SelectionMadeFully=true;
 					for(var i in result){
 						if(lib.playerOL[i].identity=='zhu'){
@@ -2584,13 +2621,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					if(!isChar2SelectionMadeFully){
-						event.goto(16);
+						event.goto(20);
 					}
 					else{
-						event.goto(17);
+						event.goto(21);
 					}
 
-					"step 16"
+					"step 20"
 					// other players to choose character2, again with use of change char
 					var list=[];
 					var selectButton=1;
@@ -2622,7 +2659,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					});
 
-					"step 17"
+					"step 21"
 					for(var i in result){
 						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
 						if(distanceFromZhu>0&&result[i].bool&&event.chosenChars[distanceFromZhu].length==1){
@@ -2649,7 +2686,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.init(result.links[0],result.links[1],false);
 						}
 					});
-					"step 18"
+					"step 22"
 					var shen=[];
 					for(var i in result){
 						if(result[i]&&result[i].links){
@@ -2692,7 +2729,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						});
 					}
-					"step 19"
+					"step 23"
 					if(!result) result={};
 					var result2=event.result2;
 					game.broadcast(function(result,result2){
@@ -2846,6 +2883,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			anlezhugong2:'安乐主公',
 			"xianqu_skill":"先驱",
 			"xianqu_skill_info":"",
+			zanbuliangjiang:'暂不亮将',
 			bumingzhi:'不明置',
 			tongshimingzhi:'同时明置',
 			_mingzhisuodingji:"亮将",
