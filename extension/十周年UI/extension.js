@@ -337,15 +337,21 @@ content:function(config, pack){
 						// account for simayi guicai and zhangjiao guidao
 						var eventTemp=event;
 						var isChangeJudge=false;
-						while(eventTemp&&eventTemp.name&&!eventTemp.name.includes('guicai')&&!eventTemp.name.includes('guidao')){
+						var shouldSkip=false;
+						do{
+							if(eventTemp.name&&eventTemp.name.includes('guicai')||eventTemp.name.includes('guidao')){
+								isChangeJudge=true;
+								break;
+							}
+							if(eventTemp.skill&&eventTemp.skill.includes('huomo')){
+								shouldSkip=true;
+								break;
+							}
 							if(!game.online) eventTemp=eventTemp.parent;
 							else eventTemp=eventTemp._modparent;
-						}
-						if(eventTemp&&eventTemp.name&&(eventTemp.name.includes('guicai')||eventTemp.name.includes('guidao'))){
-							isChangeJudge=true;
-						}
+						}while(eventTemp&&(eventTemp.name||eventTemp.skill));
 
-						if (event.name == 'chooseToUse'||event.name == 'chooseToRespond'||isChangeJudge) {
+						if (!shouldSkip&&(event.name == 'chooseToUse'||event.name == 'chooseToRespond'||isChangeJudge)) {
 							var skill = event.skill;
 							var isHand = event.position == undefined || event.position.indexOf('h') != -1;
 							if ((!skill && isHand) || (skill && lib.skill[skill].viewAs && (!lib.skill[skill].selectCard || lib.skill[skill].selectCard > 0) && isHand)) {

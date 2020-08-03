@@ -598,7 +598,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			xinfu_zuilun2:{
-				trigger:{player:['chooseToUseBefore','phaseAfter']},
+				trigger:{player:['chooseToUseBefore','phaseDiscardAfter','phaseAfter']},
 				silent:true,
 				filter:function(event,player){
 					if(_status.currentPhase!=player) return false;
@@ -606,7 +606,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				content:function(){
-					if(trigger.name=='chooseToUse'){
+					if(trigger.name=='chooseToUse'||trigger.name=='phaseDiscard'){
 						var str=[];
 						if(player.getHistory('lose',function(evt){
 							return evt.type=='discard';
