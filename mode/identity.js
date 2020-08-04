@@ -335,6 +335,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(players.length>4){
 						players[i].hiddenSkills.add('woshixiaonei');
 						players[i].addSkillTrigger('woshixiaonei',true);
+						players[i].showRevealXiaonei();
 					}
 				}
 				if(players[i].identity=='zhu'&&players.length>=6&&players.length%2==0){
@@ -3389,6 +3390,35 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						this.recover(maxHpToGain);
 					}
 
+					if(!this.isUnseen(2)){
+						if(this==game.me){
+							ui.revealCharacter.classList.remove('glow');
+							ui.revealCharacter.innerHTML='亮将x0';
+							ui.revealCharacter.hide();
+						}
+						else if(this.isOnline2()){
+							this.send(function(){
+								ui.revealCharacter.classList.remove('glow');
+								ui.revealCharacter.innerHTML='亮将x0';
+								ui.revealCharacter.hide();
+							});
+						}
+					}
+					else{
+						if(this==game.me){
+							if(ui.revealCharacter){
+								ui.revealCharacter.innerHTML='亮将x1';
+							}
+						}
+						else if(this.isOnline2()){
+							this.send(function(){
+								if(ui.revealCharacter){
+									ui.revealCharacter.innerHTML='亮将x1';
+								}
+							});
+						}
+					}
+
 					this.checkConflict();
 				},
 			}
@@ -3723,7 +3753,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				limited:true,
 				audio:'yeyan',
 				enable:'chooseToUse',
-				trigger:{player:'chooseToRespondBegin'},
+				trigger:{player:'chooseToRespondBegin',global:'revealXiaonei'},
 				skillAnimation:'legend',
 				animationColor:'thunder',
 				filterTarget:function(card,player,target){
@@ -3731,6 +3761,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					if(player==game.me){
+						ui.revealXiaonei.classList.remove('glow');
+						ui.revealXiaonei.hide();
+					}
+					else if(player.isOnline2()){
+						player.send(function(){
+							ui.revealXiaonei.classList.remove('glow');
+							ui.revealXiaonei.hide();
+						});
+					}
 					player.awakenSkill('woshixiaonei');
 					player.chooseControlList(true,function(event,player){
 						return Math.floor(Math.random()*2);
@@ -4399,12 +4439,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			_mingzhi1:{
-				trigger:{player:['phaseBeginStart','dyingBefore']},
+				trigger:{player:['phaseBeginStart','dyingBefore'],global:['mingzhi1_1','mingzhi1_2','mingzhi1_3','mingzhi1_4','mingzhi1_5','mingzhi1_6','mingzhi1_7','mingzhi1_8','mingzhi1_9','mingzhi1_10',]},
 				priority:19,
 				forced:true,
 				popup:false,
 				content:function(){
 					"step 0"
+					if(event.triggername&&event.triggername.includes('mingzhi1_')&&event.triggername!=('mingzhi1_'+player.seat)){
+						event.cancel();
+						return;
+					}
+
 					var choice=1;
 					for(var i=0;i<player.hiddenSkills.length;i++){
 						if(lib.skill[player.hiddenSkills[i]].ai){

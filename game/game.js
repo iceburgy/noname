@@ -11270,6 +11270,14 @@
 						ui.roomInfo.remove();
 						delete ui.roomInfo;
 					}
+					if(ui.leaderBoardDialog){
+						ui.leaderBoardDialog.remove();
+						delete ui.leaderBoardDialog;
+					}
+					if(ui.changeLogDialog){
+						ui.changeLogDialog.remove();
+						delete ui.changeLogDialog;
+					}
 					if(ui.exitroom){
 						ui.exitroom.remove();
 						delete ui.exitroom;
@@ -16067,7 +16075,12 @@
 							this._inits[i](this);
 						}
 					}
-					if(!game.observe&&this==game.me) this.showGiveup();
+					if(!game.observe&&this==game.me){
+						this.showGiveup();
+						if(character2&&lib.character[character2]){
+							this.showRevealCharacter();
+						}
+					}
 					this.update();
 					return this;
 				},
@@ -16458,6 +16471,22 @@
 					}
 					else if(this.isOnline2()){
 						this.send(ui.create.giveup);
+					}
+				},
+				showRevealCharacter:function(){
+					if(this==game.me){
+						ui.create.revealCharacter();
+					}
+					else if(this.isOnline2()){
+						this.send(ui.create.revealCharacter);
+					}
+				},
+				showRevealXiaonei:function(){
+					if(this==game.me){
+						ui.create.revealXiaonei();
+					}
+					else if(this.isOnline2()){
+						this.send(ui.create.revealXiaonei);
 					}
 				},
 				applySkills:function(skills){
@@ -25766,12 +25795,22 @@
 					if(player) lib.element.player.chat.call(player,str);
 				},
 				giveup:function(player){
-					_status.event.next.length=0;
 					game.createEvent('giveup',false).setContent(function(){
 						game.log(player,'投降');
 						player.popup('投降');
 						player.die('nosource');
 					}).player=player;
+				},
+				revealCharacter:function(player){
+					var next=game.createEvent('revealCharacter',false).setContent(function(){
+						_status.event.trigger('mingzhi1_'+player.seat);
+					});
+					next.player=player;
+				},
+				revealXiaonei:function(){
+					game.createEvent('revealXiaonei',false).setContent(function(){
+						_status.event.trigger('revealXiaonei');
+					});
 				},
 				auto:function(){
 					var player=lib.playerOL[this.id];
@@ -25923,53 +25962,55 @@
 							var sender=lib.node.clients[i];
 							var muniuCardsParentsShouldRemove=[];
 							var muniu = player.getEquip(5);
-							if(!muniu.cards){
-								muniu.cards=[];
-							}
-							for(var ind=0;ind<muniu.cards.length;ind++){
-								var parent=muniu.cards[ind].parentNode;
-								var shouldRemove=!parent || (parent.id != 'special' && (!parent.classList||!parent.classList.contains('special')));
-								muniuCardsParentsShouldRemove.push(shouldRemove);
-							}
-							for(var ind=0;ind<muniu.cards.length;ind++){
-								if(muniuCardsParentsShouldRemove[ind]){
-									muniu.cards[ind].classList.remove('selected');
-									muniu.cards[ind].classList.remove('selectable');
-									muniu.cards[ind].classList.remove('un-selectable');
-									muniu.cards.splice(ind,1);
-									muniuCardsParentsShouldRemove.splice(ind,1);
-									ind--
-								}
-							}
-							game.broadcastAll(function(player,muniu,cards){
-								muniu.cards=cards;
-								player.updateMarks();
-							},player,muniu,muniu.cards);
-
-							var args=[];
-							args.push(function(player){
-								//ui.handSpecial.reset(player.getEquip(5).cards);
-								var muniu = player.getEquip(5);
+							if(muniu){
 								if(!muniu.cards){
 									muniu.cards=[];
 								}
-								var cards=muniu.cards;
-								var elements = ui.handSpecial.cards.childNodes;
-								for (var i = elements.length - 1; i >= 0; i--) {
-									if (cards && cards.contains(elements[i])) continue;
-									ui.special.appendChild(elements[i]);
+								for(var ind=0;ind<muniu.cards.length;ind++){
+									var parent=muniu.cards[ind].parentNode;
+									var shouldRemove=!parent || (parent.id != 'special' && (!parent.classList||!parent.classList.contains('special')));
+									muniuCardsParentsShouldRemove.push(shouldRemove);
 								}
-
-								if (cards && cards.length) {
-									for (var i = 0; i < cards.length; i++) {
-										if (cards[i]&&!ui.handSpecial.cards.contains(cards[i])) ui.handSpecial.cards.appendChild(cards[i]);
+								for(var ind=0;ind<muniu.cards.length;ind++){
+									if(muniuCardsParentsShouldRemove[ind]){
+										muniu.cards[ind].classList.remove('selected');
+										muniu.cards[ind].classList.remove('selectable');
+										muniu.cards[ind].classList.remove('un-selectable');
+										muniu.cards.splice(ind,1);
+										muniuCardsParentsShouldRemove.splice(ind,1);
+										ind--
 									}
 								}
+								game.broadcastAll(function(player,muniu,cards){
+									muniu.cards=cards;
+									player.updateMarks();
+								},player,muniu,muniu.cards);
 
-								ui.handSpecial.show();
-							});
-							args.push(player);
-							sender.send.apply(sender,args);
+								var args=[];
+								args.push(function(player){
+									//ui.handSpecial.reset(player.getEquip(5).cards);
+									var muniu = player.getEquip(5);
+									if(!muniu.cards){
+										muniu.cards=[];
+									}
+									var cards=muniu.cards;
+									var elements = ui.handSpecial.cards.childNodes;
+									for (var i = elements.length - 1; i >= 0; i--) {
+										if (cards && cards.contains(elements[i])) continue;
+										ui.special.appendChild(elements[i]);
+									}
+
+									if (cards && cards.length) {
+										for (var i = 0; i < cards.length; i++) {
+											if (cards[i]&&!ui.handSpecial.cards.contains(cards[i])) ui.handSpecial.cards.appendChild(cards[i]);
+										}
+									}
+
+									ui.handSpecial.show();
+								});
+								args.push(player);
+								sender.send.apply(sender,args);
+							}
 							break;
 						}
 					}
@@ -26833,6 +26874,14 @@
 					if(ui.roomInfo){
 						ui.roomInfo.remove();
 						delete ui.roomInfo;
+					}
+					if(ui.leaderBoardDialog){
+						ui.leaderBoardDialog.remove();
+						delete ui.leaderBoardDialog;
+					}
+					if(ui.changeLogDialog){
+						ui.changeLogDialog.remove();
+						delete ui.changeLogDialog;
 					}
 					if(ui.exitroom){
 						ui.exitroom.remove();
@@ -30868,6 +30917,14 @@
 					ui.giveup.remove();
 					delete ui.giveup;
 				}
+				if(ui.revealCharacter){
+					ui.revealCharacter.remove();
+					delete ui.revealCharacter;
+				}
+				if(ui.revealXiaonei){
+					ui.revealXiaonei.remove();
+					delete ui.revealXiaonei;
+				}
 				if(game.servermode){
 					ui.exit.firstChild.innerHTML='返回房间';
 					setTimeout(function(){
@@ -31736,6 +31793,14 @@
 			if(ui.giveup){
 				ui.giveup.remove();
 				delete ui.giveup;
+			}
+			if(ui.revealCharacter){
+				ui.revealCharacter.remove();
+				delete ui.revealCharacter;
+			}
+			if(ui.revealXiaonei){
+				ui.revealXiaonei.remove();
+				delete ui.revealXiaonei;
 			}
 
 			if(lib.config.test_game&&!_status.connectMode){
@@ -42745,12 +42810,12 @@
 					if(this.innerHTML=='<span>确认</span>'){
 						clearTimeout(this.confirmTimeout);
 						var player=game.me;
-						this.remove();
+						this.innerHTML='<span>投降</span>';
+						this.hide();
 						if(game.online){
 							game.send('giveup',player);
 						}
 						else{
-							_status.event.next.length=0;
 							game.createEvent('giveup',false).setContent(function(){
 								game.log(player,'投降');
 								player.popup('投降');
@@ -42769,6 +42834,48 @@
 						},1000);
 					}
 				},true);
+			},
+			revealCharacter:function(){
+				if(!ui.revealCharacter){
+					ui.revealCharacter=ui.create.system('亮将x2',function(){
+						if(this.innerHTML=='亮将x2'){
+							this.innerHTML='亮将x1';
+						}
+						else{
+							ui.revealCharacter.classList.remove('glow');
+							ui.revealCharacter.innerHTML='亮将x0';
+							ui.revealCharacter.hide();
+						}
+						var player=game.me;
+						if(game.online){
+							game.send('revealCharacter',player);
+						}
+						else{
+							var next=game.createEvent('revealCharacter',false).setContent(function(){
+								_status.event.trigger('mingzhi1_'+player.seat);
+							});
+							next.player=player;
+						}
+					},true);
+					ui.revealCharacter.classList.add('glow');
+				}
+			},
+			revealXiaonei:function(){
+				if(!ui.revealXiaonei){
+					ui.revealXiaonei=ui.create.system('亮小内',function(){
+						ui.revealXiaonei.classList.remove('glow');
+						ui.revealXiaonei.hide();
+						if(game.online){
+							game.send('revealXiaonei');
+						}
+						else{
+							game.createEvent('revealXiaonei',false).setContent(function(){
+								_status.event.trigger('revealXiaonei');
+							});
+						}
+					},true);
+					ui.revealXiaonei.classList.add('glow');
+				}
 			},
 			moonlight:function(moonlightBalance){
 				if(ui.moonlight) return;
