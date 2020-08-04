@@ -2181,8 +2181,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					game.me.chooseButtonOL(list,function(player,result){
 						if(result.links&&(game.online||player==game.me)){
-							player.init(player.chosenChar1,result.links[0],false);
-							var info=lib.character[result.links[0]];
+							player.chosenChar2=result.links[0];
+							player.init(player.chosenChar1,player.chosenChar2,false);
+							var info=lib.character[player.chosenChar2];
 							var skills=info[3];
 							for(var i=0;i<skills.length;i++){
 								player.hiddenSkills.add(skills[i]);
@@ -2222,8 +2223,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					game.me.chooseButtonOL(list,function(player,result){
 						if(game.online||player==game.me){
-							player.init(player.chosenChar1,result.links[0],false);
-							var info=lib.character[result.links[0]];
+							player.chosenChar2=result.links[0];
+							player.init(player.chosenChar1,player.chosenChar2,false);
+							var info=lib.character[player.chosenChar2];
 							var skills=info[3];
 							for(var i=0;i<skills.length;i++){
 								player.hiddenSkills.add(skills[i]);
@@ -2238,7 +2240,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					// determine main and vice character
 					var list=[];
-					var selectButton=2;
+					var selectButton=1;
 
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==game.zhu){
@@ -2252,14 +2254,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.me.chooseButtonOL(list,function(player,result){
 						if(game.online||player==game.me) {
 							// this determines the current user will see full character and group info or not
-							player.init(result.links[0],result.links[1],false);
+							var mainChar=result.links[0];
+							var viceChar=mainChar==player.chosenChar1?player.chosenChar2:player.chosenChar1;
+							player.init(mainChar,viceChar,false);
 						}
 					});
 					"step 8"
 					if(game.me!=game.zhu){
 						for(var i in result){
 							// this determines the other online users will see full character and group info or not
-							game.zhu.init(result[i].links[0],result[i].links[1],false)
+							var mainChar=result[i].links[0];
+							var viceChar=mainChar==event.chosenChars[0][0]?event.chosenChars[0][1]:event.chosenChars[0][0];
+							game.zhu.init(mainChar,viceChar,false)
 							// game.zhu.init will be called from host and is broadcasting
 							// avoid exposing zhu character and group after making selection
 							game.zhu.group='unknown';
@@ -2354,18 +2360,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},game.zhu);
 					"step 11"
 					// zhu choose to show character
-					game.zhu.chooseControl('zanbuliangjiang','明置'+get.translation(game.zhu.name1),
-						'明置'+get.translation(game.zhu.name2),'tongshimingzhi',true).ai=function(event,player){
-						return 0;
-					};
+					var liangjiang=[];
+					var list=['hidden','main','vice','all',];
+					for(var i=0;i<list.length;i++){
+						list[i]=['','',list[i]];
+					}
+					game.zhu.chooseButton(['是否亮将',[list,'vcard']],true);
 					"step 12"
-					switch(result.control){
-						case '明置'+get.translation(game.zhu.name1):game.zhu.showCharacter(0);event.goto(15);break;
-						case '明置'+get.translation(game.zhu.name2):game.zhu.showCharacter(1);event.goto(15);break;
-						case 'tongshimingzhi':game.zhu.showCharacter(2);event.goto(15);break;
-						default:
-							game.zhu.trySkillAnimate('不亮将','不亮将',false);
-							break;
+					event.zhuGroupRevealed=true;
+					var choice=result.links[0][2];
+					switch(choice){
+						case 'main':game.zhu.showCharacter(0);event.goto(15);break;
+						case 'vice':game.zhu.showCharacter(1);event.goto(15);break;
+						case 'all':game.zhu.showCharacter(2);event.goto(15);break;
+						default:game.zhu.trySkillAnimate('不亮将','不亮将',false);event.zhuGroupRevealed=false;break;
 					}
 					"step 13"
 					// zhu choose to show group
@@ -2374,7 +2382,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<list.length;i++){
 						list[i]=['','','group_'+list[i]];
 					}
-					game.zhu.chooseButton(['是否亮势力',[list,'vcard']]);
+					game.zhu.chooseButton(['是否声明势力',[list,'vcard']]);
 					"step 14"
 					if(result.bool){
 						var shili=result.links[0][2].slice(6);
@@ -2386,7 +2394,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},game.zhu,game.zhu.group);
 					}
 					else{
-						game.zhu.trySkillAnimate('不亮势力','不亮势力',false);
+						game.zhu.trySkillAnimate('不声明势力','不声明势力',false);
 					}
 					"step 15"
 					// other players to choose character1, no use of change char
@@ -2596,8 +2604,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					game.me.chooseButtonOL(list,function(player,result){
 						if(result.links&&(game.online||player==game.me)){
-							player.init(player.chosenChar1,result.links[0],false);
-							var info=lib.character[result.links[0]];
+							player.chosenChar2=result.links[0];
+							player.init(player.chosenChar1,player.chosenChar2,false);
+							var info=lib.character[player.chosenChar2];
 							var skills=info[3];
 							for(var i=0;i<skills.length;i++){
 								player.hiddenSkills.add(skills[i]);
@@ -2651,8 +2660,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					game.me.chooseButtonOL(list,function(player,result){
 						if(game.online||player==game.me){
-							player.init(player.chosenChar1,result.links[0],false);
-							var info=lib.character[result.links[0]];
+							player.chosenChar2=result.links[0];
+							player.init(player.chosenChar1,player.chosenChar2,false);
+							var info=lib.character[player.chosenChar2];
 							var skills=info[3];
 							for(var i=0;i<skills.length;i++){
 								player.hiddenSkills.add(skills[i]);
@@ -2670,7 +2680,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					// other players to determine main and vice character
 					var list=[];
-					var selectButton=2;
+					var selectButton=1;
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=game.zhu){
 							var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
@@ -2684,24 +2694,26 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					game.me.chooseButtonOL(list,function(player,result){
 						if(game.online||player==game.me) {
-							player.init(result.links[0],result.links[1],false);
+							var mainChar=result.links[0];
+							var viceChar=mainChar==player.chosenChar1?player.chosenChar2:player.chosenChar1;
+							player.init(mainChar,viceChar,false);
 						}
 					});
 					"step 22"
-					var shen=[];
-					for(var i in result){
-						if(result[i]&&result[i].links){
-							for(var j=0;j<result[i].links.length;j++){
-								event.list2.remove(result[i].links[j]);
-							}
-						}
+					for(var i=0;i<event.chosenChars.length;i++){
+						event.list2.remove(event.chosenChars[i][0]);
+						event.list2.remove(event.chosenChars[i][1]);
 					}
+					var shen=[];
 					for(var i in result){
 						if(result[i]=='ai'){
 							result[i]=event.list2.randomRemove(lib.configOL.double_character?2:1);
 						}
 						else{
-							result[i]=result[i].links
+							var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
+							var mainChar=result[i].links[0];
+							var viceChar=mainChar==event.chosenChars[distanceFromZhu][0]?event.chosenChars[distanceFromZhu][1]:event.chosenChars[distanceFromZhu][0];
+							result[i]=[mainChar,viceChar];
 						}
 						if(lib.character[result[i][0]]&&lib.character[result[i][0]][1]=='shen'||
 							lib.character[result[i][1]]&&lib.character[result[i][1]][1]=='shen') shen.push(lib.playerOL[i]);
@@ -2743,9 +2755,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							    lib.playerOL[i].groupshen=result2[i].links[0][2].slice(6);
 							}
 						}
-						setTimeout(function(){
-							ui.arena.classList.remove('choose-character');
-						},500);
 					},result2,result);
 					
 					for(var i in result2){
@@ -2769,7 +2778,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 					for(var i=0;i<game.players.length;i++){
 						// game.zhu has been set at above and it should be skipped here
-						if(game.players[i]==game.zhu) continue;
+						// but we need to revert group from previous fake declaration
+						if(game.players[i]==game.zhu){
+							if(!event.zhuGroupRevealed){
+								game.zhu.group='unknown';
+								game.broadcast(function(player,group){
+									player.group='unknown';
+								},game.zhu);
+							}
+							continue;
+						}
 
 						game.broadcastAll(function(player){
 							player.classList.add('unseen');
@@ -2807,8 +2825,34 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						},game.players[i]);
 					}
+					"step 24"
+					var liangjiang=[];
+					var list=['hidden','main','vice','all',];
+					for(var i=0;i<list.length;i++){
+						list[i]=['','',list[i]];
+					}
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]!=game.zhu){
+							liangjiang.push([game.players[i],['是否亮将',[list,'vcard']],1,true]);
+						}
+					}
+					game.me.chooseButtonOL(liangjiang,function(player,result){});
+					"step 25"
+					for(var i in result){
+						if(result[i]&&result[i].links) {
+							var choice=result[i].links[0][2];
+							switch(choice){
+								case 'main':lib.playerOL[i].showCharacter(0);break;
+								case 'vice':lib.playerOL[i].showCharacter(1);break;
+								case 'all':lib.playerOL[i].showCharacter(2);break;
+								default:break;
+							}
+						}
+					}
 					setTimeout(function(){
-						ui.arena.classList.remove('choose-character');
+						game.broadcastAll(function(){
+							ui.arena.classList.remove('choose-character');
+						});
 					},500);
 				});
 			},
@@ -2884,7 +2928,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			anlezhugong2:'安乐主公',
 			"xianqu_skill":"先驱",
 			"xianqu_skill_info":"",
-			zanbuliangjiang:'暂不亮将',
 			bumingzhi:'不明置',
 			tongshimingzhi:'同时明置',
 			_mingzhisuodingji:"亮将",
