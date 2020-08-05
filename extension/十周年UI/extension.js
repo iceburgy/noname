@@ -358,14 +358,12 @@ content:function(config, pack){
 								var muniu = player.getEquip(5);
 								if (muniu) {
 									if(!game.online){
-										if(player==game.me){
-											lib.skill.muniu_skill.sync(muniu);
-											game.broadcastAll(function(player){
-												player.updateMarks();
-											},player);
-											ui.handSpecial.reset(player.getEquip(5).cards);
-											ui.handSpecial.show();
-										}
+										lib.skill.muniu_skill.sync(muniu);
+										game.broadcastAll(function(player){
+											player.updateMarks();
+										},player);
+										ui.handSpecial.reset(player.getEquip(5).cards);
+										if(player==game.me) ui.handSpecial.show();
 									}
 									else{
 										game.send('syncMuniu',player);

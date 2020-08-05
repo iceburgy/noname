@@ -12,13 +12,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				onEquip:function(){
 					player.markSkill('muniu_skill6');
 
-					if(player==game.me){
+					if(!player.isOnline2()){
 						lib.skill.muniu_skill.sync(this);
 						game.broadcastAll(function(player){
 							player.updateMarks();
 						},player);
 						ui.handSpecial.reset(player.getEquip(5).cards);
-						ui.handSpecial.show();
+						if(player==game.me) ui.handSpecial.show();
 					}
 					else{
 						player.send(function(player){
@@ -32,7 +32,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(player==game.me){
 							ui.handSpecial.hide();
 						}
-						else{
+						else if(player.isOnline2()){
 							player.send(function(){
 								ui.handSpecial.hide();
 							});
