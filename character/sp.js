@@ -15059,7 +15059,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					var list=[1,2,3,4,5,6,7,8,9,10,11,12,13]
 					target.chooseControl(list).set('ai',function(){
-						return list.randomGet();
+						return Math.floor(Math.random()*13)+1;
 					});
 					"step 1"
 					if(result.control){
