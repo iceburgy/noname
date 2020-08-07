@@ -474,7 +474,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"loseAfter",
 				},
 				filter:function (event,player){
-					if(event.getParent().name=='equip') return false;
+					if(event.getParent().name=='equip'){
+						var isMuniu=false;
+						if(event.cards&&event.cards.length&&get.subtype(event.cards[0].name)=='equip5') isMuniu=true;
+						if(!isMuniu) return false;
+					}
 					if(player.hp!=player.countCards('e')||!player.isDamaged()) return false;
 					return event.es&&event.es.length>0;
 				},
