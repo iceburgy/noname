@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.08.07',
+	version:'2020.08.07.1',
 	update:'2020.06.13.1',
 	changeLog:[
 		'开启主公限定技先驱标记',
@@ -9,7 +9,7 @@ window.noname_update={
 		'开启随时亮小内',
 		'主副将选择一键完成',
 		'默认总是显示木牛卡牌区',
-		'修复吕岱移出木马时装备与体力相等不回血的bug',
+		'修复bugs',
 		'更多更新历史信息请查看：https://bit.ly/wumingsha',
 	],
 	files:[
