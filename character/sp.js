@@ -17375,7 +17375,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_jianjie2_info":"",
 			"smh_lianhuan1":"连铸",
 			"smh_lianhuan1_info":"",
-			"smh_yeyan":"业炎",
+			"smh_yeyan":"司马徽业炎",
 			"smh_yeyan_info":"",
 			"xinfu_yinshi":"隐士",
 			"xinfu_yinshi_info":"锁定技，若你没有龙印、凤印且防具栏为空，则当你受到属性伤害或锦囊牌造成的伤害时，防止此伤害。",

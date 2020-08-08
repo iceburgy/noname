@@ -25816,11 +25816,7 @@
 					if(player) lib.element.player.chat.call(player,str);
 				},
 				giveup:function(player){
-					game.createEvent('giveup',false).setContent(function(){
-						game.log(player,'投降');
-						player.popup('投降');
-						player.die('nosource');
-					}).player=player;
+					game.voteGiveup(player);
 				},
 				revealCharacter:function(player){
 					var next=game.createEvent('revealCharacter',false).setContent(function(){
@@ -26959,6 +26955,83 @@
 		phaseName:['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'],
 	};
 	var game={
+		voteGiveup(player){
+			player.trySkillAnimate('我投了','我投了',false);
+			game.log(player,'【我投了】');
+			if(!game.votersIDs) {
+				game.votersIDs={};
+				game.votersIDs.zhu=0;
+				game.votersIDs.zhong=0;
+				game.votersIDs.fan=0;
+				game.votersIDs.nei=0;
+			}
+			var voterID=player.identity;
+			game.votersIDs[voterID]++;
+			var popzhuzhong=1+get.population('zhong');
+			var popfan=get.population('fan');
+			var popnei=get.population('nei');
+			var todie;
+
+			switch(voterID){
+				case 'zhu':
+				case 'zhong':
+					if(popzhuzhong+popnei==game.votersIDs.zhu+game.votersIDs.zhong+game.votersIDs.nei){
+						todie=[];
+						for(var i=0;i<game.players.length;i++){
+							if(['zhu','zhong','nei'].contains(game.players[i].identity)){
+								todie.push(game.players[i]);
+							}
+						}
+					}
+					break;
+				case 'fan':
+					if(popfan+popnei==game.votersIDs.fan+game.votersIDs.nei){
+						todie=[];
+						for(var i=0;i<game.players.length;i++){
+							if(['fan','nei'].contains(game.players[i].identity)){
+								todie.push(game.players[i]);
+							}
+						}
+					}
+					break;
+				case 'nei':
+					if(popzhuzhong+popnei==game.votersIDs.zhu+game.votersIDs.zhong+game.votersIDs.nei){
+						todie=[];
+						for(var i=0;i<game.players.length;i++){
+							if(['zhu','zhong','nei'].contains(game.players[i].identity)){
+								todie.push(game.players[i]);
+							}
+						}
+					}
+					else if(popfan+popnei==game.votersIDs.fan+game.votersIDs.nei){
+						todie=[];
+						for(var i=0;i<game.players.length;i++){
+							if(['fan','nei'].contains(game.players[i].identity)){
+								todie.push(game.players[i]);
+							}
+						}
+					}
+					else if(popfan==0){
+						todie=[];
+						todie.push(player);
+					}
+					break;
+				default:num=0;break;
+			}
+
+			if(todie){
+				game.todie=todie;
+				game.createEvent('giveup',false).setContent(function(){
+					for(var td of game.todie){
+						if(td.isAlive()){
+							game.log(td,'投降');
+							td.popup('投降');
+							td.die('nosource');
+						}
+					}
+				});
+			}
+		},
 		getMaxHpToGain(shownMaxHp, otherMaxHp, isOtherUnseen){
 			var baseMaxHp=4;
 			if(!isOtherUnseen){
@@ -30974,7 +31047,7 @@
 				}
 			}
 			// only record statistics if there are at least 5 human players
-			if(_status.connectMode&&(game.players.length||game.dead.length)&&numHuman>=6&&clients.length==8||clients.length==10){
+			if(_status.connectMode&&(game.players.length||game.dead.length)&&numHuman>=6&&(clients.length==8||clients.length==10)){
 				// game statistics
 				/* lib.config.players_statistics
 				{
@@ -42820,11 +42893,7 @@
 							game.send('giveup',player);
 						}
 						else{
-							game.createEvent('giveup',false).setContent(function(){
-								game.log(player,'投降');
-								player.popup('投降');
-								player.die('nosource');
-							}).player=player;
+							game.voteGiveup(player);
 						}
 						if(_status.paused&&_status.imchoosing&&!_status.auto){
 							ui.click.auto();

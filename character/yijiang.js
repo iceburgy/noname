@@ -5824,7 +5824,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jigong2:{
 				mod:{
-					maxHandcardBase:function(player,num){
+					maxHandcard:function(player,num){
 						var damage=player.getStat().damage;
 						if(typeof damage=='number') return damage;
 						return 0;

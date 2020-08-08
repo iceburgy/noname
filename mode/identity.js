@@ -312,7 +312,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			// name hidden players with position
 			game.broadcastAll(function(player){
 				for(var i=0;i<game.players.length;i++){
-					game.players[i].name='unknown'+get.distance(player,game.players[i],'absolute');
+					if(game.players[i].name=='unknown') game.players[i].name='unknown'+get.distance(player,game.players[i],'absolute');
 					game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[game.players[i].name]),game.players[i]);
 					if(game.players[i].node.zoneCamp){
 						game.players[i].node.zoneCamp.node.avatarDefaultName.innerHTML = get.verticalStr(lib.translate[game.players[i].name]);
@@ -340,7 +340,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				if(players[i].identity=='zhu'&&players.length>=6&&players.length%2==0){
 					game.broadcastAll(function(player){
-						player.addSkill('xianqu_skill');
 						player.addSkill('zhikezhugong');
 						player.addSkill('anlezhugong');
 					},players[i]);
@@ -2917,7 +2916,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			woshixiaonei:'我是小内',
 			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）增加一点体力上限，然后回复一点体力并且摸2张牌；2）获得限定技‘知己知彼’，然后回复一点体力并且摸3张牌。（知己知彼：村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废）',
 			xiaoneizhibi:'知己知彼',
-			xiaoneizhibi_info:'出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废',
+			xiaoneizhibi_info:'限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废',
 			xiaoneibonus:'主内单挑',
 			zhikezhugong:'制克主公',
 			zhikezhugong_info:'村规主公限定技：如果场上玩家数是6人或者更多，而且为偶数，则主公在第一回合内可以2选1：1）准备阶段使用一次手气卡；2）如果没有对其他玩家使用牌，可以跳过弃牌阶段',
@@ -2926,8 +2925,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			anlezhugong:'安乐主公',
 			anlezhugong_info:'村规主公限定技：主公如果在第一轮被乐而且中乐，则手牌上限加2，（十人局则加3）',
 			anlezhugong2:'安乐主公',
-			"xianqu_skill":"先驱",
-			"xianqu_skill_info":"",
 			bumingzhi:'不明置',
 			tongshimingzhi:'同时明置',
 			_mingzhisuodingji:"亮将",
@@ -4090,54 +4087,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						return num+keepExtra;
 					}
-				},
-			},
-			"xianqu_skill":{
-				ruleSkill:true,
-				enable:"phaseUse",
-				usable:1,
-				mark:true,
-				intro:{
-					content:"出牌阶段，你可以弃置此标记，然后将手牌摸至四张并观看一名其他角色的武将牌。",
-				},
-				content:function (){
-					"step 0"
-					var num=4-player.countCards('h');
-					if(num) player.draw(num);
-					player.chooseTarget('是否观看一名其他角色的暗置武将牌？',function(card,player,target){
-						return target!=player&&target.isUnseen(2);
-					}).set('ai',function(target){
-						if(target.isUnseen()){
-							var next=_status.event.player.getNext();
-							if (target!=next) return 10;
-							return 9;
-						}
-						return -get.attitude(_status.event.player,target);
-					});
-					"step 1"
-					if(result.bool){
-						var target=result.targets[0];
-						var content;
-						var str=get.translation(target)+'的';
-						var nameToView=[];
-						if(target.isUnseen(0)) nameToView.push(target.name1);
-						if(target.isUnseen(1)) nameToView.push(target.name2);
-						content=[str+'武将',[nameToView,'character']];
-						game.log(player,'观看了',target,'的武将');
-						player.chooseControl('ok').set('dialog',content);
-					}
-					game.broadcastAll(function(player){
-						player.removeSkill('xianqu_skill');
-					},player);
-				},
-				ai:{
-					order:1,
-					result:{
-						player:function(player){
-							if(4-player.countCards('h')<2) return 0;
-							return 1;
-						},
-					},
 				},
 			},
 			identity_junshi:{
