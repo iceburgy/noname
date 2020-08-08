@@ -2912,25 +2912,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.line(result.targets[0],'green');
 							player.discardPlayerCard(result.targets[0],'hej',true);
 						}
- 					event.dialog.close();
- 					game.addVideo('judge2',null,event.videoId);
+						event.dialog.close();
+
+						game.log(player,'展示完放回牌堆顶',event.card);
+						ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+
+						game.addVideo('judge2',null,event.videoId);
 						game.addVideo('deletenode',player,[get.cardInfo(event.node)]);
 						event.node.delete();
- 					game.broadcast(function(id,card){
- 						var dialog=get.idDialog(id);
- 						if(dialog){
- 							dialog.close();
- 						}
- 						if(card.clone){
+						game.broadcast(function(id,card){
+							var dialog=get.idDialog(id);
+							if(dialog){
+								dialog.close();
+							}
+							if(card.clone){
 								card.clone.delete();
 							}
- 						ui.arena.classList.remove('thrownhighlight');
- 					},event.videoId,event.card);
- 					ui.arena.classList.remove('thrownhighlight');
+							ui.arena.classList.remove('thrownhighlight');
+						},event.videoId,event.card);
+						ui.arena.classList.remove('thrownhighlight');
 					}
 					else if(result.targets){
- 					event.dialog.close();
- 					game.addVideo('judge2',null,event.videoId);
+						event.dialog.close();
+						game.addVideo('judge2',null,event.videoId);
 						player.line(result.targets,'green');
 						player.give(event.card,result.targets[0]);
 						event.node.moveDelete(result.targets[0]);
@@ -2938,9 +2942,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ui.arena.classList.remove('thrownhighlight');
 						game.broadcast(function(card,target,id){
 							var dialog=get.idDialog(id);
- 						if(dialog){
- 							dialog.close();
- 						}
+							if(dialog){
+								dialog.close();
+							}
 							ui.arena.classList.remove('thrownhighlight');
 							if(card.clone){
 								card.clone.moveDelete(target);
@@ -2948,21 +2952,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},event.card,result.targets[0],event.videoId);
 					}
 					else{
+						game.log(player,'展示完放回牌堆顶',event.card);
+						ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+
 						game.addVideo('deletenode',player,[get.cardInfo(event.node)]);
 						event.node.delete();
- 					game.broadcast(function(id){
- 						var dialog=get.idDialog(id);
- 						if(dialog){
- 							dialog.close();
- 						}
- 						if(card.clone){
+						game.broadcast(function(id){
+							var dialog=get.idDialog(id);
+							if(dialog){
+								dialog.close();
+							}
+							if(card.clone){
 								card.clone.delete();
 							}
- 						ui.arena.classList.remove('thrownhighlight');
- 					},event.videoId,event.card);
- 					event.dialog.close();
- 					game.addVideo('judge2',null,event.videoId);
- 					ui.arena.classList.remove('thrownhighlight');
+							ui.arena.classList.remove('thrownhighlight');
+						},event.videoId,event.card);
+						event.dialog.close();
+						game.addVideo('judge2',null,event.videoId);
+						ui.arena.classList.remove('thrownhighlight');
 					}
 				},
 				ai:{
