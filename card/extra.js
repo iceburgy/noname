@@ -683,6 +683,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return true;
 					},
 					check:function(button){
+						if(_status.event.getParent().type!='phase') return 1;
 						if(button.link.name=='du') return 10;
 						if(button.link.name=='shan') return 10;
 						if(button.link.name=='wuxie') return 10;
@@ -692,7 +693,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function(links,player){
 						return {
-							prompt:'选择'+get.translation(links)+'的目标',
 							filterCard:function(){return false},
 							selectCard:-1,
 							viewAs:links[0],
@@ -707,6 +707,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								},player);
 							}
 						}
+					},
+					prompt:function(links){
+						return '选择'+get.translation(links)+'的目标';
 					},
 				},
 				ai:{
@@ -800,6 +803,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				vanish:true,
 				silent:true,
 				popup:false,
+				nopop:true,
 				onremove:function(player){
 					if(player.node.jiu){
 						player.node.jiu.delete();
@@ -1111,7 +1115,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			["diamond",13,"hualiu"],
 			["club",1,"baiyin"],
 			["spade",2,"tengjia"],
-			["club",2,"tengjia",'fire'],
+			["club",2,"tengjia"],
 			["spade",1,"guding"],
 			["diamond",1,"zhuque"],
 

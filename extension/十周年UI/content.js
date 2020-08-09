@@ -88,7 +88,6 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 								aIndex = aIndex >= 0 ? aIndex : guanXing.orderCardsList[i].length;
 								bIndex = bIndex >= 0 ? bIndex : guanXing.orderCardsList[i].length;
 								return aIndex - bIndex;
-								return 
 							});
 						}
 						
@@ -462,6 +461,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 					}
 					
 					cards[j].rawCssText = cards[j].style.cssText;
+					cards[j].fix();
 					content.appendChild(cards[j]);
 				}
 			}

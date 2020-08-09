@@ -177,7 +177,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 						cards = decadeUI.get.bestValueCards(cards, friend);
 					} else {
 						cards.sort(function(a, b){
-							get.value(a, next) - get.value(b, next);
+							return get.value(a, next) - get.value(b, next);
 						});
 					}
 
@@ -307,7 +307,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 						cards = decadeUI.get.bestValueCards(cards, friend);
 					} else {
 						cards.sort(function(a, b){
-							get.value(a, next) - get.value(b, next);
+							return get.value(a, next) - get.value(b, next);
 						});
 					}
 
@@ -316,7 +316,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 					for (var i = 0; i < cards.length; i++) {
 						setTimeout(function(card, index, finished){
 							dialog.move(card, index, 0);
-							if (finished) dialog.finishTime(1000);
+							if (finished) dialog.finishTime(cards.length <= 1 ? 250 : 1000);;
 						}, time, cards[i], i, i >= cards.length - 1);
 						time += 500;
 					}
@@ -387,6 +387,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 						
 						var next = player.getNext();
 						var friend = (get.attitude(player, next) < 0) ? null : next;
+						judges = next.node.judges.childNodes;
 						
 						if (judges.length > 0) cheats = decadeUI.get.cheatJudgeCards(cards, judges, friend != null);
 						
@@ -394,7 +395,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 							cards = decadeUI.get.bestValueCards(cards, friend);
 						} else {
 							cards.sort(function(a, b){
-								get.value(a, next) - get.value(b, next);
+								return get.value(a, next) - get.value(b, next);
 							});
 						}
 
@@ -403,7 +404,7 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 						for (var i = 0; i < cards.length; i++) {
 							setTimeout(function(card, index, finished){
 								dialog.move(card, index, 0);
-								if (finished) dialog.finishTime(1000);
+								if (finished) dialog.finishTime(cards.length <= 1 ? 250 : 1000);;
 							}, time, cards[i], i, i >= cards.length - 1);
 							time += 500;
 						}

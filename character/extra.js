@@ -11,12 +11,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_shan:['shen_zhaoyun','shen_simayi'],
 				extra_yin:['shen_liubei','shen_luxun'],
 				extra_lei:['shen_ganning','shen_zhangliao'],
+				extra_key:['key_kagari','key_shiki'],
 				extra_ol:['ol_zhangliao','shen_caopi','shen_zhenji'],
 			},
 		},
 		character:{
+			key_kagari:['female','shen',3,['kagari_zongsi'],['key']],
+			key_shiki:['female','shen','3/5',['shiki_omusubi'],['key']],
+
 			shen_guanyu:['male','shen',5,['new_wuhun','wushen'],['shu']],
-			shen_zhaoyun:['male','shen',2,['xinjuejing','xinlonghun'],['shu']],
+			shen_zhaoyun:['male','shen',2,['xinjuejing','relonghun'],['shu']],
 			shen_zhugeliang:['male','shen',3,['qixing','kuangfeng','dawu'],['shu']],
 			shen_lvmeng:['male','shen',3,['shelie','gongxin'],['wu']],
 			shen_zhouyu:['male','shen',4,['yeyan','qinyin'],['wu']],
@@ -42,6 +46,169 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//shen_ganning:"体力上限：6",
 		},
 		skill:{
+			shiki_omusubi:{
+				trigger:{global:'roundStart'},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('shiki_omusubi'),lib.filter.notMe).set('ai',function(target){
+						var player=_status.event.player;
+							if(player.isHealthy()) return 0;
+							if(player.hp<3&&player.getDamagedHp()<2) return 0;
+							var list=[];
+							if(lib.character[target.name]) list.addArray(lib.character[target.name][3]);
+							if(lib.character[target.name1]) list.addArray(lib.character[target.name1][3]);
+							if(lib.character[target.name2]) list.addArray(lib.character[target.name2][3]);
+							list=list.filter(function(i){
+								return !player.hasSkill(i);
+							});
+							if(!list.length) return 0;
+						return 1+Math.random();
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('shiki_omusubi',target);
+						player.loseMaxHp();
+						var list=[];
+						if(lib.character[target.name]) list.addArray(lib.character[target.name][3]);
+						if(lib.character[target.name1]) list.addArray(lib.character[target.name1][3]);
+						if(lib.character[target.name2]) list.addArray(lib.character[target.name2][3]);
+						player.addSkill(list);
+						game.broadcastAll(function(list){
+							lib.character.key_shiki[3].addArray(list);
+							game.expandSkills(list);
+							for(var i of list){
+								var info=lib.skill[i];
+								if(!info) continue;
+								if(!info.audioname2) info.audioname2={};
+								info.audioname2.key_shiki='shiki_omusubi';
+							}
+						},list);
+					}
+				},
+			},
+			kagari_zongsi:{
+				enable:'phaseUse',
+				usable:1,
+				content:function(){
+					'step 0'
+					var controls=[];
+					if(ui.cardPile.hasChildNodes()) controls.push('选择牌堆中的一张牌');
+					if(ui.discardPile.hasChildNodes()) controls.push('选择弃牌堆中的一张牌');
+					if(game.hasPlayer(function(current){
+						return current.countCards('hej')>0;
+					})) controls.push('选择一名角色区域内的一张牌');
+					if(!controls.length){event.finish();return;}
+					event.controls=controls;
+					var next=player.chooseControl();
+					next.set('choiceList',controls)
+					next.set('prompt','请选择要移动的卡牌的来源');
+					next.ai=function(){return 0};
+					'step 1'
+					result.control=event.controls[result.index];
+					var list=['弃牌堆','牌堆','角色'];
+					for(var i=0;i<list.length;i++){
+						if(result.control.indexOf(list[i])!=-1){event.index=i;break;}
+					}
+					if(event.index==2){
+						player.chooseTarget('请选择要移动的卡牌的来源',true,function(card,kagari,target){
+							return target.countCards('hej')>0;
+						});
+					}
+					else{
+						var source=ui[event.index==0?'discardPile':'cardPile'].childNodes;
+						var list=[];
+						for(var i=0;i<source.length;i++) list.push(source[i]);
+						player.chooseButton(['请选择要移动的卡牌',list],true).ai=get.buttonValue;
+					}
+					'step 2'
+					if(event.index==2){
+						player.line(result.targets[0]);
+						event.target1=result.targets[0];
+						player.choosePlayerCard(result.targets[0],true,'hej').set('visible',true);
+					}
+					else{
+						event.card=result.links[0];
+					}
+					'step 3'
+					if(event.index==2) event.card=result.cards[0];
+					var controls=[
+						'将这张牌移动到牌堆的顶部或者底部',
+						'将这张牌移动到弃牌堆的顶部或者底部',
+						'将这张牌移动到一名角色对应的区域里',
+					];
+					event.controls=controls;
+					var next=player.chooseControl();
+					next.set('prompt','要对'+get.translation(event.card)+'做什么呢？');
+					next.set('choiceList',controls);
+					next.ai=function(){return 2};
+					'step 4'
+					result.control=event.controls[result.index];
+					var list=['弃牌堆','牌堆','角色'];
+					for(var i=0;i<list.length;i++){
+						if(result.control.indexOf(list[i])!=-1){event.index2=i;break;}
+					}
+					if(event.index2==2){
+						player.chooseTarget('要将'+get.translation(card)+'移动到哪一名角色的对应区域呢',true).ai=function(target){
+							return target==_status.event.player?1:0;
+						};
+					}
+					else{
+						player.chooseControl('顶部','底部').set('prompt','把'+get.translation(card)+'移动到'+(event.index2==0?'弃':'')+'牌堆的...');
+					}
+					'step 5'
+					if(event.index2!=2){
+						if(event.target1) event.target1.lose(card,ui.special);
+						else card.goto(ui.special);
+						event.way=result.control;
+					}
+					else{
+						event.target2=result.targets[0];
+						var list=['手牌区'];
+						if(lib.card[card.name].type=='equip'&&event.target2.isEmpty(lib.card[card.name].subtype)) list.push('装备区');
+						if(lib.card[card.name].type=='delay'&&!event.target2.storage._disableJudge&&!event.target2.hasJudge(card.name)) list.push('判定区');
+						if(list.length==1) event._result={control:list[0]};
+						else{
+							player.chooseControl(list).set('prompt','把'+get.translation(card)+'移动到'+get.translation(event.target2)+'的...').ai=function(){return 0};
+						}
+					}
+					'step 6'
+					if(event.index2!=2){
+						card.fix();
+						var node=ui[event.index==0?'discardPile':'cardPile'];
+						if(event.way=='底部') node.appendChild(card);
+						else node.insertBefore(card,node.firstChild);
+						game.updateRoundNumber();
+						event.finish();
+					}
+					else{
+						if(result.control=='手牌区'){
+							var next=event.target2.gain(card);
+							if(event.target1){
+								next.source=event.target1;
+								next.animate='giveAuto';
+							}
+							else next.animate='draw';
+						}
+						else if(result.control=='装备区'){
+							if(event.target1) event.target1.$give(card,event.target2);
+							event.target2.equip(card);
+						}
+						else{
+							if(event.target1) event.target1.$give(card,event.target2);
+							event.target2.addJudge(card);
+						}
+					}
+					'step 7'
+					game.updateRoundNumber();
+				},
+				ai:{
+					order:10,
+					result:{player:1},
+				},
+			},
+
 			caopi_xingdong:{
 				audio:'olfangquan',
 				audioname:['shen_caopi'],
@@ -950,7 +1117,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					maixie:true,
 					maixie_hp:true,
-					effect:{
+					/*effect:{
 						target:function(card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
 							if(get.tag(card,'damage')){
@@ -974,7 +1141,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return 'zeroplayertarget';
 							}
 						}
-					}
+					}*/
 				}
 			},
 			renjie2:{
@@ -1870,6 +2037,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			longhun:{
+				audio:4,
 				group:['longhun1','longhun2','longhun3','longhun4'],
 				ai:{
 					skillTagFilter:function(player,tag){
@@ -2007,6 +2175,134 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.num+=(player.getDamagedHp());
 				}
 			},
+			relonghun:{
+				audio:'longhun',
+				//技能发动时机
+				enable:['chooseToUse','chooseToRespond'],
+				//发动时提示的技能描述
+				prompt:'将♦牌当做杀，♥牌当做桃，♣牌当做闪，♠牌当做无懈可击使用或打出',
+				//动态的viewAs
+				viewAs:function(cards,player){
+					var name=false;
+					var nature=null;
+					//根据选择的卡牌的花色 判断要转化出的卡牌是闪还是火杀还是无懈还是桃
+					switch(get.suit(cards[0],player)){
+						case 'club':name='shan';break;
+						case 'diamond':name='sha';nature='fire';break;
+						case 'spade':name='wuxie';break;
+						case 'heart':name='tao';break;
+					}
+					//返回判断结果
+					if(name) return {name:name,nature:nature};
+					return null;
+				},
+				//AI选牌思路
+				check:function(card){
+					if(ui.selected.cards.length) return 0;
+					var player=_status.event.player;
+					if(_status.event.type=='phase'){
+						var max=0;
+						var name2;
+						var list=['sha','tao'];
+						var map={sha:'diamond',tao:'heart'}
+						for(var i=0;i<list.length;i++){
+							var name=list[i];
+		 				if(player.countCards('he',function(card){
+		 					return (name!='sha'||get.value(card)<5)&&get.suit(card,player)==map[name];
+		 				})>0&&player.getUseValue({name:name,nature:name=='sha'?'fire':null})>0){
+		 					var temp=get.order({name:name,nature:name=='sha'?'fire':null});
+		 					if(temp>max){
+		 						max=temp;
+		 						name2=map[name];
+		 					}
+		 				}
+		 			}
+		 			if(name2==get.suit(card,player)) return (name2=='diamond'?(5-get.value(card)):20-get.value(card));
+		 			return 0;
+					}
+					return 1;
+				},
+				//选牌数量
+				selectCard:[1,2],
+				//确保选择第一张牌后 重新检测第二张牌的合法性 避免选择两张花色不同的牌
+				complexCard:true,
+				//选牌范围：手牌区和装备区
+				position:'he',
+				//选牌合法性判断
+				filterCard:function(card,player,event){
+					//如果已经选了一张牌 那么第二张牌和第一张花色相同即可
+					if(ui.selected.cards.length) return get.suit(card,player)==get.suit(ui.selected.cards[0],player);
+					event=event||_status.event;
+					//获取当前时机的卡牌选择限制
+					var filter=event._backup.filterCard;
+					//获取卡牌花色
+					var name=get.suit(card,player);
+					//如果这张牌是梅花并且当前时机能够使用/打出闪 那么这张牌可以选择
+					if(name=='club'&&filter({name:'shan',cards:[card]},player,event)) return true;
+					//如果这张牌是方片并且当前时机能够使用/打出火杀 那么这张牌可以选择
+					if(name=='diamond'&&filter({name:'sha',cards:[card],nature:'fire'},player,event)) return true;
+					//如果这张牌是黑桃并且当前时机能够使用/打出无懈 那么这张牌可以选择
+					if(name=='spade'&&filter({name:'wuxie',cards:[card]},player,event)) return true;
+					//如果这张牌是红桃并且当前时机能够使用/打出桃 那么这张牌可以选择
+					if(name=='heart'&&filter({name:'tao',cards:[card]},player,event)) return true;
+					//上述条件都不满足 那么就不能选择这张牌
+					return false;
+				},
+				//判断当前时机能否发动技能
+				filter:function(event,player){
+					//获取当前时机的卡牌选择限制
+					var filter=event.filterCard;
+					//如果当前时机能够使用/打出火杀并且角色有方片 那么可以发动技能
+					if(filter({name:'sha',nature:'fire'},player,event)&&player.countCards('he',{suit:'diamond'})) return true;
+					//如果当前时机能够使用/打出闪并且角色有梅花 那么可以发动技能
+					if(filter({name:'shan'},player,event)&&player.countCards('he',{suit:'club'})) return true;
+					//如果当前时机能够使用/打出桃并且角色有红桃 那么可以发动技能
+					if(filter({name:'tao'},player,event)&&player.countCards('he',{suit:'heart'})) return true;
+					//如果当前时机能够使用/打出无懈可击并且角色有黑桃 那么可以发动技能
+					if(filter({name:'wuxie'},player,event)&&player.countCards('he',{suit:'spade'})) return true;
+					return false;
+				},
+				ai:{
+					respondSha:true,
+					respondShan:true,
+					save:true,
+					//让系统知道角色“有杀”“有闪”“有桃”
+					skillTagFilter:function(player,tag){
+						var name;
+						switch(tag){
+							case 'respondSha':name='diamond';break;
+							case 'respondShan':name='club';break;
+							case 'save':name='heart';break;
+						}
+						if(!player.countCards('he',{suit:name})) return false;
+					},
+					//AI牌序
+					order:function(item,player){
+						if(player&&_status.event.type=='phase'){
+							var max=0;
+							var list=['sha','tao'];
+							var map={sha:'diamond',tao:'heart'}
+							for(var i=0;i<list.length;i++){
+								var name=list[i];
+			 				if(player.countCards('he',function(card){
+		 						return (name!='sha'||get.value(card)<5)&&get.suit(card,player)==map[name];
+		 					})>0&&player.getUseValue({name:name,nature:name=='sha'?'fire':null})>0){
+			 					var temp=get.order({name:name,nature:name=='sha'?'fire':null});
+			 					if(temp>max) max=temp;
+			 				}
+			 			}
+			 			max/=1.1;
+			 			return max;
+						}
+						return 2;
+					},
+				},
+				//让系统知道玩家“有无懈”
+				hiddenCard:function(player,name){
+					return name=='wuxie'&&player.countCards('he',{suit:'spade'})>0;
+				},
+				group:['xinlonghun_num','xinlonghun_discard'],
+			},
 			xinlonghun:{
 				group:['xinlonghun1','xinlonghun2','xinlonghun3','xinlonghun4','xinlonghun_num','xinlonghun_discard'],
 				ai:{
@@ -2033,19 +2329,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					num:{
-						trigger:{source:['damageBegin','recoverBegin']},
+						trigger:{player:'useCard'},
 						forced:true,
 						popup:false,
 						filter:function(event){
-							var evt=event.getParent();
-							return (evt.skill=='xinlonghun1'||evt.skill=='xinlonghun2')&&evt.cards&&evt.cards.length==2;
+							var evt=event;
+							return (evt.skill=='xinlonghun1'||evt.skill=='xinlonghun2'||(['sha','tao'].contains(evt.card.name)&&evt.skill=='relonghun'))&&evt.cards&&evt.cards.length==2;
 						},
 						content:function(){
-							trigger.num++;
+							trigger.baseDamage++;
 						}
 					},
 					discard:{
-						trigger:{player:['useCard','respond']},
+						trigger:{player:['useCardAfter','respondAfter']},
 						forced:true,
 						popup:false,
 						logTarget:function(){
@@ -2055,7 +2351,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.name=='respond'?0.5:false;
 						},
 						filter:function(evt,player){
-							return (evt.skill=='xinlonghun3'||evt.skill=='xinlonghun4')&&
+							return (evt.skill=='xinlonghun3'||evt.skill=='xinlonghun4'||(['shan','wuxie'].contains(evt.card.name)&&evt.skill=='relonghun'))&&
 								evt.cards&&evt.cards.length==2&&_status.currentPhase&&_status.currentPhase!=player&&_status.currentPhase.countDiscardableCards(player,'he');
 						},
 						content:function(){
@@ -2152,7 +2448,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				audio:'juejing',
-				trigger:{player:['dyingBegin','dyingAfter']},
+				trigger:{player:['dying','dyingAfter']},
 				forced:true,
 				content:function(){
 					player.draw();
@@ -2168,6 +2464,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					trigger.changeToZero();
 					event.cards=get.cards(5);
+					game.cardsGotoOrdering(event.cards);
 					event.videoId=lib.status.videoId++;
 					game.broadcastAll(function(player,id,cards){
 						var str;
@@ -2197,13 +2494,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 2"
 					if(result.bool&&result.links){
-						var cards2=[];
-						for(var i=0;i<result.links.length;i++){
-							cards2.push(result.links[i]);
-							cards.remove(result.links[i]);
-						}
-						game.cardsDiscard(cards);
-						event.cards2=cards2;
+						event.cards2=result.links;
 					}
 					else{
 						event.finish();
@@ -2768,11 +3059,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					event.list1=[];
 					event.list2=[];
-					if(target.countCards('h')>0){
-						var chooseButton=player.chooseButton(4,'hidden',['你的手牌',player.getCards('h'),get.translation(target.name)+'的手牌',target.getCards('h'),'hidden']);
+					if(player.countCards('h')>0){
+						var chooseButton=player.chooseButton(4,['你的手牌',player.getCards('h'),get.translation(target.name)+'的手牌',target.getCards('h')]);
 					}
 					else{
-						var chooseButton=player.chooseButton(4,'hidden',['你的手牌',player.getCards('h'),'hidden']);
+						var chooseButton=player.chooseButton(4,[get.translation(target.name)+'的手牌',target.getCards('h')]);
 					}
 					chooseButton.set('target',target);
 					chooseButton.set('ai',function(button){
@@ -3006,6 +3297,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_lvbu:'神吕布',
 			xinjuejing:'绝境',
 			xinjuejing_info:'锁定技，你的手牌上限+2；当你进入或脱离濒死状态时，你摸一张牌。',
+			relonghun:'龙魂',
+			relonghun_info:'你可以将同花色的一至两张牌按下列规则使用或打出：红桃当【桃】，方块当火【杀】，梅花当【闪】，黑桃当普【无懈可击】。若你以此法使用了两张红色牌，则此牌回复值或伤害值+1。若你以此法使用了两张黑色牌，则你弃置当前回合角色一张牌。',
 			xinlonghun:'龙魂',
 			xinlonghun1:'龙魂♥︎',
 			xinlonghun2:'龙魂♦︎',
@@ -3113,13 +3406,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qixian_info:'锁定技，你的手牌上限视为7。',
 			caopi_xingdong:'行动',
 			caopi_xingdong_info:'出牌阶段限一次，你可以将一张【杀】或普通锦囊牌交给一名其他角色，然后该角色选择一项：对除你以外的角色使用此牌并在此牌结算完成后和你各摸一张牌；或跳过下回合的判定阶段和摸牌阶段。',
-			
+
+			key_kagari:'篝',
+			kagari_zongsi:'纵丝',
+			kagari_zongsi_info:'出牌阶段限一次，你可以选择一张不在游戏外的牌，然后将其置于牌堆/弃牌堆的顶部/底部或一名角色的对应区域内。',
+			key_shiki:'神山识',
+			shiki_omusubi:'御结',
+			shiki_omusubi_info:'一轮游戏开始时，你可以减1点体力上限，然后将一名其他角色武将牌上的技能加入到你的武将牌上。',
+
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',
 			extra_lin:'神话再临·林',
 			extra_shan:'神话再临·山',
 			extra_yin:'神话再临·阴',
 			extra_lei:'神话再临·雷',
+			extra_key:'神话再临·论外',
 			extra_ol:'神话再临OL',
 		},
 	};

@@ -153,17 +153,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target,card,isLink){
-							if(!isLink&&player.hasSkill('jiu')&&!target.hasSkillTag('filterDamage',null,{
-								player:player,
-								card:card,
-								jiu:true,
-							})){
-								if(get.attitude(player,target)>0){
-									return -7;
+							if(!isLink&&player.hasSkill('jiu')){
+								if(!target.hasSkillTag('filterDamage',null,{
+									player:player,
+									card:card,
+									jiu:true,
+								})){
+ 								if(get.attitude(player,target)>0){
+ 									return -7;
+ 								}
+ 								else{
+ 									return -4;
+ 								}
 								}
-								else{
-									return -4;
-								}
+								return -0.5;
 							}
 							return -1.5;
 						},
@@ -598,7 +601,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<dialog.buttons.length;i++){
 						if(dialog.buttons[i].link==card){
 							button=dialog.buttons[i];
-							button.querySelector('.info').innerHTML=get.translation(target);
+							button.querySelector('.info').innerHTML=function(target){
+ 							if(target._tempTranslate) return target._tempTranslate;
+ 							var name=target.name;
+ 							if(lib.translate[name+'_ab']) return lib.translate[name+'_ab'];
+ 							return get.translation(name);
+							}(target);
 							dialog.buttons.remove(button);
 							break;
 						}
@@ -619,7 +627,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									}
 								}
 							}
-						},card,dialog.videoId,get.translation(target),capt);
+						},card,dialog.videoId,function(target){
+							if(target._tempTranslate) return target._tempTranslate;
+							var name=target.name;
+							if(lib.translate[name+'_ab']) return lib.translate[name+'_ab'];
+							return get.translation(name);
+						}(target),capt);
 					}
 					dialog.content.firstChild.innerHTML=capt;
 					game.addVideo('dialogCapt',null,[dialog.videoId,dialog.content.firstChild.innerHTML]);
@@ -1064,7 +1077,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
-							if(get.attitude(player,target)<=0) return (target.countCards('he')>0)?-1.5:1.5;
+							if(get.attitude(player,target)<=0) return (target.countCards('he',function(card){
+								return card.name=='tengjia'||get.value(card)>0;
+							})>0)?-1.5:1.5;
 							var js=target.getCards('j');
 							if(js.length){
 								var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
@@ -1161,7 +1176,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							var es=target.getCards('e');
 							var noe=(es.length==0||target.hasSkillTag('noe'));
-							var noe2=(es.length==1&&es[0].name=='baiyin'&&target.isDamaged());
+							var noe2=(es.filter(function(esx){
+							return esx.name=='tengjia'||get.value(esx)>0
+							}).length==0);
 							var noh=(nh==0||target.hasSkillTag('noh'));
 							if(noh&&(noe||noe2)) return 0;
 							if(att<=0&&!target.countCards('he')) return 1.5;
@@ -1207,8 +1224,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.directfalse=true;
 					}
 					else{
-						target.chooseToUse('对'+get.translation(event.addedTarget)+'使用一张杀，或令'+get.translation(player)+'获得你的武器牌',
-							{name:'sha'}).set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
+						target.chooseToUse('对'+get.translation(event.addedTarget)+'使用一张杀，或令'+get.translation(player)+'获得你的武器牌',function(card,player){
+							if(get.name(card)!='sha') return false;
+							return lib.filter.filterCard.apply(this,arguments);
+						}).set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
 						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
 						return lib.filter.filterTarget.apply(this,arguments);
 					}).set('sourcex',event.addedTarget).set('addCount',false).set('respondTo',[player,card]);
@@ -1657,8 +1676,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				priority:12,
 				content:function(){
-						player.storage.qinggang2.remove(trigger.card);
-						if(!player.storage.qinggang2.length) player.removeSkill('qinggang2');
+					player.storage.qinggang2.remove(trigger.card);
+					if(!player.storage.qinggang2.length) player.removeSkill('qinggang2');
 				},
 			},
 			qinglong_skill:{
@@ -1667,22 +1686,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					if(get.mode()=='guozhan') return false;
-					return player.canUse('sha',event.target,false)&&player.hasSha();
+					return player.canUse('sha',event.target,false)&&(player.hasSha()||_status.connectMode&&player.countCards('h'));
 				},
 				content:function(){
 					"step 0"
-					if(player.hasSkill('jiu')){
-						game.broadcastAll(function(player){
-							player.removeSkill('jiu');
-						},player);
-						event.jiu=true;
-					}
-					player.chooseToUse(get.prompt('qinglong'),{name:'sha'},trigger.target,-1).set('addCount',false).logSkill='qinglong_skill';
-					"step 1"
-					if(result.bool);
-					else if(event.jiu){
-						player.addSkill('jiu');
-					}
+					player.chooseToUse(get.prompt('qinglong'),function(card,player,event){
+						if(get.name(card)!='sha') return false;
+						return lib.filter.filterCard.apply(this,arguments);
+					},trigger.target,-1).set('addCount',false).logSkill='qinglong_skill';
 				}
 			},
 			zhangba_skill:{
@@ -2014,7 +2025,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 										if(typeof aiii=='number') return aiii;
 									}
 									if(Math.abs(get.attitude(_status.event.player,source))<3) return 0;
-									if(source.hasSkillTag('guanxing')&&(source!=player||!source.hasSkill('guanxing_fail'))) return 0;
+									if(source.hasSkillTag('nowuxie_judge')||source.hasSkillTag('guanxing')&&(source!=player||!source.hasSkill('guanxing_fail'))) return 0;
 									if(name!='lebu'&&name!='bingliang'){
 										if(source!=_status.event.player){
 											return 0;
@@ -2066,7 +2077,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 										if(typeof aiii=='number') return aiii;
 									}
 									if(Math.abs(get.attitude(_status.event.player,source))<3) return 0;
-									return -get.attitude(_status.event.player,source)
+									return -get.attitude(_status.event.player,source)*state;
 								}
 							},
 							source:target,

@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			shenhua:{
 				shenhua_feng:["sp_zhangjiao","re_yuji","old_zhoutai","old_caoren","re_xiahouyuan","re_xiaoqiao","huangzhong","re_weiyan"],
-				shenhua_huo:['dianwei','xunyu','pangtong','sp_zhugeliang','taishici','yanwen','re_yuanshao','pangde'],
+				shenhua_huo:['dianwei','xunyu','pangtong','sp_zhugeliang','taishici','yanwen','re_yuanshao','re_pangde'],
 				shenhua_lin:['caopi','xuhuang','menghuo','zhurong','re_lusu','sunjian','dongzhuo','jiaxu'],
 				shenhua_shan:['dengai','zhanghe','liushan','jiangwei','zhangzhang','sunce','caiwenji','zuoci'],
 				shenhua_yin:['wangji','kuailiangkuaiyue','yanyan','wangping','sunliang','luji','xuyou','yl_luzhi'],
@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhoutai:['male','wu',4,['gzbuqu']],
 			old_caoren:['male','wei',4,['moon_jushou','jiewei']],
 			xuhuang:['male','wei',4,['gzduanliang']],
-			pangde:['male','qun',4,['mashu','mengjin']],
+			re_pangde:['male','qun',4,['mashu','jianchu']],
 			re_xiahouyuan:['male','wei',4,['xinshensu']],
 			huangzhong:['male','shu',4,['liegong']],
 			re_weiyan:['male','shu',4,['xinkuanggu','qimou']],
@@ -177,8 +177,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!player.storage.zhengrong) player.storage.zhengrong=[];
 						player.storage.zhengrong.push(card);
 						player.markSkill('zhengrong');
-						game.delayx();
 					}
+					'step 3'
+					game.delayx();
 				},
 				marktext:'荣',
 				intro:{
@@ -720,8 +721,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseToDisable(true).set('ai',function(event,player,list){
 						if(list.contains('equip2')) return 'equip2';
-						if(list.contains('equip1')&&player.countCards('h',{name:'sha'})>2) return 'equip1';
-						if(list.contains('equip5')&&player.countCards('h',{type:'trick'})>=1) return 'equip5';
+						if(list.contains('equip1')&&(player.countCards('h',function(card){
+							return get.name(card,player)=='sha'&&player.hasUseTarget(card);
+						})-player.getCardUsable('sha'))>1) return 'equip1';
+						if(list.contains('equip5')&&player.countCards('h',function(card){
+							return get.type2(card,player)=='trick'&&player.hasUseTarget(card);
+						})>1) return 'equip5';
 					});
 					'step 1'
 					if(result.control=='equip1'){
@@ -743,8 +748,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player){
 							if(!player.isDisabled('equip2')) return 1;
-							if(!player.isDisabled('equip1')&&player.countCards('h',{name:'sha'})>2) return 1;
-							if(!player.isDisabled('equip5')&&player.countCards('h',{type:'trick'})>=1) return 1;
+							if(!player.isDisabled('equip1')&&(player.countCards('h',function(card){
+								return get.name(card,player)=='sha'&&player.hasUseTarget(card);
+							})-player.getCardUsable('sha'))>1) return 1;
+							if(!player.isDisabled('equip5')&&player.countCards('h',function(card){
+								return get.type2(card,player)=='trick'&&player.hasUseTarget(card);
+							})>1) return 1;
 							return -1;
 						},
 					},
@@ -844,10 +853,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"drlt_yongsi":{
+				audio:2,
 				group:["drlt_yongsi_1","drlt_yongsi_2"],
 				subSkill:{
 					'1':{
-						audio:["yongsi1",2],
+						audio:"drlt_yongsi",
 						trigger:{
 							player:'phaseDrawBegin2'
 						},
@@ -860,7 +870,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					'2':{
-						audio:["yongsi2",2],
+						audio:"drlt_yongsi",
 						trigger:{
 							player:'phaseUseEnd'
 						},
@@ -1667,7 +1677,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					return (player.getHistory('useCard',function(evt){
 						return evt.getParent('phaseUse')==event;
-					}).length<game.countPlayer(function(current){return current!=player&&!current.inRange(player)}))&&game.hasPlayer(function(target){
+					}).length<game.countPlayer(function(current){return !current.inRange(player)}))&&game.hasPlayer(function(target){
 						return target!=player&&!target.inRange(player)&&target.countDiscardableCards(player,'he');
 					});
 				},
@@ -1865,6 +1875,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.markSkill('nzry_chenglve');
 					},player);
 				},
+				onremove:true,
 			},
 			"nzry_shicai":{
 				audio:"nzry_shicai_2",
@@ -2895,7 +2906,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					event.num=trigger.num;
 					'step 1'
-					player.chooseDrawRecover(get.prompt('xinkuanggu')).set('logSkill','xinkuanggu').set('prompt2','摸一张牌或回复1点体力');
+					player.chooseDrawRecover(get.prompt(event.name)).set('logSkill',event.name).set('prompt2','摸一张牌或回复1点体力');
 					'step 2'
 					if(result.control!='cancel2'){
 						event.num--;
@@ -3489,7 +3500,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['re_dengai','gz_dengai'],
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.storage.tuntian.length>0;
+					return player.storage.tuntian.length>0&&event.filterCard({name:'shunshou'},player,event);
 				},
 				chooseButton:{
 					dialog:function(event,player){
@@ -3625,6 +3636,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return target.hasZhuSkill('zhiba',player)&&player.canCompare(target);
 				},
 				direct:true,
+				clearTime:true,
 				prepare:function(cards,player,targets){
 					targets[0].logSkill('zhiba');
 				},
@@ -4366,7 +4378,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageSource'},
 				filter:function(event,player){
 					if(event._notrigger.contains(event.player)) return false;
-					return (event.card&&event.card.name=='sha'&&
+					return (event.card&&event.card.name=='sha'&&event.getParent().name=='sha'&&
 						event.player.isAlive()&&
 						player.canCompare(event.player));
 				},
@@ -4707,7 +4719,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yinghun:{
 				audio:2,
-				audioname:['re_sunjian','sunce','re_sunben','re_sunce'],
+				audioname:['re_sunjian','sunce','re_sunben','re_sunce','ol_sunjian'],
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
 					return player.hp<player.maxHp;
@@ -4784,7 +4796,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			gzyinghun:{
 				audio:'yinghun',
-				audioname:['re_sunjian','sunce','re_sunben','re_sunce'],
+				audioname:['re_sunjian','sunce','re_sunben','re_sunce','ol_sunjian'],
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
 					return player.getDamagedHp()>0;
@@ -5123,6 +5135,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bazhen:{
 				locked:true,
 				audio:2,
+				audioname:['re_sp_zhugeliang','ol_sp_zhugeliang','ol_pangtong'],
+				group:'bazhen_bagua',
+				locked:true,
+			},
+			bazhen_bagua:{
+				audio:'bazhen',
 				audioname:['re_sp_zhugeliang','ol_sp_zhugeliang','ol_pangtong'],
 				equipSkill:true,
 				noHidden:true,
@@ -5598,6 +5616,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinqiangxi3:{},
 			tianyi:{
 				audio:2,
+				audioname:['re_taishici'],
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
@@ -6868,6 +6887,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:false,
 				line:true,
 				direct:true,
+				clearTime:true,
 				prepare:function(cards,player,targets){
 					targets[0].logSkill('huangtian');
 				},
@@ -7574,7 +7594,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			taishici:'太史慈',
 			yanwen:'颜良文丑',
 			yuanshao:'旧袁绍',
-			re_pangde:'界庞德',
+			re_pangde:'庞德',
 			huoji:'火计',
 			bazhen:'八阵',
 			kanpo:'看破',
@@ -7630,7 +7650,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhoutai:'周泰',
 			old_caoren:'曹仁',
 			xuhuang:'徐晃',
-			pangde:'庞德',
+			pangde:'旧庞德',
 			xiahouyuan:'旧夏侯渊',
 			caoren:'界曹仁',
 			huangzhong:'黄忠',

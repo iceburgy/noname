@@ -223,9 +223,11 @@ content:function(config, pack){
 			};
 			
 			game.updateRoundNumber = function(){
-				game.broadcastAll(function(num1, num2){
-					if(ui.cardPileNumber) ui.cardPileNumber.innerHTML = '牌堆' + num2 + ' 第' + num1 +'轮';
-				},game.roundNumber, ui.cardPile.childNodes.length);
+				game.broadcastAll(function(num1, num2, top) {
+					_status.pileTop = top;
+					if (ui.cardPileNumber && window.decadeUI) ui.cardPileNumber.innerHTML = '牌堆' + num2 + ' 第' + num1 + '轮';
+					else if (ui.cardPileNumber) ui.cardPileNumber.innerHTML = num1 + '轮 剩余牌: ' + num2;
+				}, game.roundNumber, ui.cardPile.childNodes.length, ui.cardPile.firstChild);
 			};
 			
 			game.bossPhaseLoop = function(){
@@ -580,7 +582,9 @@ content:function(config, pack){
 							else if (typeof info.enable == 'object') enable = info.enable.contains(event.name);
 							else if (info.enable == 'phaseUse') enable = (event.type == 'phase');
 							else if (typeof info.enable == 'string') enable = (info.enable == event.name);
+							
 							if (enable) {
+								if (info.noHidden && !game.expandSkills(player.getSkills()).contains(skills2[i])) enable = false;
 								if (info.filter) {
 									if (info.filterCard && (!info.selectCard || info.selectCard > 0)) if (ui.handSpecial) ui.handSpecial.countIn = true;
 									enable = info.filter(event, player);
@@ -589,9 +593,10 @@ content:function(config, pack){
 									// if (info.filterCard && info.selectCard && info.selectCard < 1) 
 									// enable = info.filter(event, player);
 									// if (ui.handSpecial) ui.handSpecial.ignored = false;
-								} 
-								if (info.viewAs && event.filterCard && !event.filterCard(info.viewAs, player, event)) enable = false;
-								if (info.viewAs && info.viewAsFilter && info.viewAsFilter(player) == false) enable = false;
+								}
+								
+								if (info.viewAs && typeof info.viewAs != 'function' && event.filterCard && !event.filterCard(info.viewAs, player, event)) enable = false;
+								if (info.viewAs && typeof info.viewAs != 'function' && info.viewAsFilter && info.viewAsFilter(player) == false) enable = false;
 								if (info.usable && get.skillCount(skills2[i]) >= info.usable) enable = false;
 								if (info.chooseButton && _status.event.noButton) enable = false;
 								if (info.round && (info.round - (game.roundNumber - player.storage[skills2[i] + '_roundcount']) > 0)) enable = false;
@@ -654,7 +659,7 @@ content:function(config, pack){
 					if (skillinfo && skillinfo.multitarget && !skillinfo.multiline) {
 						_status.multitarget = true;
 					}
-					if ((skillinfo && skillinfo.viewAs) || !_status.event.skill) {
+					if ((skillinfo && skillinfo.viewAs && typeof skillinfo.viewAs != 'function') || !_status.event.skill) {
 						var cardinfo = get.info(get.card());
 						if (cardinfo && cardinfo.multitarget && !cardinfo.multiline) {
 							_status.multitarget = true;
@@ -733,7 +738,7 @@ content:function(config, pack){
 			            game.players[i].classList.remove('un-selectable');
 			        }
 			    }
-			    
+
 			    var result = gameUncheckFunction.apply(this, arguments);
 			    return result;
 			};
@@ -1839,6 +1844,7 @@ content:function(config, pack){
 			
 			lib.element.content.chooseToCompare = function(){
 				"step 0"
+				event.forceDie = true;
 				if (player.countCards('h') == 0 || target.countCards('h') == 0) {
 					event.result = {
 						cancelled: true,
@@ -1866,7 +1872,10 @@ content:function(config, pack){
 						};
 					}
 				};
-				if (player.isOnline()) {
+				
+				if (event.fixedResult && event.fixedResult[player.playerid]){
+					event.card1 = event.fixedResult[player.playerid];
+				} else if (player.isOnline()) {
 					player.wait(sendback);
 					event.ol = true;
 					player.send(function(ai) {
@@ -1877,7 +1886,10 @@ content:function(config, pack){
 					event.localPlayer = true;
 					player.chooseCard('请选择拼点牌', true).set('type', 'compare').set('glow_result', true).ai = event.ai;
 				}
-				if (target.isOnline()) {
+				
+				if (event.fixedResult && event.fixedResult[target.playerid]){
+					event.card2 = event.fixedResult[target.playerid]; 
+				} else if (target.isOnline()) {
 					target.wait(sendback);
 					event.ol = true;
 					target.send(function(ai) {
@@ -2071,6 +2083,7 @@ content:function(config, pack){
 			
 			lib.element.content.chooseToCompareMultiple = function(){
 				"step 0"
+				event.forceDie = true;
 				if (player.countCards('h') == 0) {
 					event.result = {
 						cancelled: true,
@@ -2104,36 +2117,55 @@ content:function(config, pack){
 				}, player, targets[0]);
 				
 				"step 1"
-				event.list = targets.slice(0);
-				event.list.unshift(player);
-				player.chooseCardOL(event.list, '请选择拼点牌', true).set('type', 'compare').set('ai', event.ai).set('source', player).aiCard = function(target) {
-					var hs = target.getCards('h');
-					var event = _status.event;
-					event.player = target;
-					hs.sort(function(a, b) {
-						return event.ai(b) - event.ai(a);
-					});
-					delete event.player;
-					return {
-						bool: true,
-						cards: [hs[0]]
+				event._result = [];
+				event.list = targets.filter(function(current) {
+					return ! event.fixedResult || !event.fixedResult[current.playerid];
+				});
+				
+				if (event.list.length || !event.fixedResult || !event.fixedResult[player.playerid]) {
+					if (!event.fixedResult || !event.fixedResult[player.playerid]) event.list.unshift(player);
+					player.chooseCardOL(event.list, '请选择拼点牌', true).set('type', 'compare').set('ai', event.ai).set('source', player).aiCard = function(target) {
+						var hs = target.getCards('h');
+						var event = _status.event;
+						event.player = target;
+						hs.sort(function(a, b) {
+							return event.ai(b) - event.ai(a);
+						});
+						delete event.player;
+						return {
+							bool: true,
+							cards: [hs[0]]
+						};
 					};
-				};
+				}
 				
 				"step 2"
 				var cards = [];
-				if (result[0].skill && lib.skill[result[0].skill] && lib.skill[result[0].skill].onCompare) {
+				if (event.fixedResult && event.fixedResult[player.playerid]) {
+					event.list.unshift(player);
+					result.unshift({
+						bool: true,
+						cards: [event.fixedResult[player.playerid]]
+					});
+				} else if (result[0].skill && lib.skill[result[0].skill] && lib.skill[result[0].skill].onCompare) {
 					player.logSkill(result[0].skill);
-					result[0].cards = lib.skill[result[0].skill].onCompare(player)
+					result[0].cards = lib.skill[result[0].skill].onCompare(player);
 				};
+				
 				player.lose(result[0].cards, ui.ordering);
-				for (var i = 1; i < result.length; i++) {
-					if (result[i].skill && lib.skill[result[i].skill] && lib.skill[result[i].skill].onCompare) {
-						event.list[i].logSkill(result[i].skill);
-						result[i].cards = lib.skill[result[i].skill].onCompare(event.list[i]);
+				for (var j = 0; j < targets.length; j++) {
+					if (event.list.contains(targets[j])) {
+						var i = event.list.indexOf(targets[j]);
+						if (result[i].skill && lib.skill[result[i].skill] && lib.skill[result[i].skill].onCompare) {
+							event.list[i].logSkill(result[i].skill);
+							result[i].cards = lib.skill[result[i].skill].onCompare(event.list[i]);
+						}
+						event.list[i].lose(result[i].cards, ui.ordering);
+						cards.push(result[i].cards[0]);
+					} else if (event.fixedResult && event.fixedResult[targets[j].playerid]) {
+						targets[j].lose(event.fixedResult[targets[j].playerid], ui.ordering);
+						cards.push(event.fixedResult[targets[j].playerid]);
 					}
-					event.list[i].lose(result[i].cards, ui.ordering);
-					cards.push(result[i].cards[0]);
 				}
 				event.cardlist = cards;
 				event.cards = cards;
@@ -3054,7 +3086,7 @@ content:function(config, pack){
                     }
                 }
             };
-            
+
             lib.element.player.$give = function(card, player, log, init) {
                 if (init !== false) {
                     game.broadcast(function(source, card, player, init) {
@@ -4277,6 +4309,7 @@ content:function(config, pack){
 								break;
 							case 'three':
 							case 'four':
+							case 'guandu':
 								var side = player.finalSide ? player.finalSide : player.side;
 								if (side === false) identity += '_false';
 								break;
@@ -4333,6 +4366,7 @@ content:function(config, pack){
 							case 'three':
 							case 'standard':
 							case 'four':
+							case 'guandu':
 								switch (identity) {
 									case 'zhu': identity = '主公'; break;
 									case 'zhong': identity = '忠臣'; break;
@@ -4764,15 +4798,14 @@ package:{
     intro:
     '<p style="color:rgb(200,200,000); font-size:12px; line-height:14px; text-shadow: 0 0 2px black;">' +
     '有bug请先关闭UI重试下，不行再联系作者，目前有些置牌堆顶丢弃的牌不会消失有虾皮。' + '<br>' +
-	'1.9.99.3.0.1：<br>' +
-	'- 修复界/曹植的【落英】AI不获得牌的问题； <br>' +
-	'- 修复界曹植的【落英】配音；<br>' +
-	'- 修复视为卡牌名称的问题；<br>' +
+	'1.9.100.4.2.1:<br>' +
+	'- 修复界太史慈拼点，官渡许攸BUG； <br>' +
+	'- 调整界/曹植的落英获得牌操作顺序； <br>' +
     '</p>',
     author:"短歌 QQ464598631",
     diskURL:"",
     forumURL:"",
-    version:"1.9.99.3.0.1",
+    version:"1.9.100.4.2.1",
 },
 files:{
     "character":[],
@@ -4910,12 +4943,14 @@ editable: false
 - 修复界/曹植的【落英】AI不获得牌的问题；
 - 修复界曹植的【落英】配音；
 - 修复视为卡牌名称的问题；
-
-
-
-
-
-
+1.9.100.0.0.1:
+- 修复新版引起的技能BUG；
+1.9.100.2.0.1:
+- 修复【落英】AI引起的界面卡住问题；
+1.9.100.4.2.1:
+- 优化带了有观星类UI技能的AI排序牌的问题；
+- 修复界太史慈拼点，官渡许攸BUG，键枣宗介的【设控】AI弹窗；
+- 调整界/曹植的落英获得牌操作顺序；
 
 
 

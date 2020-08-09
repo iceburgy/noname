@@ -472,6 +472,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		card:{
+ 		niaobaidaowenha:{
+ 			type:'equip',
+ 			subtype:'equip5',
+ 			skills:['niaobaidaowenha_skill'],
+				modeimage:'boss',
+				ai:{
+					basic:{
+						equipValue:7.5,
+					},
+				},
+				fullskin:true,
+ 		},
  		goujiangdesidai:{
  			type:'equip',
  			subtype:'equip1',
@@ -1592,7 +1604,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return name;
 					}
 					else{
-						var arr=['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu'];
+						var arr=['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu','shen_liubei','shen_luxun','shen_ganning','ol_zhangliao','shen_zhenji','shen_caopi','key_kagari','key_shiki'];
 						arr.removeArray(list);
 						return arr.randomGet();
 					}
@@ -1641,7 +1653,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.check();
 						});
 						control.backup1=ui.create.div('.buttons');
-						control.backup2=ui.create.buttons(['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu','shen_liubei','shen_luxun','shen_ganning','ol_zhangliao','shen_zhenji','shen_caopi'],'character',control.backup1);
+						control.backup2=ui.create.buttons(['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu','shen_liubei','shen_luxun','shen_ganning','ol_zhangliao','shen_zhenji','shen_caopi','key_kagari','key_shiki'],'character',control.backup1);
 						return control;
 					}
 				},
@@ -1734,6 +1746,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							case 'key_kagari':{
 								game.players[i].equip(game.createCard2('goujiangdesidai','heart',1));
 								lib.inpile.add('goujiangdesidai');
+								break;
+							}
+							case 'key_shiki':{
+								game.players[i].equip(game.createCard2('niaobaidaowenha','diamond',13));
+								lib.inpile.add('niaobaidaowenha');
 								break;
 							}
 						}
@@ -2018,6 +2035,27 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			niaobaidaowenha_skill:{
+				trigger:{player:'loseMaxHpAfter'},
+				direct:true,
+				content:function(){
+					'step 0'
+					event.count=trigger.num;
+					'step 1'
+					event.count--;
+					player.chooseTarget(get.prompt2('niaobaidaowenha_skill'),lib.filter.notMe).set('ai',function(target){
+						return get.attitude(_status.event.player,target)/(target.maxHp||1)
+					});
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('niaobaidaowenha_skill',target);
+						target.gainMaxHp();
+						target.recover();
+						if(event.count) event.goto(1);
+					}
+				},
+			},
 			goujiangdesidai_skill:{
 				inherit:'kagari_zongsi',
 				filter:function(event,player){
@@ -2112,10 +2150,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					event.target=trigger.player;
 					var list=[];
-					if(player.countCards('he')>0) list.push('交给其一张牌');
+					if(player.countCards('he')>1) list.push('交给其一张牌');
 					if(trigger.player.countCards('he')>0) list.push('令其交给你一张牌');
 					event.list=list;
-					player.chooseControl('cancel2').set('choiceList',list).set('prompt',get.prompt('shanrangzhaoshu',trigger.player));
+					player.chooseControl('cancel2').set('choiceList',list).set('prompt',get.prompt('shanrangzhaoshu',trigger.player)).set('ai',function(){
+						if(get.attitude(_status.event.player,_status.event.getTrigger().player)<0) return _status.event.getParent().list.length-1;
+						return 'cancel2';
+					});
 					'step 1'
 					if(result.control=='cancel2'){
 						event.finish();return;
@@ -2126,7 +2167,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.target=player;
 					}
 					'step 2'
-					player.chooseCard('he',true);
+					player.chooseCard('he',true).set('filterCard',function(card,player){
+						if(player!=_status.event.getTrigger().player) return card!=player.getEquip('shanrangzhaoshu');
+						return true;
+					});
 					'step 3'
 					if(result.cards&&result.cards.length) target.gain(result.cards,player,'giveAuto');
 				},
@@ -2549,6 +2593,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			boss_tiemian:{
 				inherit:'renwang_skill',
+				priority:-0.3,
+				equipSkill:false,
 				filter:function(event,player){
 					if(!player.isEmpty(2)) return false;
 					return lib.skill.renwang_skill.filter.apply(this,arguments);
@@ -2556,6 +2602,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			boss_zhadao:{
 				inherit:'qinggang_skill',
+				equipSkill:false,
 			},
 			boss_zhuxin:{
 				trigger:{player:'die'},
@@ -2592,7 +2639,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			boss_leifu:{
-				trigger:{player:'phaseAfter'},
+				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
 				content:function(){
 					var list=game.players.slice(0);
@@ -3653,7 +3700,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			boss_shedu:{
-				trigger:{player:"phaseBefore"},
+				trigger:{player:"phaseBegin"},
 				mark:true,
 				intro:{content:'mark'},
 				forced:true,
@@ -3681,7 +3728,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return num-player.hp+9;
 					},
 				},
-				trigger:{player:['phaseUseBegin','phaseAfter','phaseDrawBegin']},
+				trigger:{player:['phaseUseBegin','phaseJieshuBegin','phaseDrawBegin']},
 				forced:true,
 				filter:function(event,player){
 					return event.name=='phaseDraw'||player.countCards('h')<9;
@@ -3732,9 +3779,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			boss_bingxian:{
-				trigger:{global:'phaseAfter'},
+				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
-					return event.player!=player&&event.player.countUsed('sha')==0;
+					return event.player!=player&&event.player.countUsed('sha',true)==0;
 				},
 				forced:true,
 				content:function(){
@@ -3846,7 +3893,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				forced:true,
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseZhunbeiBegin'},
 				content:function(){
 					'step 0'
 					event.num1=3;
@@ -3903,7 +3950,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			boss_yanyu:{
 				forced:true,
-				trigger:{global:'phaseBefore'},
+				trigger:{global:'phaseBegin'},
 				filter:function(event,player){
 					return player!=event.player;
 				},
@@ -3925,7 +3972,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			boss_fengdong:{
-				trigger:{player:"phaseBefore"},
+				trigger:{player:"phaseBegin"},
 				forced:true,
 				content:function(){
 					game.countPlayer(function(current){
@@ -4526,7 +4573,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			boss_yandu:{
-				trigger:{global:'phaseAfter'},
+				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
 					return event.player!=player&&!event.player.getStat('damage')&&event.player.countCards('he');
 				},
@@ -8663,20 +8710,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			shenji:{
-				unique:true,
-				mod:{
-					selectTarget:function(card,player,range){
-						if(range[1]==-1) return;
-						//if(player.getEquip(1)) return;
-						if(card.name=='sha') range[1]+=2;
-					},
-					cardUsable:function(card,player,num){
-						//if(player.getEquip(1)) return;
-						if(card.name=='sha') return num+1;
-					}
-				},
-			},
 			boss_baonuwash:{
 				trigger:{player:'phaseAfter'},
 				forced:true,
@@ -9596,8 +9629,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_baonu_info:'锁定技，当你的体力值降至4或更低时，你变身为暴怒战神或神鬼无前，并立即开始你的回合',
 			shenwei:'神威',
 			shenwei_info:'锁定技，摸牌阶段，你额外摸X张牌，你的手牌上限+X（X为场上其他角色的数目且至多为3）',
-			shenji:'神戟',
-			shenji_info:'锁定技，你使用【杀】指定的目标数上限+2，次数上限+1',
 			xiuluo:'修罗',
 			xiuluo_info:'准备阶段，你可以弃置一张牌，然后弃置你判定区内一张同花色的牌。你可以重复此流程。',
 			shenqu:'神躯',
@@ -9774,6 +9805,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			goujiangdesidai:'篝酱的丝带',
 			goujiangdesidai_info:'锁定技，若你未拥有技能【纵丝】，则你视为拥有技能【纵丝】；若你拥有技能【纵丝】，则你将此技能改为「出牌阶段限两次」',
 			goujiangdesidai_skill:'纵丝',
+			niaobaidaowenha:'鸟白岛文蛤',
+			niaobaidaowenha_skill:'鸟白岛文蛤',
+			niaobaidaowenha_info:'当你减少1点体力上限后，你可令一名其他角色增加1点体力上限并回复1点体力。',
+			niaobaidaowenha_skill_info:'当你减少1点体力上限后，你可令一名其他角色增加1点体力上限并回复1点体力。',
 
 			mode_boss_card_config:'挑战卡牌',
 			mode_boss_character_config:'挑战武将',
