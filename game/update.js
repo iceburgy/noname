@@ -1,6 +1,6 @@
 window.noname_update={
 	version:'2020.08.09.1',
-	update:'2020.08.09.1',
+	update:'2020.08.09',
 	changeLog:[
 		'更新至官方最新版本：1.9.100.7.1',
 		'更多更新历史信息请查看：https://bit.ly/wumingsha',
