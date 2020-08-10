@@ -3830,6 +3830,39 @@
 							}
 						}
 					},
+					export_leaderboard:{
+						name:'导出战况',
+						onclick:function(){
+							var playersStatisticsKeyRoot='players_statistics';
+							var playersStatisticsRoot=lib.config[playersStatisticsKeyRoot];
+							if(!playersStatisticsRoot){
+								playersStatisticsRoot={};
+							}
+							var rolesStatisticsKeyRoot='roles_statistics';
+							var rolesStatisticsRoot=lib.config[rolesStatisticsKeyRoot];
+							if(!rolesStatisticsRoot){
+								rolesStatisticsRoot={};
+							}
+							var data={};
+							data[playersStatisticsKeyRoot]=playersStatisticsRoot;
+							data[rolesStatisticsKeyRoot]=rolesStatisticsRoot;
+							game.export(lib.init.encode(JSON.stringify(data)),'leaderboard-'+(new Date()).toLocaleString());
+						},
+						clear:true
+					},
+					import_leaderboard:{
+						name:'导入战况',
+						onclick:function(){
+							ui.import_leaderboard_button.classList.toggle('hidden');
+						},
+						clear:true
+					},
+					import_leaderboard_button:{
+						name:'<div style="white-space:nowrap;width:calc(100% - 10px)">'+
+						'<input type="file" style="width:calc(100% - 40px)">'+
+						'<button style="width:40px">确定</button></div>',
+						clear:true,
+					},
 					xiaoneijiangli_by_seat:{
 						name:'小内奖励',
 						init:'0',
@@ -37251,6 +37284,49 @@
 												if(missing.length){
 													game.export(JSON.stringify(missing),'noname-rolelib-missing-'+(new Date()).toLocaleString()+'-'+missing.length+'.json');
 												}
+
+												alert('导入成功');
+												lib.init.background();
+												game.reload();
+											};
+											fileReader.readAsText(fileToLoad, "UTF-8");
+										}
+									}
+								}
+								else if(j=='import_leaderboard_button'){
+									ui.import_leaderboard_button=cfgnode;
+									cfgnode.hide();
+									cfgnode.querySelector('button').onclick=function(){
+										var fileToLoad=this.previousSibling.files[0];
+										if(fileToLoad){
+											var fileReader = new FileReader();
+											fileReader.onload = function(fileLoadedEvent)
+											{
+												var data = fileLoadedEvent.target.result;
+												if(!data) return;
+												try{
+													data=JSON.parse(lib.init.decode(data));
+													if(!data||typeof data!='object'){
+														throw('err');
+													}
+												}
+												catch(e){
+													console.log(e);
+													alert('导入失败');
+													return;
+												}
+												var playersStatisticsKeyRoot='players_statistics';
+												var playersStatisticsRoot=data[playersStatisticsKeyRoot];
+												if(!playersStatisticsRoot){
+													playersStatisticsRoot={};
+												}
+												game.saveConfig(playersStatisticsKeyRoot,playersStatisticsRoot);
+												var rolesStatisticsKeyRoot='roles_statistics';
+												var rolesStatisticsRoot=data[rolesStatisticsKeyRoot];
+												if(!rolesStatisticsRoot){
+													rolesStatisticsRoot={};
+												}
+												game.saveConfig(rolesStatisticsKeyRoot,rolesStatisticsRoot);
 
 												alert('导入成功');
 												lib.init.background();
