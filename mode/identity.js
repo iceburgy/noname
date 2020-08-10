@@ -1939,7 +1939,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					// avoid zhu/nei repeatedly being assigned to the same player
 					// 1. game statistics
-					var playersStatistics=lib.config['players_statistics']['local']
+					var playersStatistics;
+					if(lib.config[lib.statsKeyGame]&&lib.config[lib.statsKeyGame][lib.statsKeyLocal]&&lib.config[lib.statsKeyGame][lib.statsKeyLocal]&&[lib.statsKeyPlayer]){
+						playersStatistics=lib.config[lib.statsKeyGame][lib.statsKeyLocal][lib.statsKeyPlayer];
+					}
 					// 2. assign without repetition with max of 10 times
 					var assignAttempts=1;
 					var assignAttemptsMax=10;

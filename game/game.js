@@ -24,6 +24,11 @@
 		}],
 	};
 	var lib={
+		statsKeyGame:'stats_game',
+		statsKeyLocal:'stats_local',
+		statsKeyIdentity:'stats_identity',
+		statsKeyRole:'stats_role',
+		statsKeyPlayer:'stats_player',
 		configprefix:'noname_0.9_',
 		versionOL:27,
 		updateURLS:{
@@ -3813,8 +3818,7 @@
 						onclick:function(){
 							if(this.innerHTML=='<span>确认重置</span>'){
 								clearTimeout(this.confirmTimeout);
-								game.saveConfig('players_statistics',{});
-								game.saveConfig('roles_statistics',{});
+								game.saveConfig(lib.statsKeyGame,{});
 								this.innerHTML='<span>重置成功</span>';
 								var that=this;
 								setTimeout(function(){
@@ -3833,20 +3837,7 @@
 					export_leaderboard:{
 						name:'导出战况',
 						onclick:function(){
-							var playersStatisticsKeyRoot='players_statistics';
-							var playersStatisticsRoot=lib.config[playersStatisticsKeyRoot];
-							if(!playersStatisticsRoot){
-								playersStatisticsRoot={};
-							}
-							var rolesStatisticsKeyRoot='roles_statistics';
-							var rolesStatisticsRoot=lib.config[rolesStatisticsKeyRoot];
-							if(!rolesStatisticsRoot){
-								rolesStatisticsRoot={};
-							}
-							var data={};
-							data[playersStatisticsKeyRoot]=playersStatisticsRoot;
-							data[rolesStatisticsKeyRoot]=rolesStatisticsRoot;
-							game.export(lib.init.encode(JSON.stringify(data)),'leaderboard-'+(new Date()).toLocaleString());
+							game.export(lib.init.encode(JSON.stringify(lib.config[lib.statsKeyGame])),'leaderboard-'+(new Date()).toLocaleString());
 						},
 						clear:true
 					},
@@ -27219,8 +27210,7 @@
 			delete data1.alertDup;
 			delete data1.xiaoneibonus;
 			delete data1.players_info;
-			delete data1.players_statistics;
-			delete data1.roles_statistics;
+			delete data1[lib.statsKeyGame];
 			if(cleanPersonalData){
 				delete data1.connect_nickname;
 				delete data1.connect_nickname_mode_config_connect;
@@ -27841,12 +27831,17 @@
 		getWinRateByNickname:function(nickname){
 			var winRate='0%';
 			if(nickname&&!game.online){ // if this is the server
-				var playersStatisticsRoot=lib.config['players_statistics'];
-				if(playersStatisticsRoot){
-					var playersStatistics=playersStatisticsRoot['local'];
-					if(playersStatistics&&nickname&&playersStatistics[nickname]&&playersStatistics[nickname]['winRate']){
-						winRate=playersStatistics[nickname]['winRate'];
-					}
+				var statsGame=lib.config[lib.statsKeyGame];
+				if(!statsGame){
+					statsGame={};
+				}
+				var statsLocal=statsGame[lib.statsKeyLocal];
+				if(!statsLocal){
+					statsLocal={};
+				}
+				var playersStatistics=statsLocal[lib.statsKeyPlayer];
+				if(playersStatistics&&nickname&&playersStatistics[nickname]&&playersStatistics[nickname]['winRate']){
+					winRate=playersStatistics[nickname]['winRate'];
 				}
 			}
 			return winRate;
@@ -31196,79 +31191,82 @@
 			// only record statistics if there are at least 5 human players
 			if(_status.connectMode&&(game.players.length||game.dead.length)&&numHuman>=6&&(clients.length==8||clients.length==10)){
 				// game statistics
-				/* lib.config.players_statistics
+				/* lib.config.stats_game
 				{
-					local:{
-						nickname:{
-							'numWin':0,
-							'numLose':0,
-							'winRate':'0%',
-							'lastID':'',
-							'zhuWin':0,
-							'zhuLose':0,
-							'zhuRate':'0%',
-							'zhongWin':0,
-							'zhongLose':0,
-							'zhongRate':'0%',
-							'neiWin':0,
-							'neiLose':0,
-							'neiRate':'0%',
-							'fanWin':0,
-							'fanLose':0,
-							'fanRate':'0%',
-						},
-					},
-					otherZone:{
-						...
-					}
-				}
-				/* lib.config.players_statistics
-				{
-					local:{
-						identity:{
+					stats_local:{
+						stats_identity:{
 							zhuzhong:0,
 							fan:0,
 							nei:0,
+						}
+						stats_role{
+							"re_zhenji": {
+								"numWin": 3,
+								"numLose": 1,
+								"winRate": 75,
+								"zhuWin": 0,
+								"zhuLose": 0,
+								"zhuRate": "0%",
+								"zhongWin": 1,
+								"zhongLose": 1,
+								"zhongRate": 50,
+								"neiWin": 0,
+								"neiLose": 0,
+								"neiRate": "0%",
+								"fanWin": 2,
+								"fanLose": 0,
+								"fanRate": 100
+							}
 						},
+						stats_player{
+							"nickname": {
+								'numWin':0,
+								'numLose':0,
+								'winRate':'0%',
+								'lastID':'',
+								'zhuWin':0,
+								'zhuLose':0,
+								'zhuRate':'0%',
+								'zhongWin':0,
+								'zhongLose':0,
+								'zhongRate':'0%',
+								'neiWin':0,
+								'neiLose':0,
+								'neiRate':'0%',
+								'fanWin':0,
+								'fanLose':0,
+								'fanRate':'0%',
+							},
+						}
 					},
-					otherZone:{
+					stats_otherZone:{
 						...
 					}
 				}
 				*/
-				var playersStatisticsKeyRoot='players_statistics';
-				var playersStatisticsRoot=lib.config[playersStatisticsKeyRoot];
-				if(!playersStatisticsRoot){
-					playersStatisticsRoot={};
+				var statsGame=lib.config[lib.statsKeyGame];
+				if(!statsGame){
+					statsGame={};
 				}
-				var playersStatisticsKeyLocal='local';
-				var playersStatistics=playersStatisticsRoot[playersStatisticsKeyLocal];
-				if(!playersStatistics){
-					playersStatistics={};
+				var statsLocal=statsGame[lib.statsKeyLocal];
+				if(!statsLocal){
+					statsLocal={};
 				}
-				var rolesStatisticsKeyRoot='roles_statistics';
-				var rolesStatisticsRoot=lib.config[rolesStatisticsKeyRoot];
-				if(!rolesStatisticsRoot){
-					rolesStatisticsRoot={};
-				}
-				var rolesStatisticsKeyLocal='local';
-				var rolesStatistics=rolesStatisticsRoot[rolesStatisticsKeyLocal];
-				if(!rolesStatistics){
-					rolesStatistics={};
-				}
-				var identityStatisticsKeyRoot='identity_statistics';
-				var identityStatisticsRoot=lib.config[identityStatisticsKeyRoot];
-				if(!identityStatisticsRoot){
-					identityStatisticsRoot={};
-				}
-				var identityStatisticsKeyLocal='local';
-				var identityStatistics=identityStatisticsRoot[identityStatisticsKeyLocal];
+				var identityStatistics=statsLocal[lib.statsKeyIdentity];
 				if(!identityStatistics){
 					identityStatistics={
 						zhuzhong:0,
 						fan:0,
 						nei:0,
 					};
+				}
+				var rolesStatistics=statsLocal[lib.statsKeyRole];
+				if(!rolesStatistics){
+					rolesStatistics={};
+				}
+				var playersStatistics=statsLocal[lib.statsKeyPlayer];
+				if(!playersStatistics){
+					playersStatistics={};
 				}
 
 				clients.sort((a, b) => {
@@ -31454,20 +31452,23 @@
 				}
 
 				roles.sort((a, b) => {
-					var rolesStatisticsKeyRoot='roles_statistics';
-					var rolesStatisticsRoot=lib.config[rolesStatisticsKeyRoot];
-					if(rolesStatisticsRoot){
-						var rolesStatisticsKeyLocal='local';
-						var rolesStatistics=rolesStatisticsRoot[rolesStatisticsKeyLocal];
-						if(rolesStatistics){
-							if(rolesStatistics[a].winRate!=rolesStatistics[b].winRate){
-								return rolesStatistics[a].winRate>rolesStatistics[b].winRate?-1:1;
-							}
-							if(rolesStatistics[a].numWin!=rolesStatistics[b].numWin){
-								return rolesStatistics[a].numWin>rolesStatistics[b].numWin?-1:1;
-							}
-							return a<=b?-1:1;
+					var statsGame=lib.config[lib.statsKeyGame];
+					if(!statsGame){
+						statsGame={};
+					}
+					var statsLocal=statsGame[lib.statsKeyLocal];
+					if(!statsLocal){
+						statsLocal={};
+					}
+					var rolesStatistics=statsLocal[lib.statsKeyRole];
+					if(rolesStatistics){
+						if(rolesStatistics[a].winRate!=rolesStatistics[b].winRate){
+							return rolesStatistics[a].winRate>rolesStatistics[b].winRate?-1:1;
 						}
+						if(rolesStatistics[a].numWin!=rolesStatistics[b].numWin){
+							return rolesStatistics[a].numWin>rolesStatistics[b].numWin?-1:1;
+						}
+						return a<=b?-1:1;
 					}
 				});
 
@@ -31524,32 +31525,22 @@
 					tableStatisticsByRole.appendChild(tr);
 				}
 
-				// by players
-				playersStatisticsRoot[playersStatisticsKeyLocal]=playersStatistics
-				game.saveConfig(playersStatisticsKeyRoot,playersStatisticsRoot);
-				// by identity
-				identityStatisticsRoot[identityStatisticsKeyLocal]=identityStatistics
-				game.saveConfig(identityStatisticsKeyRoot,identityStatisticsRoot);
-				// by roles
-				rolesStatisticsRoot[rolesStatisticsKeyLocal]=rolesStatistics
-				game.saveConfig(rolesStatisticsKeyRoot,rolesStatisticsRoot);
+				statsLocal[lib.statsKeyIdentity]=identityStatistics;
+				statsLocal[lib.statsKeyRole]=rolesStatistics;
+				statsLocal[lib.statsKeyPlayer]=playersStatistics;
+				statsGame[lib.statsKeyLocal]=statsLocal;
+				game.saveConfig(lib.statsKeyGame,statsGame);
 
-				var dataToSend={};
-				dataToSend[playersStatisticsKeyRoot]=playersStatistics;
-				dataToSend[identityStatisticsKeyRoot]=identityStatistics;
-				dataToSend[rolesStatisticsKeyRoot]=rolesStatistics;
 				var hostZone=game.me.nickname;
 				if(hostZone){
 					game.broadcast(function(zoneKey,data){
-						for(var key in data){
-							var statsRoot=lib.config[key];
-							if(!statsRoot){
-								statsRoot={};
-							}
-							statsRoot[zoneKey]=data[key];
-							game.saveConfig(key,statsRoot);
+						var statsGame=lib.config[lib.statsKeyGame];
+						if(!statsGame){
+							statsGame={};
 						}
-					},hostZone,dataToSend);
+						statsGame[zoneKey]=data;
+						game.saveConfig(lib.statsKeyGame,statsGame);
+					},hostZone,statsLocal);
 				}
 			}
 			var resultbool=result;
@@ -34827,34 +34818,16 @@
 			dialog.classList.add('clsleaderboard');
 			dialog.forcebutton=true;
 			// game statistics
-			var playersStatisticsKeyRoot='players_statistics';
-			var playersStatisticsRoot=lib.config[playersStatisticsKeyRoot];
-			if(!playersStatisticsRoot){
-				playersStatisticsRoot={};
+			var statsGame=lib.config[lib.statsKeyGame];
+			if(!statsGame){
+				statsGame={};
 			}
-
-			var identityStatisticsKeyRoot='identity_statistics';
-			var identityStatisticsRoot=lib.config[identityStatisticsKeyRoot];
-			if(!identityStatisticsRoot){
-				identityStatisticsRoot={};
-			}
-
-			var rolesStatisticsKeyRoot='roles_statistics';
-			var rolesStatisticsRoot=lib.config[rolesStatisticsKeyRoot];
-			if(!rolesStatisticsRoot){
-				rolesStatisticsRoot={};
-			}
-			var hostZones=Object.keys(rolesStatisticsRoot);
-			for(var k=0;k<hostZones.length;k++){
-				var hostZone=hostZones[k];
-				var p=document.createElement('p');
-				p.innerHTML='本地';
-				if(hostZone!='local') {
-					 p.innerHTML=hostZone+'区';
+			for(var hostZone in statsGame){
+				var statsByZone=statsGame[hostZone];
+				if(!statsByZone){
+					statsByZone={};
 				}
-				dialog.content.appendChild(p);
-
-				var identityStatistics=identityStatisticsRoot[hostZone];
+				var identityStatistics=statsByZone[lib.statsKeyIdentity];
 				if(!identityStatistics){
 					identityStatistics={
 						zhuzhong:0,
@@ -34862,6 +34835,20 @@
 						nei:0,
 					};
 				}
+				var rolesStatistics=statsByZone[lib.statsKeyRole];
+				if(!rolesStatistics){
+					rolesStatistics={};
+				}
+				var playersStatistics=statsByZone[lib.statsKeyPlayer];
+				if(!playersStatistics){
+					playersStatistics={};
+				}
+				var p=document.createElement('p');
+				p.innerHTML='【本地】';
+				if(hostZone!=lib.statsKeyLocal) {
+					 p.innerHTML='【'+hostZone+'】区';
+				}
+				dialog.content.appendChild(p);
 
 				tableStatistics=document.createElement('table');
 				tr=document.createElement('tr');
@@ -34893,11 +34880,6 @@
 				tableStatistics.appendChild(tr);
 				dialog.content.appendChild(tableStatistics);
 				dialog.add(ui.create.div('.placeholder'));
-
-				var rolesStatistics=rolesStatisticsRoot[hostZone];
-				if(!rolesStatistics){
-					rolesStatistics={};
-				}
 
 				// sort by winRate, returns [[k1, val1],[k2, val2]]
 				var sortedStats=game.sortProperties(rolesStatistics);
@@ -37328,25 +37310,7 @@
 													alert('导入失败');
 													return;
 												}
-												var identityStatisticsKeyRoot='identity_statistics';
-												var identityStatisticsRoot=data[identityStatisticsKeyRoot];
-												if(!identityStatisticsRoot){
-													identityStatisticsRoot={};
-												}
-												game.saveConfig(identityStatisticsKeyRoot,identityStatisticsRoot);
-												var playersStatisticsKeyRoot='players_statistics';
-												var playersStatisticsRoot=data[playersStatisticsKeyRoot];
-												if(!playersStatisticsRoot){
-													playersStatisticsRoot={};
-												}
-												game.saveConfig(playersStatisticsKeyRoot,playersStatisticsRoot);
-												var rolesStatisticsKeyRoot='roles_statistics';
-												var rolesStatisticsRoot=data[rolesStatisticsKeyRoot];
-												if(!rolesStatisticsRoot){
-													rolesStatisticsRoot={};
-												}
-												game.saveConfig(rolesStatisticsKeyRoot,rolesStatisticsRoot);
-
+												game.saveConfig(lib.statsKeyGame,data);
 												alert('导入成功');
 												lib.init.background();
 												game.reload();

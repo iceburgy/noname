@@ -181,7 +181,7 @@ window.config={
 			dierestart:true
 		},
 	},
-	players_statistics:{},
+	stats_game:{},
 	current_mode:{},
 	customforbid:[],
 	forbid:[
