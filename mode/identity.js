@@ -2054,23 +2054,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},game.zhu,game.zhu.identity,game.players[i],game.players[i].identity);
 					}
 
-					event.list=[];
-					event.list2=[];
-
-					var libCharacter={};
-					for(var i=0;i<lib.configOL.characterPack.length;i++){
-						var pack=lib.characterPack[lib.configOL.characterPack[i]];
-						for(var j in pack){
-							if(j=='zuoci') continue;
-							if(lib.character[j]) libCharacter[j]=pack[j];
-						}
-					}
-					for(i in libCharacter){
-						if(lib.filter.characterDisabled(i,libCharacter)) continue;
-						event.list.push(i);
-						event.list2.push(i);
-					}
-					_status.characterlist=event.list.slice(0);
+					var charactersOLList=get.charactersOL();
+					event.list=charactersOLList.slice(0);
+					event.list2=charactersOLList.slice(0);
+					_status.characterlist=charactersOLList.slice(0);
 
 					// chosenChars for each player: [[zhu1, zhu2], [p1_1, p1_2], ...]
 					// index is based on distance from zhu
