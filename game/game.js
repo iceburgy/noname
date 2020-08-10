@@ -37221,22 +37221,28 @@
 													alert('导入失败');
 													return;
 												}
-												var delta=[];
+												var deltaOL=[];
+												var deltaNotOL=[];
+												var charactersOLList=get.charactersOL();
 												for(var craw in lib.character){
 													if(!data.contains(craw)&&!lib.configOL.banned.contains(craw)){
-														delta.push(craw);
+														if(charactersOLList.contains(craw)) deltaOL.push(craw);
+														else deltaNotOL.push(craw);
 														lib.configOL.banned.push(craw);
 													}
 												}
-												if(delta.length){
-													var deltaObj=game.buildRoleLibFromCharacters(delta);
-													game.export(JSON.stringify(deltaObj),'noname-rolelib-delta-'+(new Date()).toLocaleString()+'-'+delta.length+'.json');
+												if(deltaOL.length){
+													var deltaObj=game.buildRoleLibFromCharacters(deltaOL);
+													game.export(JSON.stringify(deltaObj),'noname-rolelib-deltaOL-'+(new Date()).toLocaleString()+'-'+deltaOL.length+'.json');
+												}
+												if(deltaNotOL.length){
+													var deltaObj=game.buildRoleLibFromCharacters(deltaNotOL);
+													game.export(JSON.stringify(deltaObj),'noname-rolelib-deltaNotOL-'+(new Date()).toLocaleString()+'-'+deltaNotOL.length+'.json');
 												}
 												game.saveConfig('connect_identity_banned',lib.configOL.banned);
 
 												// check missing roles
 												var missing=[];
-												var charactersOLList=get.charactersOL();
 												for(var prev of data){
 													if(!charactersOLList.contains(prev)){
 														missing.push(prev);

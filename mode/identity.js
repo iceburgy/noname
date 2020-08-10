@@ -2361,7 +2361,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 11"
 					// zhu choose to show character
 					var liangjiang=[];
-					var list=['hidden','main','vice','all',];
+					var list=['暗','主','副','全',];
 					for(var i=0;i<list.length;i++){
 						list[i]=['','',list[i]];
 					}
@@ -2370,9 +2370,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.zhuGroupRevealed=true;
 					var choice=result.links[0][2];
 					switch(choice){
-						case 'main':game.zhu.showCharacter(0);event.goto(15);break;
-						case 'vice':game.zhu.showCharacter(1);event.goto(15);break;
-						case 'all':game.zhu.showCharacter(2);event.goto(15);break;
+						case '主':game.zhu.showCharacter(0);event.goto(15);break;
+						case '副':game.zhu.showCharacter(1);event.goto(15);break;
+						case '全':game.zhu.showCharacter(2);event.goto(15);break;
 						default:game.zhu.trySkillAnimate('不亮将','不亮将',false);event.zhuGroupRevealed=false;break;
 					}
 					"step 13"
@@ -2828,7 +2828,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					"step 24"
 					var liangjiang=[];
-					var list=['hidden','main','vice','all',];
+					var list=['暗','主','副','全',];
 					for(var i=0;i<list.length;i++){
 						list[i]=['','',list[i]];
 					}
@@ -2843,9 +2843,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(result[i]&&result[i].links) {
 							var choice=result[i].links[0][2];
 							switch(choice){
-								case 'main':lib.playerOL[i].showCharacter(0);break;
-								case 'vice':lib.playerOL[i].showCharacter(1);break;
-								case 'all':lib.playerOL[i].showCharacter(2);break;
+								case '主':lib.playerOL[i].showCharacter(0);break;
+								case '副':lib.playerOL[i].showCharacter(1);break;
+								case '全':lib.playerOL[i].showCharacter(2);break;
 								default:break;
 							}
 						}

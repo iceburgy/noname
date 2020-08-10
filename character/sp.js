@@ -18944,7 +18944,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_mumu2":"穆穆",
 			"new_mumu2_info":"锁定技，你不能使用【杀】。",
 			remeibu:'魅步',
-			remeibu_info:'其他角色的出牌阶段开始时，若你在其攻击范围内，你可以弃置一张牌，令该角色于本阶段内拥有〖止息〗。',
+			remeibu_info:'其他角色的出牌阶段开始时，若你在其攻击范围内，你可以弃置一张牌，令该角色于本阶段内拥有〖止息〗。（〖止息〗锁定技，当你使用【杀】或普通锦囊牌时，你弃置一张手牌。）',
 			rezhixi:'止息',
 			rezhixi_info:'锁定技，当你使用【杀】或普通锦囊牌时，你弃置一张手牌。',
 			remumu:'穆穆',
