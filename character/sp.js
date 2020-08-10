@@ -157,7 +157,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			dongbai:['female','qun',3,['lianzhu','xiehui']],
 
-			zhaoxiang:['female','shu',4,['refanghun','refuhan']],
+			zhaoxiang:['female','shu',4,['fanghun','fuhan']],
 			mazhong:['male','shu',4,['fuman']],
 			dongyun:['male','shu',3,['bingzheng','sheyan']],
 			kanze:['male','wu',3,['xiashu','kuanshi']],
@@ -8223,11 +8223,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					// apply cungui jinjiangbiao
 					var charpool=list.randomGets(5);
-					if(_status.connectMode){
-						var zhaoxiangindex=game.getCharacterIndex(player,'zhaoxiang');
-						var othercharname=(zhaoxiangindex==0?player.name2:player.name1);
-						charpool=game.getNextValidCharacters(othercharname,5,list);
-					}
+					var zhaoxiangindex=game.getCharacterIndex(player,'zhaoxiang');
+					var othercharname=(zhaoxiangindex==0?player.name2:player.name1);
+					charpool=game.getNextValidCharacters(othercharname,5,list);
 					player.chooseButton(true).set('ai',function(button){
 						return get.rank(button.link,true)-lib.character[button.link][2];
 					}).set('createDialog',['获得一张武将牌上的所有技能',[charpool,'character']]);
