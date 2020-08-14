@@ -10383,8 +10383,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return false;
 						},
-						direct:true,
-						//frequent:'check',
+						frequent:true,
 						content:function(){
 							"step 0"
 							if(trigger.delay==false) game.delay();
@@ -10396,14 +10395,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							if(cards.length){
-								player.gain(cards,'log','gain2');
+								player.chooseButton(['落英：选择要获得的牌',cards],[1,cards.length]);
+							}
+							"step 2"
+							if(result.bool){
+								player.logSkill(event.name);
+								player.gain(result.links,'gain2','log');
 							}
 						},
 					},
 					judge:{
 						audio:2,
 						trigger:{global:'cardsDiscardAfter'},
-						frequent:'check',
+						frequent:true,
 						check:function(event,player){
 							return event.cards[0].name!='du';
 						},
@@ -10420,7 +10424,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return (get.suit(event.cards[0])=='club');
 						},
 						content:function(){
-							player.gain(trigger.cards,'gain2','log');
+							"step 0"
+							player.chooseButton(['落英：选择要获得的牌',trigger.cards],[1,trigger.cards.length]).set('ai',function(button){
+								return get.value(button.link,player,'raw');
+							});
+							"step 1"
+							if(result.bool){
+								player.logSkill(event.name);
+								player.gain(result.links,'gain2','log');
+							}
 						}
 					}
 				}
