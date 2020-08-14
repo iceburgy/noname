@@ -37,7 +37,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			handang:['male','wu',4,['gongji','jiefan']],
 			fuhuanghou:['female','qun',3,['qiuyuan','zhuikong']],
 			zhonghui:['male','wei',4,['quanji','zili']],
-			jianyong:['male','shu',3,['reqiaoshui','jyzongshi']],
+			jianyong:['male','shu',3,['qiaoshui','jyzongshi']],
 			madai:['male','shu',4,['mashu','qianxi']],
 			liufeng:['male','shu',4,['xiansi']],
 			manchong:['male','wei',3,['xinjunxing','yuce']],
