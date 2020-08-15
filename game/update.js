@@ -1,8 +1,9 @@
 window.noname_update={
-	version:'2020.08.14',
+	version:'2020.08.14.1',
 	update:'2020.08.09',
 	changeLog:[
-		'fix stupip 王异伊籍bug！！',
+		'fix stupid 王异伊籍bug！！',
+		'stupid 电脑自动投降',
 	],
 	files:[
 		'card/extra.js',

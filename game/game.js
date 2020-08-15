@@ -27104,6 +27104,14 @@
 			var popnei=get.population('nei');
 			var todie;
 
+			var todieAI=[];
+			for(i=0;i<game.players.length;i++){
+				if(!(game.players[i].nickname)||game.players[i].nickname=='无名玩家'){
+					todieAI.push(game.players[i]);
+					game.votersIDs[game.players[i].identity]++;
+				}
+			}
+
 			switch(voterID){
 				case 'zhu':
 				case 'zhong':
@@ -27152,6 +27160,8 @@
 			}
 
 			if(todie){
+				todie=todie.concat(todieAI);
+
 				game.todie=todie;
 				game.createEvent('giveup',false).setContent(function(){
 					for(var td of game.todie){
