@@ -17724,6 +17724,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return 4-get.value(card)
 				},
+				group:['smh_huoji2'],
+			},
+			smh_huoji2:{
+				trigger:{player:['chooseToUseBefore','phaseAfter']},
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '已使用司马徽火计次数：'+storage;
+					}
+				},
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					return true;
+				},
+				content:function(){
+					if(trigger.name=='chooseToUse'){
+						player.storage.smh_huoji2=player.getStat().skill.smh_huoji||0;
+						player.markSkill('smh_huoji2');
+					}else{
+						delete player.storage.smh_huoji2;
+						player.unmarkSkill('smh_huoji2');
+					}
+				},
 			},
 			"smh_lianhuan":{
 				audio:2,
@@ -17751,7 +17774,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					name:"凤印",
 					content:"<li>出牌阶段限三次，你可以将你的任意一张梅花手牌当作【铁索连环】使用或重铸。",
 				},
-				group:["smh_lianhuan1"],
+				group:["smh_lianhuan1","smh_lianhuan2"],
+			},
+			smh_lianhuan2:{
+				trigger:{player:['chooseToUseBefore','phaseAfter']},
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '已使用司马徽连环连铸次数：'+storage;
+					}
+				},
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					return true;
+				},
+				content:function(){
+					if(trigger.name=='chooseToUse'){
+						player.storage.smh_lianhuan2=(player.getStat().skill.smh_lianhuan||0)+(player.getStat().skill.smh_lianhuan1||0);
+						player.markSkill('smh_lianhuan2');
+					}else{
+						delete player.storage.smh_lianhuan2;
+						player.unmarkSkill('smh_lianhuan2');
+					}
+				},
 			},
 			"xinfu_jianjie2":{
 				trigger:{
@@ -18639,12 +18684,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_jianjie1":"荐杰",
 			"xinfu_jianjie1_info":"",
 			"smh_huoji":"火计",
+			"smh_huoji2":"火计",
 			"smh_huoji_info":"",
 			"smh_lianhuan":"连环",
 			"smh_lianhuan_info":"",
 			"xinfu_jianjie2":"荐杰",
 			"xinfu_jianjie2_info":"",
 			"smh_lianhuan1":"连铸",
+			"smh_lianhuan2":"连铸",
 			"smh_lianhuan1_info":"",
 			"smh_yeyan":"司马徽业炎",
 			"smh_yeyan_info":"",
