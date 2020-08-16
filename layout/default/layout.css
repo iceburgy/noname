@@ -673,7 +673,7 @@ table {
 .player.connect[data-position='7']>.intro,
 .player.connect[data-position='8']>.intro,
 .player.connect[data-position='9']>.intro {
-	bottom: 10px;
+	bottom: 25px;
 	left: 40px;
 	opacity: 1;
 	display: block !important;

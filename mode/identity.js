@@ -2081,6 +2081,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								choiceZhu++;
 								game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
 							}
+							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
+								choiceZhu++;
+								game.players[i].trySkillAnimate('生日奖励','生日奖励',false);
+							}
 							var str='选择角色1';
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
@@ -2160,6 +2164,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								delete lib.config.xiaoneibonus[game.players[i].nickname];
 								game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
 								game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
+							}
+							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
+								choiceZhu++;
+								game.players[i].trySkillAnimate('生日奖励','生日奖励',false);
 							}
 							var str='选择角色2';
 							if(game.players[i].special_identity){
@@ -2443,6 +2451,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								num3++;
 								game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
 							}
+							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
+								num3++;
+								game.players[i].trySkillAnimate('生日奖励','生日奖励',false);
+							}
 							var str='选择角色1';
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
@@ -2582,6 +2594,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								delete lib.config.xiaoneibonus[game.players[i].nickname];
 								game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
 								game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
+							}
+							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
+								num3++;
+								game.players[i].trySkillAnimate('生日奖励','生日奖励',false);
 							}
 							var str='选择角色2';
 							if(game.players[i].special_identity){
