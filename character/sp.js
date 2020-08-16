@@ -13511,11 +13511,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'phaseEnd'},
 						forced:true,
 						filter:function(event,player){
-							return event.player.hasSkill('rezhoufu3')&&event.player.isAlive();
+							for(var p of game.players){
+								if(p.hasSkill('rezhoufu3')&&p.isAlive()){
+									return true;
+								}
+							}
+							return false;
 						},
 						logTarget:'player',
 						content:function(){
-							trigger.player.loseHp();
+							for(var p of game.players){
+								if(p.hasSkill('rezhoufu3')&&p.isAlive()){
+									p.loseHp();
+								}
+							}
 						},
 					},
 				},
