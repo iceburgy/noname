@@ -6987,6 +6987,8 @@
 						}
 						if(e.keyCode==32){
 							var node=ui.window.querySelector('pausedbg');
+							if(!node) node=document.querySelector('.pausedbg');
+							if(!node) node=document.querySelector('.touchinfohidden');
 							if(node){
 								node.click();
 							}
@@ -25778,7 +25780,7 @@
 									}
 									var id=banned_info;
 									this.send(function(id){
-										alert('请尊重其他玩家，不要双开旁观');
+										alert('你已在游戏中');
 										if(game.ws){
 											game.ws.close();
 											game.saveConfig('reconnect_info');
@@ -44871,7 +44873,7 @@
 				}
 				if(lib.config.auto_check_update&&game.download){
 					setTimeout(function(){
-						game.checkForUpdate(null,false);
+						if(game.checkForUpdate&&(typeof game.checkForUpdate == 'function')) game.checkForUpdate(null,false);
 					},3000);
 				}
 				if(!lib.config.asset_version){

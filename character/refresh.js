@@ -5876,7 +5876,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var num=trigger.num;
 					player.draw(3*num);
-					if(_status.currentPhase==player){
+					if(player.isPhaseUsing()){
 						if(!player.storage.zhaxiang2) player.storage.zhaxiang2=0;
 						player.storage.zhaxiang2+=num;
 						player.addTempSkill('zhaxiang2',{player:'phaseAfter'});
@@ -7046,7 +7046,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_sunjian:'界孙坚',
 			wulie:'武烈',
 			wulie2:'武烈',
-			wulie_info:'限定技，结束阶段，你可以失去任意点体力并指定等量的角色。这些角色各获得一枚「烈」。有「烈」的角色受到伤害时，其移去一枚「烈」，然后防止此伤害。',
+			wulie_info:'限定技，结束阶段，你可以失去任意点体力并指定等量的其他角色。这些角色各获得一枚「烈」。有「烈」的角色受到伤害时，其移去一枚「烈」，然后防止此伤害。',
 			re_sunluban:'界孙鲁班',
 			re_masu:'界马谡',
 			ol_pangde:'界庞德',
