@@ -40,7 +40,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhangliao:['male','wei',4,['new_retuxi']],
 			re_xuzhu:['male','wei',4,['new_reluoyi']],
 			re_xiahoudun:['male','wei',4,['reganglie','new_qingjian']],
-			re_zhangfei:['male','shu',4,['paoxiao','new_tishen']],
+			re_zhangfei:['male','shu',4,['new_repaoxiao','new_tishen']],
 			re_zhaoyun:['male','shu',4,['ollongdan','olyajiao']],
 			re_guanyu:['male','shu',4,['new_rewusheng','new_yijue']],
 			re_machao:['male','shu',4,['mashu','retieji']],
