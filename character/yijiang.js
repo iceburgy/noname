@@ -7850,7 +7850,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:2,
 				position:'h',
 				audio:2,
-				derivation:['new_rewusheng','olpaoxiao'],
+				derivation:['new_rewusheng','new_repaoxiao'],
 				viewAs:{name:'sha'},
 				prompt:'将两张手牌当杀使用或打出',
 				check:function(card){
@@ -7865,7 +7865,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					respondSha:true,
 					order:function(item,player){
-						if(player.hasSkill('new_rewusheng')&&player.hasSkill('olpaoxiao')){
+						if(player.hasSkill('new_rewusheng')&&player.hasSkill('new_repaoxiao')){
 							return 1;
 						}
 						if(player.countCards('h')<4){
@@ -7886,7 +7886,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.addTempSkill('new_rewusheng');
-					player.addTempSkill('olpaoxiao');
+					player.addTempSkill('new_repaoxiao');
 					player.addTempSkill('fuhun3');
 				}
 			},

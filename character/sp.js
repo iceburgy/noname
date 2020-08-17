@@ -15691,7 +15691,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.push('retiaoxin');
 					}
 					if(player.hp<=2){
-						list.push('olpaoxiao');
+						list.push('new_repaoxiao');
 					}
 					if(player.hp<=1){
 						list.push('xinshensu');
@@ -15703,7 +15703,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},player,list);
 					}
 				},
-				derivation:['retiaoxin','olpaoxiao','xinshensu'],
+				derivation:['retiaoxin','new_repaoxiao','xinshensu'],
 				content:function(){
 					if(!game.isCharacterSeen(player,'xiahouba')) return;
 					game.broadcastAll(function(player){
@@ -15715,7 +15715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.push('retiaoxin');
 					}
 					if(player.hp<=2){
-						list.push('olpaoxiao');
+						list.push('new_repaoxiao');
 					}
 					if(player.hp<=1){
 						list.push('xinshensu');
