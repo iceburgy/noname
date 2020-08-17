@@ -3896,7 +3896,7 @@
 						intro:'按照座位号发小内奖励卡',
 					},
 					birthdaybonus_by_seat:{
-						name:'生日奖励',
+						name:'生日奖励或者移除',
 						init:'0',
 						item:{
 							'0':'一号位',
@@ -3913,13 +3913,13 @@
 						frequent:true,
 						restart:true,
 						onclick:function(seat,label){
-							this.innerHTML=this.innerHTML.replace('生日奖励','奖励中...');
+							this.innerHTML=this.innerHTML.replace('生日奖励或者移除','设置中...');
 							game.saveConfig('birthdaybonus_by_seat',seat);
 							var result=game.addBirthdayBonusBySeat(seat);
 							var that=this;
 							if(result){
 								setTimeout(function(){
-									that.innerHTML=that.innerHTML.replace('奖励中...','奖励成功');
+									that.innerHTML=that.innerHTML.replace('设置中...','设置成功');
 									setTimeout(function(){
 										game.reload();
 									},1000);
@@ -3927,14 +3927,14 @@
 							}
 							else{
 								setTimeout(function(){
-									that.innerHTML=that.innerHTML.replace('奖励中...',label.innerHTML+'没有人！');
+									that.innerHTML=that.innerHTML.replace('设置中...',label.innerHTML+'没有人！');
 									setTimeout(function(){
-										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','生日奖励');
+										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','生日奖励或者移除');
 									},1000);
 								},1000);
 							}
 						},
-						intro:'按照座位号发小内奖励卡',
+						intro:'按照座位号发生日奖励卡，重复发将会移除生日奖励卡',
 					},
 					oneclick_reset_server:{
 						name:'一键导入单双禁将表及游戏设置',
@@ -27315,9 +27315,13 @@
 				lib.config.birthdaybonus={};
 			}
 			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
-				var expire=new Date();
-				expire.setDate(expire.getDate()+1);
-				lib.config.birthdaybonus[game.connectPlayers[seat].nickname]=expire;
+				var nn=game.connectPlayers[seat].nickname;
+				if (nn in lib.config.birthdaybonus) delete lib.config.birthdaybonus[nn];
+				else{
+					var expire=new Date();
+					expire.setDate(expire.getDate()+1);
+					lib.config.birthdaybonus[nn]=expire;
+				}
 				game.saveConfig('birthdaybonus',lib.config.birthdaybonus);
 				return true;
 			}
