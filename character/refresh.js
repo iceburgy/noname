@@ -3846,6 +3846,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:"retishen",
 			},
 			"new_tishen2":{
+				unique:true,
+				charlotte:true,
+				intro:{
+					content:function(storage){
+						return '你获得所有以你为目标且未对你造成伤害的【杀】';
+					}
+				},
+				mark:true,
+				onremove:true,
 				trigger:{
 					target:"shaUnhirt",
 				},

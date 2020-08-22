@@ -3809,6 +3809,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					if(player.awakenedSkills.contains('woshixiaonei')){
+						event.finish();
+						return;
+					}
 					if(player==game.me){
 						ui.revealXiaonei.classList.remove('glow');
 						ui.revealXiaonei.hide();

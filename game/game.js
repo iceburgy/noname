@@ -43178,6 +43178,7 @@
 				if(ui.giveup) return;
 				if(!lib.config.show_giveup) return;
 				ui.giveup=ui.create.system('投降',function(){
+					if(this.classList.contains('hidden')) return;
 					if(this.innerHTML=='<span>确认</span>'){
 						clearTimeout(this.confirmTimeout);
 						var player=game.me;
@@ -43205,6 +43206,7 @@
 			revealCharacter:function(){
 				if(!ui.revealCharacter){
 					ui.revealCharacter=ui.create.system('亮将x2',function(){
+						if(this.classList.contains('hidden')) return;
 						if(this.innerHTML=='亮将x2'){
 							this.innerHTML='亮将x1';
 						}
@@ -43230,6 +43232,7 @@
 			revealXiaonei:function(){
 				if(!ui.revealXiaonei){
 					ui.revealXiaonei=ui.create.system('亮小内',function(){
+						if(this.classList.contains('hidden')) return;
 						ui.revealXiaonei.classList.remove('glow');
 						ui.revealXiaonei.hide();
 						if(game.online){
