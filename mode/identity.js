@@ -2083,7 +2083,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
 								choiceZhu++;
-								game.players[i].trySkillAnimate('生日奖励','生日奖励',false);
+								game.players[i].trySkillAnimate('生日福利','生日福利',false);
 							}
 							var str='选择角色1';
 							if(game.players[i].special_identity){
@@ -2167,7 +2167,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
 								choiceZhu++;
-								game.players[i].trySkillAnimate('生日奖励','生日奖励',false);
+								game.players[i].trySkillAnimate('生日福利','生日福利',false);
 							}
 							var str='选择角色2';
 							if(game.players[i].special_identity){
@@ -2453,7 +2453,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
 								num3++;
-								game.players[i].trySkillAnimate('生日奖励','生日奖励',false);
+								game.players[i].trySkillAnimate('生日福利','生日福利',false);
 							}
 							var str='选择角色1';
 							if(game.players[i].special_identity){
@@ -2597,7 +2597,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
 								num3++;
-								game.players[i].trySkillAnimate('生日奖励','生日奖励',false);
+								game.players[i].trySkillAnimate('生日福利','生日福利',false);
 							}
 							var str='选择角色2';
 							if(game.players[i].special_identity){

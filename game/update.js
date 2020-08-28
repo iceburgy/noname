@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.08.22',
+	version:'2020.08.28',
 	update:'2020.08.09',
 	changeLog:[
 		'修复投降，亮将，亮小内按钮可以重复点击触发的bug',

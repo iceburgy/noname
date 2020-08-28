@@ -3896,7 +3896,7 @@
 						intro:'按照座位号发小内奖励卡',
 					},
 					birthdaybonus_by_seat:{
-						name:'生日奖励或者移除',
+						name:'生日福利或者移除',
 						init:'0',
 						item:{
 							'0':'一号位',
@@ -3913,7 +3913,7 @@
 						frequent:true,
 						restart:true,
 						onclick:function(seat,label){
-							this.innerHTML=this.innerHTML.replace('生日奖励或者移除','设置中...');
+							this.innerHTML=this.innerHTML.replace('生日福利或者移除','设置中...');
 							game.saveConfig('birthdaybonus_by_seat',seat);
 							var result=game.addBirthdayBonusBySeat(seat);
 							var that=this;
@@ -3929,12 +3929,12 @@
 								setTimeout(function(){
 									that.innerHTML=that.innerHTML.replace('设置中...',label.innerHTML+'没有人！');
 									setTimeout(function(){
-										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','生日奖励或者移除');
+										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','生日福利或者移除');
 									},1000);
 								},1000);
 							}
 						},
-						intro:'按照座位号发生日奖励卡，重复发将会移除生日奖励卡',
+						intro:'按照座位号发生日福利卡，重复发将会移除生日福利卡',
 					},
 					oneclick_reset_server:{
 						name:'一键导入单双禁将表及游戏设置',
@@ -11359,8 +11359,8 @@
 							winRate='小内奖励';
 						}
 						if(lib.config.birthdaybonus&&(lib.config.connect_nickname in lib.config.birthdaybonus)){
-							if(winRate&&winRate.length) winRate+='<br/>生日奖励';
-							else winRate='生日奖励';
+							if(winRate&&winRate.length) winRate+='<br/>生日福利';
+							else winRate='生日福利';
 						}
 						me.setIdentity('zhu');
 						me.initOL(lib.config.connect_nickname,lib.config.connect_avatar,winRate);
@@ -25901,8 +25901,8 @@
 									winRate='小内奖励';
 								}
 								if(lib.config.birthdaybonus&&(this.nickname in lib.config.birthdaybonus)){
-									if(winRate&&winRate.length) winRate+='<br/>生日奖励';
-									else winRate='生日奖励';
+									if(winRate&&winRate.length) winRate+='<br/>生日福利';
+									else winRate='生日福利';
 								}
 								game.connectPlayers[i].initOL(this.nickname,this.avatar,winRate);
 								game.connectPlayers[i].ws=this;
@@ -27816,8 +27816,8 @@
 						winRate='小内奖励';
 					}
 					if(lib.config.birthdaybonus&&(player.nickname in lib.config.birthdaybonus)){
-						if(winRate&&winRate.length) winRate+='<br/>生日奖励';
-						else winRate='生日奖励';
+						if(winRate&&winRate.length) winRate+='<br/>生日福利';
+						else winRate='生日福利';
 					}
 					if(!game.onlinezhu){
 						game.onlinezhu=player.playerid;
