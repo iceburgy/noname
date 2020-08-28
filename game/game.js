@@ -27385,6 +27385,20 @@
 			game.saveConfig('alertDup',val);
 			return lib.config.alertDup;
 		},
+		getQiandaofuliInfo:function(){
+			if(lib.config.qiandaofuli){
+				if(lib.config.qiandaofuli.qianDaoCutoff){
+					lib.config.qiandaofuli.qianDaoCutoff.toJSON = function(){ return this.toLocaleString(); }
+				}
+				if(lib.config.qiandaofuli.users){
+					for(var nn in lib.config.qiandaofuli.users){
+						lib.config.qiandaofuli.users[nn].toJSON = function(){ return this.toLocaleString(); }
+					}
+				}
+				return JSON.stringify(lib.config.qiandaofuli,null,4);
+			}
+			return 'NA';
+		},
 		syncQiandaofuli:function(){
 			if(!lib.config.qiandaofuli){
 				lib.config.qiandaofuli={};
