@@ -11402,13 +11402,7 @@
 
 						// set qiandaofuli if applicable
 						if(game.isQiandaoing()){
-							if(!lib.config.qiandaofuli.users){
-								lib.config.qiandaofuli.users={};
-							}
-							if(!(lib.config.connect_nickname in lib.config.qiandaofuli.users)){
-								lib.config.qiandaofuli.users[lib.config.connect_nickname]=new Date();
-							}
-							game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
+							game.addQiandaofuli(lib.config.connect_nickname);
 						}
 
 						//var winRate=game.getWinRateByNickname(lib.config.connect_nickname);
@@ -25958,13 +25952,7 @@
 							if(game.connectPlayers[i]!=game.me&&!game.connectPlayers[i].playerid){
 								// set qiandaofuli if applicable
 								if(game.isQiandaoing()){
-									if(!lib.config.qiandaofuli.users){
-										lib.config.qiandaofuli.users={};
-									}
-									if(!(this.nickname in lib.config.qiandaofuli.users)){
-										lib.config.qiandaofuli.users[this.nickname]=new Date();
-									}
-									game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
+									game.addQiandaofuli(this.nickname);
 								}
 
 								game.connectPlayers[i].playerid=this.id;
@@ -27454,6 +27442,16 @@
 			}
 			return false;
 		},
+		addQiandaofuli:function(nickname){
+			if(!nickname||nickname=='无名玩家') return;
+			if(!lib.config.qiandaofuli.users){
+				lib.config.qiandaofuli.users={};
+			}
+			if(!(nickname in lib.config.qiandaofuli.users)){
+				lib.config.qiandaofuli.users[nickname]=new Date();
+			}
+			game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
+		},
 		displayQiandaofuli:function(ip){
 			var bar=ui.create.div(ui.window);
 			bar.style.height='20px';
@@ -28006,13 +28004,7 @@
 				if(player.playerid){
 					// set qiandaofuli if applicable
 					if(game.isQiandaoing()){
-						if(!lib.config.qiandaofuli.users){
-							lib.config.qiandaofuli.users={};
-						}
-						if(!(player.nickname in lib.config.qiandaofuli.users)){
-							lib.config.qiandaofuli.users[player.nickname]=new Date();
-						}
-						game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
+						game.addQiandaofuli(player.nickname);
 					}
 
 					//var winRate=game.getWinRateByNickname(player.nickname);
