@@ -3968,8 +3968,19 @@
 							'20':'晚上8点'
 						},
 						frequent:true,
-						restart:false,
+						restart:true,
 						intro:'签到福利截止时间',
+						onclick:function(hour,label){
+							this.innerHTML=this.innerHTML.replace('签到福利截止时间','设置中...');
+							game.saveConfig('qiandaofuli_cutoff',hour);
+							var that=this;
+							setTimeout(function(){
+								that.innerHTML=that.innerHTML.replace('设置中...','设置成功');
+								setTimeout(function(){
+									game.reload();
+								},1000);
+							},1000);
+						},
 					},
 					oneclick_reset_server:{
 						name:'一键导入单双禁将表及游戏设置',
