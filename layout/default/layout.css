@@ -673,10 +673,11 @@ table {
 .player.connect[data-position='7']>.intro,
 .player.connect[data-position='8']>.intro,
 .player.connect[data-position='9']>.intro {
-	bottom: 25px;
+	bottom: 10px;
 	left: 40px;
 	opacity: 1;
 	display: block !important;
+	height: auto;
 }
 #arena #me>div>div>.card {
 	position: absolute;

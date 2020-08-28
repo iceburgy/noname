@@ -3936,6 +3936,41 @@
 						},
 						intro:'按照座位号发生日福利卡，重复发将会移除生日福利卡',
 					},
+					gaming_today:{
+						name:'今日再战',
+						clear:true,
+						onclick:function(){
+							if(this.innerHTML=='<span>确认今日再战</span>'){
+								clearTimeout(this.confirmTimeout);
+								game.setQiandaofuliCutoff(new Date());
+								this.innerHTML='<span>重置今日再战成功</span>';
+								var that=this;
+								setTimeout(function(){
+									game.reload();
+								},1000);
+							}
+							else{
+								this.innerHTML='<span>确认今日再战</span>';
+								var that=this;
+								this.confirmTimeout=setTimeout(function(){
+									that.innerHTML='<span>今日再战</span>';
+								},1000);
+							}
+						}
+					},
+					qiandaofuli_cutoff:{
+						name:'签到福利截止时间',
+						init:'19',
+						item:{
+							'0':'关闭',
+							'18':'晚上6点',
+							'19':'晚上7点',
+							'20':'晚上8点'
+						},
+						frequent:true,
+						restart:false,
+						intro:'签到福利截止时间',
+					},
 					oneclick_reset_server:{
 						name:'一键导入单双禁将表及游戏设置',
 						clear:true,
@@ -11353,6 +11388,18 @@
 					ui.create.connectPlayers(game.ip);
 					if(!window.isNonameServer){
 						var me=game.connectPlayers[0];
+
+						// set qiandaofuli if applicable
+						if(game.isQiandaoing()){
+							if(!lib.config.qiandaofuli.users){
+								lib.config.qiandaofuli.users={};
+							}
+							if(!(lib.config.connect_nickname in lib.config.qiandaofuli.users)){
+								lib.config.qiandaofuli.users[lib.config.connect_nickname]=new Date();
+							}
+							game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
+						}
+
 						//var winRate=game.getWinRateByNickname(lib.config.connect_nickname);
 						var winRate='';
 						if(lib.config.xiaoneibonus&&(lib.config.connect_nickname in lib.config.xiaoneibonus)){
@@ -11361,6 +11408,10 @@
 						if(lib.config.birthdaybonus&&(lib.config.connect_nickname in lib.config.birthdaybonus)){
 							if(winRate&&winRate.length) winRate+='<br/>生日福利';
 							else winRate='生日福利';
+						}
+						if(lib.config.qiandaofuli&&lib.config.qiandaofuli.users&&(lib.config.connect_nickname in lib.config.qiandaofuli.users)){
+							if(winRate&&winRate.length) winRate+='<br/>签到福利';
+							else winRate='签到福利';
 						}
 						me.setIdentity('zhu');
 						me.initOL(lib.config.connect_nickname,lib.config.connect_avatar,winRate);
@@ -25894,6 +25945,17 @@
 						for(var i=0;i<game.connectPlayers.length;i++){
 							if(game.connectPlayers[i].classList.contains('unselectable2')) continue;
 							if(game.connectPlayers[i]!=game.me&&!game.connectPlayers[i].playerid){
+								// set qiandaofuli if applicable
+								if(game.isQiandaoing()){
+									if(!lib.config.qiandaofuli.users){
+										lib.config.qiandaofuli.users={};
+									}
+									if(!(this.nickname in lib.config.qiandaofuli.users)){
+										lib.config.qiandaofuli.users[this.nickname]=new Date();
+									}
+									game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
+								}
+
 								game.connectPlayers[i].playerid=this.id;
 								//var winRate=game.getWinRateByNickname(this.nickname);
 								var winRate='';
@@ -25903,6 +25965,10 @@
 								if(lib.config.birthdaybonus&&(this.nickname in lib.config.birthdaybonus)){
 									if(winRate&&winRate.length) winRate+='<br/>生日福利';
 									else winRate='生日福利';
+								}
+								if(lib.config.qiandaofuli&&lib.config.qiandaofuli.users&&(this.nickname in lib.config.qiandaofuli.users)){
+									if(winRate&&winRate.length) winRate+='<br/>签到福利';
+									else winRate='签到福利';
 								}
 								game.connectPlayers[i].initOL(this.nickname,this.avatar,winRate);
 								game.connectPlayers[i].ws=this;
@@ -26210,6 +26276,25 @@
 								args.push(player);
 								sender.send.apply(sender,args);
 							}
+							break;
+						}
+					}
+				},
+				displayQiandaoingServer:function(ip){
+					for(var i=0;i<lib.node.clients.length;i++){
+						if(lib.node.clients[i].id==this.id){
+							var sender=lib.node.clients[i];
+							if(game.isQiandaoing()){
+								ip+='<br/>签到福利发放中！';
+								var cutoff=lib.config.qiandaofuli.qianDaoCutoff;
+								ip+='<br/>截止到：'+cutoff.toLocaleString();
+							}
+							var args=[];
+							args.push(function(ip){
+								game.displayQiandaofuli(ip);
+							});
+							args.push(ip);
+							sender.send.apply(sender,args);
 							break;
 						}
 					}
@@ -27285,6 +27370,7 @@
 			delete data1.alertDup;
 			delete data1.xiaoneibonus;
 			delete data1.birthdaybonus;
+			delete data1.qiandaofuli;
 			delete data1.players_info;
 			delete data1[lib.statsKeyGame];
 			if(cleanPersonalData){
@@ -27298,6 +27384,89 @@
 		updateAlertDup:function(val){
 			game.saveConfig('alertDup',val);
 			return lib.config.alertDup;
+		},
+		syncQiandaofuli:function(){
+			if(!lib.config.qiandaofuli){
+				lib.config.qiandaofuli={};
+			}
+			var now=new Date();
+			if(now.getDay()==5){
+				game.setQiandaofuliCutoff(now);
+			}
+
+			if(!game.isGameDay()){
+				lib.config.qiandaofuli.users={};
+			}
+			game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
+		},
+		setQiandaofuliCutoff:function(nowValue){
+			if(!lib.config.qiandaofuli){
+				lib.config.qiandaofuli={};
+			}
+			var cutoffHour=lib.config['qiandaofuli_cutoff'];
+			nowValue.setHours(cutoffHour, 0, 0, 0);
+			lib.config.qiandaofuli.qianDaoCutoff=nowValue;
+			game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
+		},
+		isGameDay:function(){
+			if(lib.config.qiandaofuli&&lib.config.qiandaofuli.qianDaoCutoff){
+				var cutoff=lib.config.qiandaofuli.qianDaoCutoff;
+				var start=new Date(cutoff.getTime());
+				start.setHours(0, 0, 0, 0);
+				var end=new Date(cutoff.getTime());
+				end.setDate(cutoff.getDate()+1);
+				end.setHours(3, 0, 0, 0);
+				var now=new Date();
+				return start<=now&&now<=end;
+			}
+			return false;
+		},
+		isQiandaoing:function(){
+			if(game.isGameDay()){
+				var cutoff=lib.config.qiandaofuli.qianDaoCutoff;
+				var now=new Date();
+				return now<=cutoff;
+			}
+			return false;
+		},
+		displayQiandaofuli:function(ip){
+			var bar=ui.create.div(ui.window);
+			bar.style.height='20px';
+			bar.style.width='80%';
+			bar.style.left='10%';
+			bar.style.top='calc(200% / 7 - 120px + 5px)';
+			bar.style.textAlign='center';
+
+			var ipbar=ui.create.div('.shadowed',ip,bar);
+			ipbar.style.padding='4px';
+			ipbar.style.borderRadius='2px';
+			ipbar.style.position='relative';
+
+			var button=ui.create.div('.menubutton.large.highlight.connectbutton.pointerdiv',game.online?'退出联机':'开始游戏',ui.window,function(){
+				if(button.clicked) return;
+				if(game.online){
+					if(game.onlinezhu){
+						game.send('startGame');
+					}
+					else{
+						game.saveConfig('tmp_owner_roomId');
+						game.saveConfig('tmp_user_roomId');
+						game.saveConfig('reconnect_info');
+						game.reload();
+					}
+				}
+				else{
+					game.resume();
+				}
+				button.delete();
+				bar.delete();
+				delete ui.connectStartButton;
+				delete ui.connectStartBar;
+				button.clicked=true;
+			});
+
+			ui.connectStartButton=button;
+			ui.connectStartBar=bar;
 		},
 		addXiaoneiBonusBySeat:function(seat){
 			if(!lib.config.xiaoneibonus){
@@ -27810,6 +27979,17 @@
 			for(var i=0;i<game.connectPlayers.length;i++){
 				var player=game.connectPlayers[i];
 				if(player.playerid){
+					// set qiandaofuli if applicable
+					if(game.isQiandaoing()){
+						if(!lib.config.qiandaofuli.users){
+							lib.config.qiandaofuli.users={};
+						}
+						if(!(player.nickname in lib.config.qiandaofuli.users)){
+							lib.config.qiandaofuli.users[player.nickname]=new Date();
+						}
+						game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
+					}
+
 					//var winRate=game.getWinRateByNickname(player.nickname);
 					var winRate='';
 					if(lib.config.xiaoneibonus&&(player.nickname in lib.config.xiaoneibonus)){
@@ -27818,6 +27998,10 @@
 					if(lib.config.birthdaybonus&&(player.nickname in lib.config.birthdaybonus)){
 						if(winRate&&winRate.length) winRate+='<br/>生日福利';
 						else winRate='生日福利';
+					}
+					if(lib.config.qiandaofuli&&lib.config.qiandaofuli.users&&(player.nickname in lib.config.qiandaofuli.users)){
+						if(winRate&&winRate.length) winRate+='<br/>签到福利';
+						else winRate='签到福利';
 					}
 					if(!game.onlinezhu){
 						game.onlinezhu=player.playerid;
@@ -27920,6 +28104,7 @@
 						num=lib.configOL.choose_timeout_main_vice;
 					}
 					break;
+				case '是否使用签到福利':
 				case '请选择神武将的势力':
 				case '是否亮将':
 				case '是否声明势力':
@@ -45363,42 +45548,18 @@
 					}
 				}
 
-				var bar=ui.create.div(ui.window);
-				bar.style.height='20px';
-				bar.style.width='80%';
-				bar.style.left='10%';
-				bar.style.top='calc(200% / 7 - 120px + 5px)';
-				bar.style.textAlign='center';
-				var ipbar=ui.create.div('.shadowed',ip,bar);
-				ipbar.style.padding='4px';
-				ipbar.style.borderRadius='2px';
-				ipbar.style.position='relative';
-
-				var button=ui.create.div('.menubutton.large.highlight.connectbutton.pointerdiv',game.online?'退出联机':'开始游戏',ui.window,function(){
-					if(button.clicked) return;
-					if(game.online){
-						if(game.onlinezhu){
-							game.send('startGame');
-						}
-						else{
-							game.saveConfig('tmp_owner_roomId');
-							game.saveConfig('tmp_user_roomId');
-							game.saveConfig('reconnect_info');
-							game.reload();
-						}
+				// ensure it is server that handles display qiandaofuli
+				if(game.online){
+					game.send('displayQiandaoingServer',ip);
+				}
+				else{
+					if(game.isQiandaoing()){
+						ip+='<br/>签到福利发放中！';
+						var cutoff=lib.config.qiandaofuli.qianDaoCutoff;
+						ip+='<br/>截止到：'+cutoff.toLocaleString();
 					}
-					else{
-						game.resume();
-					}
-					button.delete();
-					bar.delete();
-					delete ui.connectStartButton;
-					delete ui.connectStartBar;
-					button.clicked=true;
-				});
-
-				ui.connectStartButton=button;
-				ui.connectStartBar=bar;
+					game.displayQiandaofuli(ip);
+				}
 			},
 			players:function(num){
 				if(num===0){
