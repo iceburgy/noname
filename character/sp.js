@@ -6238,6 +6238,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						selectCard:[1,nh],
 						ai1:function(card){
+							if(!_status.event.shuimeng){
+								var evtShuimeng=game.getEventByName(_status.event,'shuimeng');
+								if(evtShuimeng) _status.event.shuimeng=true;
+							}
 							var player=_status.event.player;
 							var cardname=_status.event.cardname;
 							if(_status.event.du) return -get.value(card,player,'raw');
@@ -6275,6 +6279,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 7-get.value(card,player,'raw');
 						},
 						ai2:function(target){
+							if(!_status.event.shuimeng){
+								var evtShuimeng=game.getEventByName(_status.event,'shuimeng');
+								if(evtShuimeng) _status.event.shuimeng=true;
+							}
 							var att=get.attitude(_status.event.player,target);
 							var nh2=target.countCards('h');
 							var num=Math.sqrt(1+nh2);
@@ -7824,33 +7832,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(event.target.countCards('h')==event.target.hp){
 						player.draw();
-						if(event.target==player){
-							event.finish();
-							return;
-						}
-						var next=player.chooseCard('是否交给'+get.translation(event.target)+'一张牌？','he');
-						next.set('ai',function(card){
-							if(get.position(card)!='h') return 0;
-							if(_status.event.shan&&card.name=='shan'){
-								return 11;
-							}
-							if(_status.event.goon){
-								return 10-get.value(card);
-							}
-							return -get.value(card,_status.event.player,'raw');
-						});
-						if(get.attitude(player,event.target)>1&&
-							player.countCards('h','shan')>1&&player.countCards('h')>event.target.countCards('h')){
-							next.set('shan',true);
-						}
-						if(get.attitude(player,event.target)>0&&player.needsToDiscard()){
-							next.set('goon',true);
-						}
 					}
 					else{
 						event.finish();
 					}
 					'step 4'
+					if(event.target==player){
+						event.finish();
+						return;
+					}
+					var next=player.chooseCard('是否交给'+get.translation(event.target)+'一张牌？','he');
+					next.set('ai',function(card){
+						if(get.position(card)!='h') return 0;
+						if(_status.event.shan&&card.name=='shan'){
+							return 11;
+						}
+						if(_status.event.goon){
+							return 10-get.value(card);
+						}
+						return -get.value(card,_status.event.player,'raw');
+					});
+					if(get.attitude(player,event.target)>1&&
+						player.countCards('h','shan')>1&&player.countCards('h')>event.target.countCards('h')){
+						next.set('shan',true);
+					}
+					if(get.attitude(player,event.target)>0&&player.needsToDiscard()){
+						next.set('goon',true);
+					}
+					'step 5'
 					if(result.bool){
 						event.target.gain(result.cards,player,'giveAuto');
 					}
@@ -8651,7 +8660,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					lib.skill.shanjia.sync(player);
 					player.draw(Math.min(7,player.storage.shanjia));
 					'step 1'
-					player.chooseToDiscard('he',Math.min(7,player.storage.shanjia),true);
+					player.chooseToDiscard('he',Math.min(7,player.storage.shanjia),true).set('ai',function(card){
+						if(!_status.event.minValCard){
+							var player=_status.event.player;
+							var myequipcards=player.getCards('e');
+							while(myequipcards.length){
+								var curcard=myequipcards.shift();
+								if(!_status.event.minValCard||get.value(curcard)<get.value(_status.event.minValCard)) _status.event.minValCard=curcard;
+							}
+						}
+						if(get.position(card)=='e'){
+							if(card==_status.event.minValCard){
+								return 10;
+							}
+							else{
+								return 0;
+							}
+						}
+						return 10-get.value(card);
+					});
 					'step 2'
 					var useCard=false;
 					if(result.bool&&result.cards){

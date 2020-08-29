@@ -27222,6 +27222,10 @@
 		phaseName:['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'],
 	};
 	var game={
+		getEventByName:function(event,name){
+			while(event&&event.name!=name) event=event.parent;
+			return event;
+		},
 		voteGiveup(player){
 			player.trySkillAnimate('我投了','我投了',false);
 			game.log(player,'【我投了】');

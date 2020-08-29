@@ -4171,16 +4171,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						if(!player.storage.jiaozhao1){
-							var nh=player.countCards('h');
-							if(nh>=5){
-								choice='jiu';
-							}
-							else if(nh<=2){
-								choice='sha';
-							}
-							else{
-								choice=Math.random()<0.5?'sha':'jiu';
-							}
+							choice='sha';
 						}
 						else{
 							var recover=0,lose=1,players=game.filterPlayer();
@@ -4226,6 +4217,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					event.target.chooseButton(['矫诏',[list,'vcard']],true).set('ai',function(button){
+						var card={name:button.link[2],nature:button.link[3]};
+						if(button.link[2]==_status.event.choice&&card.name=='sha'){
+							var player=_status.event.player;
+							if(game.hasPlayer(function(current){
+								return player.canUse(card,current)&&get.effect(current,card,player,player)>0
+							})){
+								if(card.nature=='fire') return 2.95;
+								if(card.nature=='thunder') return 2.92;
+								return 2.9;
+							}
+							return 1;
+						}
 						return button.link[2]==_status.event.choice?1:0;
 					}).set('choice',choice);
 					'step 3'
