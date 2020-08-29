@@ -17691,7 +17691,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"smh_huoji":{
 				charlotte:true,
-				group:["smh_yeyan"],
 				mark:true,
 				marktext:"龙",
 				intro:{
@@ -17724,7 +17723,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return 4-get.value(card)
 				},
-				group:['smh_huoji2'],
+				group:['smh_yeyan','smh_huoji2'],
 			},
 			smh_huoji2:{
 				trigger:{player:['chooseToUseBefore','phaseAfter']},
