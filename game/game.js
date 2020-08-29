@@ -27226,26 +27226,33 @@
 			player.trySkillAnimate('我投了','我投了',false);
 			game.log(player,'【我投了】');
 			if(!game.votersIDs) {
-				game.votersIDs=[];
+				game.votersIDs=new Set();
+				for(i=0;i<game.players.length;i++){
+					if(!(game.players[i].nickname)||game.players[i].nickname=='无名玩家'){
+						game.votersIDs.add(game.players[i]);
+					}
+				}
 			}
 			var voterID=player.identity;
-			game.votersIDs.push(player);
+			game.votersIDs.add(player);
+
+			var tempVotersIDs=new Set();
+			for(i=0;i<game.players.length;i++){
+				var nameol=game.players[i].node.nameol.innerText;
+				if(nameol&&(nameol.endsWith(' - 托管')||nameol.endsWith(' - 离线'))){
+					tempVotersIDs.add(game.players[i]);
+				}
+			}
+			tempVotersIDs=new Set([...tempVotersIDs,...game.votersIDs]);
 
 			var popzhuzhong=1+get.population('zhong');
 			var popfan=get.population('fan');
 			var popnei=get.population('nei');
 			var todie;
-
-			for(i=0;i<game.players.length;i++){
-				if(!(game.players[i].nickname)||game.players[i].nickname=='无名玩家'){
-					game.votersIDs.push(game.players[i]);
-				}
-			}
-
 			var voteszhuzhong=0;
 			var votesfan=0;
 			var votesnei=0;
-			for(var voter of game.votersIDs){
+			for(var voter of tempVotersIDs){
 				if(!(voter.isAlive())) continue;
 				switch(voter.identity){
 					case 'zhu':
@@ -43391,9 +43398,6 @@
 						}
 						else{
 							game.voteGiveup(player);
-						}
-						if(_status.paused&&_status.imchoosing&&!_status.auto){
-							ui.click.auto();
 						}
 					}
 					else{
