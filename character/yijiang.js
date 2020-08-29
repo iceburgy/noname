@@ -4463,6 +4463,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'kuangbi',
 						intro:{
 							onunmark:function(storage,player){
+								if(!storage) return;
 								var cards=[];
 								while(storage.length){
 									cards.addArray(storage.shift()[0]);
@@ -4474,6 +4475,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							},
 							markcount:function(content){
+								if(!content) return 0;
 								var cards=[];
 								for(var i=0;i<content.length;i++){
 									cards.addArray(content[i][0]);
