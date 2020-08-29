@@ -3168,7 +3168,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAs:{
 					name:"wuxie",
 				},
-				prompt:"将一张黑色手牌当无懈可击使用",
+				prompt:"将一张黑色牌当无懈可击使用",
 				check:function (card){return 8-get.value(card)},
 			},
 			rejieming:{
