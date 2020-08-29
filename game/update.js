@@ -3,6 +3,7 @@ window.noname_update={
 	update:'2020.08.09',
 	changeLog:[
 		'修正界卧龙看破技能提示文字错误的bug',
+		'修复界徐庶荐言和伊籍急援不能配合的bug',
 		'将托管和离线玩家设为默认投降',
 	],
 	files:[

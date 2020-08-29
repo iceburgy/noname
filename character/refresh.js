@@ -5994,7 +5994,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('neg',get.value(event.card,player,'raw')<0);
 					"step 3"
 					player.line(result.targets,'green');
-					result.targets[0].gain(event.card,'gain2');
+					player.give(event.card,result.targets[0]);
 
 				},
 				ai:{
