@@ -2059,7 +2059,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var found=false;
 					if(lib.config.qiandaofuli.users&&Object.keys(lib.config.qiandaofuli.users).length){
 						var useqiandaofuli=[];
-						var list=['是','否',];
+						var list=['否','是'];
 						for(var i=0;i<list.length;i++){
 							list[i]=['','',list[i]];
 						}
@@ -2420,7 +2420,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<list.length;i++){
 						list[i]=['','','group_'+list[i]];
 					}
-					game.zhu.chooseButton(['是否声明势力',[list,'vcard']]);
+					game.zhu.chooseButton(['是否声明势力',[list,'vcard']]).set('ai',function(button){
+						return 0;
+					});
 					"step 16"
 					if(result.bool){
 						var shili=result.links[0][2].slice(6);

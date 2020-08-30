@@ -3936,28 +3936,6 @@
 						},
 						intro:'按照座位号发生日福利卡，重复发将会移除生日福利卡',
 					},
-					gaming_today:{
-						name:'今日再战',
-						clear:true,
-						onclick:function(){
-							if(this.innerHTML=='<span>确认今日再战</span>'){
-								clearTimeout(this.confirmTimeout);
-								game.setQiandaofuliCutoff(new Date());
-								this.innerHTML='<span>重置今日再战成功</span>';
-								var that=this;
-								setTimeout(function(){
-									game.reload();
-								},1000);
-							}
-							else{
-								this.innerHTML='<span>确认今日再战</span>';
-								var that=this;
-								this.confirmTimeout=setTimeout(function(){
-									that.innerHTML='<span>今日再战</span>';
-								},1000);
-							}
-						}
-					},
 					qiandaofuli_cutoff:{
 						name:'签到福利截止时间',
 						init:'19',
@@ -3965,13 +3943,15 @@
 							'0':'关闭',
 							'18':'晚上6点',
 							'19':'晚上7点',
-							'20':'晚上8点'
+							'20':'晚上8点',
+							'24':'开放'
 						},
 						frequent:true,
 						restart:true,
 						intro:'签到福利截止时间',
 						onclick:function(hour,label){
 							this.innerHTML=this.innerHTML.replace('签到福利截止时间','设置中...');
+							game.setQiandaofuliCutoffByHour(hour);
 							game.saveConfig('qiandaofuli_cutoff',hour);
 							var that=this;
 							setTimeout(function(){
@@ -27411,7 +27391,7 @@
 			}
 			var now=new Date();
 			if(now.getDay()==5){
-				game.setQiandaofuliCutoff(now);
+				game.setQiandaofuliCutoffByHour(lib.config['qiandaofuli_cutoff']);
 			}
 
 			if(!game.isGameDay()){
@@ -27419,13 +27399,14 @@
 			}
 			game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
 		},
-		setQiandaofuliCutoff:function(nowValue){
+		setQiandaofuliCutoffByHour:function(hour){
 			if(!lib.config.qiandaofuli){
 				lib.config.qiandaofuli={};
 			}
-			var cutoffHour=lib.config['qiandaofuli_cutoff'];
-			nowValue.setHours(cutoffHour, 0, 0, 0);
-			lib.config.qiandaofuli.qianDaoCutoff=nowValue;
+			var cutofftime=new Date();
+			if(hour==24) cutofftime.setHours(23, 59, 59, 0);
+			else cutofftime.setHours(hour, 0, 0, 0);
+			lib.config.qiandaofuli.qianDaoCutoff=cutofftime;
 			game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
 		},
 		isGameDay:function(){
