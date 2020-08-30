@@ -17941,6 +17941,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				multiline:true,
 				content:function (){
 					"step 0"
+					delete player.storage.smh_huoji2;
+					player.unmarkSkill('smh_huoji2');
+					delete player.storage.smh_lianhuan2;
+					player.unmarkSkill('smh_lianhuan2');
 					player.removeSkill('smh_huoji');
 					player.removeSkill('smh_lianhuan');
 					targets.sort(lib.sort.seat);

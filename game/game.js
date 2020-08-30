@@ -15321,6 +15321,10 @@
 					game.broadcastAll(function(player){
 						if(game.hasCharacter(player,'simahui')){
 							for(var i=0;i<game.players.length;i++){
+								delete game.players[i].storage.smh_huoji2;
+								game.players[i].unmarkSkill('smh_huoji2');
+								delete game.players[i].storage.smh_lianhuan2;
+								game.players[i].unmarkSkill('smh_lianhuan2');
 								game.players[i].removeSkill('smh_huoji');
 								game.players[i].removeSkill('smh_lianhuan');
 							}
