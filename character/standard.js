@@ -1905,7 +1905,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card){
 					return get.color(card)=='black';
 				},
-				position:'he',
+				position:'hes',
 				viewAs:{name:'guohe'},
 				viewAsFilter:function(player){
 					if(!player.countCards('hes',{color:'black'})) return false;

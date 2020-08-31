@@ -4536,7 +4536,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.countCards('hes',{type:['basic','equip'],color:'black'})
 				},
-				position:'he',
+				position:'hes',
 				viewAs:{name:'bingliang'},
 				prompt:'将一黑色的基本牌或装备牌当兵粮寸断使用',
 				check:function(card){return 6-get.value(card)},

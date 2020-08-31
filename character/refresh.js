@@ -3065,7 +3065,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card){
 					return get.color(card)=='black';
 				},
-				position:'he',
+				position:'hes',
 				viewAs:{name:'shan'},
 				viewAsFilter:function(player){
 					if(!player.countCards('hes',{color:'black'})) return false;
@@ -3131,7 +3131,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				threaten:1.5,
 			},
 			rehuoji:{
-				position:"he",
+				position:"hes",
 				audio:2,
 				audioname:['ol_sp_zhugeliang','ol_pangtong'],
 				enable:"chooseToUse",
@@ -3157,7 +3157,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rekanpo:{
 				audio:2,
 				audioname:['ol_sp_zhugeliang','ol_pangtong'],
-				position:"he",
+				position:"hes",
 				enable:"chooseToUse",
 				filterCard:function (card){
 					return get.color(card)=='black';
@@ -3637,7 +3637,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.zhu(player,'shouyue')) return true;
 					return get.color(card)=='red';
 				},
-				position:"he",
+				position:"hes",
 				viewAs:{
 					name:"sha",
 				},
@@ -6019,7 +6019,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('hes',{suit:'diamond'})>0;
 				},
 				prepare:'throw',
-				position:'he',
+				position:'hes',
 				filterCard:{suit:'diamond'},
 				filterTarget:function(card,player,target){
 					if(player==target) return false;

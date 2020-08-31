@@ -10025,6 +10025,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.num=player.getDamagedHp();
 					player.draw(event.num);
 					"step 1"
+					var check=player.countCards('h')-event.num;
 					player.chooseCard('h',event.num,'是否将'+get.cnNumber(event.num)+'张手牌交给其他角色'
 					).set('ai',function(card){
 						var player=_status.event.player;
@@ -10032,8 +10033,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var check=_status.event.check;
 						if(check<1) return 0;
 						if(player.hp>1&&check<2) return 0;
+						if(!game.hasPlayer(function(current){
+							return current!=player&&get.attitude(player,current)>1;
+						})) return 0;
 						return get.unuseful(card)+9;
-					});
+					}).set('check',check);
 					"step 2"
 					if(!result.bool) event.finish();
 					else event.cards=result.cards;

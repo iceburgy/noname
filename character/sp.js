@@ -13508,8 +13508,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				toStorage:true,
 				prepare:'give',
 				content:function(){
-					if(!target.storage.rezhoufu2_markcount) target.storage.rezhoufu2_markcount=0;
+					if(!target.storage.rezhoufu2_markcount){
+						game.broadcastAll(function(player){
+							player.storage.rezhoufu2_markcount=0;
+						},target);
+					}
 					target.markAuto('rezhoufu2',cards);
+					game.broadcastAll(function(player){
+						player.addSkill('rezhoufu_judge');
+						player.addSkill('rezhoufu_losehp');
+					},target);
 				},
 				ai:{
 					order:1,
@@ -13517,43 +13525,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:-1,
 					},
 				},
-				group:['rezhoufu_judge','rezhoufu_losehp'],
-				subSkill:{
-					judge:{
-						audio:'zhoufu',
-						trigger:{global:'judgeBefore'},
-						forced:true,
-						filter:function(event,player){
-							return !event.directresult&&event.player.getStorage('rezhoufu2').length;
-						},
-						logTarget:'player',
-						content:function(){
-							var cards=[trigger.player.getStorage('rezhoufu2')[0]];
-							trigger.directresult=cards[0];
-							trigger.player.unmarkAuto('rezhoufu2',cards);
-						},
-					},
-					losehp:{
-						audio:'zhoufu',
-						trigger:{global:'phaseEnd'},
-						forced:true,
-						filter:function(event,player){
-							for(var p of game.players){
-								if(p.hasSkill('rezhoufu3')&&p.isAlive()){
-									return true;
-								}
-							}
-							return false;
-						},
-						logTarget:'player',
-						content:function(){
-							for(var p of game.players){
-								if(p.hasSkill('rezhoufu3')&&p.isAlive()){
-									p.loseHp();
-								}
-							}
-						},
-					},
+			},
+			rezhoufu_judge:{
+				audio:'zhoufu',
+				trigger:{player:'judgeBefore'},
+				forced:true,
+				filter:function(event,player){
+					return !event.directresult&&event.player.getStorage('rezhoufu2').length;
+				},
+				logTarget:'player',
+				content:function(){
+					var cards=[trigger.player.getStorage('rezhoufu2')[0]];
+					trigger.directresult=cards[0];
+					trigger.player.unmarkAuto('rezhoufu2',cards);
+				},
+			},
+			rezhoufu_losehp:{
+				audio:'zhoufu',
+				trigger:{global:'phaseEnd'},
+				forced:true,
+				filter:function(event,player){
+					return player.hasSkill('rezhoufu3')&&player.isAlive();
+				},
+				logTarget:'player',
+				content:function(){
+					player.loseHp();
+					game.broadcastAll(function(player){
+						player.removeSkill('rezhoufu_losehp');
+					},player);
 				},
 			},
 			rezhoufu2:{
@@ -13568,6 +13567,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						player.addTempSkill('rezhoufu3');
 						delete player.storage.rezhoufu2_markcount;
+						game.broadcastAll(function(player){
+							player.removeSkill('rezhoufu_judge');
+						},player);
 					},
 				},
 			},
@@ -13585,7 +13587,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.draw();
 					'step 1'
-					trigger.player.storage.rezhoufu2_markcount++;
+					game.broadcastAll(function(player){
+						player.storage.rezhoufu2_markcount++;
+					},trigger.player);
 					if(trigger.player.storage.rezhoufu2_markcount>=2){
 						var cards=trigger.player.getStorage('rezhoufu2');
 						trigger.player.$throw(cards);
@@ -19464,6 +19468,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyingbing:'影兵',
 			rezhoufu:'咒缚',
 			rezhoufu2:'咒缚',
+			rezhoufu_judge:'咒缚判定',
+			rezhoufu_losehp:'咒缚流失',
 			fenxun:'奋迅',
 			fenxun2:'奋迅',
 			spmengjin:'猛进',
