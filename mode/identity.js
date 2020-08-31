@@ -4144,7 +4144,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mod:{
 					maxHandcard:function(player,num){
 						var keepExtra = 2;
-						if(game.players.length==10){
+						if(game.players.length+game.dead.length==10){
 							keepExtra = 3;
 						}
 						return num+keepExtra;
