@@ -13590,7 +13590,7 @@
 					},str,cards,event.dialogid);
 					game.log(player,'展示了',cards);
 					game.addVideo('showCards',player,[str,get.cardsInfo(cards)]);
-					game.delayx(2);
+					game.delayx(6);
 					"step 1"
 					game.broadcast('closeDialog',event.dialogid);
 					event.dialog.close();
