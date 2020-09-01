@@ -13569,6 +13569,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						delete player.storage.rezhoufu2_markcount;
 						game.broadcastAll(function(player){
 							player.removeSkill('rezhoufu_judge');
+							if(!player.isAlive()) player.removeSkill('rezhoufu_losehp');
 						},player);
 					},
 				},
