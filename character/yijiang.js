@@ -5919,7 +5919,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					var cards=result.index==0?event.sha:event.shan;
 					event.useSha=false;
-					player.give(cards,target);
+					target.gain(cards,player,'give');
 					for(var i=0;i<cards.length;i++){
 						if(get.color(cards[i])=='red'){
 							event.useSha=true;break;
@@ -10070,7 +10070,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('enemy',get.value(event.togive[0],player,'raw')<0);
 					"step 5"
 					if(result.targets&&result.targets.length){
-						player.give(event.togive,result.targets[0]);
+						result.targets[0].gain(event.togive,player,'give');
 						player.line(result.targets[0],'green');
 						game.log(result.targets[0],'获得了'+get.cnNumber(event.togive.length)+'张牌');
 						event.goto(3);

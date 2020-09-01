@@ -530,7 +530,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.dialog.close();
 						game.addVideo('judge2',null,event.videoId);
 						player.line(result.targets,'green');
-						player.give(event.card,result.targets[0]);
+						result.targets[0].gain(event.card,player,'give');
 						event.node.moveDelete(result.targets[0]);
 						game.addVideo('gain2',result.targets[0],[get.cardInfo(event.node)]);
 						ui.arena.classList.remove('thrownhighlight');
@@ -3358,7 +3358,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.targets){
 						player.line(result.targets,'green');
-						player.give(event.card,result.targets[0]);
+						result.targets[0].gain(event.card,player,'give');
 						if(!event.same) player.chooseToDiscard(true,'he');
 					}
 				},
@@ -5994,7 +5994,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('neg',get.value(event.card,player,'raw')<0);
 					"step 3"
 					player.line(result.targets,'green');
-					player.give(event.card,result.targets[0]);
+					result.targets[0].gain(event.card,player,'give');
 
 				},
 				ai:{
