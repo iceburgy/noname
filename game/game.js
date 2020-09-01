@@ -16755,9 +16755,6 @@
 							game.addVideo('setAvatar',this,[name,name2]);
 						}
 					}
-					game.broadcast(function(player,name,name2){
-						player.setAvatar(name,name2,false);
-					},this,name,name2);
 				},
 				setAvatarQueue:function(name, list){
 					var node;
@@ -26278,6 +26275,9 @@
 						}
 					}
 				},
+				setAvatarServer:function(player,nameskin,id,name){
+					game.setAvatarServerHandler(player,nameskin,id,name);
+				},
 				showObserveButton:function(){
 					for(var i=0;i<lib.node.clients.length;i++){
 						if(lib.node.clients[i].id==this.id){
@@ -27198,6 +27198,12 @@
 		phaseName:['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'],
 	};
 	var game={
+		setAvatarServerHandler:function(player,nameskin,id,name){
+			game.broadcastAll(function(player,nameskin,id,name){
+				lib.config.skin[nameskin]=id;
+				player.setAvatar(name,name);
+			},player,nameskin,id,name);
+		},
 		getEventByName:function(event,name){
 			while(event&&event.name!=name) event=event.parent;
 			return event;
@@ -48620,6 +48626,7 @@
 					gzbool=true;
 				}
 				var changeskin=function(){
+					if(!avatar||avatar.parentNode!=game.me) return;
 					var node=ui.create.div('.changeskin','可换肤',playerbg);
 					var avatars=ui.create.div('.avatars',playerbg);
 					changeskinfunc=function(){
@@ -48640,25 +48647,42 @@
 								var button=ui.create.div(avatars,function(){
 									playerbg.classList.remove('scroll');
 									if(this._link){
-										lib.config.skin[nameskin]=this._link;
 										bg.style.backgroundImage=this.style.backgroundImage;
 										if(sourcenode) sourcenode.style.backgroundImage=this.style.backgroundImage;
-										if(avatar) avatar.style.backgroundImage=this.style.backgroundImage;
-										game.saveConfig('skin',lib.config.skin);
+										if(avatar){
+											var player=avatar.parentNode;
+											var name=player.node.avatar==avatar?player.name1:player.name2;
+											// ensure it is server that handles avatar background setting
+											if(game.online){
+												game.send('setAvatarServer',player,nameskin,this._link,name);
+											}
+											else{
+												game.setAvatarServerHandler(player,nameskin,this._link,name);
+											}
+										}
 									}
 									else{
-										delete lib.config.skin[nameskin];
 										if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&lib.config.mode_config.guozhan.guozhanSkin){
+											delete lib.config.skin[nameskin];
 											bg.setBackground(nameskin2,'character');
 											if(sourcenode) sourcenode.setBackground(nameskin2,'character');
 											if(avatar) avatar.setBackground(nameskin2,'character');
 										}
 										else{
-											bg.setBackground(nameskin,'character');
+											bg.style.backgroundImage=this.style.backgroundImage;
 											if(sourcenode) sourcenode.setBackground(nameskin,'character');
-											if(avatar) avatar.setBackground(nameskin,'character');
+											if(avatar){
+												var player=avatar.parentNode;
+												var name=player.node.avatar==avatar?player.name1:player.name2;
+												// ensure it is server that handles avatar background setting
+												if(game.online){
+													game.send('setAvatarServer',player,nameskin,this._link,name);
+												}
+												else{
+													game.setAvatarServerHandler(player,nameskin,this._link,name);
+												}
+											}
 										}
-										game.saveConfig('skin',lib.config.skin);
 									}
 								});
 								button._link=i;
