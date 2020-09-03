@@ -16500,7 +16500,9 @@
 				},
 				smoothAvatar:function(vice,video){
 					var div=ui.create.div('.fullsize');
+					var tlX='-';
 					if(vice){
+						tlX='';
 						div.style.background=getComputedStyle(this.node.avatar2).background;
 						this.node.avatar2.appendChild(div);
 					}
@@ -16509,9 +16511,9 @@
 						this.node.avatar.appendChild(div);
 					}
 					ui.refresh(div);
-					div.style.transition='all 1s';
+					div.style.transition='all 10s';
 					setTimeout(function(){
-						div.classList.add('removing');
+						div.style.transform='translateX('+tlX+'200px)';
 						setTimeout(function(){
 							div.remove();
 						},2000);
@@ -48646,31 +48648,10 @@
 							for(var i=0;i<=num;i++){
 								var button=ui.create.div(avatars,function(){
 									playerbg.classList.remove('scroll');
-									if(this._link){
-										bg.style.backgroundImage=this.style.backgroundImage;
-										if(sourcenode) sourcenode.style.backgroundImage=this.style.backgroundImage;
-										if(avatar){
-											var player=avatar.parentNode;
-											var name=player.node.avatar==avatar?player.name1:player.name2;
-											// ensure it is server that handles avatar background setting
-											if(game.online){
-												game.send('setAvatarServer',player,nameskin,this._link,name);
-											}
-											else{
-												game.setAvatarServerHandler(player,nameskin,this._link,name);
-											}
-										}
-									}
-									else{
-										if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&lib.config.mode_config.guozhan.guozhanSkin){
-											delete lib.config.skin[nameskin];
-											bg.setBackground(nameskin2,'character');
-											if(sourcenode) sourcenode.setBackground(nameskin2,'character');
-											if(avatar) avatar.setBackground(nameskin2,'character');
-										}
-										else{
+									if(lib.config.skin[nameskin]==undefined&&this._link!=0||(lib.config.skin[nameskin]!=undefined&&lib.config.skin[nameskin]!=this._link)){
+										if(this._link){
 											bg.style.backgroundImage=this.style.backgroundImage;
-											if(sourcenode) sourcenode.setBackground(nameskin,'character');
+											if(sourcenode) sourcenode.style.backgroundImage=this.style.backgroundImage;
 											if(avatar){
 												var player=avatar.parentNode;
 												var name=player.node.avatar==avatar?player.name1:player.name2;
@@ -48680,6 +48661,29 @@
 												}
 												else{
 													game.setAvatarServerHandler(player,nameskin,this._link,name);
+												}
+											}
+										}
+										else{
+											if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&lib.config.mode_config.guozhan.guozhanSkin){
+												delete lib.config.skin[nameskin];
+												bg.setBackground(nameskin2,'character');
+												if(sourcenode) sourcenode.setBackground(nameskin2,'character');
+												if(avatar) avatar.setBackground(nameskin2,'character');
+											}
+											else{
+												bg.style.backgroundImage=this.style.backgroundImage;
+												if(sourcenode) sourcenode.setBackground(nameskin,'character');
+												if(avatar){
+													var player=avatar.parentNode;
+													var name=player.node.avatar==avatar?player.name1:player.name2;
+													// ensure it is server that handles avatar background setting
+													if(game.online){
+														game.send('setAvatarServer',player,nameskin,this._link,name);
+													}
+													else{
+														game.setAvatarServerHandler(player,nameskin,this._link,name);
+													}
 												}
 											}
 										}
