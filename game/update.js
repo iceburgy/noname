@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.09.04.1',
+	version:'2020.09.04.2',
 	update:'2020.08.09',
 	changeLog:[
 		'开启联机模式下换肤功能',

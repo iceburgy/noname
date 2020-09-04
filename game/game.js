@@ -44970,7 +44970,7 @@
 					game.saveConfig('extension_'+'十周年UI'+'_enable',true);
 					game.reload();
 				}
-				if(lib.config.auto_check_update&&game.download){
+				if(game.download){
 					setTimeout(function(){
 						if(game.checkForUpdate&&(typeof game.checkForUpdate == 'function')) game.checkForUpdate(null,false);
 					},3000);
