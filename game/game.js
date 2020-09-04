@@ -16500,9 +16500,7 @@
 				},
 				smoothAvatar:function(vice,video){
 					var div=ui.create.div('.fullsize');
-					var tlX='-';
 					if(vice){
-						tlX='';
 						div.style.background=getComputedStyle(this.node.avatar2).background;
 						this.node.avatar2.appendChild(div);
 					}
@@ -16510,13 +16508,17 @@
 						div.style.background=getComputedStyle(this.node.avatar).background;
 						this.node.avatar.appendChild(div);
 					}
+					var divbar=ui.create.div('.changeskinbar');
+					div.appendChild(divbar);
+
 					ui.refresh(div);
-					div.style.transition='all 10s';
+					var transitionSecs=5;
+					div.style.transition='all '+transitionSecs+'s';
 					setTimeout(function(){
-						div.style.transform='translateX('+tlX+'200px)';
+						div.style.transform='translateY(100%)';
 						setTimeout(function(){
 							div.remove();
-						},2000);
+						},(transitionSecs+1)*1000);
 					},100);
 					if(video!=false){
 						game.addVideo('smoothAvatar',this,vice);
@@ -52474,28 +52476,18 @@
 							}
 							for(var i=0;i<=num;i++){
 								var button=ui.create.div('.button.character.pointerdiv',buttons,function(){
-									if(this._link){
-										if(avatar2){
-											lib.config.skin[nameskin]=this._link;
-											node.node.avatar2.style.backgroundImage=this.style.backgroundImage;
+									if(!node||node!=game.me) return;
+									if(lib.config.skin[nameskin]==undefined&&this._link!=0||(lib.config.skin[nameskin]!=undefined&&lib.config.skin[nameskin]!=this._link)){
+										var player=node;
+										var name=avatar2?player.name2:player.name1;
+										// ensure it is server that handles avatar background setting
+										if(game.online){
+											game.send('setAvatarServer',player,nameskin,this._link,name);
 										}
 										else{
-											lib.config.skin[nameskin]=this._link;
-											node.node.avatar.style.backgroundImage=this.style.backgroundImage;
+											game.setAvatarServerHandler(player,nameskin,this._link,name);
 										}
 									}
-									else{
-										delete lib.config.skin[nameskin];
-										if(avatar2){
-											if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&lib.config.mode_config.guozhan.guozhanSkin) node.node.avatar2.setBackground(nameskin2,'character');
-											else node.node.avatar2.setBackground(nameskin,'character');
-										}
-										else{
-											if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&lib.config.mode_config.guozhan.guozhanSkin) node.node.avatar.setBackground(nameskin2,'character');
-											else node.node.avatar.setBackground(nameskin,'character');
-										}
-									}
-									game.saveConfig('skin',lib.config.skin);
 								});
 								button._link=i;
 								if(i){

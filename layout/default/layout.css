@@ -1287,6 +1287,22 @@ body>.background.land {
 	display: block;
 	position: absolute;
 }
+.changeskinbar{
+	width: 100%;
+	height: 1px;
+	position: absolute;
+	top: 0;
+	background: #ff0;
+	animation: changeskinbarflash 0.5s ease-in-out infinite alternate;
+}
+@keyframes changeskinbarflash {
+  from {
+    box-shadow: 0 2px 2px 2px #ff0;
+  }
+  to {
+
+  }
+}
 .intro {
 	width: auto;
 	height: 20px;
