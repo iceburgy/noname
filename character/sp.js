@@ -13595,7 +13595,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var cards=trigger.player.getStorage('rezhoufu2');
 						trigger.player.$throw(cards);
 						game.delayx();
-						player.gain(cards,'gain2','log');
+						player.gain(cards,'gain2','fromStorage','log');
 						cards.length=0;
 						trigger.player.unmarkSkill('rezhoufu2');
 					}

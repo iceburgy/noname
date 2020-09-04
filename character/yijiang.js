@@ -4579,7 +4579,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.control=='选项一'){
 						var cards=get.cards(2);
-						target.viewCards('督粮',cards);
+						var content=['督粮',[cards,'card']];
+						target.chooseControl('ok').set('dialog',content);
 						event.cards2=[];
 						event.tothrow=[];
 						for(var i=0;i<cards.length;i++){
