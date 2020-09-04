@@ -16499,25 +16499,32 @@
 					return this.offsetTop;
 				},
 				smoothAvatar:function(vice,video){
+					var divwrap=ui.create.div('.fullsize');
 					var div=ui.create.div('.fullsize');
 					if(vice){
 						div.style.background=getComputedStyle(this.node.avatar2).background;
-						this.node.avatar2.appendChild(div);
+						this.node.avatar2.appendChild(divwrap);
 					}
 					else{
 						div.style.background=getComputedStyle(this.node.avatar).background;
-						this.node.avatar.appendChild(div);
+						this.node.avatar.appendChild(divwrap);
 					}
 					var divbar=ui.create.div('.changeskinbar');
-					div.appendChild(divbar);
+					divwrap.appendChild(div);
+					divwrap.appendChild(divbar);
 
-					ui.refresh(div);
+					ui.refresh(divwrap);
 					var transitionSecs=5;
 					div.style.transition='all '+transitionSecs+'s';
+					div.style['transition-timing-function']='linear';
+					divwrap.style.transition='all '+transitionSecs+'s';
+					divwrap.style['transition-timing-function']='linear';
+					divwrap.style.overflow='hidden';
 					setTimeout(function(){
-						div.style.transform='translateY(100%)';
+						div.style.transform='translateY(-100%)';
+						divwrap.style.transform='translateY(100%)';
 						setTimeout(function(){
-							div.remove();
+							divwrap.remove();
 						},(transitionSecs+1)*1000);
 					},100);
 					if(video!=false){
