@@ -27211,6 +27211,13 @@
 		phaseName:['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'],
 	};
 	var game={
+		leaderboardSortButton:function(zonename,sortkey){
+			lib.config[lib.statsKeyGame][zonename][lib.statsKeySortKey]=sortkey;
+			game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
+			ui.leaderboardButton._uiintro.close();
+			delete ui.leaderboardButton._uiintro;
+			ui.click.hoverpopped.call(ui.leaderboardButton);
+		},
 		setAvatarServerHandler:function(player,nameskin,id,name){
 			game.broadcastAll(function(player,nameskin,id,name){
 				lib.config.skin[nameskin]=id;
@@ -46573,49 +46580,49 @@
 					tr=document.createElement('tr');
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:ui.click.leaderboardSortButton("'+hostZone+'","'+lib.statsKeySortKeyRoleName+'");';
+					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","'+lib.statsKeySortKeyRoleName+'");';
 					anchor.innerHTML='武将';
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:ui.click.leaderboardSortButton("'+hostZone+'","numWin");';
+					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","numWin");';
 					anchor.innerHTML='胜场';
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:ui.click.leaderboardSortButton("'+hostZone+'","numLose");';
+					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","numLose");';
 					anchor.innerHTML='负场';
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:ui.click.leaderboardSortButton("'+hostZone+'","winRate");';
+					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","winRate");';
 					anchor.innerHTML='胜率';
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:ui.click.leaderboardSortButton("'+hostZone+'","zhuRate");';
+					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","zhuRate");';
 					anchor.innerHTML='主公';
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:ui.click.leaderboardSortButton("'+hostZone+'","zhongRate");';
+					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","zhongRate");';
 					anchor.innerHTML='忠臣';
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:ui.click.leaderboardSortButton("'+hostZone+'","fanRate");';
+					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","fanRate");';
 					anchor.innerHTML='反贼';
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:ui.click.leaderboardSortButton("'+hostZone+'","neiRate");';
+					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","neiRate");';
 					anchor.innerHTML='内奸';
 					td.appendChild(anchor);
 					tr.appendChild(td);
@@ -46670,13 +46677,6 @@
 					uiintro.add(ui.create.div('.placeholder').outerHTML);
 				}
 				return uiintro;
-			},
-			leaderboardSortButton:function(zonename,sortkey){
-				lib.config[lib.statsKeyGame][zonename][lib.statsKeySortKey]=sortkey;
-				game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
-				ui.leaderboardButton._uiintro.close();
-				delete ui.leaderboardButton._uiintro;
-				ui.click.hoverpopped.call(ui.leaderboardButton);
 			},
 			chat:function(){
 				ui.system1.classList.add('shown');
