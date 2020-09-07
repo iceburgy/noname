@@ -27211,12 +27211,20 @@
 		phaseName:['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'],
 	};
 	var game={
-		leaderboardSortButton:function(zonename,sortkey){
-			lib.config[lib.statsKeyGame][zonename][lib.statsKeySortKey]=sortkey;
-			game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
-			ui.leaderboardButton._uiintro.close();
-			delete ui.leaderboardButton._uiintro;
-			ui.click.hoverpopped.call(ui.leaderboardButton);
+		leaderboardSortButton:function(){
+			var idinfo=this.id.split(',');
+			if(idinfo&&idinfo.length==2){
+				var zonename=idinfo[0];
+				var sortkey=idinfo[1];
+				lib.config[lib.statsKeyGame][zonename][lib.statsKeySortKey]=sortkey;
+				game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
+				ui.leaderboardButton._uiintro.close();
+				delete ui.leaderboardButton._uiintro;
+				ui.click.hoverpopped.call(ui.leaderboardButton);
+			}
+			else{
+				console.log('bad link id: '+this.id);
+			}
 		},
 		setAvatarServerHandler:function(player,nameskin,id,name){
 			game.broadcastAll(function(player,nameskin,id,name){
@@ -46580,49 +46588,65 @@
 					tr=document.createElement('tr');
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","'+lib.statsKeySortKeyRoleName+'");';
+					anchor.href='javascript:void(0);';
+					anchor.id=hostZone+','+lib.statsKeySortKeyRoleName;
+					anchor.addEventListener('click',game.leaderboardSortButton);
 					anchor.innerHTML='武将';
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","numWin");';
+					anchor.href='javascript:void(0);';
+					anchor.id=hostZone+',numWin';
+					anchor.addEventListener('click',game.leaderboardSortButton);
 					anchor.innerHTML='胜场';
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","numLose");';
+					anchor.href='javascript:void(0);';
+					anchor.id=hostZone+',numLose';
+					anchor.addEventListener('click',game.leaderboardSortButton);
 					anchor.innerHTML='负场';
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","winRate");';
+					anchor.href='javascript:void(0);';
+					anchor.id=hostZone+',winRate';
+					anchor.addEventListener('click',game.leaderboardSortButton);
 					anchor.innerHTML='胜率';
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","zhuRate");';
+					anchor.href='javascript:void(0);';
+					anchor.id=hostZone+',zhuRate';
+					anchor.addEventListener('click',game.leaderboardSortButton);
 					anchor.innerHTML='主公';
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","zhongRate");';
+					anchor.href='javascript:void(0);';
+					anchor.id=hostZone+',zhongRate';
+					anchor.addEventListener('click',game.leaderboardSortButton);
 					anchor.innerHTML='忠臣';
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","fanRate");';
+					anchor.href='javascript:void(0);';
+					anchor.id=hostZone+',fanRate';
+					anchor.addEventListener('click',game.leaderboardSortButton);
 					anchor.innerHTML='反贼';
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
 					anchor=document.createElement('a');
-					anchor.href='javascript:game.leaderboardSortButton("'+hostZone+'","neiRate");';
+					anchor.href='javascript:void(0);';
+					anchor.id=hostZone+',neiRate';
+					anchor.addEventListener('click',game.leaderboardSortButton);
 					anchor.innerHTML='内奸';
 					td.appendChild(anchor);
 					tr.appendChild(td);
@@ -46673,7 +46697,9 @@
 						tr.appendChild(td);
 						tableStatistics.appendChild(tr);
 					}
-					uiintro.add(tableStatistics.outerHTML);
+					var tablewrap=ui.create.div('.caption');
+					tablewrap.appendChild(tableStatistics);
+					uiintro.add(tablewrap);
 					uiintro.add(ui.create.div('.placeholder').outerHTML);
 				}
 				return uiintro;
