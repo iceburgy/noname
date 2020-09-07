@@ -7095,15 +7095,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						var card={name:button.link[2],nature:button.link[3]};
 						if(game.hasPlayer(function(current){
-							return player.canUse(card,current)&&get.effect(current,card,player,player)>0;
+							return (player.canUse(card,current)||player!=_status.currentPhase)&&get.effect(current,card,player,player)>0;
 						})){
 							switch(button.link[2]){
 								case 'tao':return 5;
-								case 'jiu':return 3.01;
+								case 'jiu':return (player!=_status.currentPhase?6:3.01);
 								case 'shan':return 3.01;
 								case 'sha':
 									if(button.link[3]=='fire') return 2.95;
-									else if(button.link[3]=='fire') return 2.92;
+									else if(button.link[3]=='thunder') return 2.92;
 									else return 2.9;
 							}
 						}
