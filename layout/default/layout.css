@@ -38,6 +38,11 @@ table {
 	table-layout: fixed;
 }
 
+.clsleaderboardsortkey{
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
 /*--------场景--------*/
 #window {
 	width: 100%;

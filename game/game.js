@@ -46516,6 +46516,15 @@
 				if(!statsGame){
 					statsGame={};
 				}
+				var createLeaderboardAnchor=function(hostzone,key,text){
+					anchor=document.createElement('a');
+					anchor.href='javascript:void(0);';
+					anchor.id=hostzone+','+key;
+					anchor.addEventListener('click',game.leaderboardSortButton);
+					anchor.innerHTML=text;
+					if(key==statsGame[hostzone][lib.statsKeySortKey]) anchor.classList.add('clsleaderboardsortkey');
+					return anchor;
+				}
 				for(var hostZone in statsGame){
 					var statsByZone=statsGame[hostZone];
 					if(!statsByZone){
@@ -46579,6 +46588,7 @@
 					uiintro.add(ui.create.div('.placeholder').outerHTML);
 
 					// sort by winRate, returns [[k1, val1],[k2, val2]]
+					if(!statsByZone[lib.statsKeySortKey]) statsByZone[lib.statsKeySortKey]=lib.statsKeySortKeyRoleName;
 					var sortedStats=game.sortProperties(rolesStatistics,statsByZone[lib.statsKeySortKey]);
 
 					tableStatistics=document.createElement('table');
@@ -46587,67 +46597,35 @@
 					tableStatistics.classList.add('text');
 					tr=document.createElement('tr');
 					td=document.createElement('td');
-					anchor=document.createElement('a');
-					anchor.href='javascript:void(0);';
-					anchor.id=hostZone+','+lib.statsKeySortKeyRoleName;
-					anchor.addEventListener('click',game.leaderboardSortButton);
-					anchor.innerHTML='武将';
+					anchor=createLeaderboardAnchor(hostZone,lib.statsKeySortKeyRoleName,'武将');
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
-					anchor=document.createElement('a');
-					anchor.href='javascript:void(0);';
-					anchor.id=hostZone+',numWin';
-					anchor.addEventListener('click',game.leaderboardSortButton);
-					anchor.innerHTML='胜场';
+					anchor=createLeaderboardAnchor(hostZone,'numWin','胜场');
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
-					anchor=document.createElement('a');
-					anchor.href='javascript:void(0);';
-					anchor.id=hostZone+',numLose';
-					anchor.addEventListener('click',game.leaderboardSortButton);
-					anchor.innerHTML='负场';
+					anchor=createLeaderboardAnchor(hostZone,'numLose','负场');
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
-					anchor=document.createElement('a');
-					anchor.href='javascript:void(0);';
-					anchor.id=hostZone+',winRate';
-					anchor.addEventListener('click',game.leaderboardSortButton);
-					anchor.innerHTML='胜率';
+					anchor=createLeaderboardAnchor(hostZone,'winRate','胜率');
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
-					anchor=document.createElement('a');
-					anchor.href='javascript:void(0);';
-					anchor.id=hostZone+',zhuRate';
-					anchor.addEventListener('click',game.leaderboardSortButton);
-					anchor.innerHTML='主公';
+					anchor=createLeaderboardAnchor(hostZone,'zhuRate','主公');
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
-					anchor=document.createElement('a');
-					anchor.href='javascript:void(0);';
-					anchor.id=hostZone+',zhongRate';
-					anchor.addEventListener('click',game.leaderboardSortButton);
-					anchor.innerHTML='忠臣';
+					anchor=createLeaderboardAnchor(hostZone,'zhongRate','忠臣');
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
-					anchor=document.createElement('a');
-					anchor.href='javascript:void(0);';
-					anchor.id=hostZone+',fanRate';
-					anchor.addEventListener('click',game.leaderboardSortButton);
-					anchor.innerHTML='反贼';
+					anchor=createLeaderboardAnchor(hostZone,'fanRate','反贼');
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					td=document.createElement('td');
-					anchor=document.createElement('a');
-					anchor.href='javascript:void(0);';
-					anchor.id=hostZone+',neiRate';
-					anchor.addEventListener('click',game.leaderboardSortButton);
-					anchor.innerHTML='内奸';
+					anchor=createLeaderboardAnchor(hostZone,'neiRate','内奸');
 					td.appendChild(anchor);
 					tr.appendChild(td);
 					tableStatistics.appendChild(tr);

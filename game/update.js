@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.09.06',
+	version:'2020.09.06.1',
 	update:'2020.08.09',
 	changeLog:[
 		'支持战况自定义排序',
