@@ -35167,6 +35167,11 @@
 					if(wra!=wrb){
 						return wra>wrb?-1:1;
 					}
+					else if(sortkey.endsWith('Rate')){
+						var winNuma=parseFloat(a[1][sortkey.split('Rate')[0]+'Win']);
+						var winNumb=parseFloat(b[1][sortkey.split('Rate')[0]+'Win']);
+						if(winNuma!=winNumb) return winNuma>winNumb?-1:1;
+					}
 					return ka<=kb?-1:1;
 				});
 			}
