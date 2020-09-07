@@ -1448,7 +1448,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					switch(suits.length){
 						case 1:additionalSkills=['reyingzi'];break;
 						case 2:additionalSkills=['reyingzi','qixi'];break;
-						case 3:additionalSkills=['reyingzi','qixi','rexuanfeng'];break;
+						case 3:additionalSkills=['reyingzi','qixi','xuanfeng'];break;
 					}
 					if(additionalSkills.length){
 						player.addAdditionalSkill(skill,additionalSkills);
