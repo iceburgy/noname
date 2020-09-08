@@ -15709,6 +15709,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!game.isCharacterSeen(player,'xiahouba')) return true;
 						return false;
 					}
+					else if(event.name=='showCharacter'){
+						return game.isCharacterSeen(player,'xiahouba');
+					}
 					return true;
 				},
 				init:function(player){
