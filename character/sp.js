@@ -16412,7 +16412,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function (player,target){
 							var numj=target.countCards('j');
 							var numhe=target.countCards('he');
-							if(numhe==0) return numj>0?6:-6;
+							if(numhe==0) return numj>0?6:0;
 							return -6-(numj+1)/numhe;
 						},
 					},
