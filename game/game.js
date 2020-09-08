@@ -46523,11 +46523,13 @@
 				}
 				var createLeaderboardAnchor=function(hostzone,key,text){
 					anchor=document.createElement('a');
-					anchor.href='javascript:void(0);';
-					anchor.id=hostzone+','+key;
-					anchor.addEventListener('click',game.leaderboardSortButton);
 					anchor.innerHTML=text;
 					if(key==statsGame[hostzone][lib.statsKeySortKey]) anchor.classList.add('clsleaderboardsortkey');
+					else{
+						anchor.id=hostzone+','+key;
+						anchor.href='javascript:void(0);';
+						anchor.addEventListener('click',game.leaderboardSortButton);
+					}
 					return anchor;
 				}
 				for(var hostZone in statsGame){
