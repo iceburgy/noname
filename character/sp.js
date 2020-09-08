@@ -15701,7 +15701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			baobian:{
 				audio:2,
 				enable:'phaseUse',
-				trigger:{player:['phaseBefore','changeHp']},
+				trigger:{player:['changeHp','showCharacterAfter']},
 				forced:true,
 				popup:false,
 				filter:function(event,player){

@@ -2985,8 +2985,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			anlezhugong2:'安乐主公',
 			bumingzhi:'不明置',
 			tongshimingzhi:'同时明置',
-			_mingzhisuodingji:"亮将",
-			_mingzhisuodingji_info:"你可以明置拥有“锁定技”的武将牌。",
 		},
 		element:{
 			content:{
@@ -3437,32 +3435,62 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var maxHp2=get.infoMaxHp(info2[2]);
 					var maxHpToGain=0;
 
+					var updateRevealCharacterButtons=function(player,updateMain,updateVice){
+						if(updateMain){
+							if(player==game.me){
+								ui.revealCharacterMain.classList.remove('glow');
+								ui.revealCharacterMain.hide();
+							}
+							else if(player.isOnline2()){
+								player.send(function(){
+									ui.revealCharacterMain.classList.remove('glow');
+									ui.revealCharacterMain.hide();
+								});
+							}
+						}
+						if(updateVice){
+							if(player==game.me){
+								ui.revealCharacterVice.classList.remove('glow');
+								ui.revealCharacterVice.hide();
+							}
+							else if(player.isOnline2()){
+								player.send(function(){
+									ui.revealCharacterVice.classList.remove('glow');
+									ui.revealCharacterVice.hide();
+								});
+							}
+						}
+					}
+
 					switch(num){
 						case 0:
-						if(log!==false) game.log(this,'展示了主将','#b'+this.name1);
-						this.name=this.name1;
-						skills=lib.character[this.name][3];
-						this.sex=lib.character[this.name][0];
-						this.classList.remove('unseen');
-						maxHpToGain=game.getMaxHpToGain(maxHp1,maxHp2,this.isUnseen(1));
-						break;
+							if(log!==false) game.log(this,'展示了主将','#b'+this.name1);
+							this.name=this.name1;
+							skills=lib.character[this.name][3];
+							this.sex=lib.character[this.name][0];
+							this.classList.remove('unseen');
+							maxHpToGain=game.getMaxHpToGain(maxHp1,maxHp2,this.isUnseen(1));
+							updateRevealCharacterButtons(this,true,false);
+							break;
 						case 1:
-						if(log!==false) game.log(this,'展示了副将','#b'+this.name2);
-						skills=lib.character[this.name2][3];
-						if(this.sex=='unknown') this.sex=lib.character[this.name2][0];
-						if(this.name.indexOf('unknown')==0) this.name=this.name2;
-						this.classList.remove('unseen2');
-						maxHpToGain=game.getMaxHpToGain(maxHp2,maxHp1,this.isUnseen(0));
-						break;
+							if(log!==false) game.log(this,'展示了副将','#b'+this.name2);
+							skills=lib.character[this.name2][3];
+							if(this.sex=='unknown') this.sex=lib.character[this.name2][0];
+							if(this.name.indexOf('unknown')==0) this.name=this.name2;
+							this.classList.remove('unseen2');
+							maxHpToGain=game.getMaxHpToGain(maxHp2,maxHp1,this.isUnseen(0));
+							updateRevealCharacterButtons(this,false,true);
+							break;
 						case 2:
-						if(log!==false) game.log(this,'展示了主将','#b'+this.name1,'、副将','#b'+this.name2);
-						this.name=this.name1;
-						skills=lib.character[this.name][3].concat(lib.character[this.name2][3]);
-						this.sex=lib.character[this.name][0];
-						this.classList.remove('unseen');
-						this.classList.remove('unseen2');
-						maxHpToGain=Math.max(maxHp1,maxHp2)-4;
-						break;
+							if(log!==false) game.log(this,'展示了主将','#b'+this.name1,'、副将','#b'+this.name2);
+							this.name=this.name1;
+							skills=lib.character[this.name][3].concat(lib.character[this.name2][3]);
+							this.sex=lib.character[this.name][0];
+							this.classList.remove('unseen');
+							this.classList.remove('unseen2');
+							maxHpToGain=Math.max(maxHp1,maxHp2)-4;
+							updateRevealCharacterButtons(this,true,true);
+							break;
 					}
 					this.group=lib.character[this.name][1];
 					if(this.group=='shen') this.group=this.groupshen;
@@ -3486,35 +3514,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(maxHpToGain>0){
 						this.gainMaxHp(maxHpToGain);
 						this.recover(maxHpToGain);
-					}
-
-					if(!this.isUnseen(2)){
-						if(this==game.me){
-							ui.revealCharacter.classList.remove('glow');
-							ui.revealCharacter.innerHTML='亮将x0';
-							ui.revealCharacter.hide();
-						}
-						else if(this.isOnline2()){
-							this.send(function(){
-								ui.revealCharacter.classList.remove('glow');
-								ui.revealCharacter.innerHTML='亮将x0';
-								ui.revealCharacter.hide();
-							});
-						}
-					}
-					else{
-						if(this==game.me){
-							if(ui.revealCharacter){
-								ui.revealCharacter.innerHTML='亮将x1';
-							}
-						}
-						else if(this.isOnline2()){
-							this.send(function(){
-								if(ui.revealCharacter){
-									ui.revealCharacter.innerHTML='亮将x1';
-								}
-							});
-						}
 					}
 
 					this.checkConflict();
@@ -4493,17 +4492,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			_mingzhi1:{
-				trigger:{player:['phaseBeginStart','dyingBefore'],global:['mingzhi1_1','mingzhi1_2','mingzhi1_3','mingzhi1_4','mingzhi1_5','mingzhi1_6','mingzhi1_7','mingzhi1_8','mingzhi1_9','mingzhi1_10',]},
+				trigger:{player:['phaseBeginStart','dyingBefore']},
 				priority:19,
 				forced:true,
 				popup:false,
 				content:function(){
 					"step 0"
-					if(event.triggername&&event.triggername.includes('mingzhi1_')&&event.triggername!=('mingzhi1_'+player.seat)){
-						event.cancel();
-						return;
-					}
-
 					var choice=1;
 					for(var i=0;i<player.hiddenSkills.length;i++){
 						if(lib.skill[player.hiddenSkills[i]].ai){
@@ -4650,86 +4644,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				}
-			},
-			_mingzhisuodingji:{
-				audio:'_mingzhisuodingji',
-				enable:'chooseToUse',
-				trigger:{player:'chooseToRespondBegin'},
-				filter:function (event,player){
-					var bool=false;
-					var skillm=lib.character[player.name1][3];
-					var skillv=lib.character[player.name2][3];
-					if(player.isUnseen(0)){
-						for(var i=0;i<skillm.length;i++){
-							if(!lib.nonLockSkills.contains(skillm[i])&&get.is.locked(skillm[i])){
-								bool=true;
-							}
-						}
-					}
-					if(player.isUnseen(1)){
-						for(var i=0;i<skillv.length;i++){
-							if(!lib.nonLockSkills.contains(skillv[i])&&get.is.locked(skillv[i])){
-								bool=true;
-							}
-						}
-					}
-					return bool;
-				},
-				filterTarget:function(card,player,target){
-					return target==player;
-				},
-				content:function (){
-					"step 0"
-					var choice=[];
-					var mainName=player.name1?player.name1:player.name;
-					var skillm=lib.character[mainName][3];
-					var skillv=lib.character[player.name2][3];
-					if(player.isUnseen(0)){
-						for(var i=0;i<skillm.length;i++){
-							if(!lib.nonLockSkills.contains(skillm[i])&&get.is.locked(skillm[i])&&!choice.contains('明置主将')){
-								choice.push("明置主将");
-							}
-						}
-					}
-					if(player.isUnseen(1)){
-						for(var i=0;i<skillv.length;i++){
-							if(!lib.nonLockSkills.contains(skillv[i])&&get.is.locked(skillv[i])&&!choice.contains('明置副将')){
-								choice.push("明置副将");
-							}
-						}
-					}
-					if(choice.length==2) choice.push('全部明置')
-					player.chooseControl(choice);
-					"step 1"
-					if(result.control){
-						switch(result.control){
-							case "取消":break;
-							case "明置主将":player.showCharacter(0);break;
-							case "明置副将":player.showCharacter(1);break;
-							case "全部明置":player.showCharacter(2);break;
-						}
-					}
-					// event hierarchy:
-					// thisskillname/useSkill/chooseToUse/sha - huihewai, need redo
-					// thisskillname/useSkill/_wuxie/trigger/arrangeTrigger/tiesuo - huihewai, need redo
-					// thisskillname/useSkill/chooseToUse/phaseUse/phase - huihenei
-					// thisskillname/trigger/arrangeTrigger/chooseToRespond/wanjian
-					// we need to redo huihewai useSkill
-					var useSkillEvent=event.parent;
-					if(useSkillEvent&&useSkillEvent.name=='useSkill'){
-						if(useSkillEvent.parent) {
-							if(useSkillEvent.parent.name=='_wuxie'||useSkillEvent.parent.name=='chooseToUse'&&useSkillEvent.parent.parent.name!='phaseUse') {
-								useSkillEvent.parent.parent.redo();
-							}
-						}
-					}
-				},
-				ai:{
-					order:11,
-					result:{
-						player:-99,
-					},
-				},
 			},
 		},
 		help:{

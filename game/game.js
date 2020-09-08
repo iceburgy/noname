@@ -26055,11 +26055,8 @@
 				giveup:function(player){
 					game.voteGiveup(player);
 				},
-				revealCharacter:function(player){
-					var next=game.createEvent('revealCharacter',false).setContent(function(){
-						_status.event.trigger('mingzhi1_'+player.seat);
-					});
-					next.player=player;
+				revealCharacter:function(player,index){
+					player.showCharacter(index);
 				},
 				revealXiaonei:function(){
 					game.createEvent('revealXiaonei',false).setContent(function(){
@@ -31470,9 +31467,13 @@
 					ui.giveup.remove();
 					delete ui.giveup;
 				}
-				if(ui.revealCharacter){
-					ui.revealCharacter.remove();
-					delete ui.revealCharacter;
+				if(ui.revealCharacterMain){
+					ui.revealCharacterMain.remove();
+					delete ui.revealCharacterMain;
+				}
+				if(ui.revealCharacterVice){
+					ui.revealCharacterVice.remove();
+					delete ui.revealCharacterVice;
 				}
 				if(ui.revealXiaonei){
 					ui.revealXiaonei.remove();
@@ -32351,9 +32352,13 @@
 				ui.giveup.remove();
 				delete ui.giveup;
 			}
-			if(ui.revealCharacter){
-				ui.revealCharacter.remove();
-				delete ui.revealCharacter;
+			if(ui.revealCharacterMain){
+				ui.revealCharacterMain.remove();
+				delete ui.revealCharacterMain;
+			}
+			if(ui.revealCharacterVice){
+				ui.revealCharacterVice.remove();
+				delete ui.revealCharacterVice;
 			}
 			if(ui.revealXiaonei){
 				ui.revealXiaonei.remove();
@@ -43278,29 +43283,35 @@
 				},true);
 			},
 			revealCharacter:function(){
-				if(!ui.revealCharacter){
-					ui.revealCharacter=ui.create.system('亮将x2',function(){
+				if(!ui.revealCharacterMain){
+					ui.revealCharacterMain=ui.create.system('亮主将',function(){
 						if(this.classList.contains('hidden')) return;
-						if(this.innerHTML=='亮将x2'){
-							this.innerHTML='亮将x1';
-						}
-						else{
-							ui.revealCharacter.classList.remove('glow');
-							ui.revealCharacter.innerHTML='亮将x0';
-							ui.revealCharacter.hide();
-						}
+						this.classList.remove('glow');
+						this.hide();
 						var player=game.me;
 						if(game.online){
-							game.send('revealCharacter',player);
+							game.send('revealCharacter',player,0);
 						}
 						else{
-							var next=game.createEvent('revealCharacter',false).setContent(function(){
-								_status.event.trigger('mingzhi1_'+player.seat);
-							});
-							next.player=player;
+							player.showCharacter(0);
 						}
 					},true);
-					ui.revealCharacter.classList.add('glow');
+					ui.revealCharacterMain.classList.add('glow');
+				}
+				if(!ui.revealCharacterVice){
+					ui.revealCharacterVice=ui.create.system('亮副将',function(){
+						if(this.classList.contains('hidden')) return;
+						this.classList.remove('glow');
+						this.hide();
+						var player=game.me;
+						if(game.online){
+							game.send('revealCharacter',player,1);
+						}
+						else{
+							player.showCharacter(1);
+						}
+					},true);
+					ui.revealCharacterVice.classList.add('glow');
 				}
 			},
 			revealXiaonei:function(){
