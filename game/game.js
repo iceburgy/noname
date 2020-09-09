@@ -46525,13 +46525,14 @@
 				uiintro.listen(function(e){
 					e.stopPropagation();
 				});
-				var tableStatistics, tr, td, anchor;
 				uiintro.classList.add('clsleaderboard');
-				// game statistics
 				var statsGame=lib.config[lib.statsKeyGame];
-				if(!statsGame){
-					statsGame={};
+				if(!statsGame||Object.keys(statsGame).length==0){
+					uiintro.add('暂无战况');
+					return uiintro;
 				}
+				var tableStatistics, tr, td, anchor;
+				// game statistics
 				var createLeaderboardAnchor=function(hostzone,key,text){
 					anchor=document.createElement('a');
 					anchor.innerHTML=text;
