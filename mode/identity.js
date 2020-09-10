@@ -3404,6 +3404,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var maxHpToGain=0;
 
 					var updateRevealCharacterButtons=function(player,updateMain,updateVice){
+						if(!ui.revealCharacterMain) return;
 						if(updateMain){
 							if(player==game.me){
 								ui.revealCharacterMain.classList.remove('glow');
