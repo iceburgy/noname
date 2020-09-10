@@ -2397,23 +2397,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					},game.zhu);
 					"step 13"
-					// zhu choose to show character
-					var liangjiang=[];
-					var list=['暗','主','副','全',];
-					for(var i=0;i<list.length;i++){
-						list[i]=['','',list[i]];
-					}
-					game.zhu.chooseButton(['是否亮将',[list,'vcard']],true);
-					"step 14"
-					event.zhuGroupRevealed=true;
-					var choice=result.links[0][2];
-					switch(choice){
-						case '主':game.zhu.showCharacter(0);event.goto(17);break;
-						case '副':game.zhu.showCharacter(1);event.goto(17);break;
-						case '全':game.zhu.showCharacter(2);event.goto(17);break;
-						default:game.zhu.trySkillAnimate('不亮将','不亮将',false);event.zhuGroupRevealed=false;break;
-					}
-					"step 15"
 					// zhu choose to show group
 					var list=lib.group.slice(0);
 					list.remove('shen');
@@ -2423,7 +2406,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.zhu.chooseButton(['是否声明势力',[list,'vcard']]).set('ai',function(button){
 						return 0;
 					});
-					"step 16"
+					"step 14"
 					if(result.bool){
 						var shili=result.links[0][2].slice(6);
 						var shiliTrans=get.translation(shili);
@@ -2436,7 +2419,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						game.zhu.trySkillAnimate('不声明势力','不声明势力',false);
 					}
-					"step 17"
+					game.zhu.showGiveup();
+					game.zhu.showRevealCharacter();
+					"step 15"
 					// other players to choose character1, no use of change char
 					var list=[];
 					var selectButton=1;
@@ -2518,7 +2503,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					});
-					"step 18"
+					"step 16"
 					var isChar1SelectionMadeFully=true;
 					for(var i in result){
 						if(lib.playerOL[i].identity=='zhu'){
@@ -2535,13 +2520,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					if(!isChar1SelectionMadeFully){
-						event.goto(19);
+						event.goto(17);
 					}
 					else{
-						event.goto(20);
+						event.goto(18);
 					}
 
-					"step 19"
+					"step 17"
 					// other players to choose character1, again with use of change char
 					var list=[];
 					var selectButton=1;
@@ -2573,7 +2558,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					});
 
-					"step 20"
+					"step 18"
 					for(var i in result){
 						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
 						if(distanceFromZhu>0&&result[i].bool&&event.chosenChars[distanceFromZhu].length==0){
@@ -2670,7 +2655,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					});
 
-					"step 21"
+					"step 19"
 					var isChar2SelectionMadeFully=true;
 					for(var i in result){
 						if(lib.playerOL[i].identity=='zhu'){
@@ -2687,13 +2672,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					if(!isChar2SelectionMadeFully){
-						event.goto(22);
+						event.goto(20);
 					}
 					else{
-						event.goto(23);
+						event.goto(21);
 					}
 
-					"step 22"
+					"step 20"
 					// other players to choose character2, again with use of change char
 					var list=[];
 					var selectButton=1;
@@ -2726,7 +2711,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					});
 
-					"step 23"
+					"step 21"
 					for(var i in result){
 						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
 						if(distanceFromZhu>0&&result[i].bool&&event.chosenChars[distanceFromZhu].length==1){
@@ -2755,7 +2740,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.init(mainChar,viceChar,false);
 						}
 					});
-					"step 24"
+					"step 22"
 					for(var i=0;i<event.chosenChars.length;i++){
 						event.list2.remove(event.chosenChars[i][0]);
 						event.list2.remove(event.chosenChars[i][1]);
@@ -2798,7 +2783,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						});
 					}
-					"step 25"
+					"step 23"
 					if(!result) result={};
 					var result2=event.result2;
 					game.broadcast(function(result,result2){
@@ -2882,28 +2867,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						},game.players[i]);
 					}
-					"step 26"
-					var liangjiang=[];
-					var list=['暗','主','副','全',];
-					for(var i=0;i<list.length;i++){
-						list[i]=['','',list[i]];
-					}
+					"step 24"
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=game.zhu){
-							liangjiang.push([game.players[i],['是否亮将',[list,'vcard']],1,true]);
-						}
-					}
-					game.me.chooseButtonOL(liangjiang,function(player,result){});
-					"step 27"
-					for(var i in result){
-						if(result[i]&&result[i].links) {
-							var choice=result[i].links[0][2];
-							switch(choice){
-								case '主':lib.playerOL[i].showCharacter(0);break;
-								case '副':lib.playerOL[i].showCharacter(1);break;
-								case '全':lib.playerOL[i].showCharacter(2);break;
-								default:break;
-							}
+							game.players[i].showGiveup();
+							game.players[i].showRevealCharacter();
 						}
 					}
 					setTimeout(function(){

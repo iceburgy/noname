@@ -16233,12 +16233,6 @@
 							this._inits[i](this);
 						}
 					}
-					if(!game.observe&&this==game.me){
-						this.showGiveup();
-						if(character2&&lib.character[character2]){
-							this.showRevealCharacter();
-						}
-					}
 					this.update();
 					return this;
 				},
@@ -28142,7 +28136,6 @@
 					break;
 				case '是否使用签到福利':
 				case '请选择神武将的势力':
-				case '是否亮将':
 				case '是否声明势力':
 					if(lib.configOL.choose_timeout_shen_group){
 						num=lib.configOL.choose_timeout_shen_group;
