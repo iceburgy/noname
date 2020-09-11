@@ -4573,8 +4573,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainPlayerCard(target,'h',true);
 					'step 1'
 					var name=get.translation(target);
-					player.chooseControl(function(){
-						return Math.random()<0.5?'选项一':'选项二';
+					player.chooseControl(function(event,player){
+						return (get.attitude(player,event.target)>0)?'选项一':'选项二';
 					}).set('prompt','督粮').set('choiceList',['令'+name+'观看牌堆顶的两张牌，然后获得其中的基本牌','令'+name+'于下个摸牌阶段额外摸一张牌']);
 					'step 2'
 					if(result.control=='选项一'){
