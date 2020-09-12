@@ -26403,11 +26403,11 @@
 					}
 				},
 				exec:function(func){
-					// if(typeof func=='function'){
-					//     var args=Array.from(arguments);
-					//     args.shift();
-					//     func.apply(this,args);
-					// }
+					if(typeof func=='function'){
+						var args=Array.from(arguments);
+						args.shift();
+						func.apply(this,args);
+					}
 				},
 				log:function(){
 					var items=[];

@@ -1755,6 +1755,10 @@ content:function(config, pack){
 						lib.skill[event.buttoned + '_backup'] = info.backup(result.links, player);
 						lib.skill[event.buttoned + '_backup'].sourceSkill = event.buttoned;
 						if (game.online) {
+							game.send(function(buttoned,backup){
+								lib.skill[buttoned + '_backup'] = backup;
+								lib.skill[buttoned + '_backup'].sourceSkill = buttoned;
+							},event.buttoned,info.backup(result.links, player));
 							event._sendskill = [event.buttoned + '_backup', lib.skill[event.buttoned + '_backup']];
 						}
 						event.backup(event.buttoned + '_backup');
