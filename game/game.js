@@ -27232,7 +27232,7 @@
 			game.log(player,'【我投了】');
 			if(!game.votersIDs) {
 				game.votersIDs=new Set();
-				for(i=0;i<game.players.length;i++){
+				for(var i=0;i<game.players.length;i++){
 					if(!(game.players[i].nickname)||game.players[i].nickname=='无名玩家'){
 						game.votersIDs.add(game.players[i]);
 					}
@@ -27242,10 +27242,24 @@
 			game.votersIDs.add(player);
 
 			var tempVotersIDs=new Set();
-			for(i=0;i<game.players.length;i++){
+			var tempZhong=[];
+			var tempFan=[];
+			var tempNei=[];
+			for(var i=0;i<game.players.length;i++){
 				var nameol=game.players[i].node.nameol.innerText;
 				if(nameol&&(nameol.endsWith(' - 托管')||nameol.endsWith(' - 离线'))){
 					tempVotersIDs.add(game.players[i]);
+				}
+				switch(game.players[i].identity){
+					case 'zhong':
+						tempZhong.push(game.players[i]);
+						break;
+					case 'fan':
+						tempFan.push(game.players[i]);
+						break;
+					case 'nei':
+						tempNei.push(game.players[i]);
+						break;
 				}
 			}
 			tempVotersIDs=new Set([...tempVotersIDs,...game.votersIDs]);
@@ -27253,7 +27267,7 @@
 			var popzhuzhong=1+get.population('zhong');
 			var popfan=get.population('fan');
 			var popnei=get.population('nei');
-			var todie;
+			var todie=[];
 			var voteszhuzhong=0;
 			var votesfan=0;
 			var votesnei=0;
@@ -27275,54 +27289,20 @@
 				}
 			}
 
-			switch(voterID){
-				case 'zhu':
-				case 'zhong':
-					if(popzhuzhong+popnei==voteszhuzhong+votesnei){
-						todie=[];
-						for(var i=0;i<game.players.length;i++){
-							if(['zhu','zhong','nei'].contains(game.players[i].identity)){
-								todie.push(game.players[i]);
-							}
-						}
-					}
-					break;
-				case 'fan':
-					if(popfan+popnei==votesfan+votesnei){
-						todie=[];
-						for(var i=0;i<game.players.length;i++){
-							if(['fan','nei'].contains(game.players[i].identity)){
-								todie.push(game.players[i]);
-							}
-						}
-					}
-					break;
-				case 'nei':
-					if(popzhuzhong+popnei==voteszhuzhong+votesnei){
-						todie=[];
-						for(var i=0;i<game.players.length;i++){
-							if(['zhu','zhong','nei'].contains(game.players[i].identity)){
-								todie.push(game.players[i]);
-							}
-						}
-					}
-					else if(popfan+popnei==votesfan+votesnei){
-						todie=[];
-						for(var i=0;i<game.players.length;i++){
-							if(['fan','nei'].contains(game.players[i].identity)){
-								todie.push(game.players[i]);
-							}
-						}
-					}
-					else if(popfan==0){
-						todie=[];
-						todie.push(player);
-					}
-					break;
-				default:num=0;break;
+			// surrender to fan
+			if((voterID=='zhu'||voterID=='zhong'||voterID=='nei')&&popfan>0&&popzhuzhong+popnei==voteszhuzhong+votesnei){
+				todie=[...tempNei,...tempZhong,game.zhu];
+			}
+			// surrender to zhuzhong
+			else if((voterID=='fan'||voterID=='nei')&&popfan+popnei==votesfan+votesnei){
+				todie=[...tempNei,...tempFan];
+			}
+			// surrender to nei
+			else if((voterID=='zhu'||voterID=='zhong'||voterID=='fan')&&popnei>0&&popzhuzhong+popfan==voteszhuzhong+votesfan){
+				todie=[...tempFan,...tempZhong,game.zhu];
 			}
 
-			if(todie){
+			if(todie.length){
 				game.todie=todie;
 				game.createEvent('giveup',false).setContent(function(){
 					for(var td of game.todie){
