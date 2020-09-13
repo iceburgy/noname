@@ -2412,7 +2412,7 @@ content:function(config, pack){
 				        if (identity == 'ye' && get.is.jun(this)) {
 							this.identity = identity = lib.character[this.name1][1];
 						}
-						if(['zhu','zhong','nei','fan'].includes(identity)){
+						if(_status.playback&&['zhu','zhong','nei','fan'].includes(identity)){
 							this.group=lib.character[this.name1][1];
 							if(this.group=='shen') this.group=this.groupshen;
 						}else{

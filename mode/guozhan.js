@@ -7207,17 +7207,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									}
 								}
 							}
-						}
-						if(ui.selected.buttons.length==0){
-							for(var i=0;i<ui.dialog.buttons.length;i++){
-								if(ui.dialog.buttons[i]!=button&&lib.character[button.link][1]==lib.character[ui.dialog.buttons[i].link][1]){
-									return true;
+							if(ui.selected.buttons.length==0){
+								for(var i=0;i<ui.dialog.buttons.length;i++){
+									if(ui.dialog.buttons[i]!=button&&lib.character[button.link][1]==lib.character[ui.dialog.buttons[i].link][1]){
+										return true;
+									}
 								}
-							}
-							return false;
-						};
+								return false;
+							};
+						}
 						if(!lib.character[button.link]) return false;
-						return (lib.character[button.link][1]==lib.character[ui.selected.buttons[0].link][1]);
+						return ui.selected.buttons.length&&(lib.character[button.link][1]==lib.character[ui.selected.buttons[0].link][1]);
 					};
 					list.randomSort();
 					for(var i=0;i<game.players.length;i++){
