@@ -16494,15 +16494,17 @@
 				getTop:function(){
 					return this.offsetTop;
 				},
-				smoothAvatar:function(vice,video){
+				smoothAvatar:function(vice,video,isShowCharacter){
 					var divwrap=ui.create.div('.fullsize');
 					var div=ui.create.div('.fullsize');
 					if(vice){
-						div.style.background=getComputedStyle(this.node.avatar2).background;
+						if(isShowCharacter) div.style.background='rgba(0, 0, 0, 1)';
+						else div.style.background=getComputedStyle(this.node.avatar2).background;
 						this.node.avatar2.appendChild(divwrap);
 					}
 					else{
-						div.style.background=getComputedStyle(this.node.avatar).background;
+						if(isShowCharacter) div.style.background='rgba(0, 0, 0, 1)';
+						else div.style.background=getComputedStyle(this.node.avatar).background;
 						this.node.avatar.appendChild(divwrap);
 					}
 					var divbar=ui.create.div('.changeskinbar');
@@ -26049,8 +26051,8 @@
 				giveup:function(player){
 					game.voteGiveup(player);
 				},
-				revealCharacter:function(player,index){
-					player.showCharacter(index);
+				revealCharacter:function(player,index,log,playAudio){
+					player.showCharacter(index,log,playAudio);
 				},
 				revealXiaonei:function(){
 					game.createEvent('revealXiaonei',false).setContent(function(){
@@ -43263,10 +43265,10 @@
 						this.hide();
 						var player=game.me;
 						if(game.online){
-							game.send('revealCharacter',player,0);
+							game.send('revealCharacter',player,0,true,true);
 						}
 						else{
-							player.showCharacter(0);
+							player.showCharacter(0,true,true);
 						}
 					},true);
 					ui.revealCharacterMain.classList.add('glow');
@@ -43278,10 +43280,10 @@
 						this.hide();
 						var player=game.me;
 						if(game.online){
-							game.send('revealCharacter',player,1);
+							game.send('revealCharacter',player,1,true,true);
 						}
 						else{
-							player.showCharacter(1);
+							player.showCharacter(1,true,true);
 						}
 					},true);
 					ui.revealCharacterVice.classList.add('glow');

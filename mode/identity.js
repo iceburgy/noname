@@ -3348,7 +3348,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					this.checkConflict();
 				},
-				showCharacter:function(num,log){
+				showCharacter:function(num,log,playAudio){
 					var toShow=[];
 					if((num==0||num==2)&&this.isUnseen(0)) toShow.add(this.name1);
 					if((num==1||num==2)&&this.isUnseen(1)) toShow.add(this.name2);
@@ -3362,7 +3362,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					next.setContent('showCharacter');
 					return next;
 				},
-				$showCharacter:function(num,log){
+				$showCharacter:function(num,log,playAudio){
 					if(num==0&&!this.isUnseen(0)){
 						return;
 					}
@@ -3373,7 +3373,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					game.addVideo('showCharacter',this,num);
-					game.playSkillAudio('yingzi');
+					if(playAudio) game.playSkillAudio('yingzi');
 					if(this.identity=='unknown'){
 						this.group=lib.character[this.name1][1];
 						if(get.is.jun(this.name1)&&this.isAlive()){
@@ -3439,6 +3439,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							skills=lib.character[this.name][3];
 							this.sex=lib.character[this.name][0];
 							this.classList.remove('unseen');
+							this.smoothAvatar(false,true,true);
 							maxHpToGain=game.getMaxHpToGain(maxHp1,maxHp2,this.isUnseen(1));
 							updateRevealCharacterButtons(this,true,false);
 							break;
@@ -3448,6 +3449,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(this.sex=='unknown') this.sex=lib.character[this.name2][0];
 							if(this.name.indexOf('unknown')==0) this.name=this.name2;
 							this.classList.remove('unseen2');
+							this.smoothAvatar(true,true,true);
 							maxHpToGain=game.getMaxHpToGain(maxHp2,maxHp1,this.isUnseen(0));
 							updateRevealCharacterButtons(this,false,true);
 							break;
@@ -3458,6 +3460,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							this.sex=lib.character[this.name][0];
 							this.classList.remove('unseen');
 							this.classList.remove('unseen2');
+							this.smoothAvatar(false,true,true);
+							this.smoothAvatar(true,true,true);
 							maxHpToGain=Math.max(maxHp1,maxHp2)-4;
 							updateRevealCharacterButtons(this,true,true);
 							break;
@@ -3469,9 +3473,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.name=name;
 						player.sex=sex;
 						switch(num){
-							case 0:player.classList.remove('unseen');break;
-							case 1:player.classList.remove('unseen2');break;
-							case 2:player.classList.remove('unseen');player.classList.remove('unseen2');break;
+							case 0:
+								player.smoothAvatar(false,true,true);
+								player.classList.remove('unseen');
+								break;
+							case 1:
+								player.smoothAvatar(true,true,true);
+								player.classList.remove('unseen2');
+								break;
+							case 2:
+								player.smoothAvatar(false,true,true);
+								player.smoothAvatar(true,true,true);
+								player.classList.remove('unseen');
+								player.classList.remove('unseen2');
+								break;
 						}
 						player.ai.shown=1;
 					},this,this.name,this.sex,num,this.group);
