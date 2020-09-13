@@ -1880,6 +1880,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.players[i].addSkillTrigger(game.players[i].hiddenSkills[j],true);
 						}
 					}
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].showRevealCharacter();
+					}
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
 					},500);
@@ -3074,7 +3077,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				dieAfter:function(source){
-					this.showCharacter(2);
+					var showID=2;
+					if(this.isUnseen(2)){
+						if(this.isUnseen()) this.showCharacter(2);
+						else if(this.isUnseen(0)) this.showCharacter(0);
+						if(this.isUnseen(1)) this.showCharacter(1);
+					}
 					game.broadcastAll(function(player,identity,identity2){
 						player.setIdentity(player.identity);
 						player.identityShown=true;
@@ -3373,7 +3381,30 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					game.addVideo('showCharacter',this,num);
-					if(playAudio) game.playSkillAudio('yingzi');
+					var getCharacterSkillWithAudio=function(character){
+						var retSkill='';
+						var info=lib.character[character];
+						if(info&&info.length){
+							var skills=info[3];
+							if(skills&&skills.length){
+								for(var skill of skills){
+									var skillinfo=lib.skill[skill];
+									if(skillinfo&&('audio' in skillinfo)){
+										var tempSkill=(typeof skillinfo['audio']=='string')?skillinfo['audio']:skill;
+										if(skillinfo['zhuSkill']||skillinfo['juexingji']||skillinfo['limited']) return tempSkill;
+										if(!retSkill.length) retSkill=tempSkill;
+									}
+								}
+							}
+						}
+						return retSkill;
+					}
+					if(playAudio){
+						var character=this.name1;
+						if(num==1) character=this.name2
+						var skill=getCharacterSkillWithAudio(character);
+						game.playSkillAudio(skill);
+					}
 					if(this.identity=='unknown'){
 						this.group=lib.character[this.name1][1];
 						if(get.is.jun(this.name1)&&this.isAlive()){
@@ -3438,8 +3469,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							this.name=this.name1;
 							skills=lib.character[this.name][3];
 							this.sex=lib.character[this.name][0];
-							this.classList.remove('unseen');
 							this.smoothAvatar(false,true,true);
+							this.classList.remove('unseen');
 							maxHpToGain=game.getMaxHpToGain(maxHp1,maxHp2,this.isUnseen(1));
 							updateRevealCharacterButtons(this,true,false);
 							break;
@@ -3448,8 +3479,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							skills=lib.character[this.name2][3];
 							if(this.sex=='unknown') this.sex=lib.character[this.name2][0];
 							if(this.name.indexOf('unknown')==0) this.name=this.name2;
-							this.classList.remove('unseen2');
 							this.smoothAvatar(true,true,true);
+							this.classList.remove('unseen2');
 							maxHpToGain=game.getMaxHpToGain(maxHp2,maxHp1,this.isUnseen(0));
 							updateRevealCharacterButtons(this,false,true);
 							break;
@@ -3458,10 +3489,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							this.name=this.name1;
 							skills=lib.character[this.name][3].concat(lib.character[this.name2][3]);
 							this.sex=lib.character[this.name][0];
-							this.classList.remove('unseen');
-							this.classList.remove('unseen2');
 							this.smoothAvatar(false,true,true);
 							this.smoothAvatar(true,true,true);
+							this.classList.remove('unseen');
+							this.classList.remove('unseen2');
 							maxHpToGain=Math.max(maxHp1,maxHp2)-4;
 							updateRevealCharacterButtons(this,true,true);
 							break;
@@ -4476,11 +4507,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.die();
 				}
 			},
+			// this is skill is now only meant for AI players
 			_mingzhi1:{
 				trigger:{player:['phaseBeginStart','dyingBefore']},
 				priority:19,
 				forced:true,
 				popup:false,
+				filter:function(event,player){
+					return player!=game.me&&!player.isOnline2();
+				},
 				content:function(){
 					"step 0"
 					var choice=1;

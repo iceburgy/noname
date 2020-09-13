@@ -2992,7 +2992,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player,target){
 							var target=game.findPlayer(function(current){
-								return current.hasSkill('wengua');
+								return current.hasSkill('wengua')||_status.currentPhase==current&&game.hasCharacter(current,'xushi');
 							});
 							if(target){
 								return get.attitude(player,target);

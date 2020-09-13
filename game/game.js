@@ -16497,14 +16497,13 @@
 				smoothAvatar:function(vice,video,isShowCharacter){
 					var divwrap=ui.create.div('.fullsize');
 					var div=ui.create.div('.fullsize');
+					if(isShowCharacter) div.style.background='rgba(53,38,32)';
 					if(vice){
-						if(isShowCharacter) div.style.background='rgba(0, 0, 0, 1)';
-						else div.style.background=getComputedStyle(this.node.avatar2).background;
+						if(!isShowCharacter) div.style.background=getComputedStyle(this.node.avatar2).background;
 						this.node.avatar2.appendChild(divwrap);
 					}
 					else{
-						if(isShowCharacter) div.style.background='rgba(0, 0, 0, 1)';
-						else div.style.background=getComputedStyle(this.node.avatar).background;
+						if(!isShowCharacter) div.style.background=getComputedStyle(this.node.avatar).background;
 						this.node.avatar.appendChild(divwrap);
 					}
 					var divbar=ui.create.div('.changeskinbar');
@@ -21386,7 +21385,7 @@
 					return game.expandSkills(this.getStockSkills(arg1,arg2,arg3)).contains(skill);
 				},
 				hasZhuSkill:function(skill,player){
-					if(!this.hasSkill(skill)) return false;
+					if(!this.hasSkill(skill)&&!this.hiddenSkills.contains(skill)) return false;
 					var mode=get.mode();
 					if(mode=='identity'||(mode=='versus'&&(_status.mode=='four'||_status.mode=='guandu'))){
 						if(mode!='identity'){
