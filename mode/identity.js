@@ -3373,6 +3373,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					game.addVideo('showCharacter',this,num);
+					game.playSkillAudio('yingzi');
 					if(this.identity=='unknown'){
 						this.group=lib.character[this.name1][1];
 						if(get.is.jun(this.name1)&&this.isAlive()){
