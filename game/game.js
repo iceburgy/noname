@@ -16497,7 +16497,7 @@
 				smoothAvatar:function(vice,video,isShowCharacter){
 					var divwrap=ui.create.div('.fullsize');
 					var div=ui.create.div('.fullsize');
-					if(isShowCharacter) div.style.background='rgba(53,38,32)';
+					if(isShowCharacter) div.style.background='rgba(53,38,32,1)';
 					if(vice){
 						if(!isShowCharacter) div.style.background=getComputedStyle(this.node.avatar2).background;
 						this.node.avatar2.appendChild(divwrap);
