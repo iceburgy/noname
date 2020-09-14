@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.100.7',
+	'v1.9.100.7.1',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -1078,8 +1078,8 @@ window.noname_asset_list=[
 	'audio/skill/jieyuan_more.mp3',
 	'audio/skill/jieyue11.mp3',
 	'audio/skill/jieyue12.mp3',
+	'audio/skill/jieyue1.mp3',
 	'audio/skill/jieyue2.mp3',
-	'audio/skill/jieyue3.mp3',
 	'audio/skill/jiezi1.mp3',
 	'audio/skill/jiezi2.mp3',
 	'audio/skill/jigong1.mp3',

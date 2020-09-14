@@ -3384,18 +3384,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					game.addVideo('showCharacter',this,num);
-					var getCharacterSkillWithAudio=function(character){
+					var getCharacterSkillWithAudio=function(characters){
 						var retSkill='';
-						var info=lib.character[character];
-						if(info&&info.length){
-							var skills=info[3];
-							if(skills&&skills.length){
-								for(var skill of skills){
-									var skillinfo=lib.skill[skill];
-									if(skillinfo&&('audio' in skillinfo)){
-										var tempSkill=(typeof skillinfo['audio']=='string')?skillinfo['audio']:skill;
-										if(skillinfo['zhuSkill']||skillinfo['juexingji']||skillinfo['limited']) return tempSkill;
-										if(!retSkill.length) retSkill=tempSkill;
+						for(var character of characters){
+							var info=lib.character[character];
+							if(info&&info.length){
+								var skills=info[3];
+								if(skills&&skills.length){
+									for(var skill of skills){
+										var skillinfo=lib.skill[skill];
+										if(skillinfo&&('audio' in skillinfo)){
+											var tempSkill=(typeof skillinfo['audio']=='string')?skillinfo['audio']:skill;
+											if(skillinfo['zhuSkill']||skillinfo['juexingji']||skillinfo['limited']) return tempSkill;
+											if(!retSkill.length) retSkill=tempSkill;
+										}
 									}
 								}
 							}
@@ -3404,9 +3406,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					var audioSkill;
 					if(playAudio){
-						var character=this.name1;
-						if(num==1) character=this.name2
-						audioSkill=getCharacterSkillWithAudio(character);
+						var characters;
+						if(num==0) characters=[this.name1];
+						else if(num==1) characters=[this.name2];
+						else characters=[this.name1,this.name2];
+						audioSkill=getCharacterSkillWithAudio(characters);
 						game.playSkillAudio(audioSkill);
 					}
 					if(this.identity=='unknown'){

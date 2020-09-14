@@ -15699,7 +15699,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			baobian:{
-				audio:2,
 				enable:'phaseUse',
 				trigger:{player:['changeHp','showCharacterAfter']},
 				forced:true,
