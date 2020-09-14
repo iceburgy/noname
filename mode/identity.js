@@ -3399,11 +3399,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						return retSkill;
 					}
+					var audioSkill;
 					if(playAudio){
 						var character=this.name1;
 						if(num==1) character=this.name2
-						var skill=getCharacterSkillWithAudio(character);
-						game.playSkillAudio(skill);
+						audioSkill=getCharacterSkillWithAudio(character);
+						game.playSkillAudio(audioSkill);
 					}
 					if(this.identity=='unknown'){
 						this.group=lib.character[this.name1][1];
@@ -3499,7 +3500,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					this.group=lib.character[this.name][1];
 					if(this.group=='shen') this.group=this.groupshen;
-					game.broadcast(function(player,name,sex,num,group){
+					game.broadcast(function(player,name,sex,num,group,audioSkill){
+						if(audioSkill){
+							game.playSkillAudio(audioSkill);
+						}
 						player.group=group;
 						player.name=name;
 						player.sex=sex;
@@ -3520,7 +3524,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								break;
 						}
 						player.ai.shown=1;
-					},this,this.name,this.sex,num,this.group);
+					},this,this.name,this.sex,num,this.group,audioSkill);
 					for(var i=0;i<skills.length;i++){
 						this.hiddenSkills.remove(skills[i]);
 						this.addSkill(skills[i]);
@@ -4562,9 +4566,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					switch(result.control){
-						case '明置'+get.translation(player.name1):player.showCharacter(0);break;
-						case '明置'+get.translation(player.name2):player.showCharacter(1);break;
-						case 'tongshimingzhi':player.showCharacter(2);break;
+						case '明置'+get.translation(player.name1):player.showCharacter(0,true,true);break;
+						case '明置'+get.translation(player.name2):player.showCharacter(1,true,true);break;
+						case 'tongshimingzhi':player.showCharacter(2,true,true);break;
 					}
 				}
 			},
