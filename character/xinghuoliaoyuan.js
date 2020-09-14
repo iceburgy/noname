@@ -456,7 +456,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"xinfu_qinguo":{
 				group:["qinguo_use","qinguo_lose"],
-				audio:2,
+				audio:'qinguo_use',
 				trigger:{
 					player:"useCardEnd",
 				},
