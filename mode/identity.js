@@ -4507,15 +4507,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.die();
 				}
 			},
-			// this is skill is now only meant for AI players
 			_mingzhi1:{
 				trigger:{player:['phaseBeginStart','dyingBefore']},
 				priority:19,
 				forced:true,
 				popup:false,
-				filter:function(event,player){
-					return player!=game.me&&!player.isOnline2();
-				},
 				content:function(){
 					"step 0"
 					var choice=1;

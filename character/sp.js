@@ -11689,10 +11689,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.cards.length==1&&get.type(event.cards[0],'trick')=='trick';
 				},
 				forced:true,
-				content:function(){
-					trigger.addCount=false;
-					if(player.stat[player.stat.length-1].card.sha>0){
-						player.stat[player.stat.length-1].card.sha--;
+				content:function(){},
+				mod:{
+					cardUsable:function(card,player,num){
+						if(card.cards&&card.cards.length==1&&get.type(card.cards[0],'trick')=='trick'&&get.color(card.cards[0])=='red') return Infinity;
 					}
 				},
 				group:'nuzhan2'

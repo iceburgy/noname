@@ -400,11 +400,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				filter:function(event,player){
+					// for qiangwu
+					var isQiangwu,qiangwuCards;
+					if(player.hasSkill('qiangwu3')){
+						var qiangwuCards=player.getCards('hes',function(card){
+							return card.number>player.storage.qiangwu&&get.name(card,player)=='shan';
+						});
+						isQiangwu=qiangwuCards&&qiangwuCards.length;
+					}
+
+					// for chenglve
+					var isChenglve,chenglveCards;
+					if(player.hasSkill('nzry_chenglve1')&&player.storage.nzry_chenglve1&&player.storage.nzry_chenglve1.length){
+						var chenglveCards=player.getCards('hes',function(card){
+							var cards=player.storage.nzry_chenglve1;
+							for(var i=0;i<cards.length;i++){
+								if(cards[i]==get.suit(card)&&get.name(card,player)=='shan') return true;
+							};
+						});
+						isChenglve=chenglveCards&&chenglveCards.length;
+					}
+
+					var tempCard;
+					if(isQiangwu) tempCard={name:'sha',cards:[qiangwuCards[0]]};
+					else if(isChenglve) tempCard={name:'sha',cards:[chenglveCards[0]]};
+					else tempCard={name:'sha'};
+
 					var filter=event.filterCard;
-					if(filter({name:'sha'},player,event)&&player.countCards('h','shan')) return true;
-					if(filter({name:'shan'},player,event)&&player.countCards('h','sha')) return true;
-					if(filter({name:'tao'},player,event)&&player.countCards('h','jiu')) return true;
-					if(filter({name:'jiu'},player,event)&&player.countCards('h','tao')) return true;
+					if(filter(tempCard,player,event)&&player.countCards('hs','shan')) return true;
+					if(filter({name:'shan'},player,event)&&player.countCards('hs','sha')) return true;
+					if(filter({name:'tao'},player,event)&&player.countCards('hs','jiu')) return true;
+					if(filter({name:'jiu'},player,event)&&player.countCards('hs','tao')) return true;
 					return false;
 				},
 				ai:{
@@ -418,7 +444,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							case 'respondShan':name='sha';break;
 							case 'save':name='jiu';break;
 						}
-						if(!player.countCards('h',name)) return false;
+						if(!player.countCards('hs',name)) return false;
 					},
 					order:function(item,player){
 						if(player&&_status.event.type=='phase'){
@@ -427,7 +453,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var map={sha:'shan',tao:'jiu',jiu:'tao'}
 							for(var i=0;i<list.length;i++){
 								var name=list[i];
-			 				if(player.countCards('h',map[name])>(name=='jiu'?1:0)&&player.getUseValue({name:name})>0){
+			 				if(player.countCards('hs',map[name])>(name=='jiu'?1:0)&&player.getUseValue({name:name})>0){
 			 					var temp=get.order({name:name});
 			 					if(temp>max) max=temp;
 			 				}
@@ -3637,16 +3663,58 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.zhu(player,'shouyue')) return true;
 					return get.color(card)=='red';
 				},
+				filter:function(event,player){
+					// for nuzhan
+					var redTrickCards=player.getCards('hes',function(card){
+						return get.type(card,'trick')=='trick'&&get.color(card)=='red';
+					});
+					var isNuzhan=player.hasSkill('nuzhan')&&redTrickCards&&redTrickCards.length;
+
+					// for qiangwu
+					var isQiangwu,redQiangwuCards;
+					if(player.hasSkill('qiangwu3')){
+						var redQiangwuCards=player.getCards('hes',function(card){
+							return card.number>player.storage.qiangwu&&get.color(card)=='red';
+						});
+						isQiangwu=redQiangwuCards&&redQiangwuCards.length;
+					}
+
+					// for chenglve
+					var isChenglve,chenglveCards;
+					if(player.hasSkill('nzry_chenglve1')&&player.storage.nzry_chenglve1&&player.storage.nzry_chenglve1.length){
+						var chenglveCards=player.getCards('hes',function(card){
+							var cards=player.storage.nzry_chenglve1;
+							for(var i=0;i<cards.length;i++){
+								if(cards[i]==get.suit(card)&&get.color(card)=='red') return true;
+							};
+						});
+						isChenglve=chenglveCards&&chenglveCards.length;
+					}
+
+					var tempCard;
+					if(isNuzhan) tempCard={name:'sha',cards:[redTrickCards[0]]};
+					else if(isQiangwu) tempCard={name:'sha',cards:[redQiangwuCards[0]]};
+					else if(isChenglve) tempCard={name:'sha',cards:[chenglveCards[0]]};
+					else tempCard={name:'sha'};
+					var filter=event.filterCard;
+					if((filter(tempCard,player,event))&&player.countCards('hes',{color:'red'})) return true;
+					return false;
+				},
 				position:"hes",
-				viewAs:{
-					name:"sha",
+				viewAs:function(cards,player){
+					if(get.color(cards[0])=='red'){
+						return {
+							name:"sha"
+						}
+					}
+					return null;
 				},
 				viewAsFilter:function (player){
 					if(get.zhu(player,'shouyue')){
 						if(!player.countCards('hes')) return false;
 					}
 					else{
-						if(!player.countCards('he',{color:'red'})) return false;
+						if(!player.countCards('hes',{color:'red'})) return false;
 					}
 				},
 				prompt:"将一张红色牌当杀使用或打出",
