@@ -86,7 +86,9 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 			},
 		},
 		gameStart:function(){
-			game.playAudio('../extension', decadeUI.extensionName, 'audio/game_start.mp3');
+			game.broadcastAll(function(extensionName){
+				game.playAudio('../extension', extensionName, 'audio/game_start.mp3');
+			},decadeUI.extensionName);
 			// 没素材 :(
 			
 			

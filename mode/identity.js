@@ -3394,9 +3394,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									for(var skill of skills){
 										var skillinfo=lib.skill[skill];
 										if(skillinfo&&('audio' in skillinfo)){
-											var tempSkill=(typeof skillinfo['audio']=='string')?skillinfo['audio']:skill;
-											if(skillinfo['zhuSkill']||skillinfo['juexingji']||skillinfo['limited']) return tempSkill;
-											if(!retSkill.length) retSkill=tempSkill;
+											if(skillinfo['zhuSkill']||skillinfo['juexingji']||skillinfo['limited']) return skill;
+											if(!retSkill.length) retSkill=skill;
 										}
 									}
 								}
@@ -3411,7 +3410,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						else if(num==1) characters=[this.name2];
 						else characters=[this.name1,this.name2];
 						audioSkill=getCharacterSkillWithAudio(characters);
-						game.playSkillAudio(audioSkill);
+						game.trySkillAudio(audioSkill,this,true);
 					}
 					if(this.identity=='unknown'){
 						this.group=lib.character[this.name1][1];
@@ -3509,7 +3508,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(this.group=='shen') this.group=this.groupshen;
 					game.broadcast(function(player,name,sex,num,group,audioSkill){
 						if(audioSkill){
-							game.playSkillAudio(audioSkill);
+							game.trySkillAudio(audioSkill,player,true);
 						}
 						player.group=group;
 						player.name=name;

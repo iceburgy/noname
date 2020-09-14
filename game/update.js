@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.09.13',
+	version:'2020.09.14',
 	update:'2020.08.09',
 	changeLog:[
 		'优化亮将视效与音效',
@@ -31,6 +31,7 @@ window.noname_update={
 		'theme/woodden/style.css',
 		'extension/十周年UI/content.js',
 		'extension/十周年UI/decadeLayout.css',
+		'extension/十周年UI/effect.js',
 		'extension/十周年UI/extension.js',
 		'extension/十周年UI/dialog.css',
 		'extension/十周年UI/layout.css',
