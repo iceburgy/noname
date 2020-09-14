@@ -3077,12 +3077,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				dieAfter:function(source){
-					var showID=2;
-					if(this.isUnseen(2)){
-						if(this.isUnseen()) this.showCharacter(2);
-						else if(this.isUnseen(0)) this.showCharacter(0);
-						if(this.isUnseen(1)) this.showCharacter(1);
-					}
+					this.showCharacter(2);
 					game.broadcastAll(function(player,identity,identity2){
 						player.setIdentity(player.identity);
 						player.identityShown=true;
@@ -3371,14 +3366,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return next;
 				},
 				$showCharacter:function(num,log,playAudio){
+					if(!this.isUnseen(2)){
+						return;
+					}
 					if(num==0&&!this.isUnseen(0)){
 						return;
 					}
 					if(num==1&&!this.isUnseen(1)){
 						return;
 					}
-					if(!this.isUnseen(2)){
-						return;
+					if(num==2){
+						if(!this.isUnseen(0)){
+							num=1;
+						}
+						if(!this.isUnseen(1)){
+							num=0;
+						}
 					}
 					game.addVideo('showCharacter',this,num);
 					var getCharacterSkillWithAudio=function(character){
