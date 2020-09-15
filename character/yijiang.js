@@ -10405,7 +10405,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							if(cards.length){
-								player.chooseButton(['落英：选择要获得的牌',cards],[1,cards.length]);
+								player.chooseButton(['落英：选择要获得的牌',cards],[1,cards.length]).set('ai',function(button){
+									return 1;
+								});
 							}
 							"step 2"
 							if(result.bool){
@@ -10436,7 +10438,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							"step 0"
 							player.chooseButton(['落英：选择要获得的牌',trigger.cards],[1,trigger.cards.length]).set('ai',function(button){
-								return get.value(button.link,player,'raw');
+								return 1;
 							});
 							"step 1"
 							if(result.bool){

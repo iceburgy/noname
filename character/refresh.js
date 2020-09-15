@@ -2302,7 +2302,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.cards=[result.player,result.target].filterInD('d');
 						if(!event.cards.length) event.finish();
 						else source.chooseControl('ok','cancel2').set('dialog',['是否获得拼点牌？',event.cards]).set('ai',function(){
-							if(get.value(event.cards,source,'raw')<=0) return false;
 							return true;
 						});
 					}
