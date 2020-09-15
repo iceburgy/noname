@@ -4954,6 +4954,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//forceaudio:true,
 				trigger:{global:'damageSource'},
 				filter:function(event,player){
+					if(!game.isCharacterSeen(player,'re_dongzhuo')) return false;
 					if(player==event.source||!event.source||event.source.group!='qun') return false;
 					return player.hasZhuSkill('baonue',event.source);
 				},
