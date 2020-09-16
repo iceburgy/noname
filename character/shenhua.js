@@ -1597,10 +1597,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.num=cards.length;
 					event.str1='令至多'+event.num+'名角色摸一张牌';
 					event.str2='对任意名体力值之和为'+event.num+'的角色造成一点伤害';
-					player.chooseControl('cancel2').set('ai',function(){
-						if(game.countPlayer(function(current){return get.attitude(player,current)<0&&current.hp==event.num})>0&&event.num<=3) return 1;
+					player.chooseControl('cancel2').set('choiceList',[event.str1,event.str2]).set('prompt','是否发动【溃诛】？').set('ai',function(){
+						if(game.countPlayer(function(current){return get.attitude(_status.event.player,current)<0&&current.hp==_status.event.num})>0&&_status.event.num<=3) return 1;
 						return 0;
-					}).set('choiceList',[event.str1,event.str2]).set('prompt','是否发动【溃诛】？');
+					}).set('num',event.num);
 					'step 1'
 					if(result.control=='cancel2') event.finish();
 					event.control=[event.str1,event.str2][result.index];
@@ -1617,7 +1617,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return num+target.hp<=_status.event.num;
 						}).set('ai',function(target){
 							if(ui.selected.targets[0]!=undefined) return -1;
-							return get.attitude(player,target)<0;
+							return get.attitude(_status.event.player,target)<0;
 						}).set('promptbar','none').set('num',event.num).set('selectTarget',function(){
 							var targets=ui.selected.targets;
 							var num=0;
@@ -1630,7 +1630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						player.chooseTarget('请选择〖溃诛〗的目标',[1,event.num]).ai=function(target){
-							return get.attitude(player,target);
+							return get.attitude(_status.event.player,target);
 						};
 					};
 					'step 3'
@@ -1677,7 +1677,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					return (player.getHistory('useCard',function(evt){
 						return evt.getParent('phaseUse')==event;
-					}).length<game.countPlayer(function(current){return !current.inRange(player)}))&&game.hasPlayer(function(target){
+					}).length<game.countPlayer(function(current){return current!=player&&!current.inRange(player)}))&&game.hasPlayer(function(target){
 						return target!=player&&!target.inRange(player)&&target.countDiscardableCards(player,'he');
 					});
 				},
@@ -1734,7 +1734,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"nzry_lijun":{
 				unique:true,
-				global:'nzry_lijun1',
+				group:'nzry_lijun1',
 				audio:'nzry_lijun1',
 				zhuSkill:true,
 			},
@@ -1743,55 +1743,60 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				//forceaudio:true,
 				trigger:{
-					player:'useCardAfter'
+					global:'useCardAfter'
 				},
 				filter:function(event,player){
+					if(event.player.hasSkill('nzry_lijun2')) return false;
 					if(event.card.name!='sha') return false;
-					if(player.hasSkill('nzry_lijun2')) return false;
-					if(player.group!='wu') return false;
-					if(_status.currentPhase!=player) return false;
+					if(event.player.group!='wu') return false;
+					if(_status.currentPhase!=event.player) return false;
 					if(!game.hasPlayer(function(target){
-						return player!=target&&target.hasZhuSkill('nzry_lijun',player);
+						return event.player!=target&&target.hasZhuSkill('nzry_lijun',event.player);
 					})) return false;
 					for(var i=0;i<event.cards.length;i++){
 						if(get.position(event.cards[i],true)=='o'){
 							return true;
 						}
 					}
-				return false;
+					return false;
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					var list=game.filterPlayer(function(target){
-						return player!=target&&target.hasZhuSkill('nzry_lijun',player);
-					});
-					player.chooseTarget(get.prompt('nzry_lijun'),'将'+get.translation(trigger.cards)+'交给'+get.translation(list)+(list.length>1?'中的一人':''),function(card,player,target){
-						return player!=target&&target.hasZhuSkill('nzry_lijun',player);
-					}).ai=function(target){
-					return get.attitude(_status.event.player,target);
-					};
+					if(!game.isCharacterSeen(player,'sunliang')){
+						player.chooseBool('是否明置'+get.translation('sunliang')+'发动【立军】？').set('choice',get.attitude(trigger.player,player)>0);
+					}
+					else{
+						event.goto(2);
+					}
 					'step 1'
+					if(result.bool){
+						var index=game.getCharacterIndex(player,'sunliang');
+						player.showCharacter(index);
+						player.logSkill('nzry_lijun');
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					trigger.player.chooseBool('是否对'+get.translation(player)+'发动【立军】？').set('choice',get.attitude(trigger.player,player)>0);
+					'step 3'
 					if(!result.bool) event.finish();
 					else{
-						player.addTempSkill('nzry_lijun2','phaseUseEnd');
-						var zhu=result.targets[0];
-						player.line(zhu,'green');
-						zhu.logSkill('nzry_lijun');
+						trigger.player.addTempSkill('nzry_lijun2','phaseUseEnd');
+						trigger.player.line(player,'green');
+						player.logSkill('nzry_lijun');
 						var list=[];
 						for(var i=0;i<trigger.cards.length;i++){
 							if(get.position(trigger.cards[i],true)=='o'){
 								list.push(trigger.cards[i]);
 							}
 						}
-						player.give(list,zhu);
-						zhu.chooseBool().set('ai',function(){
-							if(get.attitude(zhu,player)>0) return true;
-							return false;
-						}).set('prompt','是否令'+get.translation(player)+'摸一张牌？');
+						trigger.player.give(list,player);
+						player.chooseBool('是否令'+get.translation(trigger.player)+'摸一张牌？').set('choice',get.attitude(trigger.player,player)>0);
 					}
-					'step 2'
-					if(result.bool) player.draw();
+					'step 4'
+					if(result.bool) trigger.player.draw();
 				},
 			},
 			"nzry_chenglve":{
@@ -4954,15 +4959,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//forceaudio:true,
 				trigger:{global:'damageSource'},
 				filter:function(event,player){
-					if(!game.isCharacterSeen(player,'re_dongzhuo')) return false;
 					if(player==event.source||!event.source||event.source.group!='qun') return false;
 					return player.hasZhuSkill('baonue',event.source);
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					trigger.source.chooseBool('是否对'+get.translation(player)+'发动【暴虐】？').set('choice',get.attitude(trigger.source,player)>0);
+					if(!game.isCharacterSeen(player,'re_dongzhuo')){
+						player.chooseBool('是否明置'+get.translation('re_dongzhuo')+'发动【暴虐】？').set('choice',get.attitude(trigger.source,player)>0);
+					}
+					else{
+						event.goto(2);
+					}
 					'step 1'
+					if(result.bool){
+						var index=game.getCharacterIndex(player,'re_dongzhuo');
+						player.showCharacter(index);
+						player.logSkill('baonue');
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					trigger.source.chooseBool('是否对'+get.translation(player)+'发动【暴虐】？').set('choice',get.attitude(trigger.source,player)>0);
+					'step 3'
 					if(result.bool){
 						player.logSkill('baonue');
 						trigger.source.line(player,'green')
@@ -4974,7 +4994,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						event.finish();
 					}
-					'step 2'
+					'step 4'
 					if(result.suit=='spade'){
 						player.recover();
 					}

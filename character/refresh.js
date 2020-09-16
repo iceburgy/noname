@@ -91,7 +91,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_liushan:['male','shu',3,['xiangle','olfangquan','olruoyu'],['zhu']],
 			re_zhangzhang:['male','wu',3,['rezhijian','guzheng']],
 			
-			re_sunce:['male','wu',4,['jiang','olhunzi','olzhiba'],['zhu']],
+			re_sunce:['male','wu',4,['jiang','olhunzi','olzhiba','olzhiba2'],['zhu']],
 		},
 		characterIntro:{
 			re_gongsunzan:'群雄之一。出身贵族，因母地位卑贱，只当了郡中小吏。他貌美，声音洪亮，机智善辩。后随卢植于缑氏山中读书，粗通经传。',
@@ -2239,7 +2239,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current!=player&&current.group=='wu'&&player.canCompare(current);
 					})) return true;
 					return (player.group=='wu'&&game.hasPlayer(function(current){
-						return current!=player&&current.hasZhuSkill('olzhiba',player)&&!current.hasSkill('olzhiba3')&&player.canCompare(current);
+						return current!=player&&game.isCharacterSeen(current,'re_sunce')&&!current.hasSkill('olzhiba3')&&player.canCompare(current);
 					}));
 				},
 				filterTarget:function(card,player,target){
@@ -4553,38 +4553,49 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			rejiuyuan:{
-				global:'rejiuyuan2',
+				group:'rejiuyuan2',
 				audio:2,
 				zhuSkill:true,
 			},
 			rejiuyuan2:{
 				audio:'jiuyuan',
 				forceaudio:true,
-				trigger:{player:'useCardToPlayer'},
+				trigger:{global:'useCardToPlayer'},
 				filter:function(event,player){
 					if(event.card.name!='tao') return false;
-					if(player.group!='wu') return false;
-					if(event.target!=player) return false;
+					if(event.player.group!='wu') return false;
+					if(event.target!=event.player) return false;
 					return game.hasPlayer(function(target){
-						return player!=target&&!event.targets.contains(target)&&target.isDamaged()&&target.hp<player.hp&&target.hasZhuSkill('rejiuyuan',player);
+						return event.player!=target&&!event.targets.contains(target)&&target.isDamaged()&&target.hp<event.player.hp&&target.hasZhuSkill('rejiuyuan',event.player);
 					});
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt2('rejiuyuan'),function(card,player,target){
-						return player!=target&&!_status.event.targets.contains(target)&&target.isDamaged()&&target.hp<player.hp&&target.hasZhuSkill('rejiuyuan',player);
-					}).set('ai',function(target){
-						return get.attitude(_status.event.player,target);
-					}).set('targets',trigger.targets);
+					if(!game.isCharacterSeen(player,'re_sunquan')){
+						player.chooseBool('是否明置'+get.translation('re_sunquan')+'发动【救援】？').set('choice',get.attitude(trigger.player,player)>0);
+					}
+					else{
+						event.goto(2);
+					}
 					'step 1'
 					if(result.bool){
-						var target=result.targets[0];
-						target.logSkill('rejiuyuan');
-						player.line('rejiuyuan2',target,'green');
-						trigger.getParent().targets.remove(player);
-						trigger.getParent().targets.push(target);
-						player.draw();
+						var index=game.getCharacterIndex(player,'re_sunquan');
+						player.showCharacter(index);
+						player.logSkill('rejiuyuan');
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					trigger.player.chooseBool('是否对'+get.translation(player)+'发动【救援】？').set('choice',get.attitude(trigger.player,player)>0);
+					'step 3'
+					if(result.bool){
+						player.logSkill('rejiuyuan');
+						trigger.player.line('rejiuyuan2',player,'green')
+						trigger.getParent().targets.remove(trigger.player);
+						trigger.getParent().targets.push(player);
+						trigger.player.draw();
 					}
 				}
 			},

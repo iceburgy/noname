@@ -1,9 +1,10 @@
 window.noname_update={
-	version:'2020.09.14',
+	version:'2020.09.15',
 	update:'2020.08.09',
 	changeLog:[
 		'优化亮将视效与音效',
 		'修复转化杀（武圣，龙胆）与增加出杀上限（怒斩，枪舞，恃才）技能之间配合的bug',
+		'修复主公技暗将不触发的bug（制霸，救援，立军，暴虐）',
 	],
 	files:[
 		'card/extra.js',
