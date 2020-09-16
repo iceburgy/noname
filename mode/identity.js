@@ -4540,6 +4540,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var group=lib.character[player.name1][1];
 						player.chooseControl('bumingzhi','明置'+get.translation(player.name1),
 							'明置'+get.translation(player.name2),'tongshimingzhi',true).ai=function(event,player){
+							if(event.triggername=='dyingBefore') return 3;
 							var popu=get.population(lib.character[player.name1][1])
 							if(popu>=2||(popu==1&&game.players.length<=4)){
 								return Math.random()<0.5?3:(Math.random()<0.5?2:1);
@@ -4559,7 +4560,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						};
 					}
 					else{
-						if(Math.random()<0.5) choice=0;
+						if(event.triggername=='dyingBefore') choice=1;
+						else if(Math.random()<0.5) choice=0;
 						if(player.isUnseen(0)){
 							player.chooseControl('bumingzhi','明置'+get.translation(player.name1),true).choice=choice;
 						}
