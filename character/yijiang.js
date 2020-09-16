@@ -2942,9 +2942,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 3"
 					if(event.target.getCards('he').contains(event.card)){
 						event.target.chooseControlList('问卦','将'+get.translation(event.card)+'置于牌堆顶','将'+get.translation(event.card)+'置于牌堆底',event.target==player,function(){
-							if(get.attitude(event.target,player)<0) return 2;
+							if(get.attitude(_status.event.targetPlayer,_status.event.currentPlayer)<0) return 2;
 							return 1;
-						});
+						}).set('targetPlayer',event.target).set('currentPlayer',player);
 					}
 					else{
 						event.finish();

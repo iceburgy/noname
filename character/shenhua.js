@@ -1598,7 +1598,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.str1='令至多'+event.num+'名角色摸一张牌';
 					event.str2='对任意名体力值之和为'+event.num+'的角色造成一点伤害';
 					player.chooseControl('cancel2').set('choiceList',[event.str1,event.str2]).set('prompt','是否发动【溃诛】？').set('ai',function(){
-						if(game.countPlayer(function(current){return get.attitude(_status.event.player,current)<0&&current.hp==_status.event.num})>0&&_status.event.num<=3) return 1;
+						if(game.countPlayer(function(current){return get.attitude(_status.event.player,current)<0&&current.hp==_status.event.num})>0&&_status.event.num<=1) return 1;
 						return 0;
 					}).set('num',event.num);
 					'step 1'
