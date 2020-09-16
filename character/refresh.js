@@ -2239,7 +2239,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current!=player&&current.group=='wu'&&player.canCompare(current);
 					})) return true;
 					return (player.group=='wu'&&game.hasPlayer(function(current){
-						return current!=player&&game.isCharacterSeen(current,'re_sunce')&&!current.hasSkill('olzhiba3')&&player.canCompare(current);
+						return current!=player&&current.hasZhuSkill('olzhiba',player)&&game.isCharacterSeen(current,'re_sunce')&&!current.hasSkill('olzhiba3')&&player.canCompare(current);
 					}));
 				},
 				filterTarget:function(card,player,target){
