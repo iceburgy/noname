@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.100.7.2',
+	'v1.9.100.7.3',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -1554,6 +1554,8 @@ window.noname_asset_list=[
 	'audio/skill/ranshang22.mp3',
 	'audio/skill/rebiyue1.mp3',
 	'audio/skill/rebiyue2.mp3',
+	'audio/skill/rechunlao1.mp3',
+	'audio/skill/rechunlao2.mp3',
 	'audio/skill/refangquan1.mp3',
 	'audio/skill/refangquan2.mp3',
 	'audio/skill/refangzhu1.mp3',
