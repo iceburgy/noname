@@ -2127,7 +2127,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.list.randomRemove(choiceZhu).concat(['re_dongzhuo','re_sunquan','re_sunce','sp_zhangjiao','sunliang','sunxiu']),'character']],false]);
+							list.push([game.players[i],[str,[event.list.randomRemove(choiceZhu),'character']],false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2217,7 +2217,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[0][0],choiceZhu,event.list);
-							list.push([game.players[i],[str,[nextValidCharacters.concat(['re_dongzhuo','re_sunquan','re_sunce','sp_zhangjiao','sunliang','sunxiu']),'character']],false]);
+							list.push([game.players[i],[str,[nextValidCharacters,'character']],false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
