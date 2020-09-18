@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.09.17',
+	version:'2020.09.18',
 	update:'2020.08.09',
 	changeLog:[
 		'优化亮将视效与音效',
