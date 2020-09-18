@@ -3507,9 +3507,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					this.group=lib.character[this.name][1];
 					if(this.group=='shen') this.group=this.groupshen;
 					game.broadcast(function(player,name,sex,num,group,audioSkill){
-						if(audioSkill){
-							game.trySkillAudio(audioSkill,player,true);
-						}
 						player.group=group;
 						player.name=name;
 						player.sex=sex;
