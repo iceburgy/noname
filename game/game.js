@@ -50634,6 +50634,23 @@
 			}
 			return list;
 		},
+		charactersAndZhuOL:function(allList,zhuList){
+			var libCharacter={};
+			for(var i=0;i<lib.configOL.characterPack.length;i++){
+				var pack=lib.characterPack[lib.configOL.characterPack[i]];
+				for(var j in pack){
+					if(lib.connectBanned.contains(j)) continue;
+					if(lib.character[j]) libCharacter[j]=pack[j];
+				}
+			}
+			for(i in libCharacter){
+				if(lib.filter.characterDisabled(i,libCharacter)) continue;
+				allList.push(i);
+				if(lib.character[i][4]&&lib.character[i][4].contains('zhu')){
+					zhuList.push(i);
+				}
+			}
+		},
 		trimip:function(str){
 			var len=str.length-5;
 			if(str.lastIndexOf(':8080')==len){

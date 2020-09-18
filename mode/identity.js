@@ -418,10 +418,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				return state;
 			},
-			getNextValidCharacters:function(mainChar,numOfChars,charPool){
+			getNextValidCharacters:function(mainChars,numOfChars,charPool){
 				var nextValidCharacters=[];
-				if(mainChar&&lib.config['forbid_double']&&lib.config['forbid_double'][mainChar]){
-					var forbidChars=lib.config['forbid_double'][mainChar];
+				if(typeof mainChars=='string') mainChars=[mainChars];
+				if(mainChars&&Array.isArray(mainChars)&&mainChars.length){
+					var forbidCharsSet=new Set();
+					for(var mainChar of mainChars){
+						if(lib.config['forbid_double']&&lib.config['forbid_double'][mainChar]){
+							forbidCharsSet=new Set([...forbidCharsSet,...lib.config['forbid_double'][mainChar]]);
+						}
+					}
+					var forbidChars=[...forbidCharsSet];
 					for(var i=0;i<numOfChars;i++){
 						var candiChar=undefined;
 						do{
@@ -2090,10 +2097,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					"step 3"
-					var charactersOLList=get.charactersOL();
-					event.list=charactersOLList.slice(0);
-					event.list2=charactersOLList.slice(0);
-					_status.characterlist=charactersOLList.slice(0);
+					event.allList=[];
+					event.zhuList=[];
+					get.charactersAndZhuOL(event.allList,event.zhuList)
+					event.list=event.allList.slice(0);
+					_status.characterlist=event.allList.slice(0);
 
 					// chosenChars for each player: [[zhu1, zhu2], [p1_1, p1_2], ...]
 					// index is based on distance from zhu
@@ -2127,7 +2135,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.list.randomRemove(choiceZhu),'character']],false]);
+							var tempChars=event.allList.randomRemove(choiceZhu);
+							event.zhuList.remove(tempChars);
+							list.push([game.players[i],[str,[tempChars,'character']],false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2167,7 +2177,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.list.randomRemove(choiceZhu),'character']],true]);
+							var tempChars=event.allList.randomRemove(choiceZhu);
+							event.zhuList.remove(tempChars);
+							list.push([game.players[i],[str,[tempChars,'character']],true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2216,8 +2228,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[0][0],choiceZhu,event.list);
-							list.push([game.players[i],[str,[nextValidCharacters,'character']],false]);
+							var nextValidZhu=game.getNextValidCharacters(event.chosenChars[0],1,event.zhuList);
+							if(nextValidZhu.length>0){
+								choiceZhu--;
+								event.allList.remove(nextValidZhu);
+							}
+							var nextValidRest=game.getNextValidCharacters([...event.chosenChars[0],...nextValidZhu],choiceZhu,event.allList);
+							list.push([game.players[i],[str,[[...nextValidZhu,...nextValidRest],'character']],false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2258,7 +2275,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[0][0],choiceZhu,event.list);
+							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[0],choiceZhu,event.allList);
 							list.push([game.players[i],[str,[nextValidCharacters,'character']],true]);
 						}
 					}
@@ -2367,6 +2384,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							zhu.update();
 						}
 					},game.zhu,game.zhu.name,game.zhu.name2,game.players.length>4);
+
+					// remove zhu two characters from pool
+					event.list.remove(event.chosenChars[0]);
 
 					// hide zhu character
 					game.broadcastAll(function(player){
@@ -2744,21 +2764,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					});
 					"step 22"
-					for(var i=0;i<event.chosenChars.length;i++){
-						event.list2.remove(event.chosenChars[i][0]);
-						event.list2.remove(event.chosenChars[i][1]);
-					}
 					var shen=[];
 					for(var i in result){
-						if(result[i]=='ai'){
-							result[i]=event.list2.randomRemove(lib.configOL.double_character?2:1);
-						}
-						else{
-							var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
-							var mainChar=result[i].links[0];
-							var viceChar=mainChar==event.chosenChars[distanceFromZhu][0]?event.chosenChars[distanceFromZhu][1]:event.chosenChars[distanceFromZhu][0];
-							result[i]=[mainChar,viceChar];
-						}
+						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
+						var mainChar=result[i].links[0];
+						var viceChar=mainChar==event.chosenChars[distanceFromZhu][0]?event.chosenChars[distanceFromZhu][1]:event.chosenChars[distanceFromZhu][0];
+						result[i]=[mainChar,viceChar];
 						if(lib.character[result[i][0]]&&lib.character[result[i][0]][1]=='shen'||
 							lib.character[result[i][1]]&&lib.character[result[i][1]][1]=='shen') shen.push(lib.playerOL[i]);
 					}
@@ -2814,11 +2825,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i in event.special_identity){
 							game.zhu.addSkill(i);
 						}
-					}
-					for(var i=0;i<game.players.length;i++){
-						_status.characterlist.remove(game.players[i].name);
-						_status.characterlist.remove(game.players[i].name1);
-						_status.characterlist.remove(game.players[i].name2);
 					}
 
 					for(var i=0;i<game.players.length;i++){
@@ -3109,12 +3115,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(red.length<=1&&blue.length<=1) game.broadcastAll(game.showIdentity);
 						return;
 					};
-					if(game.zhu&&game.zhu.isZhu){
-						if(get.population('zhong')+get.population('nei')==0||
-						get.population('zhong')+get.population('fan')==0){
-							game.broadcastAll(game.showIdentity);
-						}
-					}
 					if(game.zhu&&game.zhu.storage.enhance_zhu&&get.population('fan')<3){
 						game.zhu.removeSkill(game.zhu.storage.enhance_zhu);
 						delete game.zhu.storage.enhance_zhu;
