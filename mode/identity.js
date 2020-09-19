@@ -2089,7 +2089,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							switch(choice){
 								case '是':
 									lib.config.qiandaofuli.users[lib.playerOL[i].nickname]='usingqiandaofuli';
-									lib.playerOL[i].trySkillAnimate('签到福利','签到福利',false);
 									break;
 								default:break;
 							}
@@ -2830,11 +2829,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						// game.zhu has been set at above and it should be skipped here
 						// but we need to revert group from previous fake declaration
-						if(game.players[i]==game.zhu&&game.zhu.isUnseen()){
-							game.zhu.group='unknown';
-							game.broadcast(function(player,group){
-								player.group='unknown';
-							},game.zhu);
+						if(game.players[i]==game.zhu){
+							if(game.zhu.isUnseen()){
+								game.zhu.group='unknown';
+								game.broadcast(function(player,group){
+									player.group='unknown';
+								},game.zhu);
+							}
 							continue;
 						}
 
