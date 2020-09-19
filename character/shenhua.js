@@ -5165,7 +5165,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'bazhen',
 				audioname:['re_sp_zhugeliang','ol_sp_zhugeliang','ol_pangtong'],
 				equipSkill:true,
-				noHidden:true,
 				inherit:'bagua_skill',
 				filter:function(event,player){
 					if(!lib.skill.bagua_skill.filter(event,player)) return false;
