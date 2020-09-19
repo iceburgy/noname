@@ -12603,8 +12603,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(function(card,player,target){
 						return target==player||target==_status.event.source;
 					},true,'礼下：摸一张牌或令对方摸两张牌').set('ai',function(target){
-						return get.attitude(player,target);
-					}).set('source',trigger.player);
+						return get.attitude(_status.event.selfPlayer,target);
+					}).set('source',trigger.player).set('selfPlayer',player);
 					'step 1'
 					if(result.targets.length){
 						result.targets[0].draw(result.targets[0]==player?1:2);
