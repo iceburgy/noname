@@ -2815,6 +2815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=event.map[result.control]||1;
 					player.storage.defaultCardUsable=player.getCardUsable('sha');
 					player.storage.qimou2=num;
+					player.storage.qimou5=num;
 					player.storage.qimou3=num+player.storage.defaultCardUsable;
 					player.loseHp(num);
 					player.addTempSkill('qimou2');
@@ -2864,8 +2865,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					globalFrom:function(from,to,distance){
-						if(typeof from.storage.qimou2=='number'){
-							return distance-from.storage.qimou2;
+						if(typeof from.storage.qimou5=='number'){
+							return distance-from.storage.qimou5;
 						}
 					}
 				}

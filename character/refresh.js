@@ -1335,10 +1335,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('prompt','失去任意点体力').set('goon',num);
 					'step 1'
 					var num=event.map[result.control]||1;
+					player.storage.defaultCardUsable=player.getCardUsable('sha');
 					player.storage.reqimou2=num;
+					player.storage.reqimou5=num;
+					player.storage.usedshas=0;
+					player.storage.reqimou3=num+player.storage.defaultCardUsable;
+					player.storage.reqimou6=num+player.storage.defaultCardUsable;
 					player.loseHp(num);
 					player.draw(num);
 					player.addTempSkill('reqimou2');
+					player.addTempSkill('reqimou3');
+					player.markSkill('reqimou3');
+					player.addTempSkill('reqimou4');
 				},
 				ai:{
 					order:2,
@@ -1382,11 +1390,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					globalFrom:function(from,to,distance){
-						if(typeof from.storage.reqimou2=='number'){
-							return distance-from.storage.reqimou2;
+						if(typeof from.storage.reqimou5=='number'){
+							return distance-from.storage.reqimou5;
 						}
 					}
 				}
+			},
+			reqimou3:{
+				trigger:{player:'useCardAfter'},
+				silent:true,
+				intro:{
+					content:function(storage){
+						return '可使用杀的次数'+storage;
+					}
+				},
+				filter:function(event,player){
+					return player.storage.reqimou3>0&&get.name(event.card)=='sha';
+				},
+				content:function(){
+					player.storage.usedshas=player.getStat().card.sha;
+					player.storage.reqimou3=player.storage.reqimou6-player.storage.usedshas;
+					player.markSkill('reqimou3');
+				},
+				onremove:true,
+			},
+			reqimou4:{
+				trigger:{player:'phaseUseEnd'},
+				silent:true,
+				content:function(){
+					player.storage.reqimou2-=(player.storage.usedshas-player.storage.defaultCardUsable);
+					player.storage.reqimou3+=player.storage.defaultCardUsable;
+					player.storage.reqimou6=player.storage.reqimou3;
+				},
+				onremove:true,
 			},
 			olniepan:{
 				audio:2,
@@ -7082,6 +7118,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olniepan_info:'限定技，当你处于濒死状态时，你可以弃置你区域内的所有牌并复原你的武将牌，然后摸三张牌并将体力回复至3点。然后你选择获得以下技能中的一个：〖八阵〗/〖火计〗/〖看破〗',
 			ol_weiyan:'界魏延',
 			reqimou:'奇谋',
+			reqimou3:'谋',
 			reqimou_info:'限定技，出牌阶段，你可以失去任意点体力并摸等量的牌，然后直到回合结束，你计算与其他角色的距离时-X，且你可以多使用X张【杀】（X为你失去的体力值）',
 			ol_xiaoqiao:'界小乔',
 			rehongyan:'红颜',

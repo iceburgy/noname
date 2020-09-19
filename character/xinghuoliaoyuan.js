@@ -1605,7 +1605,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"qinguo_use":"勤国",
 			"qinguo_use_info":"",
 			"xinfu_qinguo":"勤国",
-			"xinfu_qinguo_info":"当你使用的装备牌结算完成时，你可以视为使用一张【杀】；当你因使用或失去装备牌导致装备区内牌的数量发生变化后，若你装备区内牌的数量等于你的体力值，则你回复1点体力。",
+			"xinfu_qinguo_info":"当你使用的装备牌结算完成时，你可以视为使用一张【杀】；当你的装备区里的牌移动后，或装备牌移至你的装备区后，若你装备区里的牌数与你的体力值相等且与此次移动之前你装备区里的牌数不等，你回复1点体力。",
 			"qinguo_lose":"勤国",
 			"qinguo_lose_info":"",
 			"xinfu_jijun":"集军",
