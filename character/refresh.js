@@ -1335,12 +1335,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('prompt','失去任意点体力').set('goon',num);
 					'step 1'
 					var num=event.map[result.control]||1;
-					player.storage.defaultCardUsable=player.getCardUsable('sha');
-					player.storage.reqimou2=num;
-					player.storage.reqimou5=num;
-					player.storage.usedshas=0;
-					player.storage.reqimou3=num+player.storage.defaultCardUsable;
-					player.storage.reqimou6=num+player.storage.defaultCardUsable;
+					player.storage.reqimou2=num; // for extra sha usable tracking
+					player.storage.reqimou5=num; // only for range tracking
+					player.storage.reqimou3=num+player.getCardUsable('sha'); // usable sha total count
 					player.loseHp(num);
 					player.draw(num);
 					player.addTempSkill('reqimou2');
@@ -1400,27 +1397,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardAfter'},
 				silent:true,
 				intro:{
-					content:function(storage){
-						return '可使用杀的次数'+storage;
+					content:function(storage,player){
+						return '可使用杀的次数'+storage+',距离减'+player.storage.reqimou5;
 					}
 				},
 				filter:function(event,player){
 					return player.storage.reqimou3>0&&get.name(event.card)=='sha';
 				},
 				content:function(){
-					player.storage.usedshas=player.getStat().card.sha;
-					player.storage.reqimou3=player.storage.reqimou6-player.storage.usedshas;
+					player.storage.reqimou3=player.getCardUsable('sha');
 					player.markSkill('reqimou3');
 				},
 				onremove:true,
 			},
 			reqimou4:{
-				trigger:{player:'phaseUseEnd'},
+				// this skill is only meant for liaohua with two use phases
+				trigger:{player:['phaseUseEnd','phaseUseBegin']},
 				silent:true,
 				content:function(){
-					player.storage.reqimou2-=(player.storage.usedshas-player.storage.defaultCardUsable);
-					player.storage.reqimou3+=player.storage.defaultCardUsable;
-					player.storage.reqimou6=player.storage.reqimou3;
+					if(event.triggername=='phaseUseEnd'){
+						player.storage.usedExtraShas=player.getStat().card.sha-1;
+					}
+					else{
+						if(player.storage.usedExtraShas>0) player.storage.reqimou2-=player.storage.usedExtraShas;
+						if(player.storage.reqimou2<0) player.storage.reqimou2=0;
+						player.storage.reqimou3=player.storage.reqimou2+1;
+						player.markSkill('reqimou3');
+					}
 				},
 				onremove:true,
 			},
