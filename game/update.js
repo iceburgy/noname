@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.09.24',
+	version:'2020.09.25',
 	update:'2020.08.09',
 	changeLog:[
 		'修复界魏延奇谋标记',
