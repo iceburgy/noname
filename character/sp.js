@@ -9514,7 +9514,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var mode=get.mode();
 						if(mode=='identity'||(mode=='versus'&&_status.mode=='four')){
 							if(target.name&&lib.character[target.name]){
-								var skills=lib.character[target.name][3];
+								var skills=lib.character[target.name1][3].concat(lib.character[target.name2][3]);
 								target.storage.zhuSkill_yongdi=[];
 								for(var i=0;i<skills.length;i++){
 									var info=lib.skill[skills[i]];
