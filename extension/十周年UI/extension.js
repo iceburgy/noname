@@ -2609,8 +2609,13 @@ content:function(config, pack){
 				            }else{
 				                eventName = '对' + get.translation(event.targets[0]);
 				            }
-				        }else{
-				            eventName = '使用';
+				        }
+				        if (event.card
+				        && event.card.cards
+				        && event.card.cards.length
+				        && (event.card.cards.length > 1 || event.card.name != event.card.cards[0].name || event.card.nature != event.card.cards[0].nature)) {
+				        	var shaNature = event.card.name == 'sha' ? event.card.nature : '';
+				        	eventName += '使用'+get.translation(shaNature)+get.translation(event.card.name)
 				        }
 						
 						if (decadeUI.config.cardUseEffect && event.card && event.card.cards && event.card.cards.length == 1 && event.card.cards[0].clone == card) {
