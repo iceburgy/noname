@@ -1107,7 +1107,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								}
 								return 0;
 							}
-							return 1;
+							return player.hasSkill('zhikezhugong_kejizg')?0:1;
 						}
 					},
 					tag:{
