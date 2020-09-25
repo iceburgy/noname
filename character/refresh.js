@@ -3952,6 +3952,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:"retishen",
 			},
 			"new_tishen2":{
+				audio:"retishen",
 				unique:true,
 				charlotte:true,
 				intro:{
@@ -3962,10 +3963,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				onremove:true,
 				trigger:{
-					target:"shaUnhirt",
+					target:"shaAfter",
 				},
 				filter:function (event,player){
 					if(get.itemtype(event.cards)!='cards') return false;
+					var bool=game.hasPlayer2(function(current){
+						return current.getHistory('damage',function(evt){
+							return event==evt.getParent(1);
+						}).length>0
+					});
+					if(bool) return false;
 					for(var i=0;i<event.cards.length;i++){
 						if(event.cards[i].isInPile()){
 							return true;
@@ -3976,7 +3983,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				nopop:true,
 				content:function (){
-					player.logSkill('new_tishen');
 					var list=[];
 						for(var i=0;i<trigger.cards.length;i++){
 							if(trigger.cards[i].isInPile()){
