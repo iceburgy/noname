@@ -31,6 +31,8 @@
 		statsKeyPlayer:'stats_player',
 		statsKeySortKey:'sort_key',
 		statsKeySortKeyRoleName:'role_name',
+		statsKeyStatsByZones:'stats_by_zones',
+		statsKeyDisplayZone:'display_zone',
 		configprefix:'noname_0.9_',
 		versionOL:27,
 		updateURLS:{
@@ -27208,7 +27210,20 @@
 			if(idinfo&&idinfo.length==2){
 				var zonename=idinfo[0];
 				var sortkey=idinfo[1];
-				lib.config[lib.statsKeyGame][zonename][lib.statsKeySortKey]=sortkey;
+				lib.config[lib.statsKeyGame][lib.statsKeySortKey]=sortkey;
+				game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
+				ui.leaderboardButton._uiintro.close();
+				delete ui.leaderboardButton._uiintro;
+				ui.click.hoverpopped.call(ui.leaderboardButton);
+			}
+			else{
+				console.log('bad link id: '+this.id);
+			}
+		},
+		leaderboardSwitchHostZoneButton:function(){
+			var zonename=this.id;
+			if(zonename){
+				lib.config[lib.statsKeyGame][lib.statsKeyDisplayZone]=zonename;
 				game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
 				ui.leaderboardButton._uiintro.close();
 				delete ui.leaderboardButton._uiintro;
@@ -28150,7 +28165,11 @@
 				if(!statsGame){
 					statsGame={};
 				}
-				var statsLocal=statsGame[lib.statsKeyLocal];
+				var statsByZones=statsGame[lib.statsKeyStatsByZones];
+				if(!statsByZones){
+					statsByZones={};
+				}
+				var statsLocal=statsByZones[lib.statsKeyLocal];
 				if(!statsLocal){
 					statsLocal={};
 				}
@@ -31563,11 +31582,13 @@
 					}
 				}
 				*/
-				var statsGame=lib.config[lib.statsKeyGame];
-				if(!statsGame){
-					statsGame={};
+				if(!lib.config[lib.statsKeyGame]){
+					lib.config[lib.statsKeyGame]={};
 				}
-				var statsLocal=statsGame[lib.statsKeyLocal];
+				if(!lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]){
+					lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]={};
+				}
+				var statsLocal=lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal];
 				if(!statsLocal){
 					statsLocal={};
 				}
@@ -31775,7 +31796,11 @@
 					if(!statsGame){
 						statsGame={};
 					}
-					var statsLocal=statsGame[lib.statsKeyLocal];
+					var statsByZones=statsGame[lib.statsKeyStatsByZones];
+					if(!statsByZones){
+						statsByZones={};
+					}
+					var statsLocal=statsByZones[lib.statsKeyLocal];
 					if(!statsLocal){
 						statsLocal={};
 					}
@@ -31847,18 +31872,20 @@
 				statsLocal[lib.statsKeyIdentity]=identityStatistics;
 				statsLocal[lib.statsKeyRole]=rolesStatistics;
 				statsLocal[lib.statsKeyPlayer]=playersStatistics;
-				statsGame[lib.statsKeyLocal]=statsLocal;
-				game.saveConfig(lib.statsKeyGame,statsGame);
+				lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal]=statsLocal;
+				game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
 
 				var hostZone=game.me.nickname;
 				if(hostZone){
 					game.broadcast(function(zoneKey,data){
-						var statsGame=lib.config[lib.statsKeyGame];
-						if(!statsGame){
-							statsGame={};
+						if(!lib.config[lib.statsKeyGame]){
+							lib.config[lib.statsKeyGame]={};
 						}
-						statsGame[zoneKey]=data;
-						game.saveConfig(lib.statsKeyGame,statsGame);
+						if(!lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]){
+							lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]={};
+						}
+						lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][zoneKey]=data;
+						game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
 					},hostZone,statsLocal);
 				}
 			}
@@ -46511,178 +46538,204 @@
 				});
 				uiintro.classList.add('clsleaderboard');
 				var statsGame=lib.config[lib.statsKeyGame];
-				if(!statsGame||Object.keys(statsGame).length==0){
+				var statsByZones=statsGame[lib.statsKeyStatsByZones];
+				if(!statsByZones){
+					statsByZones={};
+				}
+				if(!statsGame||!statsGame[lib.statsKeyStatsByZones]||Object.keys(statsGame[lib.statsKeyStatsByZones]).length==0){
 					uiintro.add('暂无战况');
 					return uiintro;
 				}
 				var tableStatistics, tr, td, anchor;
 				// game statistics
-				var createLeaderboardAnchor=function(hostzone,key,text){
+				var createLeaderboardAnchor=function(hostzone_input,key,text){
 					anchor=document.createElement('a');
 					anchor.innerHTML=text;
-					if(key==statsGame[hostzone][lib.statsKeySortKey]) anchor.classList.add('clsleaderboardsortkey');
+					if(key==lib.config[lib.statsKeyGame][lib.statsKeySortKey]) anchor.classList.add('clsleaderboardsortkey');
 					else{
-						anchor.id=hostzone+','+key;
+						anchor.id=hostzone_input+','+key;
 						anchor.href='javascript:void(0);';
 						anchor.addEventListener('click',game.leaderboardSortButton);
 					}
 					return anchor;
 				}
-				for(var hostZone in statsGame){
-					var statsByZone=statsGame[hostZone];
-					if(!statsByZone){
-						statsByZone={};
+				var createHostZoneAnchor=function(hostzone_input){
+					anchor=document.createElement('a');
+					anchor.innerHTML='【本地】';
+					if(hostzone_input!=lib.statsKeyLocal) {
+						 anchor.innerHTML='【'+hostzone_input+'】区';
 					}
-					var identityStatistics=statsByZone[lib.statsKeyIdentity];
-					if(!identityStatistics){
-						identityStatistics={
-							zhuzhong:0,
-							fan:0,
-							nei:0,
-						};
+					if(hostzone_input==lib.config[lib.statsKeyGame][lib.statsKeyDisplayZone]) anchor.classList.add('clsleaderboardsortkey');
+					else{
+						anchor.id=hostzone_input;
+						anchor.href='javascript:void(0);';
+						anchor.addEventListener('click',game.leaderboardSwitchHostZoneButton);
 					}
-					var rolesStatistics=statsByZone[lib.statsKeyRole];
-					if(!rolesStatistics){
-						rolesStatistics={};
-					}
-					var playersStatistics=statsByZone[lib.statsKeyPlayer];
-					if(!playersStatistics){
-						playersStatistics={};
-					}
-					var p=document.createElement('p');
-					p.innerHTML='【本地】';
-					if(hostZone!=lib.statsKeyLocal) {
-						 p.innerHTML='【'+hostZone+'】区';
-					}
-					uiintro.add(p.outerHTML);
-
-					tableStatistics=document.createElement('table');
-					tableStatistics.style.width='-webkit-fill-available';
-					tableStatistics.style.textAlign='center';
-					tableStatistics.classList.add('text');
-					tr=document.createElement('tr');
-					tr.appendChild(document.createElement('td'));
-					td=document.createElement('td');
-					td.innerHTML='主忠';
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML='反贼';
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML='内奸';
-					tr.appendChild(td);
-					tableStatistics.appendChild(tr);
-
-					tr=document.createElement('tr');
-					td=document.createElement('td');
-					td.innerHTML='胜场';
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=identityStatistics.zhuzhong;
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=identityStatistics.fan;
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=identityStatistics.nei;
-					tr.appendChild(td);
-					tableStatistics.appendChild(tr);
-					uiintro.add(tableStatistics.outerHTML);
-					uiintro.add(ui.create.div('.placeholder').outerHTML);
-
-					// sort by winRate, returns [[k1, val1],[k2, val2]]
-					if(!statsByZone[lib.statsKeySortKey]) statsByZone[lib.statsKeySortKey]=lib.statsKeySortKeyRoleName;
-					var sortedStats=game.sortProperties(rolesStatistics,statsByZone[lib.statsKeySortKey]);
-
-					tableStatistics=document.createElement('table');
-					tableStatistics.style.width='-webkit-fill-available';
-					tableStatistics.style.textAlign='center';
-					tableStatistics.classList.add('text');
-					tr=document.createElement('tr');
-					td=document.createElement('td');
-					anchor=createLeaderboardAnchor(hostZone,lib.statsKeySortKeyRoleName,'武将');
-					td.appendChild(anchor);
-					tr.appendChild(td);
-					td=document.createElement('td');
-					anchor=createLeaderboardAnchor(hostZone,'numWin','胜场');
-					td.appendChild(anchor);
-					tr.appendChild(td);
-					td=document.createElement('td');
-					anchor=createLeaderboardAnchor(hostZone,'numLose','负场');
-					td.appendChild(anchor);
-					tr.appendChild(td);
-					td=document.createElement('td');
-					anchor=createLeaderboardAnchor(hostZone,'winRate','胜率');
-					td.appendChild(anchor);
-					tr.appendChild(td);
-					td=document.createElement('td');
-					anchor=createLeaderboardAnchor(hostZone,'zhuRate','主公');
-					td.appendChild(anchor);
-					tr.appendChild(td);
-					td=document.createElement('td');
-					anchor=createLeaderboardAnchor(hostZone,'zhongRate','忠臣');
-					td.appendChild(anchor);
-					tr.appendChild(td);
-					td=document.createElement('td');
-					anchor=createLeaderboardAnchor(hostZone,'fanRate','反贼');
-					td.appendChild(anchor);
-					tr.appendChild(td);
-					td=document.createElement('td');
-					anchor=createLeaderboardAnchor(hostZone,'neiRate','内奸');
-					td.appendChild(anchor);
-					tr.appendChild(td);
-					tableStatistics.appendChild(tr);
-
-					for(var i=0;i<sortedStats.length;i++){
-						var roleName=sortedStats[i][0];
-						tr=document.createElement('tr');
-						td=document.createElement('td');
-						td.innerHTML=get.translation(roleName);
-						tr.appendChild(td);
-						td=document.createElement('td');
-						td.innerHTML=sortedStats[i][1]['numWin'];
-						tr.appendChild(td);
-						td=document.createElement('td');
-						td.innerHTML=sortedStats[i][1]['numLose'];
-						tr.appendChild(td);
-						td=document.createElement('td');
-						td.innerHTML=sortedStats[i][1]['winRate'];
-						tr.appendChild(td);
-						td=document.createElement('td');
-						var zhuWin=sortedStats[i][1]['zhuWin'];
-						var zhuLose=sortedStats[i][1]['zhuLose'];
-						var zhuTotal=zhuWin+zhuLose;
-						var zhuRate=sortedStats[i][1]['zhuRate'];
-						td.innerHTML=zhuWin+'/'+zhuTotal+'='+zhuRate;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						var zhongWin=sortedStats[i][1]['zhongWin'];
-						var zhongLose=sortedStats[i][1]['zhongLose'];
-						var zhongTotal=zhongWin+zhongLose;
-						var zhongRate=sortedStats[i][1]['zhongRate'];
-						td.innerHTML=zhongWin+'/'+zhongTotal+'='+zhongRate;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						var fanWin=sortedStats[i][1]['fanWin'];
-						var fanLose=sortedStats[i][1]['fanLose'];
-						var fanTotal=fanWin+fanLose;
-						var fanRate=sortedStats[i][1]['fanRate'];
-						td.innerHTML=fanWin+'/'+fanTotal+'='+fanRate;
-						tr.appendChild(td);
-						td=document.createElement('td');
-						var neiWin=sortedStats[i][1]['neiWin'];
-						var neiLose=sortedStats[i][1]['neiLose'];
-						var neiTotal=neiWin+neiLose;
-						var neiRate=sortedStats[i][1]['neiRate'];
-						td.innerHTML=neiWin+'/'+neiTotal+'='+neiRate;
-						tr.appendChild(td);
-						tableStatistics.appendChild(tr);
-					}
-					var tablewrap=ui.create.div('.caption');
-					tablewrap.appendChild(tableStatistics);
-					uiintro.add(tablewrap);
-					uiintro.add(ui.create.div('.placeholder').outerHTML);
+					return anchor;
 				}
+				if(!statsGame[lib.statsKeyDisplayZone]){
+					statsGame[lib.statsKeyDisplayZone]=Object.keys(statsGame[lib.statsKeyStatsByZones])[0];
+					game.saveConfig(lib.statsKeyGame,statsGame);
+				}
+				var hostZone=statsGame[lib.statsKeyDisplayZone];
+				var statsByZone=statsByZones[hostZone];
+				if(!statsByZone){
+					statsByZone={};
+				}
+				var identityStatistics=statsByZone[lib.statsKeyIdentity];
+				if(!identityStatistics){
+					identityStatistics={
+						zhuzhong:0,
+						fan:0,
+						nei:0,
+					};
+				}
+				var rolesStatistics=statsByZone[lib.statsKeyRole];
+				if(!rolesStatistics){
+					rolesStatistics={};
+				}
+				var playersStatistics=statsByZone[lib.statsKeyPlayer];
+				if(!playersStatistics){
+					playersStatistics={};
+				}
+				var p=document.createElement('p');
+				for(var zoneName in statsByZones){
+					anchor=createHostZoneAnchor(zoneName);
+					p.appendChild(anchor);
+				}
+				var pwrap=ui.create.div('.caption');
+				pwrap.appendChild(p);
+				uiintro.add(pwrap);
+
+				tableStatistics=document.createElement('table');
+				tableStatistics.style.width='-webkit-fill-available';
+				tableStatistics.style.textAlign='center';
+				tableStatistics.classList.add('text');
+				tr=document.createElement('tr');
+				tr.appendChild(document.createElement('td'));
+				td=document.createElement('td');
+				td.innerHTML='主忠';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='反贼';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML='内奸';
+				tr.appendChild(td);
+				tableStatistics.appendChild(tr);
+
+				tr=document.createElement('tr');
+				td=document.createElement('td');
+				td.innerHTML='胜场';
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML=identityStatistics.zhuzhong;
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML=identityStatistics.fan;
+				tr.appendChild(td);
+				td=document.createElement('td');
+				td.innerHTML=identityStatistics.nei;
+				tr.appendChild(td);
+				tableStatistics.appendChild(tr);
+				uiintro.add(tableStatistics.outerHTML);
+				uiintro.add(ui.create.div('.placeholder').outerHTML);
+
+				// sort by winRate, returns [[k1, val1],[k2, val2]]
+				if(!statsGame[lib.statsKeySortKey]){
+					statsGame[lib.statsKeySortKey]=lib.statsKeySortKeyRoleName;
+					game.saveConfig(lib.statsKeyGame,statsGame);
+				}
+				var sortedStats=game.sortProperties(rolesStatistics,statsGame[lib.statsKeySortKey]);
+
+				tableStatistics=document.createElement('table');
+				tableStatistics.style.width='-webkit-fill-available';
+				tableStatistics.style.textAlign='center';
+				tableStatistics.classList.add('text');
+				tr=document.createElement('tr');
+				td=document.createElement('td');
+				anchor=createLeaderboardAnchor(hostZone,lib.statsKeySortKeyRoleName,'武将');
+				td.appendChild(anchor);
+				tr.appendChild(td);
+				td=document.createElement('td');
+				anchor=createLeaderboardAnchor(hostZone,'numWin','胜场');
+				td.appendChild(anchor);
+				tr.appendChild(td);
+				td=document.createElement('td');
+				anchor=createLeaderboardAnchor(hostZone,'numLose','负场');
+				td.appendChild(anchor);
+				tr.appendChild(td);
+				td=document.createElement('td');
+				anchor=createLeaderboardAnchor(hostZone,'winRate','胜率');
+				td.appendChild(anchor);
+				tr.appendChild(td);
+				td=document.createElement('td');
+				anchor=createLeaderboardAnchor(hostZone,'zhuRate','主公');
+				td.appendChild(anchor);
+				tr.appendChild(td);
+				td=document.createElement('td');
+				anchor=createLeaderboardAnchor(hostZone,'zhongRate','忠臣');
+				td.appendChild(anchor);
+				tr.appendChild(td);
+				td=document.createElement('td');
+				anchor=createLeaderboardAnchor(hostZone,'fanRate','反贼');
+				td.appendChild(anchor);
+				tr.appendChild(td);
+				td=document.createElement('td');
+				anchor=createLeaderboardAnchor(hostZone,'neiRate','内奸');
+				td.appendChild(anchor);
+				tr.appendChild(td);
+				tableStatistics.appendChild(tr);
+
+				for(var i=0;i<sortedStats.length;i++){
+					var roleName=sortedStats[i][0];
+					tr=document.createElement('tr');
+					td=document.createElement('td');
+					td.innerHTML=get.translation(roleName);
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=sortedStats[i][1]['numWin'];
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=sortedStats[i][1]['numLose'];
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=sortedStats[i][1]['winRate'];
+					tr.appendChild(td);
+					td=document.createElement('td');
+					var zhuWin=sortedStats[i][1]['zhuWin'];
+					var zhuLose=sortedStats[i][1]['zhuLose'];
+					var zhuTotal=zhuWin+zhuLose;
+					var zhuRate=sortedStats[i][1]['zhuRate'];
+					td.innerHTML=zhuWin+'/'+zhuTotal+'='+zhuRate;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					var zhongWin=sortedStats[i][1]['zhongWin'];
+					var zhongLose=sortedStats[i][1]['zhongLose'];
+					var zhongTotal=zhongWin+zhongLose;
+					var zhongRate=sortedStats[i][1]['zhongRate'];
+					td.innerHTML=zhongWin+'/'+zhongTotal+'='+zhongRate;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					var fanWin=sortedStats[i][1]['fanWin'];
+					var fanLose=sortedStats[i][1]['fanLose'];
+					var fanTotal=fanWin+fanLose;
+					var fanRate=sortedStats[i][1]['fanRate'];
+					td.innerHTML=fanWin+'/'+fanTotal+'='+fanRate;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					var neiWin=sortedStats[i][1]['neiWin'];
+					var neiLose=sortedStats[i][1]['neiLose'];
+					var neiTotal=neiWin+neiLose;
+					var neiRate=sortedStats[i][1]['neiRate'];
+					td.innerHTML=neiWin+'/'+neiTotal+'='+neiRate;
+					tr.appendChild(td);
+					tableStatistics.appendChild(tr);
+				}
+				var tablewrap=ui.create.div('.caption');
+				tablewrap.appendChild(tableStatistics);
+				uiintro.add(tablewrap);
+				uiintro.add(ui.create.div('.placeholder').outerHTML);
 				return uiintro;
 			},
 			chat:function(){

@@ -1,7 +1,8 @@
 window.noname_update={
-	version:'2020.09.25.2',
+	version:'2020.09.25.3',
 	update:'2020.08.09',
 	changeLog:[
+		'战况分区链接',
 		'显示转化牌的牌名',
 		'修复界魏延奇谋标记',
 		'修复拥嫡双将模式的bug',
