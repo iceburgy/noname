@@ -51833,7 +51833,7 @@
 		},
 		selectableCards:function(sort){
 			if(!_status.event.player) return[];
-			var cards=_status.event.player.getCards('hejs');
+			var cards=_status.event.player.getCards('hes');
 			var selectable=[];
 			for(var i=0;i<cards.length;i++){
 				if(cards[i].classList.contains('selectable')&&

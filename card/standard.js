@@ -745,9 +745,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						var next=target.chooseToRespond({name:'sha'});
 						next.set('ai',function(card){
 							// fix bug: ai can respond with equip and judge card
-							if(card&&get.position(card)=='j') return 0;
-							if(card&&get.name(card)!='sha') return 0;
-
+							if(card&&get.itemtype(card)=='card'&&get.name(card)!='sha'){
+								return 0;
+							}
 							var evt=_status.event.getParent();
 							if(get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
 							if(evt.player.hasSkillTag('notricksource')) return 0;
@@ -811,8 +811,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						var next=target.chooseToRespond({name:'shan'});
 						next.set('ai',function(card){
 							// fix bug: ai can respond with equip and judge card
-							if(card&&get.position(card)=='j') return 0;
-							if(card&&get.name(card)!='shan') return 0;
+							if(card&&get.itemtype(card)=='card'&&get.name(card)!='shan'){
+								return 0;
+							}
 
 							var evt=_status.event.getParent();
 							if(get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
@@ -936,6 +937,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							next.set('prompt2','共需打出'+event.shaRequired+'张杀')
 						}
 						next.set('ai',function(card){
+							// fix bug: ai can respond with equip and judge card
+							if(card&&get.itemtype(card)=='card'&&get.name(card)!='sha'){
+								return 0;
+							}
 							var event=_status.event;
 							var player=event.splayer;
 							var target=event.starget;
