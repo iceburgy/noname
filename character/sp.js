@@ -16381,10 +16381,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.dialog=ui.create.dialog(event.str);
 					event.videoId=lib.status.videoId++;
 					game.broadcast('createDialog',event.videoId,event.str);
-					game.pause();
-					setTimeout(function(){
-						game.resume();
-					},1000);
+					game.delayx(4);
 
 					"step 2"
 					event.dialog.close();
@@ -16392,10 +16389,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.log(event.str);
 
 					player.judge(function(card){
-						game.pause();
-						setTimeout(function(){
-							game.resume();
-						},1000);
+						game.delayx(4);
 						if(card.number==event.num) return 4;
 						return -1;
 					});
