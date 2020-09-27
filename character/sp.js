@@ -17729,7 +17729,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:"龙",
 				intro:{
 					name:"龙印",
-					content:"<li>出牌阶段限三次，你可以将一张红色牌当【火攻】使用。<br><li>若你同时拥有「凤印」，则你视为拥有技能〖业炎〗。（发动〖业炎〗后，弃置龙印和凤印）",
+					content:"<li>一回合限三次，你可以将一张红色牌当【火攻】使用。<br><li>若你同时拥有「凤印」，则你视为拥有技能〖业炎〗。（发动〖业炎〗后，弃置龙印和凤印）",
 				},
 				usable:3,
 				audio:2,
@@ -17784,7 +17784,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"smh_lianhuan":{
 				audio:2,
 				charlotte:true,
-				enable:"phaseUse",
+				enable:"chooseToUse",
 				filter:function (event,player){
 					if(player.hasSkill('lianhuan')||player.hasSkill('xinlianhuan')) return false;
 					if(!game.hasPlayer(function(current){
@@ -17805,7 +17805,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:"凤",
 				intro:{
 					name:"凤印",
-					content:"<li>出牌阶段限三次，你可以将你的任意一张梅花手牌当作【铁索连环】使用或重铸。",
+					content:"<li>一回合限三次，你可以将你的任意一张梅花手牌当作【铁索连环】使用或重铸。",
 				},
 				group:["smh_lianhuan1","smh_lianhuan2"],
 			},
@@ -17876,14 +17876,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"smh_lianhuan1":{
-				enable:"phaseUse",
+				enable:"chooseToUse",
 				filter:function (event,player){
 					if(player.hasSkill('lianhuan')||player.hasSkill('xinlianhuan')) return false;
 					if(!game.hasPlayer(function(current){
 						return current.hasSkill('xinfu_jianjie');
 					})) return false;
 					if((player.getStat().skill.smh_lianhuan||0)+(player.getStat().skill.smh_lianhuan1||0)>=3) return false;
-					return player.countCards('h',{suit:'club'})>0;
+					var tempCard={name:'tiesuo'};
+					var filter=event.filterCard;
+					return (filter(tempCard,player,event))&&player.countCards('h',{suit:'club'})>0;
 				},
 				filterCard:function (card){
 					return get.suit(card)=='club';
