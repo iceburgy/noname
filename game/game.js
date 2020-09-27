@@ -51657,10 +51657,10 @@
 				return null;
 			}
 			if(!card.parentNode) return;
-			if(card.parentNode.classList.contains('equips')) return 'e';
-			if(card.parentNode.classList.contains('judges')) return 'j';
-			if(card.parentNode.classList.contains('handcards')) return 'h';
-			if(card.parentNode.classList.contains('special')) return 's';
+			if(card.parentNode.classList&&card.parentNode.classList.contains('equips')) return 'e';
+			if(card.parentNode.classList&&card.parentNode.classList.contains('judges')) return 'j';
+			if(card.parentNode.classList&&card.parentNode.classList.contains('handcards')) return 'h';
+			if(card.parentNode.classList&&card.parentNode.classList.contains('special')) return 's';
 			if(card.parentNode.id=='cardPile') return 'c';
 			if(card.parentNode.id=='discardPile') return 'd';
 			if(card.parentNode.id=='special') return 's';
