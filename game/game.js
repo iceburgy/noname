@@ -32606,6 +32606,7 @@
 								game.print('游戏出错：'+event.name);
 								game.print(e.toString());
 								console.log(e);
+								console.log(event.content.toString());
 							}
 						}
 						else{
