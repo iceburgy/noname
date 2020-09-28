@@ -2431,8 +2431,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 14"
 					if(result.bool){
 						var shili=result.links[0][2].slice(6);
-						var shiliTrans=get.translation(shili);
-						game.zhu.trySkillAnimate(shiliTrans,shiliTrans,false);
+						game.zhu.hiddenSkills.add('shengmingshili'+shili);
+						game.zhu.addSkillTrigger('shengmingshili'+shili,true);
+						_status.event.trigger('declareGroup');
 						game.zhu.group=shili;
 						game.broadcast(function(player,group){
 							player.group=group;
@@ -2963,6 +2964,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			anlezhugong:'安乐主公',
 			anlezhugong_info:'村规主公限定技：主公如果在第一轮被乐而且中乐，则手牌上限加2，（十人局则加3）',
 			anlezhugong2:'安乐主公',
+			shengmingshiliwei:'魏势力',
+			shengmingshilishu:'蜀势力',
+			shengmingshiliwu:'吴势力',
+			shengmingshiliqun:'群势力',
 			bumingzhi:'不明置',
 			tongshimingzhi:'同时明置',
 		},
@@ -4176,6 +4181,74 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
+			shengmingshiliwei:{
+				unique:true,
+				mark:false,
+				frequent:true,
+				limited:true,
+				audio:false,
+				trigger:{global:'declareGroup'},
+				skillAnimation:'legend',
+				animationColor:'water',
+				content:function(){
+					'step 0'
+					player.awakenSkill('shengmingshiliwei');
+					game.broadcastAll(function(player){
+						player.removeSkill('shengmingshiliwei');
+					},player);
+				},
+			},
+			shengmingshilishu:{
+				unique:true,
+				mark:false,
+				frequent:true,
+				limited:true,
+				audio:false,
+				trigger:{global:'declareGroup'},
+				skillAnimation:'legend',
+				animationColor:'soil',
+				content:function(){
+					'step 0'
+					player.awakenSkill('shengmingshilishu');
+					game.broadcastAll(function(player){
+						player.removeSkill('shengmingshilishu');
+					},player);
+				},
+			},
+			shengmingshiliwu:{
+				unique:true,
+				mark:false,
+				frequent:true,
+				limited:true,
+				audio:false,
+				trigger:{global:'declareGroup'},
+				skillAnimation:'legend',
+				animationColor:'wood',
+				content:function(){
+					'step 0'
+					player.awakenSkill('shengmingshiliwu');
+					game.broadcastAll(function(player){
+						player.removeSkill('shengmingshiliwu');
+					},player);
+				},
+			},
+			shengmingshiliqun:{
+				unique:true,
+				mark:false,
+				frequent:true,
+				limited:true,
+				audio:false,
+				trigger:{global:'declareGroup'},
+				skillAnimation:'legend',
+				animationColor:'metal',
+				content:function(){
+					'step 0'
+					player.awakenSkill('shengmingshiliqun');
+					game.broadcastAll(function(player){
+						player.removeSkill('shengmingshiliqun');
+					},player);
+				},
+			},
 			identity_junshi:{
 				name:'军师',
 				mark:true,
@@ -4588,7 +4661,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				priority:10,
 				content:function(){
 					"step 0"
-					if(get.info(trigger.skill).silent||trigger.skill=='woshixiaonei'||trigger.skill=='xiaoneibonus'){
+					if(get.info(trigger.skill).silent||trigger.skill=='woshixiaonei'||trigger.skill=='xiaoneibonus'||trigger.skill.startsWith('shengmingshili')){
 						event.finish();
 					}
 					else{
