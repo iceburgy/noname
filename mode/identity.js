@@ -2443,6 +2443,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					game.zhu.showGiveup();
 					game.zhu.showRevealCharacter();
+					if(game.zhu!=game.me&&!game.zhu.isOnline2()){
+						game.zhu.showCharacter(1);
+					}
+
 					"step 15"
 					// other players to choose character1, no use of change char
 					var list=[];
