@@ -16515,9 +16515,7 @@
 					ui.refresh(divwrap);
 					var transitionSecs=5;
 					div.style.transition='all '+transitionSecs+'s';
-					div.style['transition-timing-function']='linear';
 					divwrap.style.transition='all '+transitionSecs+'s';
-					divwrap.style['transition-timing-function']='linear';
 					divwrap.style.overflow='hidden';
 					setTimeout(function(){
 						div.style.transform='translateY(-100%)';
@@ -28142,6 +28140,7 @@
 					break;
 				case '是否使用签到福利':
 				case '请选择神武将的势力':
+				case '是否亮将':
 				case '是否声明势力':
 					if(lib.configOL.choose_timeout_shen_group){
 						num=lib.configOL.choose_timeout_shen_group;
