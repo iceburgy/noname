@@ -23003,9 +23003,9 @@
 					else{
 						game.addVideo('damage',this);
 					}
-					game.broadcast(function(player,source){
-						player.$damage(source);
-					},this,source);
+					game.broadcast(function(player,source,num){
+						player.$damage(source,num);
+					},this,source,_status.event.num);
 					if(source&&source!=this&&lib.config.damage_shake){
 						var left,top;
 						if(source.getTop()==this.getTop()){

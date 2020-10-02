@@ -2499,7 +2499,7 @@ content:function(config, pack){
 				}
 			};
 			
-			lib.element.player.$damage = function(source){
+			lib.element.player.$damage = function(source,num){
 			    if (!source) source = this;
 
 			    var result = playerDamageFunction.call(this, source);
@@ -2513,7 +2513,7 @@ content:function(config, pack){
 			    }
 			    
 			    decadeUI.delay(time + 100);
-			    this.update('nocall', _status.event.num);
+			    this.update('nocall', _status.event.num?_status.event.num:num);
 			    return result;
 			};
 			
