@@ -547,6 +547,19 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						card.style.transform='';
 						muniu.cards=cards;
 					},muniu,muniu.cards,cards[0]);
+					if(!player.isOnline2()){
+						lib.skill.muniu_skill.sync(muniu);
+						game.broadcastAll(function(player){
+							player.updateMarks();
+						},player);
+						ui.handSpecial.reset(player.getEquip(5).cards);
+						if(player==game.me) ui.handSpecial.show();
+					}
+					else{
+						player.send(function(player){
+							game.send('syncMuniu',player);
+						},player);
+					}
 					var players=game.filterPlayer(function(current){
 						if(!current.getEquip(5)&&current!=player&&!current.isTurnedOver()&&
 							get.attitude(player,current)>=3&&get.attitude(current,player)>=3){
@@ -563,27 +576,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					});
 					next.set('choice',choice);
 					"step 1"
-					var muniuOwner=player;
-					var card=player.getEquip(5);
 					if(result.bool){
+						var card=player.getEquip(5);
 						result.targets[0].equip(card);
 						player.$give(card,result.targets[0]);
 						player.line(result.targets,'green');
 						game.delay();
-						muniuOwner=result.targets[0];
-					}
-					if(!muniuOwner.isOnline2()){
-						lib.skill.muniu_skill.sync(card);
-						game.broadcastAll(function(player){
-							player.updateMarks();
-						},muniuOwner);
-						ui.handSpecial.reset(muniuOwner.getEquip(5).cards);
-						if(muniuOwner==game.me) ui.handSpecial.show();
-					}
-					else{
-						muniuOwner.send(function(player){
-							game.send('syncMuniu',player);
-						},muniuOwner);
 					}
 				},
 				ai:{

@@ -3902,7 +3902,7 @@
 						intro:'按照座位号发小内奖励卡',
 					},
 					xiaoneidianjiang_by_seat:{
-						name:'小内点将',
+						name:'点将卡',
 						init:'0',
 						item:{
 							'0':'一号位',
@@ -3919,7 +3919,7 @@
 						frequent:true,
 						restart:true,
 						onclick:function(seat,label){
-							this.innerHTML=this.innerHTML.replace('小内点将','奖励中...');
+							this.innerHTML=this.innerHTML.replace('点将卡','奖励中...');
 							game.saveConfig('xiaoneidianjiang_by_seat',seat);
 							var result=game.addXiaoneiDianjiangBySeat(seat);
 							var that=this;
@@ -3935,12 +3935,12 @@
 								setTimeout(function(){
 									that.innerHTML=that.innerHTML.replace('奖励中...',label.innerHTML+'没有人！');
 									setTimeout(function(){
-										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','小内点将');
+										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','点将卡');
 									},1000);
 								},1000);
 							}
 						},
-						intro:'按照座位号发小内点将卡',
+						intro:'按照座位号发点将卡',
 					},
 					birthdaybonus_by_seat:{
 						name:'生日福利或者移除',
@@ -11440,7 +11440,7 @@
 							}
 							if(lib.config.xiaoneibonus[lib.config.connect_nickname][lib.bonusKeyPickRole]){
 								if(winRate&&winRate.length) winRate+='<br/>';
-								winRate+='小内点将x'+lib.config.xiaoneibonus[lib.config.connect_nickname][lib.bonusKeyPickRole];
+								winRate+='点将卡x'+lib.config.xiaoneibonus[lib.config.connect_nickname][lib.bonusKeyPickRole];
 							}
 						}
 						if(lib.config.birthdaybonus&&(lib.config.connect_nickname in lib.config.birthdaybonus)){
@@ -26003,7 +26003,7 @@
 									}
 									if(lib.config.xiaoneibonus[this.nickname][lib.bonusKeyPickRole]){
 										if(winRate&&winRate.length) winRate+='<br/>';
-										winRate+='小内点将x'+lib.config.xiaoneibonus[this.nickname][lib.bonusKeyPickRole];
+										winRate+='点将卡x'+lib.config.xiaoneibonus[this.nickname][lib.bonusKeyPickRole];
 									}
 								}
 								if(lib.config.birthdaybonus&&(this.nickname in lib.config.birthdaybonus)){
@@ -26305,11 +26305,13 @@
 										ui.special.appendChild(elements[i]);
 									}
 
-									if (cards && cards.length) {
-										for (var i = 0; i < cards.length; i++) {
-											if (cards[i]&&!ui.handSpecial.cards.contains(cards[i])) ui.handSpecial.cards.appendChild(cards[i]);
+									setTimeout(function(){
+										if (cards && cards.length) {
+											for (var i = 0; i < cards.length; i++) {
+												if (cards[i]&&!ui.handSpecial.cards.contains(cards[i])) ui.handSpecial.cards.appendChild(cards[i]);
+											}
 										}
-									}
+									},100);
 
 									ui.handSpecial.show();
 								});
@@ -28115,7 +28117,7 @@
 						}
 						if(lib.config.xiaoneibonus[player.nickname][lib.bonusKeyPickRole]){
 							if(winRate&&winRate.length) winRate+='<br/>';
-							winRate+='小内点将x'+lib.config.xiaoneibonus[player.nickname][lib.bonusKeyPickRole];
+							winRate+='点将卡x'+lib.config.xiaoneibonus[player.nickname][lib.bonusKeyPickRole];
 						}
 					}
 					if(lib.config.birthdaybonus&&(player.nickname in lib.config.birthdaybonus)){
