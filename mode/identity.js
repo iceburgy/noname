@@ -331,7 +331,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 				if(players[i].identity=='nei'){
 					players[i].hiddenSkills.add('xiaoneibonus');
+					players[i].hiddenSkills.add('xiaoneidianjiang');
 					players[i].addSkillTrigger('xiaoneibonus',true);
+					players[i].addSkillTrigger('xiaoneidianjiang',true);
 					if(players.length>4){
 						players[i].hiddenSkills.add('woshixiaonei');
 						players[i].addSkillTrigger('woshixiaonei',true);
@@ -2065,43 +2067,107 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					"step 1"
-					// everyone choose to use qiandaofuli, if any
-					var found=false;
-					if(lib.config.qiandaofuli.users&&Object.keys(lib.config.qiandaofuli.users).length){
-						var useqiandaofuli=[];
-						var list=['否','是'];
-						for(var i=0;i<list.length;i++){
-							list[i]=['','',list[i]];
-						}
-						for(var i=0;i<game.players.length;i++){
-							if(lib.config.qiandaofuli.users&&(game.players[i].nickname in lib.config.qiandaofuli.users)){
-								found=true;
-								useqiandaofuli.push([game.players[i],['是否使用签到福利',[list,'vcard']],1,true]);
-							}
-						}
-					}
-					if(found) game.me.chooseButtonOL(useqiandaofuli,function(player,result){});
-					else event.goto(3);
-					"step 2"
-					for(var i in result){
-						if(result[i]&&result[i].links) {
-							var choice=result[i].links[0][2];
-							switch(choice){
-								case '是':
-									lib.config.qiandaofuli.users[lib.playerOL[i].nickname]='usingqiandaofuli';
-									break;
-								default:break;
-							}
-						}
-					}
-
-					"step 3"
 					event.allList=[];
 					event.zhuList=[];
 					get.charactersAndZhuOL(event.allList,event.zhuList)
 					event.list=event.allList.slice(0);
 					_status.characterlist=event.allList.slice(0);
+					event.usingFuli=new Array(game.players.length);
+					for(var i=0;i<game.players.length;i++){
+						event.usingFuli[i]=[];
+					}
+					event.pickedChars=new Array(game.players.length);
+					for(var i=0;i<game.players.length;i++){
+						event.pickedChars[i]="";
+					}
 
+					// everyone choose to use qiandaofuli, xiaoneibonus, xiaoneidianjiang, if any
+					var found=false;
+					var usefuli=[];
+					for(var i=0;i<game.players.length;i++){
+						if(!game.players[i].isOnline2&&game.players[i]!=game.me) continue;
+						var list=[];
+						if(lib.config.qiandaofuli.users&&(game.players[i].nickname in lib.config.qiandaofuli.users)){
+							found=true;
+							list.push('签');
+						}
+						if(lib.config.xiaoneibonus&&(game.players[i].nickname in lib.config.xiaoneibonus)){
+							if(lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyAddRole]&&lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyAddRole]>0){
+								found=true;
+								list.push('增');
+							}
+							if(lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyPickRole]&&lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyPickRole]>0){
+								found=true;
+								list.push('点');
+							}
+						}
+						if(list.length>0){
+							for(var j=0;j<list.length;j++){
+								list[j]=['','',list[j]];
+							}
+							usefuli.push([game.players[i],['是否使用福利',[list,'vcard']],[1,list.length],false]);
+						}
+					}
+					if(found){
+						game.me.chooseButtonOL(usefuli,function(player,result){})
+						.set('switchToAuto',function(){
+							_status.event.result='ai';
+						}).set('processAI',function(){
+							return {
+								bool:false,
+							};
+						});
+					}
+					else event.goto(4);
+
+					"step 2"
+					var dianjianglist=[];
+					for(var i in result){
+						if(result[i]&&result[i].bool&&result[i].links) {
+							var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
+							for(var link of result[i].links){
+								event.usingFuli[distanceFromZhu].push(link[2]);
+								if(link[2]=='点'){
+									dianjianglist.push([lib.playerOL[i],'createCharacterDialog',event.allList.slice(0),1,true]);
+								}
+							}
+						}
+					}
+					if(dianjianglist.length>0) game.me.chooseButtonOL(dianjianglist,function(player,result){});
+					else event.goto(4);
+
+					"step 3"
+					var pickedCharsMap={};
+					var pickedCharsList=[];
+					for(var i in result){
+						if(result[i]&&result[i].links) {
+							var curPickedChar=result[i].links[0];
+							if(curPickedChar in pickedCharsMap){
+								game.broadcastAll(function(conflictChar,hasIt,missIt){
+									alert('点将冲突，'+get.translation(conflictChar)+'已被'+hasIt+'点，'+missIt+'点将失败，点将卡不会被消耗');
+								},curPickedChar,pickedCharsMap[curPickedChar],lib.playerOL[i].nickname);
+							}
+							else{
+								if(lib.playerOL[i]==game.me){
+									game.addRecentCharacter(curPickedChar);
+								}
+								else if(lib.playerOL[i].isOnline2()){
+									lib.playerOL[i].send(function(curPickedChar){
+										game.addRecentCharacter(curPickedChar);
+									},curPickedChar);
+								}
+								pickedCharsMap[curPickedChar]=lib.playerOL[i].nickname;
+								var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
+								event.pickedChars[distanceFromZhu]=curPickedChar;
+							}
+						}
+					}
+					var pickedCharsList=Object.keys(pickedCharsMap);
+					event.allList.remove(pickedCharsList);
+					event.zhuList.remove(pickedCharsList);
+					event.list.remove(pickedCharsList);
+
+					"step 4"
 					// chosenChars for each player: [[zhu1, zhu2], [p1_1, p1_2], ...]
 					// index is based on distance from zhu
 					event.chosenChars=new Array(game.players.length);
@@ -2119,16 +2185,23 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(lib.configOL.choice_zhu){
 								choiceZhu=parseInt(lib.configOL.choice_zhu);
 							}
-							if(lib.config.xiaoneibonus&&(game.players[i].nickname in lib.config.xiaoneibonus)){
-								choiceZhu++;
-								game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
+							if(event.usingFuli[0]&&event.usingFuli[0].length){
+								for(var fuliname of event.usingFuli[0]){
+									switch(fuliname){
+										case '签':
+											choiceZhu++;
+											break;
+										case '增':
+											choiceZhu++;
+											game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
+											break;
+										default:break;
+									}
+								}
 							}
 							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
 								choiceZhu++;
 								game.players[i].trySkillAnimate('生日福利','生日福利',false);
-							}
-							if(lib.config.qiandaofuli&&lib.config.qiandaofuli.users&&(game.players[i].nickname in lib.config.qiandaofuli.users)&&lib.config.qiandaofuli.users[game.players[i].nickname]=='usingqiandaofuli'){
-								choiceZhu++;
 							}
 							var str='选择角色1';
 							if(game.players[i].special_identity){
@@ -2136,6 +2209,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							var tempChars=event.allList.randomRemove(choiceZhu);
 							event.zhuList.remove(tempChars);
+							if(event.pickedChars[0].length>0){
+								tempChars.unshift(event.pickedChars[0]);
+								lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyPickRole]--;
+								game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+								game.players[i].trySkillAnimate('点将卡','点将卡',false);
+							}
 							list.push([game.players[i],[str,[tempChars,'character']],false]);
 						}
 					}
@@ -2150,20 +2229,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					});
-					"step 4"
+					"step 5"
 					var isSelectionMade=false;
 					for(var i in result){
 						isSelectionMade=result[i].bool;
 					}
 
 					if(!isSelectionMade){
-						event.goto(5);
-					}
-					else{
 						event.goto(6);
 					}
+					else{
+						event.goto(7);
+					}
 
-					"step 5"
+					"step 6"
 					// choose char 1, again with use of change char
 					var list=[];
 					var selectButton=1;
@@ -2193,7 +2272,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					});
 
-					"step 6"
+					"step 7"
 					for(var i in result){
 						var chosenChar1=result[i].links[0];
 						event.chosenChars[0].push(chosenChar1);
@@ -2208,20 +2287,27 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(lib.configOL.choice_zhu){
 								choiceZhu=parseInt(lib.configOL.choice_zhu);
 							}
-							if(lib.config.xiaoneibonus&&(game.players[i].nickname in lib.config.xiaoneibonus)){
-								choiceZhu++;
-								delete lib.config.xiaoneibonus[game.players[i].nickname];
-								game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
-								game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
+							if(event.usingFuli[0]&&event.usingFuli[0].length){
+								for(var fuliname of event.usingFuli[0]){
+									switch(fuliname){
+										case '签':
+											choiceZhu++;
+											delete lib.config.qiandaofuli.users[game.players[i].nickname];
+											game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
+											break;
+										case '增':
+											choiceZhu++;
+											lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyAddRole]--;
+											game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+											game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
+											break;
+										default:break;
+									}
+								}
 							}
 							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
 								choiceZhu++;
 								game.players[i].trySkillAnimate('生日福利','生日福利',false);
-							}
-							if(lib.config.qiandaofuli&&lib.config.qiandaofuli.users&&(game.players[i].nickname in lib.config.qiandaofuli.users)&&lib.config.qiandaofuli.users[game.players[i].nickname]=='usingqiandaofuli'){
-								delete lib.config.qiandaofuli.users[game.players[i].nickname];
-								game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
-								choiceZhu++;
 							}
 							var str='选择角色2';
 							if(game.players[i].special_identity){
@@ -2248,20 +2334,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					});
 
-					"step 7"
+					"step 8"
 					var isSelectionMade=false;
 					for(var i in result){
 						isSelectionMade=result[i].bool;
 					}
 
 					if(!isSelectionMade){
-						event.goto(8);
-					}
-					else{
 						event.goto(9);
 					}
+					else{
+						event.goto(10);
+					}
 
-					"step 8"
+					"step 9"
 					// choose char 2 again with use of change char
 					var list=[];
 					var selectButton=1;
@@ -2290,7 +2376,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					});
 
-					"step 9"
+					"step 10"
 					for(var i in result){
 						var chosenChar2=result[i].links[0];
 						event.chosenChars[0].push(chosenChar2);
@@ -2316,7 +2402,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.init(mainChar,viceChar,false);
 						}
 					});
-					"step 10"
+					"step 11"
 					if(game.me!=game.zhu){
 						for(var i in result){
 							// this determines the other online users will see full character and group info or not
@@ -2363,11 +2449,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.me._hide_all_timer=true;
 						game.zhu.chooseButton(['请选择神武将的势力',[list,'vcard']],true);
 					}
-					"step 11"
+					"step 12"
 					if(event.zhuHasShen&&!game.zhu.groupshen){
 						game.zhu.groupshen=result.links[0][2].slice(6);
 					}
-					"step 12"
+					"step 13"
 					// broadcast will exclude sender itself
 					// hence zhu.maxHp++ won't happened repeatedly
 					game.broadcast(function(zhu,name,name2,addMaxHp){
@@ -2423,7 +2509,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(game.zhu!=game.me&&!game.zhu.isOnline2()){
 						game.zhu.showCharacter(1);
 					}
-					"step 13"
+					"step 14"
 					// zhu choose to show character
 					var liangjiang=[];
 					var list=['暗','主','副','全',];
@@ -2431,15 +2517,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						list[i]=['','',list[i]];
 					}
 					game.zhu.chooseButton(['是否亮将',[list,'vcard']],true);
-					"step 14"
+					"step 15"
 					var choice=result.links[0][2];
 					switch(choice){
-						case '主':game.zhu.showCharacter(0,true,true);event.goto(17);break;
-						case '副':game.zhu.showCharacter(1,true,true);event.goto(17);break;
-						case '全':game.zhu.showCharacter(2,true,true);event.goto(17);break;
+						case '主':game.zhu.showCharacter(0,true,true);event.goto(18);break;
+						case '副':game.zhu.showCharacter(1,true,true);event.goto(18);break;
+						case '全':game.zhu.showCharacter(2,true,true);event.goto(18);break;
 						default:game.zhu.trySkillAnimate('不亮将','不亮将',false);break;
 					}
-					"step 15"
+					"step 16"
 					// zhu choose to show group
 					var list=lib.group.slice(0);
 					list.remove('shen');
@@ -2449,7 +2535,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.zhu.chooseButton(['是否声明势力',[list,'vcard']]).set('ai',function(button){
 						return 0;
 					});
-					"step 16"
+					"step 17"
 					if(result.bool){
 						var shili=result.links[0][2].slice(6);
 						game.zhu.hiddenSkills.add('shengmingshili'+shili);
@@ -2463,7 +2549,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						game.zhu.trySkillAnimate('不声明势力','不声明势力',false);
 					}
-					"step 17"
+					"step 18"
 					// other players to choose character1, no use of change char
 					var list=[];
 					var selectButton=1;
@@ -2487,6 +2573,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=game.zhu){
+							var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
 							var num3=0;
 							if(event.zhongmode){
 								if(game.players[i].identity=='nei'||game.players[i].identity=='zhu'){
@@ -2516,22 +2603,36 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										break;
 								}
 							}
-							if(lib.config.xiaoneibonus&&(game.players[i].nickname in lib.config.xiaoneibonus)){
-								num3++;
-								game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
+							if(event.usingFuli[distanceFromZhu]&&event.usingFuli[distanceFromZhu].length){
+								for(var fuliname of event.usingFuli[distanceFromZhu]){
+									switch(fuliname){
+										case '签':
+											num3++;
+											break;
+										case '增':
+											num3++;
+											game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
+											break;
+										default:break;
+									}
+								}
 							}
 							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
 								num3++;
 								game.players[i].trySkillAnimate('生日福利','生日福利',false);
 							}
-							if(lib.config.qiandaofuli&&lib.config.qiandaofuli.users&&(game.players[i].nickname in lib.config.qiandaofuli.users)&&lib.config.qiandaofuli.users[game.players[i].nickname]=='usingqiandaofuli'){
-								num3++;
-							}
 							var str='选择角色1';
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.list.randomRemove(num+num3),'character']],selectButton,false]);
+							var tempChars=event.list.randomRemove(num+num3);
+							if(event.pickedChars[distanceFromZhu].length>0){
+								tempChars.unshift(event.pickedChars[distanceFromZhu]);
+								lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyPickRole]--;
+								game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+								game.players[i].trySkillAnimate('点将卡','点将卡',false);
+							}
+							list.push([game.players[i],[str,[tempChars,'character']],selectButton,false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2545,7 +2646,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					});
-					"step 18"
+					"step 19"
 					var isChar1SelectionMadeFully=true;
 					for(var i in result){
 						if(lib.playerOL[i].identity=='zhu'){
@@ -2562,13 +2663,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					if(!isChar1SelectionMadeFully){
-						event.goto(19);
-					}
-					else{
 						event.goto(20);
 					}
+					else{
+						event.goto(21);
+					}
 
-					"step 19"
+					"step 20"
 					// other players to choose character1, again with use of change char
 					var list=[];
 					var selectButton=1;
@@ -2600,7 +2701,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					});
 
-					"step 20"
+					"step 21"
 					for(var i in result){
 						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
 						if(distanceFromZhu>0&&result[i].bool&&event.chosenChars[distanceFromZhu].length==0){
@@ -2632,6 +2733,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=game.zhu){
+							var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
 							var num3=0;
 							if(event.zhongmode){
 								if(game.players[i].identity=='nei'||game.players[i].identity=='zhu'){
@@ -2661,26 +2763,32 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										break;
 								}
 							}
-							if(lib.config.xiaoneibonus&&(game.players[i].nickname in lib.config.xiaoneibonus)){
-								num3++;
-								delete lib.config.xiaoneibonus[game.players[i].nickname];
-								game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
-								game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
+							if(event.usingFuli[distanceFromZhu]&&event.usingFuli[distanceFromZhu].length){
+								for(var fuliname of event.usingFuli[distanceFromZhu]){
+									switch(fuliname){
+										case '签':
+											num3++;
+											delete lib.config.qiandaofuli.users[game.players[i].nickname];
+											game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
+											break;
+										case '增':
+											num3++;
+											lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyAddRole]--;
+											game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+											game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
+											break;
+										default:break;
+									}
+								}
 							}
 							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
 								num3++;
 								game.players[i].trySkillAnimate('生日福利','生日福利',false);
 							}
-							if(lib.config.qiandaofuli&&lib.config.qiandaofuli.users&&(game.players[i].nickname in lib.config.qiandaofuli.users)&&lib.config.qiandaofuli.users[game.players[i].nickname]=='usingqiandaofuli'){
-								delete lib.config.qiandaofuli.users[game.players[i].nickname];
-								game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
-								num3++;
-							}
 							var str='选择角色2';
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[distanceFromZhu][0],num+num3,event.list);
 							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,false]);
 						}
@@ -2697,7 +2805,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					});
 
-					"step 21"
+					"step 22"
 					var isChar2SelectionMadeFully=true;
 					for(var i in result){
 						if(lib.playerOL[i].identity=='zhu'){
@@ -2714,13 +2822,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					if(!isChar2SelectionMadeFully){
-						event.goto(22);
-					}
-					else{
 						event.goto(23);
 					}
+					else{
+						event.goto(24);
+					}
 
-					"step 22"
+					"step 23"
 					// other players to choose character2, again with use of change char
 					var list=[];
 					var selectButton=1;
@@ -2753,7 +2861,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					});
 
-					"step 23"
+					"step 24"
 					for(var i in result){
 						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
 						if(distanceFromZhu>0&&result[i].bool&&event.chosenChars[distanceFromZhu].length==1){
@@ -2782,7 +2890,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.init(mainChar,viceChar,false);
 						}
 					});
-					"step 24"
+					"step 25"
 					var shen=[];
 					for(var i in result){
 						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
@@ -2816,7 +2924,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						});
 					}
-					"step 25"
+					"step 26"
 					if(!result) result={};
 					var result2=event.result2;
 					game.broadcast(function(result,result2){
@@ -2901,7 +3009,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.players[i].showRevealCharacter();
 						}
 					}
-					"step 26"
+					"step 27"
 					var liangjiang=[];
 					var list=['暗','主','副','全',];
 					for(var i=0;i<list.length;i++){
@@ -2913,7 +3021,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					game.me.chooseButtonOL(liangjiang,function(player,result){});
-					"step 27"
+					"step 28"
 					for(var i in result){
 						if(result[i]&&result[i].links) {
 							var choice=result[i].links[0][2];
@@ -2925,7 +3033,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					}
-					"step 28"
+					"step 29"
 					setTimeout(function(){
 						game.broadcastAll(function(){
 							ui.arena.classList.remove('choose-character');
@@ -2996,6 +3104,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			xiaoneizhibi:'知己知彼',
 			xiaoneizhibi_info:'限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废',
 			xiaoneibonus:'主内单挑',
+			xiaoneidianjiang:'小内获胜',
 			zhikezhugong:'制克主公',
 			zhikezhugong_info:'村规主公限定技：如果场上玩家数是6人或者更多，而且为偶数，则主公在第一回合内可以2选1：1）准备阶段使用一次手气卡；2）如果没有对其他玩家使用牌，可以跳过弃牌阶段',
 			zhikezhugong_zhihengzg:'制衡主公',
@@ -4059,8 +4168,54 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(!lib.config.xiaoneibonus){
 						lib.config.xiaoneibonus={};
 					}
-					if(player.nickname&&player.nickname!='无名玩家'&&!(player.nickname in lib.config.xiaoneibonus)){
-						lib.config.xiaoneibonus[player.nickname]=player.nickname;
+					if(player.nickname&&player.nickname!='无名玩家'){
+						if(!lib.config.xiaoneibonus[player.nickname]){
+							lib.config.xiaoneibonus[player.nickname]={};
+						}
+						if(!lib.config.xiaoneibonus[player.nickname][lib.bonusKeyAddRole]){
+							lib.config.xiaoneibonus[player.nickname][lib.bonusKeyAddRole]=0;
+						}
+						lib.config.xiaoneibonus[player.nickname][lib.bonusKeyAddRole]++;
+						game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+					}
+				},
+				ai:{
+					order:10,
+					result:{
+						player:function(player){
+							return 1;
+						},
+					},
+				},
+			},
+			xiaoneidianjiang:{
+				unique:true,
+				mark:false,
+				frequent:true,
+				limited:true,
+				audio:false,
+				trigger:{global:'dieBefore'},
+				skillAnimation:'legend',
+				animationColor:'thunder',
+				filter:function (event,player){
+					// activate xiaonei dianjiang bonus if nei wins
+					return game.players.length==2&&event.player==game.zhu&&player.identity=='nei';
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('xiaoneidianjiang');
+					if(!lib.config.xiaoneibonus){
+						lib.config.xiaoneibonus={};
+					}
+					if(player.nickname&&player.nickname!='无名玩家'){
+						if(!lib.config.xiaoneibonus[player.nickname]){
+							lib.config.xiaoneibonus[player.nickname]={};
+						}
+						if(!lib.config.xiaoneibonus[player.nickname][lib.bonusKeyPickRole]){
+							lib.config.xiaoneibonus[player.nickname][lib.bonusKeyPickRole]=0;
+						}
+						lib.config.xiaoneibonus[player.nickname][lib.bonusKeyPickRole]++;
+						lib.config.xiaoneibonus[player.nickname][lib.bonusKeyAddRole]--;
 						game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
 					}
 				},
@@ -4707,7 +4862,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				priority:10,
 				content:function(){
 					"step 0"
-					if(get.info(trigger.skill).silent||trigger.skill=='woshixiaonei'||trigger.skill=='xiaoneibonus'||trigger.skill.startsWith('shengmingshili')){
+					if(get.info(trigger.skill).silent||trigger.skill=='woshixiaonei'||trigger.skill=='xiaoneibonus'||trigger.skill=='xiaoneidianjiang'||trigger.skill.startsWith('shengmingshili')){
 						event.finish();
 					}
 					else{

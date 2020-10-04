@@ -33,6 +33,8 @@
 		statsKeySortKeyRoleName:'role_name',
 		statsKeyStatsByZones:'stats_by_zones',
 		statsKeyDisplayZone:'display_zone',
+		bonusKeyAddRole:'addRole',
+		bonusKeyPickRole:'pickRole',
 		configprefix:'noname_0.9_',
 		versionOL:27,
 		updateURLS:{
@@ -3898,6 +3900,47 @@
 							}
 						},
 						intro:'按照座位号发小内奖励卡',
+					},
+					xiaoneidianjiang_by_seat:{
+						name:'小内点将',
+						init:'0',
+						item:{
+							'0':'一号位',
+							'1':'二号位',
+							'2':'三号位',
+							'3':'四号位',
+							'4':'五号位',
+							'5':'六号位',
+							'6':'七号位',
+							'7':'八号位',
+							'8':'九号位',
+							'9':'十号位'
+						},
+						frequent:true,
+						restart:true,
+						onclick:function(seat,label){
+							this.innerHTML=this.innerHTML.replace('小内点将','奖励中...');
+							game.saveConfig('xiaoneidianjiang_by_seat',seat);
+							var result=game.addXiaoneiDianjiangBySeat(seat);
+							var that=this;
+							if(result){
+								setTimeout(function(){
+									that.innerHTML=that.innerHTML.replace('奖励中...','奖励成功');
+									setTimeout(function(){
+										game.reload();
+									},1000);
+								},1000);
+							}
+							else{
+								setTimeout(function(){
+									that.innerHTML=that.innerHTML.replace('奖励中...',label.innerHTML+'没有人！');
+									setTimeout(function(){
+										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','小内点将');
+									},1000);
+								},1000);
+							}
+						},
+						intro:'按照座位号发小内点将卡',
 					},
 					birthdaybonus_by_seat:{
 						name:'生日福利或者移除',
@@ -11392,7 +11435,13 @@
 						//var winRate=game.getWinRateByNickname(lib.config.connect_nickname);
 						var winRate='';
 						if(lib.config.xiaoneibonus&&(lib.config.connect_nickname in lib.config.xiaoneibonus)){
-							winRate='小内奖励';
+							if(lib.config.xiaoneibonus[lib.config.connect_nickname][lib.bonusKeyAddRole]){
+								winRate='小内奖励x'+lib.config.xiaoneibonus[lib.config.connect_nickname][lib.bonusKeyAddRole];
+							}
+							if(lib.config.xiaoneibonus[lib.config.connect_nickname][lib.bonusKeyPickRole]){
+								if(winRate&&winRate.length) winRate+='<br/>';
+								winRate+='小内点将x'+lib.config.xiaoneibonus[lib.config.connect_nickname][lib.bonusKeyPickRole];
+							}
 						}
 						if(lib.config.birthdaybonus&&(lib.config.connect_nickname in lib.config.birthdaybonus)){
 							if(winRate&&winRate.length) winRate+='<br/>生日福利';
@@ -18002,6 +18051,12 @@
 				},
 				chooseButton:function(){
 					var next=game.createEvent('chooseButton');
+					var isCreateCharacterDialog=false;
+					for(var i=0;i<arguments.length;i++){
+						if(typeof arguments[i]=='string'&&arguments[i]=='createCharacterDialog'){
+							isCreateCharacterDialog=true;
+						}
+					}
 					for(var i=0;i<arguments.length;i++){
 						if(typeof arguments[i]=='boolean'){
 							next.forced=arguments[i];
@@ -18021,7 +18076,12 @@
 							else next.ai=arguments[i];
 						}
 						else if(Array.isArray(arguments[i])){
-							next.createDialog=arguments[i];
+							if(isCreateCharacterDialog&&arguments[i].length>150){
+								// if so, it's character pool for create.characterDialog
+								next.dialog=ui.create.characterDialog('heightset',arguments[i]);
+								next.closeDialog=true;
+							}
+							else next.createDialog=arguments[i];
 						}
 					}
 					next.player=this;
@@ -21353,7 +21413,7 @@
 					var name2=this.name2;
 					if(lib.character[name2]&&(!showonly||unseen1)){
 						var skills=game.expandSkills(lib.character[name2][3].slice(0));
-						if(skills.contains(skill)||(unseen0&&!unseen1&&(skill=='woshixiaonei'||skill=='xiaoneibonus'||skill=='zhikezhugong_zhihengzg'||skill=='zhikezhugong_kejizg'||skill=='anlezhugong'||skill=='xiaoneizhibi'||skill=='smh_yeyan'))){
+						if(skills.contains(skill)||(unseen0&&!unseen1&&(skill=='woshixiaonei'||skill=='xiaoneibonus'||skill=='xiaoneidianjiang'||skill=='zhikezhugong_zhihengzg'||skill=='zhikezhugong_kejizg'||skill=='anlezhugong'||skill=='xiaoneizhibi'||skill=='smh_yeyan'))){
 							if(!noshow&&this.isUnseen(1))
 							    this.showCharacter(1);
 							return 'vice';
@@ -25944,7 +26004,13 @@
 								//var winRate=game.getWinRateByNickname(this.nickname);
 								var winRate='';
 								if(lib.config.xiaoneibonus&&(this.nickname in lib.config.xiaoneibonus)){
-									winRate='小内奖励';
+									if(lib.config.xiaoneibonus[this.nickname][lib.bonusKeyAddRole]){
+										winRate='小内奖励x'+lib.config.xiaoneibonus[this.nickname][lib.bonusKeyAddRole];
+									}
+									if(lib.config.xiaoneibonus[this.nickname][lib.bonusKeyPickRole]){
+										if(winRate&&winRate.length) winRate+='<br/>';
+										winRate+='小内点将x'+lib.config.xiaoneibonus[this.nickname][lib.bonusKeyPickRole];
+									}
 								}
 								if(lib.config.birthdaybonus&&(this.nickname in lib.config.birthdaybonus)){
 									if(winRate&&winRate.length) winRate+='<br/>生日福利';
@@ -27242,6 +27308,7 @@
 			return event;
 		},
 		voteGiveup(player){
+			if(!(player.isAlive())) return;
 			player.trySkillAnimate('我投了','我投了',false);
 			game.log(player,'【我投了】');
 			if(!game.votersIDs) {
@@ -27513,7 +27580,30 @@
 				lib.config.xiaoneibonus={};
 			}
 			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
-				lib.config.xiaoneibonus[game.connectPlayers[seat].nickname]=game.connectPlayers[seat].nickname;
+				if(!lib.config.xiaoneibonus[game.connectPlayers[seat].nickname]){
+					lib.config.xiaoneibonus[game.connectPlayers[seat].nickname]={};
+				}
+				if(!lib.config.xiaoneibonus[game.connectPlayers[seat].nickname][lib.bonusKeyAddRole]){
+					lib.config.xiaoneibonus[game.connectPlayers[seat].nickname][lib.bonusKeyAddRole]=0;
+				}
+				lib.config.xiaoneibonus[game.connectPlayers[seat].nickname][lib.bonusKeyAddRole]++;
+				game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+				return true;
+			}
+			return false;
+		},
+		addXiaoneiDianjiangBySeat:function(seat){
+			if(!lib.config.xiaoneibonus){
+				lib.config.xiaoneibonus={};
+			}
+			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
+				if(!lib.config.xiaoneibonus[game.connectPlayers[seat].nickname]){
+					lib.config.xiaoneibonus[game.connectPlayers[seat].nickname]={};
+				}
+				if(!lib.config.xiaoneibonus[game.connectPlayers[seat].nickname][lib.bonusKeyPickRole]){
+					lib.config.xiaoneibonus[game.connectPlayers[seat].nickname][lib.bonusKeyPickRole]=0;
+				}
+				lib.config.xiaoneibonus[game.connectPlayers[seat].nickname][lib.bonusKeyPickRole]++;
 				game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
 				return true;
 			}
@@ -28027,7 +28117,13 @@
 					//var winRate=game.getWinRateByNickname(player.nickname);
 					var winRate='';
 					if(lib.config.xiaoneibonus&&(player.nickname in lib.config.xiaoneibonus)){
-						winRate='小内奖励';
+						if(lib.config.xiaoneibonus[player.nickname][lib.bonusKeyAddRole]){
+							winRate='小内奖励x'+lib.config.xiaoneibonus[player.nickname][lib.bonusKeyAddRole];
+						}
+						if(lib.config.xiaoneibonus[player.nickname][lib.bonusKeyPickRole]){
+							if(winRate&&winRate.length) winRate+='<br/>';
+							winRate+='小内点将x'+lib.config.xiaoneibonus[player.nickname][lib.bonusKeyPickRole];
+						}
 					}
 					if(lib.config.birthdaybonus&&(player.nickname in lib.config.birthdaybonus)){
 						if(winRate&&winRate.length) winRate+='<br/>生日福利';
@@ -28119,10 +28215,14 @@
 				eventName=_status.event.createDialog[0];
 			}
 			if(!eventName&&_status.event&&_status.event._args&&_status.event._args[0]&&_status.event._args[0][0]&&_status.event._args[0][0][1]&&_status.event._args[0][0][1][0]){
-				eventName=_status.event._args[0][0][1][0];
+				eventName=Array.isArray(_status.event._args[0][0][1])?_status.event._args[0][0][1][0]:_status.event._args[0][0][1];
+			}
+			if(!eventName&&_status.event&&_status.event._args&&_status.event._args[0]){
+				eventName=Array.isArray(_status.event._args[0])?_status.event._args[0][0]:_status.event._args[0];
 			}
 			if(!eventName) return num;
 			switch(eventName){
+				case 'createCharacterDialog':
 				case '选择角色1':
 					if(lib.configOL.choose_timeout_char_1){
 						num=lib.configOL.choose_timeout_char_1;
@@ -28138,7 +28238,7 @@
 						num=lib.configOL.choose_timeout_main_vice;
 					}
 					break;
-				case '是否使用签到福利':
+				case '是否使用福利':
 				case '请选择神武将的势力':
 				case '是否亮将':
 				case '是否声明势力':
@@ -43508,6 +43608,7 @@
 				//     }
 				// }
 				var filter,str,noclick,thisiscard,seperate,expandall,onlypack,heightset,precharacter;
+				var list=[];
 				for(var i=0;i<arguments.length;i++){
 					if(arguments[i]==='thisiscard'){
 						thisiscard=true;
@@ -43536,8 +43637,10 @@
 					else if(typeof arguments[i]=='boolean'){
 						noclick=arguments[i];
 					}
+					else if(Array.isArray(arguments[i])){
+						list=arguments[i].slice(0);
+					}
 				}
-				var list=[];
 				var dialog;
 				var node=ui.create.div('.caption.pointerspan');
 				if(get.is.phoneLayout()){
@@ -43558,32 +43661,34 @@
 					}
 					return capt;
 				}
-				if(thisiscard){
-					for(var i in lib.card){
-						if(!lib.translate[i+'_info']) continue;
-						if(filter&&filter(i)) continue;
-						list.push(['',get.translation(lib.card[i].type),i]);
-						if(namecapt.indexOf(getCapt(i))==-1){
-							namecapt.push(getCapt(i));
+				if(list.length==0){
+					if(thisiscard){
+						for(var i in lib.card){
+							if(!lib.translate[i+'_info']) continue;
+							if(filter&&filter(i)) continue;
+							list.push(['',get.translation(lib.card[i].type),i]);
+							if(namecapt.indexOf(getCapt(i))==-1){
+								namecapt.push(getCapt(i));
+							}
 						}
 					}
-				}
-				else{
-					for(var i in lib.character){
-						if(lib.character[i][4].contains('minskin')) continue;
-						if(lib.character[i][4].contains('boss')||lib.character[i][4].contains('hiddenboss')){
-							if(lib.config.mode=='boss') continue;
-							if(!lib.character[i][4].contains('bossallowed')) continue;
-						}
+					else{
+						for(var i in lib.character){
+							if(lib.character[i][4].contains('minskin')) continue;
+							if(lib.character[i][4].contains('boss')||lib.character[i][4].contains('hiddenboss')){
+								if(lib.config.mode=='boss') continue;
+								if(!lib.character[i][4].contains('bossallowed')) continue;
+							}
 
-						if(lib.character[i][4].contains('stonehidden')) continue;
-						if(lib.character[i][4].contains('unseen')) continue;
-						if(lib.config.banned.contains(i)) continue;
-						if(lib.characterFilter[i]&&!lib.characterFilter[i](get.mode())) continue;
-						if(filter&&filter(i)) continue;
-						list.push(i);
-						if(namecapt.indexOf(getCapt(i))==-1){
-							namecapt.push(getCapt(i));
+							if(lib.character[i][4].contains('stonehidden')) continue;
+							if(lib.character[i][4].contains('unseen')) continue;
+							if(lib.config.banned.contains(i)) continue;
+							if(lib.characterFilter[i]&&!lib.characterFilter[i](get.mode())) continue;
+							if(filter&&filter(i)) continue;
+							list.push(i);
+							if(namecapt.indexOf(getCapt(i))==-1){
+								namecapt.push(getCapt(i));
+							}
 						}
 					}
 				}
@@ -43799,7 +43904,6 @@
 						if(bool1&&bool2) break;
 					}
 					if(bool1) groups.add('shen');
-					if(bool2&&!bool3) groups.add('key');
 					var natures=['water','soil','wood','metal'];
 					var span=document.createElement('span');
 					newlined.appendChild(span);
