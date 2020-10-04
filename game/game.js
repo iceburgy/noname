@@ -26294,7 +26294,6 @@
 
 								var args=[];
 								args.push(function(player){
-									//ui.handSpecial.reset(player.getEquip(5).cards);
 									var muniu = player.getEquip(5);
 									if(!muniu.cards){
 										muniu.cards=[];
