@@ -18051,12 +18051,6 @@
 				},
 				chooseButton:function(){
 					var next=game.createEvent('chooseButton');
-					var isCreateCharacterDialog=false;
-					for(var i=0;i<arguments.length;i++){
-						if(typeof arguments[i]=='string'&&arguments[i]=='createCharacterDialog'){
-							isCreateCharacterDialog=true;
-						}
-					}
 					for(var i=0;i<arguments.length;i++){
 						if(typeof arguments[i]=='boolean'){
 							next.forced=arguments[i];
@@ -18076,12 +18070,12 @@
 							else next.ai=arguments[i];
 						}
 						else if(Array.isArray(arguments[i])){
-							if(isCreateCharacterDialog&&arguments[i].length>150){
-								// if so, it's character pool for create.characterDialog
-								next.dialog=ui.create.characterDialog('heightset',arguments[i]);
-								next.closeDialog=true;
-							}
-							else next.createDialog=arguments[i];
+							next.createDialog=arguments[i];
+						}
+						else if(typeof arguments[i]=='object'&&('createGivenCharacterDialog' in arguments[i])){
+							// if so, it's containing given character pool for create.characterDialog
+							next.dialog=ui.create.characterDialog('heightset',arguments[i]);
+							next.closeDialog=true;
 						}
 					}
 					next.player=this;
@@ -43637,8 +43631,9 @@
 					else if(typeof arguments[i]=='boolean'){
 						noclick=arguments[i];
 					}
-					else if(Array.isArray(arguments[i])){
-						list=arguments[i].slice(0);
+					else if(typeof arguments[i]=='object'&&('createGivenCharacterDialog' in arguments[i])){
+						// if so, it's containing given character pool for create.characterDialog
+						list=arguments[i]['createGivenCharacterDialog'].slice(0);
 					}
 				}
 				var dialog;

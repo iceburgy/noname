@@ -2128,7 +2128,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							for(var link of result[i].links){
 								event.usingFuli[distanceFromZhu].push(link[2]);
 								if(link[2]=='点'){
-									dianjianglist.push([lib.playerOL[i],'createCharacterDialog',event.allList.slice(0),1,true]);
+									dianjianglist.push([lib.playerOL[i],{'createGivenCharacterDialog':event.allList.slice(0)},1,true]);
 									lib.playerOL[i].trySkillAnimate('点将卡','点将卡',false);
 								}
 							}
