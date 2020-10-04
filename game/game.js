@@ -35313,7 +35313,7 @@
 					localmode=local;
 				}
 				else{
-					localmode=lib.config.mode;
+					localmode=lib.config.isConnectMode&&key=='recentCharacter'?'connect':lib.config.mode;
 				}
 				if(!lib.config.mode_config[localmode]){
 					lib.config.mode_config[localmode]={};
@@ -50933,7 +50933,7 @@
 			return null;
 		},
 		config:function(item,mode){
-			mode=mode||lib.config.mode;
+			mode=mode||(lib.config.isConnectMode&&item=='recentCharacter'?'connect':lib.config.mode);
 			if(!lib.config.mode_config[mode]) return;
 			return lib.config.mode_config[mode][item];
 		},

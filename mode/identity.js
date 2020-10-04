@@ -2134,7 +2134,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					}
-					if(dianjianglist.length>0) game.me.chooseButtonOL(dianjianglist,function(player,result){});
+					if(dianjianglist.length>0){
+						lib.config.isConnectMode=true;
+						game.me.chooseButtonOL(dianjianglist,function(player,result){});
+					}
 					else event.goto(4);
 
 					"step 3"
@@ -2167,6 +2170,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.allList.remove(pickedCharsList);
 					event.zhuList.remove(pickedCharsList);
 					event.list.remove(pickedCharsList);
+					delete lib.config.isConnectMode;
 
 					"step 4"
 					// chosenChars for each player: [[zhu1, zhu2], [p1_1, p1_2], ...]
