@@ -2129,6 +2129,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								event.usingFuli[distanceFromZhu].push(link[2]);
 								if(link[2]=='点'){
 									dianjianglist.push([lib.playerOL[i],'createCharacterDialog',event.allList.slice(0),1,true]);
+									lib.playerOL[i].trySkillAnimate('点将卡','点将卡',false);
 								}
 							}
 						}
@@ -2213,7 +2214,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								tempChars.unshift(event.pickedChars[0]);
 								lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyPickRole]--;
 								game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
-								game.players[i].trySkillAnimate('点将卡','点将卡',false);
 							}
 							list.push([game.players[i],[str,[tempChars,'character']],false]);
 						}
@@ -2630,7 +2630,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								tempChars.unshift(event.pickedChars[distanceFromZhu]);
 								lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyPickRole]--;
 								game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
-								game.players[i].trySkillAnimate('点将卡','点将卡',false);
 							}
 							list.push([game.players[i],[str,[tempChars,'character']],selectButton,false]);
 						}
