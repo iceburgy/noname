@@ -17694,10 +17694,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.control=='龙印'){
 						targets[0].removeSkill('smh_huoji');
+						delete targets[0].storage.smh_huoji2;
+						targets[0].unmarkSkill('smh_huoji2');
 						targets[1].addSkill('smh_huoji');
 					}
 					else{
 						targets[0].removeSkill('smh_lianhuan');
+						delete targets[0].storage.smh_lianhuan2;
+						targets[0].unmarkSkill('smh_lianhuan2');
 						targets[1].addSkill('smh_lianhuan');
 					}
 				},
