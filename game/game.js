@@ -18072,7 +18072,7 @@
 						else if(Array.isArray(arguments[i])){
 							next.createDialog=arguments[i];
 						}
-						else if(typeof arguments[i]=='object'&&('createGivenCharacterDialog' in arguments[i])){
+						else if(arguments[i]&&typeof arguments[i]=='object'&&('createGivenCharacterDialog' in arguments[i])){
 							// if so, it's containing given character pool for create.characterDialog
 							next.dialog=ui.create.characterDialog('heightset',arguments[i]);
 							next.closeDialog=true;
@@ -43632,7 +43632,7 @@
 					else if(typeof arguments[i]=='boolean'){
 						noclick=arguments[i];
 					}
-					else if(typeof arguments[i]=='object'&&('createGivenCharacterDialog' in arguments[i])){
+					else if(arguments[i]&&typeof arguments[i]=='object'&&('createGivenCharacterDialog' in arguments[i])){
 						// if so, it's containing given character pool for create.characterDialog
 						list=arguments[i]['createGivenCharacterDialog'].slice(0);
 					}
