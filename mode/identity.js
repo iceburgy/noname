@@ -329,11 +329,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					name2:players[i].name2,
 					identity:players[i].identity
 				});
-				if(players[i].identity=='nei'){
-					players[i].hiddenSkills.add('xiaoneibonus');
-					players[i].hiddenSkills.add('xiaoneidianjiang');
-					players[i].addSkillTrigger('xiaoneibonus',true);
-					players[i].addSkillTrigger('xiaoneidianjiang',true);
+				if(players[i].identity=='nei'&&game.isARealGame()){
+					players[i].hiddenSkills.add('xiaoneidantiao');
+					players[i].hiddenSkills.add('xiaoneihuosheng');
+					players[i].addSkillTrigger('xiaoneidantiao',true);
+					players[i].addSkillTrigger('xiaoneihuosheng',true);
 					if(players.length>4){
 						players[i].hiddenSkills.add('woshixiaonei');
 						players[i].addSkillTrigger('woshixiaonei',true);
@@ -376,25 +376,42 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						break;
 				}
 				var lastSeatIndex=0;
+				game.eligiblePlayers=[];
 				for(var i=0;i<numberOfPlayers;i++){
+					if(game.players[i].nickname&&game.players[i].nickname!='无名玩家'){
+						var shouqikaBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeyChangeCards);
+						if(shouqikaBalance>0){
+							game.players[i].replaceHandcardsBalance=shouqikaBalance;
+							game.eligiblePlayers.push(game.players[i]);
+						}
+					}
 					var playerSeatNumber=get.distance(game.zhu, game.players[i], 'absolute') + 1;
 					if(playerSeatNumber==numberOfPlayers){
 						lastSeatIndex=i;
-						break;
 					}
 				}
 
-				var eligiblePlayers=[];
 				while(numberOfEligiblePlayers>0){
-					eligiblePlayers.push(game.players[lastSeatIndex]);
+					if(game.players[lastSeatIndex].nickname&&game.players[lastSeatIndex].nickname!='无名玩家'){
+						game.players[lastSeatIndex].replaceHandcardsFree=1;
+						if(!game.eligiblePlayers.includes(game.players[lastSeatIndex])){
+							game.eligiblePlayers.push(game.players[lastSeatIndex]);
+						}
+					}
 					lastSeatIndex--;
 					if(lastSeatIndex<0) lastSeatIndex+=numberOfPlayers;
 
 					numberOfEligiblePlayers--;
 				}
-				if(eligiblePlayers.length) game.replaceHandcards(eligiblePlayers);
+			}
+			else{
+				event.goto(9);
 			}
 			"step 7"
+			game.replaceHandcards(game.eligiblePlayers);
+			"step 8"
+			if(game.eligiblePlayers.length>0) event.goto(7);
+			"step 9"
 			game.phaseLoop(_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me);
 		},
 		game:{
@@ -2081,25 +2098,23 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.pickedChars[i]="";
 					}
 
-					// everyone choose to use qiandaofuli, xiaoneibonus, xiaoneidianjiang, if any
+					// everyone choose to use bonus, if any
 					var found=false;
 					var usefuli=[];
 					for(var i=0;i<game.players.length;i++){
 						if(!game.players[i].isOnline2&&game.players[i]!=game.me) continue;
 						var list=[];
-						if(lib.config.qiandaofuli.users&&(game.players[i].nickname in lib.config.qiandaofuli.users)){
-							found=true;
-							list.push('签');
+						if(!game.getBonusBirthdaybonus(game.players[i].nickname)){
+							var addRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeyAddRole);
+							if(addRoleBalance){
+								found=true;
+								list.push('框');
+							}
 						}
-						if(lib.config.xiaoneibonus&&(game.players[i].nickname in lib.config.xiaoneibonus)){
-							if(lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyAddRole]&&lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyAddRole]>0){
-								found=true;
-								list.push('增');
-							}
-							if(lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyPickRole]&&lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyPickRole]>0){
-								found=true;
-								list.push('点');
-							}
+						var pickRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeyPickRole);
+						if(pickRoleBalance){
+							found=true;
+							list.push('点');
 						}
 						if(list.length>0){
 							for(var j=0;j<list.length;j++){
@@ -2190,23 +2205,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(lib.configOL.choice_zhu){
 								choiceZhu=parseInt(lib.configOL.choice_zhu);
 							}
-							if(event.usingFuli[0]&&event.usingFuli[0].length){
+							if(game.getBonusBirthdaybonus(game.players[i].nickname)){
+								choiceZhu++;
+								game.players[i].trySkillAnimate('生日福利','生日福利',false);
+							}
+							else if(event.usingFuli[0]&&event.usingFuli[0].length){
 								for(var fuliname of event.usingFuli[0]){
 									switch(fuliname){
 										case '签':
 											choiceZhu++;
 											break;
-										case '增':
+										case '框':
 											choiceZhu++;
-											game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
 											break;
 										default:break;
 									}
 								}
-							}
-							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
-								choiceZhu++;
-								game.players[i].trySkillAnimate('生日福利','生日福利',false);
 							}
 							var str='选择角色1';
 							if(game.players[i].special_identity){
@@ -2216,8 +2230,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							event.zhuList.remove(tempChars);
 							if(event.pickedChars[0].length>0){
 								tempChars.unshift(event.pickedChars[0]);
-								lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyPickRole]--;
-								game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+								game.updateBonusBalance(game.players[i].nickname,lib.bonusKeyPickRole,-1);
 							}
 							list.push([game.players[i],[str,[tempChars,'character']],false]);
 						}
@@ -2291,27 +2304,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(lib.configOL.choice_zhu){
 								choiceZhu=parseInt(lib.configOL.choice_zhu);
 							}
-							if(event.usingFuli[0]&&event.usingFuli[0].length){
+							if(game.getBonusBirthdaybonus(game.players[i].nickname)){
+								choiceZhu++;
+								game.players[i].trySkillAnimate('生日福利','生日福利',false);
+							}
+							else if(event.usingFuli[0]&&event.usingFuli[0].length){
 								for(var fuliname of event.usingFuli[0]){
 									switch(fuliname){
-										case '签':
+										case '框':
 											choiceZhu++;
-											delete lib.config.qiandaofuli.users[game.players[i].nickname];
-											game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
-											break;
-										case '增':
-											choiceZhu++;
-											lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyAddRole]--;
-											game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
-											game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
+											game.updateBonusBalance(game.players[i].nickname,lib.bonusKeyAddRole,-1);
 											break;
 										default:break;
 									}
 								}
-							}
-							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
-								choiceZhu++;
-								game.players[i].trySkillAnimate('生日福利','生日福利',false);
 							}
 							var str='选择角色2';
 							if(game.players[i].special_identity){
@@ -2607,23 +2613,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										break;
 								}
 							}
-							if(event.usingFuli[distanceFromZhu]&&event.usingFuli[distanceFromZhu].length){
+							if(game.getBonusBirthdaybonus(game.players[i].nickname)){
+								num3++;
+								game.players[i].trySkillAnimate('生日福利','生日福利',false);
+							}
+							else if(event.usingFuli[distanceFromZhu]&&event.usingFuli[distanceFromZhu].length){
 								for(var fuliname of event.usingFuli[distanceFromZhu]){
 									switch(fuliname){
 										case '签':
 											num3++;
 											break;
-										case '增':
+										case '框':
 											num3++;
-											game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
 											break;
 										default:break;
 									}
 								}
-							}
-							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
-								num3++;
-								game.players[i].trySkillAnimate('生日福利','生日福利',false);
 							}
 							var str='选择角色1';
 							if(game.players[i].special_identity){
@@ -2632,8 +2637,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var tempChars=event.list.randomRemove(num+num3);
 							if(event.pickedChars[distanceFromZhu].length>0){
 								tempChars.unshift(event.pickedChars[distanceFromZhu]);
-								lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyPickRole]--;
-								game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+								game.updateBonusBalance(game.players[i].nickname,lib.bonusKeyPickRole,-1);
 							}
 							list.push([game.players[i],[str,[tempChars,'character']],selectButton,false]);
 						}
@@ -2766,27 +2770,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										break;
 								}
 							}
-							if(event.usingFuli[distanceFromZhu]&&event.usingFuli[distanceFromZhu].length){
+							if(game.getBonusBirthdaybonus(game.players[i].nickname)){
+								num3++;
+								game.players[i].trySkillAnimate('生日福利','生日福利',false);
+							}
+							else if(event.usingFuli[distanceFromZhu]&&event.usingFuli[distanceFromZhu].length){
 								for(var fuliname of event.usingFuli[distanceFromZhu]){
 									switch(fuliname){
-										case '签':
+										case '框':
 											num3++;
-											delete lib.config.qiandaofuli.users[game.players[i].nickname];
-											game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
-											break;
-										case '增':
-											num3++;
-											lib.config.xiaoneibonus[game.players[i].nickname][lib.bonusKeyAddRole]--;
-											game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
-											game.players[i].trySkillAnimate('小内奖励','小内奖励',false);
+											game.updateBonusBalance(game.players[i].nickname,lib.bonusKeyAddRole,-1);
 											break;
 										default:break;
 									}
 								}
-							}
-							if(lib.config.birthdaybonus&&(game.players[i].nickname in lib.config.birthdaybonus)){
-								num3++;
-								game.players[i].trySkillAnimate('生日福利','生日福利',false);
 							}
 							var str='选择角色2';
 							if(game.players[i].special_identity){
@@ -3106,8 +3103,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）增加一点体力上限，然后回复一点体力并且摸2张牌；2）获得限定技‘知己知彼’，然后回复一点体力并且摸3张牌。（知己知彼：村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废）',
 			xiaoneizhibi:'知己知彼',
 			xiaoneizhibi_info:'限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废',
-			xiaoneibonus:'主内单挑',
-			xiaoneidianjiang:'小内获胜',
+			xiaoneidantiao:'主内单挑',
+			xiaoneihuosheng:'小内获胜',
 			zhikezhugong:'制克主公',
 			zhikezhugong_info:'村规主公限定技：如果场上玩家数是6人或者更多，而且为偶数，则主公在第一回合内可以2选1：1）准备阶段使用一次手气卡；2）如果没有对其他玩家使用牌，可以跳过弃牌阶段',
 			zhikezhugong_zhihengzg:'制衡主公',
@@ -4152,7 +4149,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			xiaoneibonus:{
+			xiaoneidantiao:{
 				unique:true,
 				mark:false,
 				frequent:true,
@@ -4167,19 +4164,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.awakenSkill('xiaoneibonus');
-					if(!lib.config.xiaoneibonus){
-						lib.config.xiaoneibonus={};
-					}
+					player.awakenSkill('xiaoneidantiao');
 					if(player.nickname&&player.nickname!='无名玩家'){
-						if(!lib.config.xiaoneibonus[player.nickname]){
-							lib.config.xiaoneibonus[player.nickname]={};
-						}
-						if(!lib.config.xiaoneibonus[player.nickname][lib.bonusKeyAddRole]){
-							lib.config.xiaoneibonus[player.nickname][lib.bonusKeyAddRole]=0;
-						}
-						lib.config.xiaoneibonus[player.nickname][lib.bonusKeyAddRole]++;
-						game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+						game.updateBonusBalance(player.nickname,lib.bonusKeyAddRole,1);
 					}
 				},
 				ai:{
@@ -4191,7 +4178,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			xiaoneidianjiang:{
+			xiaoneihuosheng:{
 				unique:true,
 				mark:false,
 				frequent:true,
@@ -4206,20 +4193,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.awakenSkill('xiaoneidianjiang');
-					if(!lib.config.xiaoneibonus){
-						lib.config.xiaoneibonus={};
-					}
+					player.awakenSkill('xiaoneihuosheng');
 					if(player.nickname&&player.nickname!='无名玩家'){
-						if(!lib.config.xiaoneibonus[player.nickname]){
-							lib.config.xiaoneibonus[player.nickname]={};
-						}
-						if(!lib.config.xiaoneibonus[player.nickname][lib.bonusKeyPickRole]){
-							lib.config.xiaoneibonus[player.nickname][lib.bonusKeyPickRole]=0;
-						}
-						lib.config.xiaoneibonus[player.nickname][lib.bonusKeyPickRole]++;
-						lib.config.xiaoneibonus[player.nickname][lib.bonusKeyAddRole]--;
-						game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
+						game.updateBonusBalance(player.nickname,lib.bonusKeyAddRole,-1);
+						game.updateBonusBalance(player.nickname,lib.bonusKeyPickRole,1);
 					}
 				},
 				ai:{
@@ -4865,7 +4842,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				priority:10,
 				content:function(){
 					"step 0"
-					if(get.info(trigger.skill).silent||trigger.skill=='woshixiaonei'||trigger.skill=='xiaoneibonus'||trigger.skill=='xiaoneidianjiang'||trigger.skill.startsWith('shengmingshili')){
+					if(get.info(trigger.skill).silent||trigger.skill=='woshixiaonei'||trigger.skill=='xiaoneidantiao'||trigger.skill=='xiaoneihuosheng'||trigger.skill.startsWith('shengmingshili')){
 						event.finish();
 					}
 					else{

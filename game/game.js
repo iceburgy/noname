@@ -33,8 +33,15 @@
 		statsKeySortKeyRoleName:'role_name',
 		statsKeyStatsByZones:'stats_by_zones',
 		statsKeyDisplayZone:'display_zone',
-		bonusKeyAddRole:'addRole',
+		bonusKeyFuliInfo:'fuliInfo',
+		bonusKeyFuliByUsers:'fuliByUsers',
+		bonusKeyChangeCards:'changeCards',
 		bonusKeyPickRole:'pickRole',
+		bonusKeyAddRole:'addRole',
+		bonusKeyBirthdaybonus:'birthdaybonus',
+		bonusKeyQiandaofuli:'qiandaofuli',
+		bonusKeyQianDaoCutoff:'qianDaoCutoff',
+		bonusKeyQiandaoByUsers:'qiandaoByUsers',
 		configprefix:'noname_0.9_',
 		versionOL:27,
 		updateURLS:{
@@ -3860,8 +3867,8 @@
 						'<button style="width:40px">确定</button></div>',
 						clear:true,
 					},
-					xiaoneijiangli_by_seat:{
-						name:'小内奖励',
+					addaddrolebonus_by_seat:{
+						name:'选将框',
 						init:'0',
 						item:{
 							'0':'一号位',
@@ -3878,9 +3885,9 @@
 						frequent:true,
 						restart:true,
 						onclick:function(seat,label){
-							this.innerHTML=this.innerHTML.replace('小内奖励','奖励中...');
-							game.saveConfig('xiaoneijiangli_by_seat',seat);
-							var result=game.addXiaoneiBonusBySeat(seat);
+							this.innerHTML=this.innerHTML.replace('选将框','奖励中...');
+							game.saveConfig('addaddrolebonus_by_seat',seat);
+							var result=game.addAddRoleBonusBySeat(seat);
 							var that=this;
 							if(result){
 								setTimeout(function(){
@@ -3894,14 +3901,14 @@
 								setTimeout(function(){
 									that.innerHTML=that.innerHTML.replace('奖励中...',label.innerHTML+'没有人！');
 									setTimeout(function(){
-										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','小内奖励');
+										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','选将框');
 									},1000);
 								},1000);
 							}
 						},
-						intro:'按照座位号发小内奖励卡',
+						intro:'按照座位号发选将框',
 					},
-					xiaoneidianjiang_by_seat:{
+					addpickrolebonus_by_seat:{
 						name:'点将卡',
 						init:'0',
 						item:{
@@ -3920,8 +3927,8 @@
 						restart:true,
 						onclick:function(seat,label){
 							this.innerHTML=this.innerHTML.replace('点将卡','奖励中...');
-							game.saveConfig('xiaoneidianjiang_by_seat',seat);
-							var result=game.addXiaoneiDianjiangBySeat(seat);
+							game.saveConfig('addpickrolebonus_by_seat',seat);
+							var result=game.addPickRoleBonusBySeat(seat);
 							var that=this;
 							if(result){
 								setTimeout(function(){
@@ -3942,7 +3949,48 @@
 						},
 						intro:'按照座位号发点将卡',
 					},
-					birthdaybonus_by_seat:{
+					addchangecardsbonus_by_seat:{
+						name:'手气卡',
+						init:'0',
+						item:{
+							'0':'一号位',
+							'1':'二号位',
+							'2':'三号位',
+							'3':'四号位',
+							'4':'五号位',
+							'5':'六号位',
+							'6':'七号位',
+							'7':'八号位',
+							'8':'九号位',
+							'9':'十号位'
+						},
+						frequent:true,
+						restart:true,
+						onclick:function(seat,label){
+							this.innerHTML=this.innerHTML.replace('手气卡','发放中...');
+							game.saveConfig('addchangecardsbonus_by_seat',seat);
+							var result=game.addChangeCardsBonusBySeat(seat);
+							var that=this;
+							if(result){
+								setTimeout(function(){
+									that.innerHTML=that.innerHTML.replace('发放中...','发放成功');
+									setTimeout(function(){
+										game.reload();
+									},1000);
+								},1000);
+							}
+							else{
+								setTimeout(function(){
+									that.innerHTML=that.innerHTML.replace('发放中...',label.innerHTML+'没有人！');
+									setTimeout(function(){
+										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','手气卡');
+									},1000);
+								},1000);
+							}
+						},
+						intro:'按照座位号发放手气卡',
+					},
+					addbirthdaybonus_by_seat:{
 						name:'生日福利或者移除',
 						init:'0',
 						item:{
@@ -3961,7 +4009,7 @@
 						restart:true,
 						onclick:function(seat,label){
 							this.innerHTML=this.innerHTML.replace('生日福利或者移除','设置中...');
-							game.saveConfig('birthdaybonus_by_seat',seat);
+							game.saveConfig('addbirthdaybonus_by_seat',seat);
 							var result=game.addBirthdayBonusBySeat(seat);
 							var that=this;
 							if(result){
@@ -3987,7 +4035,7 @@
 						name:'签到福利截止时间',
 						init:'19',
 						item:{
-							'0':'关闭',
+							'-1':'关闭',
 							'18':'晚上6点',
 							'19':'晚上7点',
 							'20':'晚上8点',
@@ -11434,22 +11482,23 @@
 
 						//var winRate=game.getWinRateByNickname(lib.config.connect_nickname);
 						var winRate='';
-						if(lib.config.xiaoneibonus&&(lib.config.connect_nickname in lib.config.xiaoneibonus)){
-							if(lib.config.xiaoneibonus[lib.config.connect_nickname][lib.bonusKeyAddRole]){
-								winRate='小内奖励x'+lib.config.xiaoneibonus[lib.config.connect_nickname][lib.bonusKeyAddRole];
-							}
-							if(lib.config.xiaoneibonus[lib.config.connect_nickname][lib.bonusKeyPickRole]){
-								if(winRate&&winRate.length) winRate+='<br/>';
-								winRate+='点将卡x'+lib.config.xiaoneibonus[lib.config.connect_nickname][lib.bonusKeyPickRole];
-							}
+						var addRoleBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeyAddRole);
+						if(addRoleBalance){
+							winRate='选将框x'+addRoleBalance;
 						}
-						if(lib.config.birthdaybonus&&(lib.config.connect_nickname in lib.config.birthdaybonus)){
+						var changeCardsBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeyChangeCards);
+						if(changeCardsBalance){
+							if(winRate&&winRate.length) winRate+='<br/>';
+							winRate+='手气卡x'+changeCardsBalance;
+						}
+						var pickRoleBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeyPickRole);
+						if(pickRoleBalance){
+							if(winRate&&winRate.length) winRate+='<br/>';
+							winRate+='点将卡x'+pickRoleBalance;
+						}
+						if(game.getBonusBirthdaybonus(lib.config.connect_nickname)){
 							if(winRate&&winRate.length) winRate+='<br/>生日福利';
 							else winRate='生日福利';
-						}
-						if(lib.config.qiandaofuli&&lib.config.qiandaofuli.users&&(lib.config.connect_nickname in lib.config.qiandaofuli.users)){
-							if(winRate&&winRate.length) winRate+='<br/>签到福利';
-							else winRate='签到福利';
 						}
 						me.setIdentity('zhu');
 						me.initOL(lib.config.connect_nickname,lib.config.connect_avatar,winRate);
@@ -11513,10 +11562,6 @@
 				},
 				replaceHandcardsOL:function(){
 					'step 0'
-					var send=function(){
-						game.me.chooseBool('是否置换手牌？');
-						game.resume();
-					};
 					var sendback=function(result,player){
 						if(result&&result.bool){
 							var hs=player.getCards('h')
@@ -11527,17 +11572,48 @@
 								}
 							},player,hs);
 							player.directgain(get.cards(hs.length));
+							player.trySkillAnimate('手气卡','手气卡',false);
+							if(player.replaceHandcardsFree&&player.replaceHandcardsFree>0){
+								player.replaceHandcardsFree--;
+							}
+							else{
+								player.replaceHandcardsBalance--;
+								game.updateBonusBalance(player.nickname,lib.bonusKeyChangeCards,-1);
+							}
+							if(!game.getBonusBalance(player.nickname,lib.bonusKeyChangeCards)){
+								game.eligiblePlayers.remove(player);
+							}
+						}
+						else{
+							game.eligiblePlayers.remove(player);
 						}
 					};
 					for(var i=0;i<event.players.length;i++){
-						if(event.players[i].isOnline()){
+						var balance=event.players[i].replaceHandcardsBalance;
+						var free=event.players[i].replaceHandcardsFree;
+						var prompt='是否置换手牌？';
+
+						if(free&&free>0){
+							prompt+='（免费手气卡）';
+						}
+						else if(balance&&balance>0){
+							prompt+='（手气卡余额：x'+balance+'）';
+						}
+						if(event.players[i].isOnline2()){
 							event.withol=true;
-							event.players[i].send(send);
+							event.players[i].send(function(prompt){
+								game.me.chooseBool(prompt).ai=function(){
+									return false;
+								};
+								game.resume();
+							},prompt);
 							event.players[i].wait(sendback);
 						}
 						else if(event.players[i]==game.me){
 							event.withme=true;
-							game.me.chooseBool('是否置换手牌？');
+							game.me.chooseBool(prompt).ai=function(){
+								return false;
+							};
 							game.me.wait(sendback);
 						}
 					}
@@ -21407,7 +21483,7 @@
 					var name2=this.name2;
 					if(lib.character[name2]&&(!showonly||unseen1)){
 						var skills=game.expandSkills(lib.character[name2][3].slice(0));
-						if(skills.contains(skill)||(unseen0&&!unseen1&&(skill=='woshixiaonei'||skill=='xiaoneibonus'||skill=='xiaoneidianjiang'||skill=='zhikezhugong_zhihengzg'||skill=='zhikezhugong_kejizg'||skill=='anlezhugong'||skill=='xiaoneizhibi'||skill=='smh_yeyan'))){
+						if(skills.contains(skill)||(unseen0&&!unseen1&&(skill=='woshixiaonei'||skill=='xiaoneidantiao'||skill=='xiaoneihuosheng'||skill=='zhikezhugong_zhihengzg'||skill=='zhikezhugong_kejizg'||skill=='anlezhugong'||skill=='xiaoneizhibi'||skill=='smh_yeyan'))){
 							if(!noshow&&this.isUnseen(1))
 							    this.showCharacter(1);
 							return 'vice';
@@ -25997,22 +26073,23 @@
 								game.connectPlayers[i].playerid=this.id;
 								//var winRate=game.getWinRateByNickname(this.nickname);
 								var winRate='';
-								if(lib.config.xiaoneibonus&&(this.nickname in lib.config.xiaoneibonus)){
-									if(lib.config.xiaoneibonus[this.nickname][lib.bonusKeyAddRole]){
-										winRate='小内奖励x'+lib.config.xiaoneibonus[this.nickname][lib.bonusKeyAddRole];
-									}
-									if(lib.config.xiaoneibonus[this.nickname][lib.bonusKeyPickRole]){
-										if(winRate&&winRate.length) winRate+='<br/>';
-										winRate+='点将卡x'+lib.config.xiaoneibonus[this.nickname][lib.bonusKeyPickRole];
-									}
+								var addRoleBalance=game.getBonusBalance(this.nickname,lib.bonusKeyAddRole);
+								if(addRoleBalance){
+									winRate='选将框x'+addRoleBalance;
 								}
-								if(lib.config.birthdaybonus&&(this.nickname in lib.config.birthdaybonus)){
+								var changeCardsBalance=game.getBonusBalance(this.nickname,lib.bonusKeyChangeCards);
+								if(changeCardsBalance){
+									if(winRate&&winRate.length) winRate+='<br/>';
+									winRate+='手气卡x'+changeCardsBalance;
+								}
+								var pickRoleBalance=game.getBonusBalance(this.nickname,lib.bonusKeyPickRole);
+								if(pickRoleBalance){
+									if(winRate&&winRate.length) winRate+='<br/>';
+									winRate+='点将卡x'+pickRoleBalance;
+								}
+								if(game.getBonusBirthdaybonus(this.nickname)){
 									if(winRate&&winRate.length) winRate+='<br/>生日福利';
 									else winRate='生日福利';
-								}
-								if(lib.config.qiandaofuli&&lib.config.qiandaofuli.users&&(this.nickname in lib.config.qiandaofuli.users)){
-									if(winRate&&winRate.length) winRate+='<br/>签到福利';
-									else winRate='签到福利';
 								}
 								game.connectPlayers[i].initOL(this.nickname,this.avatar,winRate);
 								game.connectPlayers[i].ws=this;
@@ -26328,7 +26405,7 @@
 							var sender=lib.node.clients[i];
 							if(game.isQiandaoing()){
 								ip+='<br/>签到福利发放中！';
-								var cutoff=lib.config.qiandaofuli.qianDaoCutoff;
+								var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
 								ip+='<br/>截止到：'+cutoff.toLocaleString();
 							}
 							var args=[];
@@ -27435,9 +27512,7 @@
 		},
 		purgeLibConfigData:function(data1,cleanPersonalData){
 			delete data1.alertDup;
-			delete data1.xiaoneibonus;
-			delete data1.birthdaybonus;
-			delete data1.qiandaofuli;
+			delete data1[lib.bonusKeyFuliInfo];
 			delete data1.players_info;
 			delete data1[lib.statsKeyGame];
 			if(cleanPersonalData){
@@ -27452,84 +27527,149 @@
 			game.saveConfig('alertDup',val);
 			return lib.config.alertDup;
 		},
+		isARealGame:function(){
+			var clients=game.players.concat(game.dead);
+			var numHuman=0;
+			for(var i=0;i<clients.length;i++){
+				if(clients[i].nickname&&clients[i].nickname!='无名玩家'){
+					numHuman++;
+				}
+			}
+			return numHuman>=6&&(clients.length==8||clients.length==10);
+		},
 		getAllFuliInfo:function(){
-			var fuliInfo={};
-			if(lib.config.xiaoneibonus){
-				fuliInfo.xiaoneibonus=lib.config.xiaoneibonus;
-			}
-			if(lib.config.birthdaybonus){
-				for(var nn in lib.config.birthdaybonus){
-					lib.config.birthdaybonus[nn].toJSON = function(){ return this.toLocaleString(); }
+			if(lib.config[lib.bonusKeyFuliInfo]&&lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]){
+				for(var nn in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]){
+					lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus][nn].toJSON = function(){ return this.toLocaleString(); }
 				}
-				fuliInfo.birthdaybonus=lib.config.birthdaybonus;
 			}
-			if(lib.config.qiandaofuli){
-				if(lib.config.qiandaofuli.qianDaoCutoff){
-					lib.config.qiandaofuli.qianDaoCutoff.toJSON = function(){ return this.toLocaleString(); }
+			if(lib.config[lib.bonusKeyFuliInfo]&&lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli]){
+				if(lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff]){
+					lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff].toJSON = function(){ return this.toLocaleString(); }
 				}
-				if(lib.config.qiandaofuli.users){
-					for(var nn in lib.config.qiandaofuli.users){
-						lib.config.qiandaofuli.users[nn].toJSON = function(){ return this.toLocaleString(); }
+				if(lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers]){
+					for(var nn in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers]){
+						lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][nn].toJSON = function(){ return this.toLocaleString(); }
 					}
 				}
-				fuliInfo.qiandaofuli=lib.config.qiandaofuli;
 			}
-			return JSON.stringify(fuliInfo,null,4);
+			return JSON.stringify(lib.config[lib.bonusKeyFuliInfo],null,4);
+		},
+		getBonusBalance:function(nickname,bonusKey){
+			var balance=0;
+			if(lib.config[lib.bonusKeyFuliInfo]&&
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers]&&
+				(nickname in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers])){
+				balance=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nickname][bonusKey]||0;
+			}
+			return balance;
+		},
+		updateBonusBalance:function(nickname,bonusKey,delta){
+			if(!lib.config[lib.bonusKeyFuliInfo]){
+				lib.config[lib.bonusKeyFuliInfo]={};
+			}
+			if(!lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers]){
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers]={};
+			}
+			if(!(nickname in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers])){
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nickname]={};
+			}
+			if(!lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nickname][bonusKey]){
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nickname][bonusKey]=0;
+			}
+			lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nickname][bonusKey]+=delta;
+			if(lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nickname][bonusKey]<0){
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nickname][bonusKey]=0;
+			}
+			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
+		},
+		addChangeCardsBonusBySeat:function(seat){
+			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
+				game.updateBonusBalance(game.connectPlayers[seat].nickname,lib.bonusKeyChangeCards,1);
+				return true;
+			}
+			return false;
+		},
+		addAddRoleBonusBySeat:function(seat){
+			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
+				game.updateBonusBalance(game.connectPlayers[seat].nickname,lib.bonusKeyAddRole,1);
+				return true;
+			}
+			return false;
+		},
+		addPickRoleBonusBySeat:function(seat){
+			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
+				game.updateBonusBalance(game.connectPlayers[seat].nickname,lib.bonusKeyPickRole,1);
+				return true;
+			}
+			return false;
+		},
+		getBonusBirthdaybonus:function(nickname){
+			var result=false;
+			if(lib.config[lib.bonusKeyFuliInfo]&&
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]&&
+				(nickname in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus])){
+				result=true;
+			}
+			return result;
 		},
 		syncQiandaofuli:function(){
-			if(!lib.config.qiandaofuli){
-				lib.config.qiandaofuli={};
+			if(!lib.config[lib.bonusKeyFuliInfo]){
+				lib.config[lib.bonusKeyFuliInfo]={};
+			}
+			if(!lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli]){
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli]={};
 			}
 			var now=new Date();
 			if(now.getDay()==5){
 				game.setQiandaofuliCutoffByHour(lib.config['qiandaofuli_cutoff']);
 			}
 
-			if(!game.isGameDay()){
-				lib.config.qiandaofuli.users={};
+			if(!game.isQiandaoing()){
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers]={};
 			}
-			game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
+			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},
 		setQiandaofuliCutoffByHour:function(hour){
-			if(!lib.config.qiandaofuli){
-				lib.config.qiandaofuli={};
+			if(!lib.config[lib.bonusKeyFuliInfo]){
+				lib.config[lib.bonusKeyFuliInfo]={};
+			}
+			if(!lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli]){
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli]={};
 			}
 			var cutofftime=new Date();
 			if(hour==24) cutofftime.setHours(23, 59, 59, 0);
+			else if(hour<0) cutofftime.setDate(cutofftime.getDate()-5);
 			else cutofftime.setHours(hour, 0, 0, 0);
-			lib.config.qiandaofuli.qianDaoCutoff=cutofftime;
-			game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
-		},
-		isGameDay:function(){
-			if(lib.config.qiandaofuli&&lib.config.qiandaofuli.qianDaoCutoff){
-				var cutoff=lib.config.qiandaofuli.qianDaoCutoff;
-				var start=new Date(cutoff.getTime());
-				start.setHours(0, 0, 0, 0);
-				var end=new Date(cutoff.getTime());
-				end.setDate(cutoff.getDate()+1);
-				end.setHours(3, 0, 0, 0);
-				var now=new Date();
-				return start<=now&&now<=end;
-			}
-			return false;
+			lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff]=cutofftime;
+			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},
 		isQiandaoing:function(){
-			if(game.isGameDay()){
-				var cutoff=lib.config.qiandaofuli.qianDaoCutoff;
-				var now=new Date();
-				return now<=cutoff;
+			if(lib.config[lib.bonusKeyFuliInfo]&&
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli]&&
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff]){
+				var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
+				return new Date()<=cutoff;
 			}
 			return false;
 		},
 		addQiandaofuli:function(nickname){
 			if(!nickname||nickname=='无名玩家') return;
-			if(!lib.config.qiandaofuli.users){
-				lib.config.qiandaofuli.users={};
+			if(!lib.config[lib.bonusKeyFuliInfo]){
+				lib.config[lib.bonusKeyFuliInfo]={};
 			}
-			if(!(nickname in lib.config.qiandaofuli.users)){
-				lib.config.qiandaofuli.users[nickname]=new Date();
+			if(!lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli]){
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli]={};
 			}
-			game.saveConfig('qiandaofuli',lib.config.qiandaofuli);
+			if(!lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers]){
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers]={};
+			}
+			if(!(nickname in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])){
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][nickname]=new Date();
+				game.updateBonusBalance(nickname,lib.bonusKeyChangeCards,3);
+				game.updateBonusBalance(nickname,lib.bonusKeyAddRole,1);
+			}
+			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},
 		displayQiandaofuli:function(ip){
 			var bar=ui.create.div(ui.window);
@@ -27570,68 +27710,37 @@
 			ui.connectStartButton=button;
 			ui.connectStartBar=bar;
 		},
-		addXiaoneiBonusBySeat:function(seat){
-			if(!lib.config.xiaoneibonus){
-				lib.config.xiaoneibonus={};
-			}
-			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
-				if(!lib.config.xiaoneibonus[game.connectPlayers[seat].nickname]){
-					lib.config.xiaoneibonus[game.connectPlayers[seat].nickname]={};
-				}
-				if(!lib.config.xiaoneibonus[game.connectPlayers[seat].nickname][lib.bonusKeyAddRole]){
-					lib.config.xiaoneibonus[game.connectPlayers[seat].nickname][lib.bonusKeyAddRole]=0;
-				}
-				lib.config.xiaoneibonus[game.connectPlayers[seat].nickname][lib.bonusKeyAddRole]++;
-				game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
-				return true;
-			}
-			return false;
-		},
-		addXiaoneiDianjiangBySeat:function(seat){
-			if(!lib.config.xiaoneibonus){
-				lib.config.xiaoneibonus={};
-			}
-			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
-				if(!lib.config.xiaoneibonus[game.connectPlayers[seat].nickname]){
-					lib.config.xiaoneibonus[game.connectPlayers[seat].nickname]={};
-				}
-				if(!lib.config.xiaoneibonus[game.connectPlayers[seat].nickname][lib.bonusKeyPickRole]){
-					lib.config.xiaoneibonus[game.connectPlayers[seat].nickname][lib.bonusKeyPickRole]=0;
-				}
-				lib.config.xiaoneibonus[game.connectPlayers[seat].nickname][lib.bonusKeyPickRole]++;
-				game.saveConfig('xiaoneibonus',lib.config.xiaoneibonus);
-				return true;
-			}
-			return false;
-		},
 		addBirthdayBonusBySeat:function(seat){
-			if(!lib.config.birthdaybonus){
-				lib.config.birthdaybonus={};
+			if(!lib.config[lib.bonusKeyFuliInfo]){
+				lib.config[lib.bonusKeyFuliInfo]={};
+			}
+			if(!lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]){
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]={};
 			}
 			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
 				var nn=game.connectPlayers[seat].nickname;
-				if (nn in lib.config.birthdaybonus) delete lib.config.birthdaybonus[nn];
+				if (nn in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]) delete lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus][nn];
 				else{
 					var expire=new Date();
 					expire.setDate(expire.getDate()+1);
-					lib.config.birthdaybonus[nn]=expire;
+					lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus][nn]=expire;
 				}
-				game.saveConfig('birthdaybonus',lib.config.birthdaybonus);
+				game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 				return true;
 			}
 			return false;
 		},
 		syncBirthdayBonus:function(){
-			if(lib.config.birthdaybonus){
+			if(lib.config[lib.bonusKeyFuliInfo]&&lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]){
 				var updated=false;
-				for(var nn in lib.config.birthdaybonus){
-					var expire=lib.config.birthdaybonus[nn];
+				for(var nn in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]){
+					var expire=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus][nn];
 					if(expire<=new Date()){
-						delete lib.config.birthdaybonus[nn];
+						delete lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus][nn];
 						updated=true;
 					}
 				}
-				if(updated) game.saveConfig('birthdaybonus',lib.config.birthdaybonus);
+				if(updated) game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 			}
 		},
 		savePlayerInfo:function(playerIP,playerNickname){
@@ -28111,22 +28220,23 @@
 
 					//var winRate=game.getWinRateByNickname(player.nickname);
 					var winRate='';
-					if(lib.config.xiaoneibonus&&(player.nickname in lib.config.xiaoneibonus)){
-						if(lib.config.xiaoneibonus[player.nickname][lib.bonusKeyAddRole]){
-							winRate='小内奖励x'+lib.config.xiaoneibonus[player.nickname][lib.bonusKeyAddRole];
-						}
-						if(lib.config.xiaoneibonus[player.nickname][lib.bonusKeyPickRole]){
-							if(winRate&&winRate.length) winRate+='<br/>';
-							winRate+='点将卡x'+lib.config.xiaoneibonus[player.nickname][lib.bonusKeyPickRole];
-						}
+					var addRoleBalance=game.getBonusBalance(player.nickname,lib.bonusKeyAddRole);
+					if(addRoleBalance){
+						winRate='选将框x'+addRoleBalance;
 					}
-					if(lib.config.birthdaybonus&&(player.nickname in lib.config.birthdaybonus)){
+					var changeCardsBalance=game.getBonusBalance(player.nickname,lib.bonusKeyChangeCards);
+					if(changeCardsBalance){
+						if(winRate&&winRate.length) winRate+='<br/>';
+						winRate+='手气卡x'+changeCardsBalance;
+					}
+					var pickRoleBalance=game.getBonusBalance(player.nickname,lib.bonusKeyPickRole);
+					if(pickRoleBalance){
+						if(winRate&&winRate.length) winRate+='<br/>';
+						winRate+='点将卡x'+pickRoleBalance;
+					}
+					if(game.getBonusBirthdaybonus(player.nickname)){
 						if(winRate&&winRate.length) winRate+='<br/>生日福利';
 						else winRate='生日福利';
-					}
-					if(lib.config.qiandaofuli&&lib.config.qiandaofuli.users&&(player.nickname in lib.config.qiandaofuli.users)){
-						if(winRate&&winRate.length) winRate+='<br/>签到福利';
-						else winRate='签到福利';
 					}
 					if(!game.onlinezhu){
 						game.onlinezhu=player.playerid;
@@ -28216,6 +28326,7 @@
 				eventName=Array.isArray(_status.event._args[0])?_status.event._args[0][0]:_status.event._args[0];
 			}
 			if(!eventName) return num;
+			if(typeof eventName=='string'&&eventName.startsWith('是否置换手牌')) eventName='是否置换手牌';
 			switch(eventName){
 				case 'createCharacterDialog':
 				case '选择角色1':
@@ -28237,6 +28348,7 @@
 				case '请选择神武将的势力':
 				case '是否亮将':
 				case '是否声明势力':
+				case '是否置换手牌':
 					if(lib.configOL.choose_timeout_shen_group){
 						num=lib.configOL.choose_timeout_shen_group;
 					}
@@ -31614,14 +31726,8 @@
 			var tableStatisticsByRole;
 			var winnerText='';
 			var clients=game.players.concat(game.dead);
-			var numHuman=0;
-			for(i=0;i<clients.length;i++){
-				if(clients[i].nickname&&clients[i].nickname!='无名玩家'){
-					numHuman++;
-				}
-			}
-			// only record statistics if there are at least 5 human players
-			if(_status.connectMode&&(game.players.length||game.dead.length)&&numHuman>=6&&(clients.length==8||clients.length==10)){
+			// only record statistics if there are at least certain human players
+			if(_status.connectMode&&game.isARealGame()){
 				// game statistics
 				/* lib.config.stats_game
 				{
@@ -45569,7 +45675,7 @@
 				else{
 					if(game.isQiandaoing()){
 						ip+='<br/>签到福利发放中！';
-						var cutoff=lib.config.qiandaofuli.qianDaoCutoff;
+						var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
 						ip+='<br/>截止到：'+cutoff.toLocaleString();
 					}
 					game.displayQiandaofuli(ip);
