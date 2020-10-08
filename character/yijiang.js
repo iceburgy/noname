@@ -62,7 +62,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hanhaoshihuan:['male','wei',4,['reshenduan','reyonglve']],
 
 			caorui:['male','wei',3,['huituo','mingjian','xingshuai'],['zhu']],
-			caoxiu:['male','wei',4,['reqianju','reqingxi']],
+			caoxiu:['male','wei',4,['reqianju','qingxi']],
 			zhongyao:['male','wei',3,['huomo','zuoding']],
 			liuchen:['male','shu',4,['zhanjue','qinwang'],['zhu']],
 			zhangyi:['male','shu',4,['wurong','shizhi']],
