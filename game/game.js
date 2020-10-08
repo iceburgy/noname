@@ -11477,7 +11477,7 @@
 
 						// set qiandaofuli if applicable
 						if(game.isQiandaoing()){
-							game.addQiandaofuli(lib.config.connect_nickname);
+							game.addQiandaofuli(game.ip,lib.config.connect_nickname);
 						}
 
 						//var winRate=game.getWinRateByNickname(lib.config.connect_nickname);
@@ -26066,8 +26066,8 @@
 							if(game.connectPlayers[i].classList.contains('unselectable2')) continue;
 							if(game.connectPlayers[i]!=game.me&&!game.connectPlayers[i].playerid){
 								// set qiandaofuli if applicable
-								if(game.isQiandaoing()){
-									game.addQiandaofuli(this.nickname);
+								if(this.ws._socket&&this.ws._socket.remoteAddress&&game.isQiandaoing()){
+									game.addQiandaofuli(this.ws._socket.remoteAddress,this.nickname);
 								}
 
 								game.connectPlayers[i].playerid=this.id;
@@ -27653,7 +27653,7 @@
 			}
 			return false;
 		},
-		addQiandaofuli:function(nickname){
+		addQiandaofuli:function(ip,nickname){
 			if(!nickname||nickname=='无名玩家') return;
 			if(!lib.config[lib.bonusKeyFuliInfo]){
 				lib.config[lib.bonusKeyFuliInfo]={};
@@ -27664,8 +27664,8 @@
 			if(!lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers]){
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers]={};
 			}
-			if(!(nickname in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])){
-				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][nickname]=new Date();
+			if(!(ip in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])){
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][ip]=new Date();
 				game.updateBonusBalance(nickname,lib.bonusKeyChangeCards,3);
 				game.updateBonusBalance(nickname,lib.bonusKeyAddRole,1);
 			}
@@ -28213,11 +28213,6 @@
 			for(var i=0;i<game.connectPlayers.length;i++){
 				var player=game.connectPlayers[i];
 				if(player.playerid){
-					// set qiandaofuli if applicable
-					if(game.isQiandaoing()){
-						game.addQiandaofuli(player.nickname);
-					}
-
 					//var winRate=game.getWinRateByNickname(player.nickname);
 					var winRate='';
 					var addRoleBalance=game.getBonusBalance(player.nickname,lib.bonusKeyAddRole);
