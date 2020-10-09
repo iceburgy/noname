@@ -7,8 +7,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			lib.config.mode_config['identity']['double_character']=true;
 			lib.config.mode_config['identity']['connect_double_character']=true;
 			game.showChangeLog();
-			game.syncBirthdayBonus();
-			game.syncQiandaofuli();
+			game.syncAllBonus();
 			"step 1"
 			var directstartmode=lib.config.directstartmode;
 			ui.create.menu(true);

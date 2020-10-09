@@ -11626,6 +11626,42 @@
 						game.pause();
 					}
 				},
+				rePickRoleOL:function(){
+					'step 0'
+					var sendback=function(result,player){
+						if(!result||!result.bool){
+							game.dianjiangusers.remove(player);
+						}
+					};
+					for(var i=0;i<game.dianjiangmissedusers.length;i++){
+						var prompt='点将冲突，是否重新点将？<br/>确定：冲突的武将不可点；<br/>取消：放弃点将并退还点将卡';
+						if(game.dianjiangmissedusers[i].isOnline2()){
+							event.withol=true;
+							game.dianjiangmissedusers[i].send(function(prompt){
+								game.me.chooseBool(prompt).ai=function(){
+									return false;
+								};
+								game.resume();
+							},prompt);
+							game.dianjiangmissedusers[i].wait(sendback);
+						}
+						else if(game.dianjiangmissedusers[i]==game.me){
+							event.withme=true;
+							game.me.chooseBool(prompt).ai=function(){
+								return false;
+							};
+							game.me.wait(sendback);
+						}
+					}
+					'step 1'
+					if(event.withme){
+						game.me.unwait(result);
+					}
+					'step 2'
+					if(event.withol&&!event.resultOL){
+						game.pause();
+					}
+				},
 				phase:function(){
 					"step 0"
 					player.phaseZhunbei();
@@ -26018,6 +26054,11 @@
 							}
 
 							if(!isDup){
+								// set qiandaofuli if applicable
+								if(this.ws._socket&&this.ws._socket.remoteAddress&&game.isQiandaoing()){
+									game.addQiandaofuli(this.ws._socket.remoteAddress,this.nickname);
+								}
+
 								lib.node.observing.push(this);
 								this.send('reinit',lib.configOL,get.arenaState(),game.getState?game.getState():{},game.ip,game.players[0].playerid);
 								if(!ui.showObserveButton){
@@ -27613,6 +27654,11 @@
 			}
 			return result;
 		},
+		syncAllBonus:function(){
+			game.syncQiandaofuli();
+			game.syncFuliByUsers();
+			game.syncBirthdayBonus();
+		},
 		syncQiandaofuli:function(){
 			if(!lib.config[lib.bonusKeyFuliInfo]){
 				lib.config[lib.bonusKeyFuliInfo]={};
@@ -27629,6 +27675,39 @@
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers]={};
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
+		},
+		syncFuliByUsers:function(){
+			if(lib.config[lib.bonusKeyFuliInfo]&&lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers]){
+				var nicknames=Object.keys(lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers])
+				if(nicknames.length>0){
+					for(var nn of nicknames){
+						var fuliNames=Object.keys(lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nn])
+						if(fuliNames.length>0){
+							for(var fuliName of fuliNames){
+								var fuliBalance=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nn][fuliName];
+								if(fuliBalance<=0) delete lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nn][fuliName]
+							}
+						}
+						if(Object.keys(lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nn]).length==0){
+							delete lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nn];
+						}
+					}
+				}
+			}
+			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
+		},
+		syncBirthdayBonus:function(){
+			if(lib.config[lib.bonusKeyFuliInfo]&&lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]){
+				var updated=false;
+				for(var nn in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]){
+					var expire=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus][nn];
+					if(expire<=new Date()){
+						delete lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus][nn];
+						updated=true;
+					}
+				}
+				if(updated) game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
+			}
 		},
 		setQiandaofuliCutoffByHour:function(hour){
 			if(!lib.config[lib.bonusKeyFuliInfo]){
@@ -27668,6 +27747,7 @@
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][ip]=new Date();
 				game.updateBonusBalance(nickname,lib.bonusKeyChangeCards,3);
 				game.updateBonusBalance(nickname,lib.bonusKeyAddRole,1);
+				game.updateBonusBalance(nickname,lib.bonusKeyPickRole,1);
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},
@@ -27729,19 +27809,6 @@
 				return true;
 			}
 			return false;
-		},
-		syncBirthdayBonus:function(){
-			if(lib.config[lib.bonusKeyFuliInfo]&&lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]){
-				var updated=false;
-				for(var nn in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]){
-					var expire=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus][nn];
-					if(expire<=new Date()){
-						delete lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus][nn];
-						updated=true;
-					}
-				}
-				if(updated) game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
-			}
 		},
 		savePlayerInfo:function(playerIP,playerNickname){
 			if(playerNickname){
@@ -28076,6 +28143,10 @@
 			else{
 				next.setContent('replaceHandcards');
 			}
+		},
+		rePickRoleOL:function(){
+			var next=game.createEvent('rePickRoleOL');
+			next.setContent('rePickRoleOL');
 		},
 		removeCard:function(name){
 			for(var i=0;i<lib.card.list.length;i++){
