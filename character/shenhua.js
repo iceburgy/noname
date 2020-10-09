@@ -5025,6 +5025,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.current.chooseToUse('乱武：使用一张杀或流失一点体力',{name:'sha'},function(card,player,target){
 						if(player==target) return false;
 						if(!player.canUse('sha',target)) return false;
+						// fix bug: ai can respond with equip and judge card
+						if(card&&get.itemtype(card)=='card'&&get.name(card)!='sha'){
+							return false;
+						}
 						if(get.distance(player,target)<=1) return true;
 						if(game.hasPlayer(function(current){
 							return current!=player&&get.distance(player,current)<get.distance(player,target);
