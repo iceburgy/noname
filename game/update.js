@@ -1,8 +1,9 @@
 window.noname_update={
-	version:'2020.10.10',
+	version:'2020.10.10.1',
 	update:'2020.08.09',
 	changeLog:[
 		'修复赵襄更换武将性别不变的bug',
+		'修复修复魏延加孙鲁班出杀发动谮毁时魏延奇谋标记不变的bug',
 	],
 	files:[
 		'card/extra.js',
