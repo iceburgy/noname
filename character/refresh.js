@@ -1394,7 +1394,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			reqimou3:{
-				trigger:{player:'useCardAfter'},
+				trigger:{global:'useCardAfter'},
 				silent:true,
 				intro:{
 					content:function(storage,player){
