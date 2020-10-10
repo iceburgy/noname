@@ -329,12 +329,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					name2:players[i].name2,
 					identity:players[i].identity
 				});
-				if(players[i].identity=='nei'&&game.isARealGame()){
-					players[i].hiddenSkills.add('xiaoneidantiao');
-					players[i].hiddenSkills.add('xiaoneihuosheng');
-					players[i].addSkillTrigger('xiaoneidantiao',true);
-					players[i].addSkillTrigger('xiaoneihuosheng',true);
-					if(players.length>4){
+				if(players[i].identity=='nei'){
+					if(game.isARealGame()){
+						players[i].hiddenSkills.add('xiaoneidantiao');
+						players[i].hiddenSkills.add('xiaoneihuosheng');
+						players[i].addSkillTrigger('xiaoneidantiao',true);
+						players[i].addSkillTrigger('xiaoneihuosheng',true);
+					}
+					if(players.length>=6){
 						players[i].hiddenSkills.add('woshixiaonei');
 						players[i].addSkillTrigger('woshixiaonei',true);
 						players[i].showRevealXiaonei();

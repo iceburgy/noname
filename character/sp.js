@@ -8180,6 +8180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					event.num=Math.min(event.num,8);
 					player.reinit('zhaoxiang',result.links[0],false);
+					if(player.isUnseen(0)||player.name1==result.links[0]) this.sex=lib.character[result.links[0]][0];
 					if(_status.characterlist){
 						_status.characterlist.add('zhaoxiang');
 						_status.characterlist.remove(result.links[0]);
