@@ -4081,7 +4081,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					player.awakenSkill('woshixiaonei');
 					player.chooseControlList(true,function(event,player){
-						return Math.floor(Math.random()*2);
+						return 0;
 					},
 					['增加一点体力上限，然后回复一点体力并且摸2张牌','获得限定技‘知己知彼’，然后回复一点体力并且摸3张牌。（知己知彼：村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废）']);
 
