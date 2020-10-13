@@ -563,20 +563,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			getIdentityList2:function(list){
-				for(var i in list){
-					switch(i){
-						case 'fan':list[i]='反贼';break;
-						case 'zhong':list[i]='忠臣';break;
-						case 'nei':list[i]='内奸';break;
-						case 'zhu':list[i]='主公';break;
-						case 'cai':case 'cai2':list[i]='未知';break;
-						case 'rZhong':case 'bZhong':list[i]='前锋';break;
-						case 'rNei':case 'bNei':list[i]='细作';break;
-						case 'rYe':case 'bYe':list[i]='野心家';break;
-					}
-				}
-			},
 			getVideoName:function(){
 				var str=get.translation(game.me.name);
 				if(game.me.name2){
