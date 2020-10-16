@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.10.16',
+	version:'2020.10.16.1',
 	update:'2020.08.09',
 	changeLog:[
 		'修复赵襄更换武将性别不变的bug',

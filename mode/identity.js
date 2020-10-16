@@ -2109,7 +2109,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							for(var j=0;j<list.length;j++){
 								list[j]=['','',list[j]];
 							}
-							usefuli.push([game.players[i],['是否使用福利',[list,'vcard']],[1,list.length],false]);
+							usefuli.push([game.players[i],['是否使用福利',[list,'vcard']],1,false]);
 						}
 					}
 					if(found){
