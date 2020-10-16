@@ -1,10 +1,11 @@
 window.noname_update={
-	version:'2020.10.16.1',
+	version:'2020.10.16.2',
 	update:'2020.08.09',
 	changeLog:[
 		'修复赵襄更换武将性别不变的bug',
 		'修复魏延加孙鲁班出杀发动谮毁时魏延奇谋标记不变的bug',
 		'修复客户端AI会装备已在装备区的装备牌的bug',
+		'小内获胜在已获得选将框的情况下额外获得点将卡',
 	],
 	files:[
 		'card/extra.js',

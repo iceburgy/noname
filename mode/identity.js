@@ -4202,7 +4202,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.awakenSkill('xiaoneihuosheng');
 					if(player.nickname&&player.nickname!='无名玩家'){
-						game.updateBonusBalance(player.nickname,lib.bonusKeyAddRole,-1);
 						game.updateBonusBalance(player.nickname,lib.bonusKeyPickRole,1);
 					}
 				},
