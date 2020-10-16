@@ -52119,7 +52119,7 @@
 		},
 		selectableCards:function(sort){
 			if(!_status.event.player) return[];
-			var cards=_status.event.player.getCards('hes');
+			var cards=_status.event.player.getCards('hs');
 			var selectable=[];
 			for(var i=0;i<cards.length;i++){
 				if(cards[i].classList.contains('selectable')&&
