@@ -26569,6 +26569,9 @@
 				unauto:function(){
 					var player=lib.playerOL[this.id];
 					if(player){
+						player.send(function(){
+							_status.imchoosing=false;
+						});
 						player.isAuto=false;
 						player.setNickname(player.nickname);
 						game.broadcast(function(player){
@@ -28356,6 +28359,7 @@
 					if(!moonlightActivated){
 						moonlightActivated=true;
 						game.invokeMoonlight(game.me);
+						game.invokePlayMoonlightAlert(game.me,game.me.mlBalance);
 					}
 					else if(--game.me.mlBalance>0){
 						game.invokePlayMoonlightAlert(game.me,game.me.mlBalance);
@@ -28411,7 +28415,8 @@
 		},
 		playMoonlightAlert:function(player,mlb){
 			if(mlb>10) return;
-			player.trySkillAnimate(mlb.toString(),mlb.toString(),false);
+			var animateMsg='【'+mlb+'】';
+			player.trySkillAnimate(animateMsg,animateMsg,false);
 			if(0<mlb&&mlb<=10&&mlb%5==0){
 				game.broadcastAll(function(){
 					game.playAudio('effect','win');
@@ -49534,6 +49539,7 @@
 						game.send('unauto');
 					}
 					else if(_status.connectMode){
+						_status.imchoosing=false;
 						game.broadcastAll(function(player){
 							player.setNickname(player.nickname);
 						},game.me);
