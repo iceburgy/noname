@@ -26561,15 +26561,6 @@
 						}
 					}
 				},
-				moonlight:function(time,isStop){
-					var player=lib.playerOL[this.id];
-					if(player){
-						game.useMoonlight(player,time,isStop);
-					}
-				},
-				playMoonlightAlert:function(){
-					game.playMoonlightAlert();
-				},
 				logSkill:function(player,skill){
 					if(player&&skill){
 						player.logSkill(skill);
@@ -28354,34 +28345,33 @@
 			var moonlightTime=parseInt(lib.configOL.moonlight_time);
 			var moonlightActivated=false;
 			_status.countDown=setInterval(function(){
+				var isDone=false;
 				if(--game.timerCurrent>0){
 					ui.timer.set(game.timerCurrent,game.timerCurrent/game.timerTime);
+					if(!game.me.mlBalance){
+						game.invokePlayMoonlightAlert(game.me,game.timerCurrent);
+					}
 				}
 				else if(game.me.mlBalance){
 					if(!moonlightActivated){
 						moonlightActivated=true;
-
-						if(game.online){
-							game.send('moonlight',game.me.mlBalance);
-						}
-						else{
-							game.useMoonlight(game.me,game.me.mlBalance);
-						}
+						game.invokeMoonlight(game.me);
 					}
-					game.me.mlBalance--;
+					else if(--game.me.mlBalance>0){
+						game.invokePlayMoonlightAlert(game.me,game.me.mlBalance);
+					}
+					else{
+						isDone=true;
+					}
 					ui.click.moonlight();
 					ui.timer.set(game.me.mlBalance,game.me.mlBalance/moonlightTime);
-					if(0<game.me.mlBalance&&game.me.mlBalance<10&&game.me.mlBalance%3==0){
-						if(game.online){
-							game.send('playMoonlightAlert');
-						}
-						else{
-							game.playMoonlightAlert();
-						}
-					}
 				}
 				else{
-					game.send('moonlight',0,true);
+					isDone=true;
+				}
+				if(isDone){
+					game.invokeTimeUpAlert();
+					game.send('exec',game.useMoonlight,game.me,0,true);
 					ui.timer.set(0,0);
 					clearInterval(_status.countDown);
 					delete _status.countDown;
@@ -28394,6 +28384,7 @@
 				player.mlBalance=time;
 				return;
 			}
+			player.trySkillAnimate('月光宝盒','月光宝盒',false);
 			if(player!=game.me){
 				player.mlBalance=time;
 				player.showTimer(time*1000);
@@ -28402,10 +28393,44 @@
 				player.showTimer(time);
 			},player,time*1000);
 		},
-		playMoonlightAlert:function(){
-			game.broadcastAll(function(){
-				game.playAudio('effect','win');
-			});
+		invokeMoonlight:function(player){
+			if(game.online){
+				game.send('exec',game.useMoonlight,player,player.mlBalance);
+			}
+			else{
+				game.useMoonlight(player,player.mlBalance);
+			}
+		},
+		invokePlayMoonlightAlert:function(player,mlb){
+			if(game.online){
+				game.send('exec',game.playMoonlightAlert,player,mlb);
+			}
+			else{
+				game.playMoonlightAlert(player,mlb);
+			}
+		},
+		playMoonlightAlert:function(player,mlb){
+			if(mlb>10) return;
+			player.trySkillAnimate(mlb.toString(),mlb.toString(),false);
+			if(0<mlb&&mlb<=10&&mlb%5==0){
+				game.broadcastAll(function(){
+					game.playAudio('effect','win');
+				});
+			}
+		},
+		invokeTimeUpAlert:function(){
+			if(game.online){
+				game.send('exec',function(){
+					game.broadcastAll(function(){
+						game.playAudio('effect','tie');
+					});
+				});
+			}
+			else{
+				game.broadcastAll(function(){
+					game.playAudio('effect','tie');
+				});
+			}
 		},
 		getChooseTimeByEvent:function(){
 			var num;
@@ -28575,7 +28600,7 @@
 		},
 		stopCountChoose:function(){
 			if(_status.countDown){
-				game.send('moonlight',game.me.mlBalance,true);
+				game.send('exec',game.useMoonlight,game.me,game.me.mlBalance,true);
 				clearInterval(_status.countDown);
 				delete _status.countDown;
 				ui.timer.hide();
