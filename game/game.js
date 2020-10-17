@@ -26567,6 +26567,9 @@
 						game.useMoonlight(player,time,isStop);
 					}
 				},
+				playMoonlightAlert:function(){
+					game.playMoonlightAlert();
+				},
 				logSkill:function(player,skill){
 					if(player&&skill){
 						player.logSkill(skill);
@@ -28368,6 +28371,14 @@
 					game.me.mlBalance--;
 					ui.click.moonlight();
 					ui.timer.set(game.me.mlBalance,game.me.mlBalance/moonlightTime);
+					if(0<game.me.mlBalance&&game.me.mlBalance<10&&game.me.mlBalance%3==0){
+						if(game.online){
+							game.send('playMoonlightAlert');
+						}
+						else{
+							game.playMoonlightAlert();
+						}
+					}
 				}
 				else{
 					game.send('moonlight',0,true);
@@ -28390,6 +28401,11 @@
 			game.broadcast(function(player,time){
 				player.showTimer(time);
 			},player,time*1000);
+		},
+		playMoonlightAlert:function(){
+			game.broadcastAll(function(){
+				game.playAudio('effect','win');
+			});
 		},
 		getChooseTimeByEvent:function(){
 			var num;
@@ -43552,12 +43568,10 @@
 				if(ui.giveup) return;
 				if(!lib.config.show_giveup) return;
 				ui.giveup=ui.create.system('投降',function(){
-					if(this.classList.contains('hidden')) return;
 					if(this.innerHTML=='<span>确认</span>'){
 						clearTimeout(this.confirmTimeout);
 						var player=game.me;
 						this.innerHTML='<span>投降</span>';
-						this.hide();
 						if(game.online){
 							game.send('giveup',player);
 						}
