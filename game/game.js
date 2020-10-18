@@ -28345,6 +28345,9 @@
 			if(game.timerTime<=0) return;
 			game.timerCurrent=game.timerTime;
 			ui.timer.set(game.timerCurrent,1);
+			if(!game.me.mlBalance){
+				game.invokePlayMoonlightAlert(game.me,game.timerCurrent);
+			}
 			var moonlightTime=parseInt(lib.configOL.moonlight_time);
 			var moonlightActivated=false;
 			_status.countDown=setInterval(function(){
