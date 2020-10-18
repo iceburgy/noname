@@ -52167,7 +52167,7 @@
 		},
 		selectableCards:function(sort){
 			if(!_status.event.player) return[];
-			var cards=_status.event.player.getCards('hs');
+			var cards=_status.event.player.getCards('hes');
 			var selectable=[];
 			for(var i=0;i<cards.length;i++){
 				if(cards[i].classList.contains('selectable')&&
@@ -54202,6 +54202,14 @@
 						return (j>0);
 					}
 					cards=get.selectableCards();
+					if(cards&&cards.length&&_status.event.name=='chooseToUse'&&!_status.event.skill){
+						for(var tci=0;tci<cards.length;tci++){
+							if(get.itemtype(cards[tci])=='card'&&get.position(cards[tci])=='e'){
+								cards[tci].classList.remove('selectable');
+								cards.splice(tci--,1);
+							}
+						}
+					}
 					if(!_status.event.player._noSkill){
 						cards=cards.concat(get.skills());
 					}

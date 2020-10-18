@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.10.17.3',
+	version:'2020.10.17.4',
 	update:'2020.08.09',
 	changeLog:[
 		'改进投降机制：允许玩家投降后再次投降但效果不会叠加',
