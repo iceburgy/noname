@@ -8334,8 +8334,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
   				},
   				filter:function(event,player){
   					if(!player.storage.fanghun||player.storage.fanghun<0) return false;
+
+					// for qiangwu
+					var isQiangwu,qiangwuCards;
+					if(player.hasSkill('qiangwu3')){
+						var qiangwuCards=player.getCards('hes',function(card){
+							return card.number>player.storage.qiangwu&&get.name(card,player)=='shan';
+						});
+						isQiangwu=qiangwuCards&&qiangwuCards.length;
+					}
+
+					// for chenglve
+					var isChenglve,chenglveCards;
+					if(player.hasSkill('nzry_chenglve1')&&player.storage.nzry_chenglve1&&player.storage.nzry_chenglve1.length){
+						var chenglveCards=player.getCards('hes',function(card){
+							var cards=player.storage.nzry_chenglve1;
+							for(var i=0;i<cards.length;i++){
+								if(cards[i]==get.suit(card)&&get.name(card,player)=='shan') return true;
+							};
+						});
+						isChenglve=chenglveCards&&chenglveCards.length;
+					}
+
+					var tempCard;
+					if(isQiangwu) tempCard={name:'sha',cards:[qiangwuCards[0]]};
+					else if(isChenglve) tempCard={name:'sha',cards:[chenglveCards[0]]};
+					else tempCard={name:'sha'};
+
   					var filter=event.filterCard;
-  					if(filter({name:'sha'},player,event)&&player.countCards('hs','shan')) return true;
+  					if(filter(tempCard,player,event)&&player.countCards('hs','shan')) return true;
   					if(filter({name:'shan'},player,event)&&player.countCards('hs','sha')) return true;
   					if(filter({name:'tao'},player,event)&&player.countCards('hs','jiu')) return true;
   					if(filter({name:'jiu'},player, event)&&player.countCards('hs','tao')) return true;
@@ -8366,7 +8393,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
   							var map={sha:'shan',tao:'jiu',jiu:'tao'}
   							for(var i=0;i<list.length;i++){
   								var name=list[i];
-  			 				if(player.countCards('h',map[name])>(name=='jiu'?1:0)&&player.getUseValue({name:name})>0){
+  			 				if(player.countCards('hs',map[name])>(name=='jiu'?1:0)&&player.getUseValue({name:name})>0){
   			 					var temp=get.order({name:name});
   			 					if(temp>max) max=temp;
   			 				}
