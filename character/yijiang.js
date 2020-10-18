@@ -5558,6 +5558,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							delete event.directCard;
 							player.chooseCardButton('选择一张牌当作兵断寸断使用',event.cards,true).set('filterButton',function(button){
+								var player=_status.currentPhase;
 								return player.canUse({name:'bingliang',cards:[button.link]},_status.event.target,false);
 							}).set('target',event.current);
 						}
