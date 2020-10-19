@@ -4,7 +4,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
-			caoxing:['male','qun',4,['cxliushi','zhanwan'],['unseen']],
 			re_maliang:['male','shu',3,['rexiemu','heli'],[]],
 			ol_yujin:['male','wei',4,['rezhenjun']],
 			ol_xinxianying:['female','wei',3,['caishi','zhongjian']],
@@ -59,7 +58,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zizouqi:["mangyachang","xugong","zhangchangpu"],
 				sp_sbfm:["lisu","xinpi","zhangwen"],
 				sp_shengun:["puyuan","guanlu","gexuan","xushao"],
-				sp_baigei:['re_panfeng','xingdaorong','caoxing'],
+				sp_baigei:['re_panfeng','xingdaorong'],
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou"],
 				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_xinxianying','ol_yujin','re_maliang'],
 			}
