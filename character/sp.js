@@ -13578,9 +13578,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				content:function(){
 					player.loseHp();
-					game.broadcastAll(function(player){
-						player.removeSkill('rezhoufu_losehp');
-					},player);
+					if(!player.hasSkill('rezhoufu_judge')){
+						game.broadcastAll(function(player){
+							player.removeSkill('rezhoufu_losehp');
+						},player);
+					}
 				},
 			},
 			rezhoufu2:{
