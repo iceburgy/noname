@@ -14148,7 +14148,7 @@
 								player.line(targets,config);
 							}
 						}
-						player.$throw(cards);
+						player.$throw(cards,undefined,undefined,undefined,_status.event);
 						if(lib.config.sync_speed&&cards[0]&&cards[0].clone){
 							var waitingForTransition=get.time();
 							event.waitingForTransition=waitingForTransition;
@@ -22276,7 +22276,7 @@
 						node2.listenTransition(onEnd02);
 					},200);
 				},
-				$throw:function(card,time,init,nosource){
+				$throw:function(card,time,init,nosource,actualevent){
 					if(typeof card=='number'){
 						var tmp=card;
 						card=[];
@@ -22289,9 +22289,9 @@
 					}
 					if(init!==false){
 						if(init!=='nobroadcast'){
-							game.broadcast(function(player,card,time,init,nosource){
-								player.$throw(card,time,init,nosource);
-							},this,card,time,init);
+							game.broadcast(function(player,card,time,init,nosource,actualevent){
+								player.$throw(card,time,init,nosource,actualevent);
+							},this,card,time,init,nosource,actualevent);
 						}
 						if(get.itemtype(card)!='cards'){
 							if(get.itemtype(card)=='card'){
@@ -22309,14 +22309,14 @@
 					if(get.itemtype(card)=='cards'){
 						var node;
 						for(var i=0;i<card.length;i++){
-							node=this.$throw(card[i],time,false,nosource);
+							node=this.$throw(card[i],time,false,nosource,actualevent);
 						}
 						return node;
 					}
 					else{
 						var node;
 						if(card==undefined||card.length==0) return;
-						node=this.$throwordered(card.copy('thrown'),nosource);
+						node=this.$throwordered(card.copy('thrown'),nosource,actualevent);
 						if(time!=undefined){
 							node.fixed=true;
 							setTimeout(function(){node.delete()},time);

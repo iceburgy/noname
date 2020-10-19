@@ -2570,7 +2570,8 @@ content:function(config, pack){
 			};
 			
 			lib.element.player.$damagepop = function(num, nature, font, nobroadcast){
-				if (typeof num != 'number') return base.lib.element.player.$damagepop.apply(this, arguments);
+				var result=base.lib.element.player.$damagepop.apply(this, arguments);
+				if (typeof num != 'number') return result;
 				
 				var player = this;
 				var x = decadeUI.get.elementLeftFromWindow(player);
@@ -2608,9 +2609,9 @@ content:function(config, pack){
 				}
 			};
 			
-			lib.element.player.$throw = function(card, time, init, nosource){
+			lib.element.player.$throw = function(card, time, init, nosource, actualevent){
 				time = undefined;
-				return playerThrowFunction.call(this, card, time, init, nosource);
+				return playerThrowFunction.call(this, card, time, init, nosource, actualevent);
 			};
 			
 			lib.element.player.$dieflip = function(){
@@ -2707,7 +2708,7 @@ content:function(config, pack){
 				return player;
 			};
 			
-			lib.element.player.$throwordered2 = function(card, nosource){
+			lib.element.player.$throwordered2 = function(card, nosource, actualevent){
 				if (_status.connectMode) ui.todiscard = [];
 				
 				card.classList.add('thrown');
@@ -2745,7 +2746,7 @@ content:function(config, pack){
 				var usedInfo = card.querySelector('.used-info');
 				if (!usedInfo) return card;
 				var eventName = '';
-				var event = _status.event;
+				var event = actualevent?actualevent:_status.event;
 	
 				switch(event.name){
 				    case 'useCard':

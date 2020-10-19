@@ -1938,7 +1938,7 @@ var spine;
 			this.toLoad++;
 			
 			var fs = (window.require == void 0 ? void 0 : require('fs'));
-			if (fs) {
+			if (true) {
 				this.downloadBinary(path, function (data) {
 					_this.assets[path] = data;
 					if (success)
@@ -1996,7 +1996,7 @@ var spine;
 			this.toLoad++;
 			
 			var fs = (window.require == void 0 ? void 0 : require('fs'));
-			if (fs) {
+			if (true) {
 				this.downloadText(path, function (data) {
 					_this.assets[path] = data;
 					if (success)

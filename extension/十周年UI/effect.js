@@ -86,8 +86,10 @@ decadeParts.import(function(lib, game, ui, get, ai, _status){
 			},
 		},
 		gameStart:function(){
-			game.playAudio('../extension', decadeUI.extensionName, 'audio/game_start.mp3');
-			decadeUI.animation.playSpine2D('effect_youxikaishi', void 0, void 0, decadeUI.animation.canvas.width * 0.8, decadeUI.animation.canvas.height * 0.8);
+			game.broadcastAll(function(extensionName){
+				game.playAudio('../extension', decadeUI.extensionName, 'audio/game_start.mp3');
+				decadeUI.animation.playSpine2D('effect_youxikaishi', void 0, void 0, decadeUI.animation.canvas.width * 0.8, decadeUI.animation.canvas.height * 0.8);
+			},decadeUI.extensionName);
 		},
 		line:function(dots){
 			// decadeUI.delay(300);
