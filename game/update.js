@@ -1,9 +1,10 @@
 window.noname_update={
-	version:'2020.10.18',
+	version:'2020.10.18.1',
 	update:'2020.08.09',
 	changeLog:[
 		'改进投降机制：允许玩家投降后再次投降但效果不会叠加',
 		'改进倒计时提醒机制：最后10秒开启音效和视效提醒',
+		'优化貂蝉离间AI：离间一血反贼给队友收',
 	],
 	files:[
 		'card/extra.js',

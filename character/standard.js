@@ -2548,7 +2548,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return -3;
 							}
 							else{
-								return get.effect(target,{name:'juedou'},ui.selected.targets[0],target);
+								var curEffect=get.effect(target,{name:'juedou'},ui.selected.targets[0],target);
+								if(player.identity!='fan'&&ui.selected.targets[0].hp==1){
+									var attitude=Math.min(6,get.attitude(player,target));
+									if(attitude>0){
+										var hcl=target.getCards('h').length;
+										curEffect+=(100*attitude+hcl);
+									}
+								}
+								return curEffect;
 							}
 						}
 					},
