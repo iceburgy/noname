@@ -4,6 +4,7 @@ content:function(config, pack){
 	var extensionName = '十周年UI';
 	var extension = lib.extensionMenu['extension_' + extensionName];
 	var extensionPath = lib.assetURL + 'extension/' + extensionName + '/';
+	
     if (!(extension && extension.enable && extension.enable.init)) return;
 
 	console.time(extensionName);
@@ -68,6 +69,8 @@ content:function(config, pack){
 							setModeState: lib.element.player.setModeState,
 							countCards: lib.element.player.countCards,
 							$compare: lib.element.player.$compare,
+							$disableEquip: lib.element.player.$disableEquip,
+							$damagepop: lib.element.player.$damagepop,
 						},
 						event:{
 							send: lib.element.event.send,
@@ -745,11 +748,11 @@ content:function(config, pack){
 			
 			game.swapPlayer = function(player, player2){
 			    var result = swapPlayerFunction.call(this, player, player2);
-    			if (ui.equipsZone && ui.equipsZone.me && game.me && game.me != ui.equipsZone.me) {
-			        ui.equipsZone.me.appendChild(ui.equipsZone.equips);
-			        ui.equipsZone.me = game.me;
-				    ui.equipsZone.equips = game.me.node.equips;
-					ui.equipsZone.appendChild(game.me.node.equips);
+    			if (game.me && game.me != ui.equipSolts.me) {
+			        ui.equipSolts.me.appendChild(ui.equipSolts.equips);
+			        ui.equipSolts.me = game.me;
+				    ui.equipSolts.equips = game.me.node.equips;
+					ui.equipSolts.appendChild(game.me.node.equips);
 			    }
 			    
 			    return result;
@@ -757,11 +760,11 @@ content:function(config, pack){
 			
 			game.swapControl = function(player){
     			var result = swapControlFunction.call(this, player);
-    			if (ui.equipsZone && ui.equipsZone.me && game.me && game.me != ui.equipsZone.me) {
-			        ui.equipsZone.me.appendChild(ui.equipsZone.equips);
-			        ui.equipsZone.me = game.me;
-				    ui.equipsZone.equips = game.me.node.equips;
-					ui.equipsZone.appendChild(game.me.node.equips);
+    			if (game.me && game.me != ui.equipSolts.me) {
+			        ui.equipSolts.me.appendChild(ui.equipSolts.equips);
+			        ui.equipSolts.me = game.me;
+				    ui.equipSolts.equips = game.me.node.equips;
+					ui.equipSolts.appendChild(game.me.node.equips);
 			    }
 			    return result;
 			};
@@ -1099,14 +1102,14 @@ content:function(config, pack){
 				ui.handcards2Container = ui.create.div('#handcards2', ui.me);
 				ui.arena.classList.add('decadeUI');
 				ui.arena.classList.remove('nome');
-				var equipsZone = decadeUI.dialog.create('equips-zone', ui.arena);
-				var equipsBack = decadeUI.dialog.create('equips-back', equipsZone);
-				ui.equipsZone = equipsZone;
-				decadeUI.dialog.create('equip0', equipsBack);
-				decadeUI.dialog.create('equip1', equipsBack);
-				decadeUI.dialog.create('equip2', equipsBack);
-				decadeUI.dialog.create('equip3', equipsBack);
-				decadeUI.dialog.create('equip4', equipsBack);
+				var equipSolts  = ui.equipSolts = decadeUI.dialog.create('equips-zone', ui.arena);
+				equipSolts.back = decadeUI.dialog.create('equips-back', equipSolts);
+				
+				decadeUI.dialog.create('icon icon-treasure', decadeUI.dialog.create('equip0', equipSolts.back));
+				decadeUI.dialog.create('icon icon-saber', decadeUI.dialog.create('equip1', equipSolts.back));
+				decadeUI.dialog.create('icon icon-shield', decadeUI.dialog.create('equip2', equipSolts.back));
+				decadeUI.dialog.create('icon icon-mount', decadeUI.dialog.create('equip3', equipSolts.back));
+				decadeUI.dialog.create('icon icon-mount', decadeUI.dialog.create('equip4', equipSolts.back));
 				
 				ui.handSpecial = decadeUI.dialog.create('hand-special playerfocus', ui.arena);
 				ui.handSpecial.hide();
@@ -1165,9 +1168,9 @@ content:function(config, pack){
 				}
 				
 				if (game.me){
-				    equipsZone.me = game.me;
-				    equipsZone.equips = game.me.node.equips;
-					equipsZone.appendChild(game.me.node.equips);
+				    equipSolts.me = game.me;
+				    equipSolts.equips = game.me.node.equips;
+					equipSolts.appendChild(game.me.node.equips);
 				}
 			};
 			
@@ -1451,7 +1454,7 @@ content:function(config, pack){
 			};
 			
 			lib.skill._decadeUI_gameStartEffect = {
-				trigger:{ global:'gameStart' },
+				trigger:{ global:'gameDrawAfter' },
 				forced: true,
 				popup: false,
 				priority: -100,
@@ -1865,6 +1868,8 @@ content:function(config, pack){
 					if (!decadeUI.effect) return;
 
 					decadeUI.effectDialog = ui.arena.appendChild(decadeUI.effect.dialog.compare(player, target));
+					if (!decadeUI.effectDialogs) decadeUI.effectDialogs = [];
+					decadeUI.effectDialogs.push(decadeUI.effectDialog);
 					decadeUI.delay(400);
 				}, player, target);
 				
@@ -1914,7 +1919,7 @@ content:function(config, pack){
 					// 更新拼点框
 					game.broadcastAll(function(){
 						if (!window.decadeUI) return;
-						
+						decadeUI.effectDialog = decadeUI.effectDialogs[decadeUI.effectDialogs.length - 1];
 						decadeUI.effectDialog.cards[0].classList.add('infohidden');
 						decadeUI.effectDialog.cards[0].classList.add('infoflip');
 					});
@@ -1934,7 +1939,7 @@ content:function(config, pack){
 					// 更新拼点框
 					game.broadcastAll(function(){
 						if (!window.decadeUI) return;
-						
+						decadeUI.effectDialog = decadeUI.effectDialogs[decadeUI.effectDialogs.length - 1];
 						decadeUI.effectDialog.cards[1].classList.add('infohidden');
 						decadeUI.effectDialog.cards[1].classList.add('infoflip');
 					});
@@ -1971,7 +1976,7 @@ content:function(config, pack){
 						// 更新拼点框
 						game.broadcastAll(function(){
 							if (!window.decadeUI) return;
-							
+							decadeUI.effectDialog = decadeUI.effectDialogs[decadeUI.effectDialogs.length - 1];
 							decadeUI.effectDialog.cards[1].classList.add('infohidden');
 							decadeUI.effectDialog.cards[1].classList.add('infoflip');
 						});
@@ -2004,7 +2009,7 @@ content:function(config, pack){
 						player.$compare(card1, target, card2);
 						return;
 					}
-					
+					decadeUI.effectDialog = decadeUI.effectDialogs[decadeUI.effectDialogs.length - 1];
 					decadeUI.effectDialog.cards[0].appendChild(card1.copy());
 					decadeUI.effectDialog.cards[1].appendChild(card2.copy());
 				}, player, target, event.card1, event.card2);
@@ -2014,11 +2019,14 @@ content:function(config, pack){
 				// 更新拼点框
 				game.broadcastAll(function(player, target){
 					if (!window.decadeUI) return;
+					decadeUI.effectDialog = decadeUI.effectDialogs[decadeUI.effectDialogs.length - 1];
 					
 					var dialog = decadeUI.effectDialog;
 					setTimeout(function(player, target, dialog){
 						player.$throwordered2(dialog.cards[0].firstChild, true);
 						target.$throwordered2(dialog.cards[1].firstChild, true);
+						decadeUI.effectDialog = decadeUI.effectDialogs[decadeUI.effectDialogs.length - 1];
+						decadeUI.effectDialogs.remove(decadeUI.effectDialog);
 						decadeUI.effectDialog.close();
 					}, 1500, player, target, dialog);
 				}, player, target);
@@ -2117,6 +2125,8 @@ content:function(config, pack){
 					if (!decadeUI.effect) return;
 
 					decadeUI.effectDialog = ui.arena.appendChild(decadeUI.effect.dialog.compare(source, target));
+					if (!decadeUI.effectDialogs) decadeUI.effectDialogs = [];
+					decadeUI.effectDialogs.push(decadeUI.effectDialog);
 					decadeUI.delay(400);
 				}, player, targets[0]);
 				
@@ -2187,7 +2197,7 @@ content:function(config, pack){
 				// 更新拼点框
 				game.broadcastAll(function(card){
 					if (!window.decadeUI) return;
-					
+					decadeUI.effectDialog = decadeUI.effectDialogs[decadeUI.effectDialogs.length - 1];
 					decadeUI.effectDialog.set('card1', card.copy());
 				}, event.card1);
 				
@@ -2207,13 +2217,14 @@ content:function(config, pack){
 							player.$compare(card1, target, card2);
 							return;
 						}
-						
+						decadeUI.effectDialog = decadeUI.effectDialogs[decadeUI.effectDialogs.length - 1];
 						decadeUI.effectDialog.show();
 						decadeUI.effectDialog.set('target', target);
 						decadeUI.effectDialog.set('card2', card2.copy());
 						
 						setTimeout(function(player, target, card2){
 							target.$throwordered2(card2, true);
+							decadeUI.effectDialog = decadeUI.effectDialogs[decadeUI.effectDialogs.length - 1];
 							decadeUI.effectDialog.hide();
 						}, 1500, player, target, decadeUI.effectDialog.cards[1].firstChild);
 					}, player, event.target, event.card1, event.card2);
@@ -2224,9 +2235,10 @@ content:function(config, pack){
 					// 更新拼点框
 					game.broadcastAll(function(player){
 						if (!window.decadeUI) return;
-						
+						decadeUI.effectDialog = decadeUI.effectDialogs[decadeUI.effectDialogs.length - 1];
 						player.$throwordered2(decadeUI.effectDialog.cards[0].firstChild, true);
 						decadeUI.effectDialog.close();
+						decadeUI.effectDialogs.remove(decadeUI.effectDialog);
 					}, player);
 					event.goto(7);
 				}
@@ -2499,12 +2511,53 @@ content:function(config, pack){
 				}
 			};
 			
-			lib.element.player.$damage = function(source,num){
+			lib.element.player.$damage = function(source){
 			    if (!source) source = this;
-
-			    var result = playerDamageFunction.call(this, source);
+				
+				if (get.itemtype(source) == 'player') {
+					game.addVideo('damage', this, source.dataset.position);
+				} else {
+					game.addVideo('damage', this);
+				}
+				
+				game.broadcast(function(player, source) {
+					player.$damage(source);
+				}, this, source);
+				if (source && source != this && lib.config.damage_shake) {
+					var left, top;
+					if (source.getTop() == this.getTop()) {
+						left = 20;
+						top = 0;
+					} else {
+						var ratio = (source.getLeft() - this.getLeft()) / (source.getTop() - this.getTop());
+						left = Math.abs(20 * ratio / Math.sqrt(1 + ratio * ratio));
+						top = Math.abs(20 / Math.sqrt(1 + ratio * ratio));
+					}
+					
+					if (source.getLeft() - this.getLeft() > 0) left = -left;
+					if (source.getTop() - this.getTop() > 0) top = -top;
+					this.style.transform = 'translate(' + left + 'px,' + top + 'px)';
+				} else {
+					var zoom1 = 0.9,
+					zoom2 = 0.95;
+					
+					if (arguments[1] == 'phase') {
+						zoom1 = 1.05;
+						zoom2 = 1.05;
+					}
+					
+					if (this.classList.contains('linked') && get.is.newLayout()) {
+						this.style.transform = 'scale(' + zoom2 + ') rotate(-90deg)';
+					} else if (game.chess && this._chesstransform) {
+						this.style.transform = 'translate(' + this._chesstransform[0] + 'px,' + this._chesstransform[1] + 'px) scale(' + zoom2 + ')';
+					} else {
+						this.style.transform = 'scale(' + zoom2 + ')';
+					}
+				}
+				
+				this.queue();
 			    var time = getComputedStyle(source).transitionDuration;
-			    if (!time) return result;
+			    if (!time) return;
 			    
 			    if (time.lastIndexOf('ms') != -1){
 			        time = parseInt(time.replace(/ms/, ''));
@@ -2513,8 +2566,46 @@ content:function(config, pack){
 			    }
 			    
 			    decadeUI.delay(time + 100);
-			    this.update('nocall', _status.event.num?_status.event.num:num);
-			    return result;
+			    this.update('nocall', _status.event.num);
+			};
+			
+			lib.element.player.$damagepop = function(num, nature, font, nobroadcast){
+				if (typeof num != 'number') return base.lib.element.player.$damagepop.apply(this, this.arguments);
+				
+				var player = this;
+				var x = decadeUI.get.elementLeftFromWindow(player);
+				var y = document.body.offsetHeight - decadeUI.get.elementTopFromWindow(player);
+				var w = player.offsetWidth;
+				var h = player.offsetHeight;
+				y -= h;
+				
+				if (num < 0) {
+					switch (nature) {
+						case 'thunder':
+							if (num <= -2) {
+								decadeUI.animation.playSpine2D('effect_shoujidonghua', x, y, w, h, 'play6');
+							} else {
+								decadeUI.animation.playSpine2D('effect_shoujidonghua', x, y, w, h, 'play5');
+							}
+							break;
+						case 'fire':
+							if (num <= -2) {
+								decadeUI.animation.playSpine2D('effect_shoujidonghua', x, y, w, h, 'play4');
+							} else {
+								decadeUI.animation.playSpine2D('effect_shoujidonghua', x, y, w, h, 'play3');
+							}
+							break;
+						default:
+							if (num <= -2) {
+								decadeUI.animation.playSpine2D('effect_shoujidonghua', x, y, w, h, 'play2');
+							} else {
+								decadeUI.animation.playSpine2D('effect_shoujidonghua', x, y, w, h, 'play1');
+							}
+							break;
+					}
+				} else {
+					decadeUI.animation.playSpine2D('effect_zhiliao', x, y, w, h);
+				}
 			};
 			
 			lib.element.player.$throw = function(card, time, init, nosource){
@@ -2559,6 +2650,61 @@ content:function(config, pack){
 				var player = this;
 				target.$throwordered2(card2.copy(false));
 				player.$throwordered2(card1.copy(false));
+			};
+			
+			lib.element.player.$disableEquip = function(skill){
+				game.broadcast(function(player, skill) {
+					player.$disableEquip(skill);
+				}, this, skill);
+				var player = this;
+				if (!player.storage.disableEquip) player.storage.disableEquip = [];
+				player.storage.disableEquip.add(skill);
+				player.storage.disableEquip.sort();
+				var pos = {
+					equip1: '武器栏',
+					equip2: '防具栏',
+					equip3: '+1马栏',
+					equip4: '-1马栏',
+					equip5: '宝物栏'
+				} [skill];
+				if (!pos) return;
+				var card = game.createCard('feichu_' + skill, pos, '');
+				card.fix();
+				card.style.transform = '';
+				card.classList.remove('drawinghidden');
+				card.classList.add('feichu');
+				delete card._transform;
+				
+				
+				var iconName = {
+					equip1: 'icon feichu icon-saber',
+					equip2: 'icon feichu icon-shield',
+					equip3: 'icon feichu icon-mount',
+					equip4: 'icon feichu icon-mount',
+					equip5: 'icon feichu icon-treasure'
+				}[skill];
+				
+				if (iconName) {
+					var icon = decadeUI.dialog.create(iconName, card);
+					icon.style.zIndex = '1';
+				}
+				
+				var equipNum = get.equipNum(card);
+				var equipped = false;
+				for (var i = 0; i < player.node.equips.childNodes.length; i++) {
+					if (get.equipNum(player.node.equips.childNodes[i]) >= equipNum) {
+						player.node.equips.insertBefore(card, player.node.equips.childNodes[i]);
+						equipped = true;
+						break;
+					}
+				}
+				if (!equipped) {
+					player.node.equips.appendChild(card);
+					if (_status.discarded) {
+						_status.discarded.remove(card);
+					}
+				}
+				return player;
 			};
 			
 			lib.element.player.$throwordered2 = function(card, nosource){
@@ -4194,7 +4340,7 @@ content:function(config, pack){
 				
 				if (me){
 					var meWidth = me.offsetWidth;
-					var equipsWidth = ui.equipsZone ? ui.equipsZone.offsetWidth : meWidth;
+					var equipsWidth = ui.equipSolts  ? ui.equipSolts.offsetWidth : meWidth;
 					ui.me.style.left = Math.round(meWidth + 30) + 'px';
 					ui.me.style.right = Math.round(equipsWidth + 30)+ 'px';
 					ui.me.style.width = 'auto';
@@ -4470,7 +4616,7 @@ content:function(config, pack){
 					return get.value(b, player) - get.value(a, player);
 				});
 				
-				cards =  matchs.concat(cards);
+				cards = matchs.concat(cards);
 				return cards;
 			},
 			cheatJudgeCards:function(cards, judges, friendly){
@@ -4494,8 +4640,31 @@ content:function(config, pack){
 				
 				return cheats;
 			},
+			elementLeftFromWindow:function(element){
+				var left = element.offsetLeft;
+				var current = element.offsetParent;
+				
+				while (current != null) {
+					left += current.offsetLeft;
+					current = current.offsetParent;
+				}
+				
+				return left;
+			},
+			elementTopFromWindow:function(element){
+				var top = element.offsetTop;
+				var current = element.offsetParent;
+				
+				while (current != null) {
+					top += current.offsetTop;
+					current = current.offsetParent;
+				}
+				
+				return top;
+			},
 		},
 	};
+	
 	
 	decadeUI.game = {
 		wait:function(){
@@ -4528,14 +4697,14 @@ content:function(config, pack){
 		ui.arena.dataset.borderLevel = decadeUI.config.borderLevel;
 		ui.arena.dataset.gainSkillsVisible = decadeUI.config.gainSkillsVisible;
 	};
+	
 	decadeUI.init();
 	console.timeEnd(extensionName);
 },
 precontent:function(){
-	// var explorer = window.navigator.userAgent.toLowerCase();
-	// var ver = explorer.match(/chrome\/([\d.].)/)[1];
-	// if (ver < 50) document.body.dataset.version = 'low';
-	
+	if (window.require) {
+		window.appPath = require('electron').remote.app.getAppPath();;
+	}
 	
 	var extensionName = '十周年UI';
 	var extension = lib.extensionMenu['extension_' + extensionName];
@@ -4563,8 +4732,10 @@ precontent:function(){
 		}
 	};
 	
-	if (!ui.css.layout.href || ui.css.layout.href.indexOf('long2') < 0) {
-		ui.css.layout.href = lib.assetURL + 'layout/long2/layout.css';
+	if (ui.css.layout) {
+		if (!ui.css.layout.href || ui.css.layout.href.indexOf('long2') < 0) {
+			ui.css.layout.href = lib.assetURL + 'layout/long2/layout.css';
+		}
 	}
 	
 	var thisObject = this;
@@ -4578,7 +4749,7 @@ precontent:function(){
 			
 			var filePath, ok;
 			var fonts = ['shousha', 'xingkai', 'xinwei'];
-			var scripts = ['component', 'skill', 'content', 'effect'];
+			var scripts = ['spine', 'component', 'skill', 'content', 'effect', 'animation'];
 			
 			var onload = function(){
 				this.remove();
@@ -4707,8 +4878,8 @@ config:{
             if (window.decadeUI) decadeUI.config.playerKillEffect = value;
         },
 	},
-	gameStartEffect:{
-		name: '游戏开始特效',
+	animationEffect:{
+		name: '游戏动画特效',
         init: true,
 	},
 	playerDieEffect:{
@@ -4804,17 +4975,25 @@ package:{
         translate:{
         }
     },
-    intro:
-    '<p style="color:rgb(200,200,000); font-size:12px; line-height:14px; text-shadow: 0 0 2px black;">' +
-    '有bug请先关闭UI重试下，不行再联系作者，目前有些置牌堆顶丢弃的牌不会消失有虾皮。' + '<br>' +
-	'1.9.100.4.2.1:<br>' +
-	'- 修复界太史慈拼点，官渡许攸BUG； <br>' +
-	'- 调整界/曹植的落英获得牌操作顺序； <br>' +
-    '</p>',
+    intro:(function(){
+		var log = [
+			'有bug请先关闭UI重试下，不行再联系作者，目前有些置牌堆顶丢弃的牌不会消失有虾皮。',
+			'当前版本: 1.9.105.3.0.1',
+			'更新日期：2020-10-16',
+			'- 修复动画多次绘制的BUG；',
+			'- 修复[藤甲、贯石斧]不能播放动画的BUG；',
+			'- 修复了某些设备不支持"webgl"导致不能加载本扩展的BUG；',
+			'- 增加了[朱雀羽扇]动画；',
+			'- 优化了[游戏开始]动画的加载时机；',
+		];
+
+
+		return '<p style="color:rgb(200,200,000); font-size:12px; line-height:14px; text-shadow: 0 0 2px black;">' + log.join('<br>') + '</p>';
+	})(),
     author:"短歌 QQ464598631",
     diskURL:"",
     forumURL:"",
-    version:"1.9.100.4.2.1",
+    version:"1.9.105.3.0.1",
 },
 files:{
     "character":[],
@@ -4960,7 +5139,22 @@ editable: false
 - 优化带了有观星类UI技能的AI排序牌的问题；
 - 修复界太史慈拼点，官渡许攸BUG，键枣宗介的【设控】AI弹窗；
 - 调整界/曹植的落英获得牌操作顺序；
-
-
-
+1.9.103.4.0.1:
+- 修复了某些情况扩展已经载入无法使用的BUG；
+- 修复了发动【拼点】时在发动拼点窗口不会消失的BUG（由寰宇星城提供代码，未验证）；
+- 增加了主玩家空装备的五个武器图标；
+- 增加了【默认】布局；
+1.9.105.1.0.1:
+- 增加了[游戏开始、诸葛连弩、八卦阵、仁王盾]动画
+- 修复了默认布局主玩家受伤动画错位的BUG
+1.9.105.1.0.2:
+- 优化了动画的预加载，提升流畅度；
+- 增加了[藤甲、白银狮子、麒麟弓、丈八蛇矛、青龙偃月刀、寒冰剑、古锭刀、贯石斧、方天画戟、雌雄双股剑]动画；
+1.9.105.3.0.1:
+- 修复动画多次绘制的BUG；
+- 修复[藤甲、贯石斧]不能播放动画的BUG；
+- 修复了某些设备不支持"webgl"导致不能加载本扩展的BUG；
+- 增加了[朱雀羽扇]动画；
+- 增加了[伤害、治疗]动画；
+- 优化了[游戏开始]动画的加载时机；
 */

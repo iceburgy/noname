@@ -15,7 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			old_zhoutai:['male','wu',4,['gzbuqu']],
+			old_zhoutai:['male','wu',4,['buqu','new_fenji']],
 			old_caoren:['male','wei',4,['moon_jushou','jiewei']],
 			xuhuang:['male','wei',4,['gzduanliang']],
 			re_pangde:['male','qun',4,['mashu','jianchu']],
@@ -674,6 +674,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player:'linkBegin'
 						},
 						forced:true,
+						filter:function(event,player){
+							return !player.isLinked();
+						},
 						content:function(){
 							trigger.cancel();
 						},
@@ -876,11 +879,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							var num=player.getStat('damage');
+							var num=0;
+							player.getHistory('sourceDamage',function(evt){
+								if(evt.getParent('phaseUse')==event) num+=evt.num;
+							});
 							return !num||num>1;
 						},
 						content:function(){
-							var numx=player.getStat('damage');
+							var numx=0;
+							player.getHistory('sourceDamage',function(evt){
+								if(evt.getParent('phaseUse')==trigger) numx+=evt.num;
+							});
 							if(!numx){
 								var num=player.hp-player.countCards('h');
 								if(num>0) player.draw(num);
@@ -2118,16 +2127,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						usable:1,
 						delay:false,
 						filter:function(event,player){
+							var storage=player.getStorage('nzry_mingren');
+							if(get.itemtype(storage)!='cards') return false;
+							var num=player.countCards('he',{color:get.color(player.storage.nzry_mingren[0])});
 							return game.hasPlayer(function(current){
 								return current!=player&&
 								player.inRange(current)&&
 								player.storage.nzry_mingren!=undefined&&
-								player.countCards('he',{color:get.color(player.storage.nzry_mingren[0])})>=Math.max(Math.abs(current.hp-player.hp),1);
+								num>=Math.max(Math.abs(current.hp-player.hp),1);
 							})&&player.storage.nzry_zhenliang!=true;
 						},
 						filterTarget:function(card,player,target){
-							return player.storage.nzry_mingren!=undefined&&
-							target!=player&&
+							return target!=player&&
 							player.inRange(target)&&
 							player.countCards('he',{color:get.color(player.storage.nzry_mingren[0])})>=Math.max(Math.abs(target.hp-player.hp),1);
 						},
@@ -2314,7 +2325,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var pl=player.storage.nzry_shenshi2;
 					var card=player.storage.nzry_shenshi1;
-					if(player.getCards('hej').contains(card)&&4-pl.countCards('h')>0){
+					if(player.getCards('he').contains(card)&&4-pl.countCards('h')>0){
 						pl.draw(4-pl.countCards('h'));
 						pl.logSkill('nzry_shenshi');
 					};
@@ -2639,6 +2650,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			ollianhuan:{
+				audio:'xinlianhuan',
+				audioname:['ol_pangtong'],
+				group:['ollianhuan3','ollianhuan5','lianhuan4'],
+			},
+			ollianhuan5:{
+				inherit:'lianhuan2',
+				audioname:['ol_pangtong'],
+				audio:['xinlianhuan',2],
+				position:'he',
+				filter:function(event,player){
+					return player.countCards('he',{suit:'club'})>0;
+				},
+			},
+			ollianhuan3:{
+				audio:['xinlianhuan',1],
+				audioname:['ol_pangtong'],
+				enable:'chooseToUse',
+				filter:function(event,player){
+					return player.countCards('he',{suit:'club'})>0;
+				},
+				filterCard:{suit:'club'},
+				viewAs:{name:'tiesuo'},
+				prompt:'将一张梅花牌当铁锁连环使用',
+				check:function(card){return 6-get.value(card)},
+				position:'he',
+			},
 			xinlianhuan:{
 				audio:2,
 				audioname:['ol_pangtong'],
@@ -2926,8 +2964,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				shaRelated:true,
 				mod:{
 					targetInRange:function(card,player,target){
-						if(card.name=='sha'&&card.number){
-							if(get.distance(player,target)<=card.number) return true;
+						if(card.name=='sha'&&typeof get.number(card)=='number'){
+							if(get.distance(player,target)<=get.number(card)) return true;
 						}
 					}
 				},
@@ -3351,11 +3389,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tuntian:{
 				audio:2,
 				audioname:['gz_dengai'],
-				trigger:{player:'loseAfter'},
+				trigger:{
+					player:'loseAfter',
+					source:'gainAfter',
+					global:['equipAfter','addJudgeAfter'],
+				},
 				frequent:true,
 				filter:function(event,player){
 					if(player==_status.currentPhase) return false;
-					return event.cards2&&event.cards2.length>0;
+					var evt=event.getl(player);
+					return evt&&evt.cards2&&evt.cards2.length>0;
 				},
 				content:function(){
 					'step 0'
@@ -4891,7 +4934,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			roulin:{
 				audio:2,
-				audioname:['re_dongzhuo'],
+				audioname:['re_dongzhuo','ol_dongzhuo'],
 				trigger:{player:'useCardToPlayered',target:'useCardToTargeted'},
 				forced:true,
 				filter:function(event,player){
@@ -4918,14 +4961,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			benghuai:{
 				audio:2,
-				audioname:['zhugedan','re_dongzhuo'],
+				audioname:['zhugedan','re_dongzhuo','ol_dongzhuo'],
 				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
 				check:function(){
 					return false;
 				},
 				filter:function(event,player){
-					return !player.isMinHp();
+					return !player.isMinHp()&&!player.hasSkill('rejiuchi_air')&&!player.hasSkill('oljiuchi_air');
 				},
 				content:function(){
 					"step 0"
@@ -6240,7 +6283,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBegin4'},
 				direct:true,
 				filter:function(event,player){
-					return player.countCards('he',{suit:'heart'})>0&&event.num>0;
+					return player.countCards('h',function(card){
+						return _status.connectMode||get.suit(card,player)=='heart';
+					})>0&&event.num>0;
 				},
 				content:function(){
 					"step 0"
@@ -6251,7 +6296,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterTarget:function(card,player,target){
 							return player!=target;
 						},
-						// position:'he',
 						ai1:function(card){
 							return 10-get.value(card);
 						},
@@ -6717,6 +6761,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseHp();
 					"step 1"
 					trigger[trigger.name=='gain'?'source':'player'].draw(2);
+				},
+			},
+			new_fenji:{
+				audio:"fenji",
+				trigger:{
+					global:"phaseJieshuBegin",
+				},
+				filter:function (event,player){
+					if(event.player.countCards('h')==0&&event.player.isAlive()) return true;
+					return false;
+				},
+				check:function (event,player){
+					return get.attitude(player,event.player)>2;
+				},
+				content:function (){
+					player.line(trigger.player,'green');
+					trigger.player.draw(2);
+					player.loseHp();
 				},
 			},
 			leiji:{
@@ -7340,6 +7402,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			disable_judge:{},
 		},
+		dynamicTranslate:{
+			nzry_juzhan:function(player){
+				if(player.storage.nzry_juzhan1==true) return '转换技，阴：当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。<span class="bluetext">阳：当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌。</span>';
+				return '转换技，<span class="bluetext">阴：当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。</span>阳：当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌。';
+			},
+			nzry_zhenliang:function(player){
+				if(player.storage.nzry_zhenliang==true) return '转换技，阴：出牌阶段限一次，你可以选择一名攻击范围内的其他角色，然后弃置X张与“任”颜色相同的牌并对其造成一点伤害（X为你与其的体力差且至少为1）。<span class="bluetext">阳：你的回合外，当你使用或打出牌进入弃牌堆时，若此牌与“任”类型相同，则你可以令一名角色摸一张牌。</span>';
+				return '转换技，<span class="bluetext">阴：出牌阶段限一次，你可以选择一名攻击范围内的其他角色，然后弃置X张与“任”颜色相同的牌并对其造成一点伤害（X为你与其的体力差且至少为1）。</span>阳：你的回合外，当你使用或打出牌进入弃牌堆时，若此牌与“任”类型相同，则你可以令一名角色摸一张牌。';
+			},
+			nzry_chenglve:function(player){
+				if(player.storage.nzry_chenglve==true) return '转换技，出牌阶段限一次，阴：你可以摸一张牌，然后弃置两张手牌。<span class="bluetext">阳：你可以摸两张牌，然后弃置一张手牌。</span>若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制。';
+				return '转换技，出牌阶段限一次，<span class="bluetext">阴：你可以摸一张牌，然后弃置两张手牌。</span>阳：你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制。';
+			},
+			nzry_shenshi:function(player){
+				if(player.storage.nzry_shenshi==true) return '转换技，阴：出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。<span class="bluetext">阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若该角色未失去此牌，你将手牌摸至四张。</span>';
+				return '转换技，<span class="bluetext">阴：出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。</span>阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若该角色未失去此牌，你将手牌摸至四张。';
+			},
+		},
 		translate:{
 			"feichu_equip1":"已废除",
 			"feichu_equip1_info":"武器栏已废除",
@@ -7382,22 +7462,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhoufei:"周妃",
 			
 			"nzry_jianxiang":"荐降",
-			"nzry_jianxiang_info":"当你成为其他角色使用牌的目标时，你可令手牌数最少的一名角色摸一张牌",
+			"nzry_jianxiang_info":"当你成为其他角色使用牌的目标时，你可令手牌数最少的一名角色摸一张牌。",
 			"nzry_shenshi1":"审时",
 			"nzry_shenshi":"审时",
-			"nzry_shenshi_info":"转换技，①出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。②其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若该角色未失去此牌，你将手牌摸至四张",
+			"nzry_shenshi_info":"转换技，阴：出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若该角色未失去此牌，你将手牌摸至四张。",
 			"nzry_mingren":"明任",
-			"nzry_mingren_info":"游戏开始时，你摸一张牌，然后将你的一张手牌置于你的武将牌上，称为“任”。结束阶段，你可以用手牌替换“任”",
+			"nzry_mingren_info":"游戏开始时，你摸一张牌，然后将你的一张手牌置于你的武将牌上，称为“任”。结束阶段，你可以用手牌替换“任”。",
 			"nzry_zhenliang":"贞良",
-			"nzry_zhenliang_info":"转换技，①出牌阶段限一次，你可以选择一名攻击范围内的其他角色，然后弃置X张与“任”颜色相同的牌并对其造成一点伤害（X为你与其的体力差且至少为1）。②你的回合外，当你使用或打出牌进入弃牌堆时，若此牌与“任”类型相同，则你可以令一名角色摸一张牌",
+			"nzry_zhenliang_info":"转换技，阴：出牌阶段限一次，你可以选择一名攻击范围内的其他角色，然后弃置X张与“任”颜色相同的牌并对其造成一点伤害（X为你与其的体力差且至少为1）。阳：你的回合外，当你使用或打出牌进入弃牌堆时，若此牌与“任”类型相同，则你可以令一名角色摸一张牌。",
 			"nzry_chenglve1":"成略",
 			"nzry_chenglve":"成略",
-			"nzry_chenglve_info":"转换技，出牌阶段限一次，①你可以摸一张牌，然后弃置两张手牌。②你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制",
+			"nzry_chenglve_info":"转换技，出牌阶段限一次，阴：你可以摸一张牌，然后弃置两张手牌。阳：你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制。",
 			"nzry_shicai":"恃才",
 			"nzry_shicai3":"恃才",
-			"nzry_shicai_info":"当你使用牌时，若此牌与你本回合使用的牌类型均不同（包括装备牌），则你可以将此牌置于牌堆顶，然后摸一张牌",
+			"nzry_shicai_info":"当你使用牌时，若此牌与你本回合使用的牌类型均不同（包括装备牌），则你可以将此牌置于牌堆顶，然后摸一张牌。",
 			"nzry_cunmu":"寸目",
-			"nzry_cunmu_info":"锁定技，当你摸牌时，改为从牌堆底摸牌",
+			"nzry_cunmu_info":"锁定技，当你摸牌时，改为从牌堆底摸牌。",
 			"nzry_kuizhu":"溃诛",
 			"nzry_kuizhu_info":"弃牌阶段结束后，你可以选择一项：令至多X名角色各摸一张牌，或对任意名体力值之和为X的角色造成一点伤害，若不少于2名角色，你须受到一点伤害。（X为你此阶段弃置的牌数）",
 			"nzry_zhizheng":"掣政",
@@ -7419,7 +7499,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_binglve_info":"锁定技，当你发动“飞军”时，若目标与你之前指定的目标均不相同，则你摸两张牌",
 			"nzry_juzhan1":"拒战",
 			"nzry_juzhan":"拒战",
-			"nzry_juzhan_info":"转换技，①当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。②当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌",
+			"nzry_juzhan_info":"转换技，阴：当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。阳：当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌。",
 			
 			liangyin:"良姻",
 			"liangyin_info":"当有牌移至游戏外时，你可以令手牌数大于你的一名角色摸一张牌；当有牌从游戏外加入任意角色的手牌时，你可以令手牌数小于你的一名角色弃置一张牌",
@@ -7624,11 +7704,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bazhen:'八阵',
 			kanpo:'看破',
 			xinlianhuan:'连环',
+			ollianhuan:'连环',
 			lianhuan:'连环',
 			lianhuan1:'连环',
 			lianhuan3:'连环',
 			lianhuan2:'连铸',
 			lianhuan5:'连铸',
+			ollianhuan3:'连环',
 			niepan:'涅槃',
 			oldniepan:'涅槃',
 			quhu:'驱虎',
@@ -7642,6 +7724,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xueyi:'血裔',
 			mengjin:'猛进',
 			xinlianhuan_info:' 你可以将一张♣手牌当【铁索连环】使用或重铸。你使用【铁索连环】选择目标的上限数+1。',
+			ollianhuan_info:' 你可以将一张♣牌当【铁索连环】使用或重铸。你使用【铁索连环】选择目标的上限数+1。',
 			huoji_info:'出牌阶段，你可以将你的任意一张红色手牌当作【火攻】使用。',
 			bazhen_info:'锁定技，若你的防具栏内没有牌且没有被废除，则你视为装备着【八卦阵】。',
 			kanpo_info:'你可以将你的任意一张黑色手牌当做【无懈可击】使用。',
@@ -7731,6 +7814,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guhuo_info:'每名角色的回合限一次，你可以扣置一张手牌当一张基本牌或普通锦囊牌使用或打出。其他角色依次选择是否质疑。一旦有其他角色质疑则翻开此牌：若为假则此牌作废，若为真，则质疑角色获得技能“缠怨”（锁定技，你不能质疑于吉，只要你的体力值为1，你失去你的武将技能）',
 			fenji_info:'当一名角色的手牌被其他角色弃置或获得后，你可以失去1点体力，然后令该角色摸两张牌。',
 			
+			new_fenji:"奋激",
+			new_fenji_info:"一名角色的结束阶段开始时，若其没有手牌，你可以令其摸两张牌，然后你失去1点体力。",
 			gzduanliang:'断粮',
 			gzduanliang_info:'你可以将一张黑色基本牌或黑色装备牌当【兵粮寸断】使用；你可以对距离为2的角色使用【兵粮寸断】',
 			"xinfu_guhuo":"蛊惑",

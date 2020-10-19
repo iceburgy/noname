@@ -39,6 +39,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					player.unmarkSkill('muniu_skill6');
+					delete player.getStat('skill').muniu_skill;
 					if((event.getParent(2)&&event.getParent(2).name!='swapEquip')&&event.parent.type!='equip'&&card&&card.cards&&card.cards.length){
 						player.$throw(card.cards,1000);
 						player.popup('muniu');
@@ -431,12 +432,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip2',
 				loseDelay:false,
 				onLose:function(){
-					if(player.isDamaged()) player.logSkill('baiyin_skill');
 					var next=game.createEvent('baiyin_recover');
 					event.next.remove(next);
-					event.getParent().after.push(next);
+					var evt=event.getParent();
+					if(evt.getlx===false) evt=evt.getParent();
+					evt.after.push(next);
 					next.player=player;
 					next.setContent(function(){
+						if(player.isDamaged()) player.logSkill('baiyin_skill');
 						player.recover();
 					});
 				},

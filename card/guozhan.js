@@ -129,11 +129,22 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				filterLose:function(card,player){
-				if(player.hasSkillTag('unequip2')) return false;
-				return true;
+					if(player.hasSkillTag('unequip2')) return false;
+					return true;
 				},
+				loseDelay:false,
 				onLose:function(){
+					var next=game.createEvent('taipingyaoshu');
+					event.next.remove(next);
+					var evt=event.getParent();
+					if(evt.getlx===false) evt=evt.getParent();
+					evt.after.push(next);
+					next.player=player;
+					next.setContent(lib.card.taipingyaoshu.onLosex);
+				},
+				onLosex:function(){
 					'step 0'
+					player.logSkill('taipingyaoshu');
 					player.draw(2);
 					'step 1'
 					if(player.hp>1) player.loseHp();
@@ -280,27 +291,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 0;
 					},
 					result:{
-						player:function(player,target){
-							if(get.mode()=='versus') return game.countPlayer(function(current){
-								if(target.isFriendOf(current)){
-									if(current.isFriendOf(player)&&current.isLinked()){
-										return get.attitude(player,target);
-									}
-									else if(current.isEnemyOf(player)&&!current.isLinked()){
-										return -get.attitude(player,target)*0.6;
-									}
-								}
-							});
-							return game.countPlayer(function(current){
-								if(target.isMajor()==current.isMajor()){
-									if(current.isLinked()){
-										return get.attitude(player,target);
-									}
-									else{
-										return -get.attitude(player,target)*0.8;
-									}
-								}
-							});
+						target:function(player,target){
+							if(get.mode()=='versus'){
+								if(target.isFriendOf(player)) return target.isLinked()?1:0;
+								return target.isLinked()?0:-1;
+							}
+							return target.isLinked()?1:-1;
 						}
 					}
 				}
@@ -361,8 +357,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							else{
 								var list=[];
-								for(var i=0;i<=Math.min(num,damaged);i++){
-									list.push('摸'+i+'回'+(num-i));
+								for(var i=Math.min(num,damaged);i>=0;i--){
+									list.push('摸'+(num-i)+'回'+i);
 								}
 								target.chooseControl(list).set('prompt','请分配自己的摸牌数和回复量').ai=function(){
 									if(player.hasSkill('diaohulishan')) return 0;
@@ -390,8 +386,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:4,
 					useful:2,
 					result:{
-						player:1.5,
-						target:1,
+						target:function(player,target){
+							if(player==target) return 2;
+							return 1;
+						},
 					},
 				},
 			},
