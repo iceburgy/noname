@@ -62,16 +62,6 @@ window.noname_asset_list=[
 	'extension/十周年UI/assets/animation/xiaosha.png',
 	'extension/十周年UI/assets/animation/xiaosha.skel',
 
-	'extension/十周年UI/image/card/huosha.webp',
-	'extension/十周年UI/image/card/jiedao.webp',
-	'extension/十周年UI/image/card/juechenjinge.webp',
-	'extension/十周年UI/image/card/leisha.webp',
-	'extension/十周年UI/image/card/longfenghemingjian.webp',
-	'extension/十周年UI/image/card/sha.webp',
-	'extension/十周年UI/image/card/shan.webp',
-
-	'extension/十周年UI/image/decoration/name_unknown.webp',
-
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
