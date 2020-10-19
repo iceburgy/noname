@@ -2511,7 +2511,7 @@ content:function(config, pack){
 				}
 			};
 			
-			lib.element.player.$damage = function(source){
+			lib.element.player.$damage = function(source,num){
 			    if (!source) source = this;
 				
 				if (get.itemtype(source) == 'player') {
@@ -2520,9 +2520,9 @@ content:function(config, pack){
 					game.addVideo('damage', this);
 				}
 				
-				game.broadcast(function(player, source) {
-					player.$damage(source);
-				}, this, source);
+				game.broadcast(function(player,source,num){
+					player.$damage(source,num);
+				},this,source,_status.event.num);
 				if (source && source != this && lib.config.damage_shake) {
 					var left, top;
 					if (source.getTop() == this.getTop()) {
@@ -2566,11 +2566,11 @@ content:function(config, pack){
 			    }
 			    
 			    decadeUI.delay(time + 100);
-			    this.update('nocall', _status.event.num);
+			    this.update('nocall', _status.event.num?_status.event.num:num);
 			};
 			
 			lib.element.player.$damagepop = function(num, nature, font, nobroadcast){
-				if (typeof num != 'number') return base.lib.element.player.$damagepop.apply(this, this.arguments);
+				if (typeof num != 'number') return base.lib.element.player.$damagepop.apply(this, arguments);
 				
 				var player = this;
 				var x = decadeUI.get.elementLeftFromWindow(player);
