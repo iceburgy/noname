@@ -431,8 +431,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"xinfu_qinguo":{
-				group:["qinguo_use","qinguo_lose"],
-				audio:'qinguo_use',
+				group:"xinfu_qinguo_recover",
+				audio:2,
+				subfrequent:['recover'],
 				trigger:{
 					player:"useCardEnd",
 				},
@@ -443,24 +444,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.chooseUseTarget({name:'sha'},get.prompt('xinfu_qinguo'),'视为使用一张【杀】',false).logSkill='qinguo_use';
 				},
-			},
-			"qinguo_lose":{
-				audio:2,
-				trigger:{
-					player:"loseAfter",
-				},
-				filter:function (event,player){
-					if(event.getParent().name=='equip'){
-						var isMuniu=false;
-						if(event.cards&&event.cards.length&&get.subtype(event.cards[0].name)=='equip5') isMuniu=true;
-						if(!isMuniu) return false;
-					}
-					if(player.hp!=player.countCards('e')||!player.isDamaged()) return false;
-					return event.es&&event.es.length>0;
-				},
-				frequent:true,
-				content:function (){
-					player.recover();
+				subSkill:{
+					recover:{
+						audio:'xinfu_qinguo',
+						trigger:{
+							player:'loseAfter',
+							source:'gainAfter',
+							global:['equipAfter','addJudgeAfter'],
+						},
+						prompt:'是否发动【勤国】回复1点体力？',
+						filter:function (event,player){
+							if(player.isHealthy()||player.countCards('e')!=player.hp) return false;
+							var evt=event.getl(player);
+							if(event.name=='equip'&&event.player==player) return !evt||evt.cards.length!=1;
+							return evt&&evt.es.length;
+						},
+						frequent:true,
+						content:function(){
+							player.recover();
+						},
+					},
 				},
 			},
 			"xinfu_jijun":{

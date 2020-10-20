@@ -580,6 +580,12 @@ content:function(config, pack){
 						game.expandSkills(skills2);
 						for (i = 0; i < skills2.length; i++) {
 							info = get.info(skills2[i]);
+							if(!info){
+								console.error('===empty info for skills2[i]');
+								console.log(skills2[i]);
+								debugger;
+								continue;
+							}
 							enable = false;
 							if (typeof info.enable == 'function') enable = info.enable(event);
 							else if (typeof info.enable == 'object') enable = info.enable.contains(event.name);
