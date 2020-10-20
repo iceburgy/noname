@@ -4316,7 +4316,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					var list=[1,2,3,4,5,6,7,8,9,10,11,12,13]
 					target.chooseControl(list).set('ai',function(){
-						return list.randomGet();
+						return Math.floor(Math.random()*13)+1;
 					});
 					"step 1"
 					if(result.control){
@@ -4329,11 +4329,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.xinfu_lveming++;
 						event.num=13;
 					};
+
+					event.str=get.translation(target)+'选择的点数为：'+event.num
+					event.dialog=ui.create.dialog(event.str);
+					event.videoId=lib.status.videoId++;
+					game.broadcast('createDialog',event.videoId,event.str);
+					game.delayx(4);
+
+					"step 2"
+					event.dialog.close();
+					game.broadcast('closeDialog',event.videoId);
+					game.log(event.str);
+
 					player.judge(function(card){
+						game.delayx(4);
 						if(card.number==event.num) return 4;
 						return -1;
 					});
-					"step 2"
+					"step 3"
 					if(result.bool==true){
 						target.damage(2);
 					}
@@ -4348,7 +4361,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function (player,target){
 							var numj=target.countCards('j');
 							var numhe=target.countCards('he');
-							if(numhe==0) return numj>0?6:-6;
+							if(numhe==0) return numj>0?6:-0.1;
 							return -6-(numj+1)/numhe;
 						},
 					},
