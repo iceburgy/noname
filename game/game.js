@@ -4089,6 +4089,42 @@
 							}
 						}
 					},
+					test_all_by_group:{
+						name:'分组测试所有武将',
+						init:'-1',
+						item:{
+							'-1':'关闭',
+							'0':'1-20',
+							'1':'21-40',
+							'2':'41-60',
+							'3':'61-80',
+							'4':'81-100',
+							'5':'101-120',
+							'6':'121-140',
+							'7':'141-160',
+							'8':'161-180',
+							'9':'181-200',
+							'10':'201-220',
+							'11':'221-240',
+							'12':'241-260',
+							'13':'261-280',
+							'14':'281-300'
+						},
+						frequent:true,
+						restart:true,
+						intro:'分组测试所有武将，每组20个',
+						onclick:function(group_id,label){
+							this.innerHTML=this.innerHTML.replace('分组测试所有武将','设置中...');
+							game.saveConfig('test_all_by_group',group_id);
+							var that=this;
+							setTimeout(function(){
+								that.innerHTML=that.innerHTML.replace('设置中...','设置成功');
+								setTimeout(function(){
+									game.reload();
+								},1000);
+							},1000);
+						},
+					},
 
 					update:function(config,map){
 						if(lib.device||lib.node){

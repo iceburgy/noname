@@ -2077,6 +2077,23 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.zhuList=[];
 					get.charactersAndZhuOL(event.allList,event.zhuList)
 					event.list=event.allList.slice(0);
+					var testAllByGroup=lib.config['test_all_by_group'];
+					if(testAllByGroup>=0){
+						var totalCount=event.allList.length;
+						var startIndex=testAllByGroup*20;
+						var endIndex=testAllByGroup*20+20;
+						if(startIndex<totalCount){
+							event.testAllByGroupList=event.allList.slice(testAllByGroup*20,testAllByGroup*20+20);
+							if(endIndex>totalCount){
+								var extraCount=endIndex-totalCount;
+								event.testAllByGroupList=event.testAllByGroupList.concat(event.allList.slice(0,extraCount));
+							}
+							console.log('===testing group from: '+startIndex+' to: '+endIndex);
+							console.log(event.testAllByGroupList);
+							console.log('===event.allList length: '+event.allList.length);
+							console.log(event.allList);
+						}
+					}
 					_status.characterlist=event.allList.slice(0);
 					event.usingFuli=new Array(game.players.length);
 					for(var i=0;i<game.players.length;i++){
@@ -2408,6 +2425,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var str='选择主副将';
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
+							}
+							if(event.testAllByGroupList){
+								event.chosenChars[0]=event.testAllByGroupList.slice(0,2);
+								game.players[i].chosenChar1=event.chosenChars[0][0];
+								game.players[i].chosenChar2=event.chosenChars[0][1];
 							}
 							list.push([game.players[i],[str,[event.chosenChars[0],'character']],selectButton,true]);
 						}
@@ -2887,6 +2909,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var str='选择主副将';
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
+							}
+							if(event.testAllByGroupList){
+								event.chosenChars[distanceFromZhu]=event.testAllByGroupList.slice(distanceFromZhu*2,distanceFromZhu*2+2);
+								game.players[i].chosenChar1=event.chosenChars[distanceFromZhu][0];
+								game.players[i].chosenChar2=event.chosenChars[distanceFromZhu][1];
 							}
 							list.push([game.players[i],[str,[event.chosenChars[distanceFromZhu],'character']],selectButton,true]);
 						}
