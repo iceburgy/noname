@@ -1,6 +1,6 @@
 window.noname_update={
-	version:'2020.10.20',
-	update:'2020.10.19.3',
+	version:'2020.10.20.1',
+	update:'2020.10.20.1',
 	changeLog:[
 		'更新至官方版本：1.9.105.4',
 		'修复新版本动画特效加载问题',
@@ -20,6 +20,7 @@ window.noname_update={
 		'character/refresh.js',
 		'character/shenhua.js',
 		'character/sp.js',
+		'character/sp2.js',
 		'character/standard.js',
 		'character/xinghuoliaoyuan.js',
 		'character/yijiang.js',
@@ -42,5 +43,6 @@ window.noname_update={
 		'extension/十周年UI/dialog.css',
 		'extension/十周年UI/layout.css',
 		'extension/十周年UI/skill.js',
+		'extension/十周年UI/spine.js',
 	]
 };
