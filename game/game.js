@@ -14012,7 +14012,7 @@
 								get.sgn(get.value(es[i],ui.selected.targets[0]))==-att2&&
 								get.sgn(get.effect(target,es[i],player,target))==sgnatt&&
 								target.isEmpty(get.subtype(es[i]))){
-								return Math.abs(att);
+								return 100*Math.abs(att);
 							}
 						}
 						if(i==es.length&&(_status.event.nojudge||!ui.selected.targets[0].countCards('j',function(card){
