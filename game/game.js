@@ -31,6 +31,7 @@
 		statsKeyPlayer:'stats_player',
 		statsKeySortKey:'sort_key',
 		statsKeySortKeyRoleName:'role_name',
+		statsKeySortKeyNumTotal:'num_total',
 		statsKeyStatsByZones:'stats_by_zones',
 		statsKeyDisplayZone:'display_zone',
 		bonusKeyFuliInfo:'fuliInfo',
@@ -35815,6 +35816,26 @@
 					else return 1;
 				});
 			}
+			else if(sortkey==lib.statsKeySortKeyNumTotal){
+				sortable.sort(function(a, b){
+					var nwa=parseFloat(a[1].numWin);
+					var nwb=parseFloat(b[1].numWin);
+					var nla=parseFloat(a[1].numLose);
+					var nlb=parseFloat(b[1].numLose);
+					var nta=nwa+nla;
+					var ntb=nwb+nlb;
+
+					var ka=a[0].split('_');
+					ka=ka[ka.length-1];
+					var kb=b[0].split('_');
+					kb=kb[kb.length-1];
+
+					if(nta!=ntb){
+						return nta>ntb?-1:1;
+					}
+					return ka<=kb?-1:1;
+				});
+			}
 			else{
 				sortable.sort(function(a, b){
 					var wra=parseFloat(a[1][sortkey]);
@@ -47403,6 +47424,10 @@
 				td.appendChild(anchor);
 				tr.appendChild(td);
 				td=document.createElement('td');
+				anchor=createLeaderboardAnchor(hostZone,lib.statsKeySortKeyNumTotal,'登场');
+				td.appendChild(anchor);
+				tr.appendChild(td);
+				td=document.createElement('td');
 				anchor=createLeaderboardAnchor(hostZone,'winRate','胜率');
 				td.appendChild(anchor);
 				tr.appendChild(td);
@@ -47435,6 +47460,9 @@
 					tr.appendChild(td);
 					td=document.createElement('td');
 					td.innerHTML=sortedStats[i][1]['numLose'];
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=sortedStats[i][1]['numWin']+sortedStats[i][1]['numLose'];
 					tr.appendChild(td);
 					td=document.createElement('td');
 					td.innerHTML=sortedStats[i][1]['winRate'];

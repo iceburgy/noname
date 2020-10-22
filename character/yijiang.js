@@ -67,7 +67,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhongyao:['male','wei',3,['huomo','zuoding']],
 			liuchen:['male','shu',4,['zhanjue','qinwang'],['zhu']],
 			zhangyi:['male','shu',4,['wurong','shizhi']],
-			sunxiu:['male','wu',3,['reyanzhu','rexingxue','rezhaofu'],['zhu']],
+			sunxiu:['male','wu',3,['yanzhu','xingxue','zhaofu'],['zhu']],
 			zhuzhi:['male','wu',4,['xinanguo']],
 			quancong:['male','wu',4,['yaoming']],
 			gongsunyuan:['male','qun',4,['huaiyi']],
