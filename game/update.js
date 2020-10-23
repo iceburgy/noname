@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.10.22.1',
+	version:'2020.10.22.2',
 	update:'2020.10.20.1',
 	changeLog:[
 		'更新至官方版本：1.9.105.4',

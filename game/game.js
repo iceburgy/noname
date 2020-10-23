@@ -43940,16 +43940,23 @@
 				if(ui.giveup) return;
 				if(!lib.config.show_giveup) return;
 				ui.giveup=ui.create.system('投降',function(){
+					if(this.classList.contains('hidden')) return;
 					if(this.innerHTML=='<span>确认</span>'){
 						clearTimeout(this.confirmTimeout);
 						var player=game.me;
-						this.innerHTML='<span>投降</span>';
 						if(game.online){
 							game.send('giveup',player);
 						}
 						else{
 							game.voteGiveup(player);
 						}
+						this.innerHTML='<span>已投</span>';
+						this.hide();
+						var that=this;
+						setTimeout(function(){
+							that.innerHTML='<span>投降</span>';
+							that.show();
+						},1000);
 					}
 					else{
 						this.innerHTML='<span>确认</span>';
