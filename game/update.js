@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.10.21',
+	version:'2020.10.22',
 	update:'2020.10.20.1',
 	changeLog:[
 		'更新至官方版本：1.9.105.4',
@@ -12,6 +12,7 @@ window.noname_update={
 		'优化貂蝉离间AI：离间一血反贼给队友收',
 		'孙休改回老版技能',
 		'战况显示登场数',
+		'签到福利包含点将卡一个',
 	],
 	files:[
 		'card/extra.js',

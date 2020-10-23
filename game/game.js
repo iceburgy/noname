@@ -28003,6 +28003,7 @@
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][ip]=new Date();
 				game.updateBonusBalance(nickname,lib.bonusKeyChangeCards,3);
 				game.updateBonusBalance(nickname,lib.bonusKeyAddRole,1);
+				game.updateBonusBalance(nickname,lib.bonusKeyPickRole,1);
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},
