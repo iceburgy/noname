@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.10.22',
+	version:'2020.10.22.1',
 	update:'2020.10.20.1',
 	changeLog:[
 		'更新至官方版本：1.9.105.4',
@@ -13,6 +13,7 @@ window.noname_update={
 		'孙休改回老版技能',
 		'战况显示登场数',
 		'签到福利包含点将卡一个',
+		'单禁以下弱将：马忠，丁奉，祖茂，张梁，卢植',
 	],
 	files:[
 		'card/extra.js',
