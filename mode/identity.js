@@ -2541,7 +2541,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.node.name2.show();
 						player._group=lib.character[player.name1][1];
 						for(var j=0;j<player.hiddenSkills.length;j++){
-							player.addSkillTrigger(player.hiddenSkills[j],true,true);
+							player.addSkillTrigger(player.hiddenSkills[j],true);
 						}
 					},game.zhu);
 					game.zhu.showGiveup();
@@ -3034,7 +3034,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.node.name2.show();
 							player._group=lib.character[player.name1][1];
 							for(var j=0;j<player.hiddenSkills.length;j++){
-								player.addSkillTrigger(player.hiddenSkills[j],true,true);
+								player.addSkillTrigger(player.hiddenSkills[j],true);
 							}
 						},game.players[i]);
 					}
@@ -3602,6 +3602,23 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						else characters=[this.name1,this.name2];
 						audioSkill=getCharacterSkillWithAudio(characters);
 						game.trySkillAudio(audioSkill,this,true);
+						if(_status.event.name=='chooseToUse'){
+							var that=this;
+							setTimeout(function(){
+								if(that==game.me){
+									delete _status.event._skillChoice;
+									delete _status.event._cardChoice;
+									game.check();
+								}
+								else if(that.isOnline2()){
+									that.send(function(){
+										delete _status.event._skillChoice;
+										delete _status.event._cardChoice;
+										game.check();
+									});
+								}
+							},100);
+						}
 					}
 					if(this.identity=='unknown'){
 						this.group=lib.character[this.name1][1];

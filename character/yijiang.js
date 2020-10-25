@@ -7493,8 +7493,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				init:function(player){
 					if(player.hasZhuSkill('xingshuai')){
-						player.markSkill('xingshuai');
+						lib.skill['xingshuai'].mark=true;
 						player.storage.xingshuai=false;
+					}
+					else{
+						lib.skill['xingshuai'].mark=false;
 					}
 				},
 				intro:{
@@ -7502,7 +7505,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				unique:true,
 				limited:true,
-				mark:false,
 				content:function(){
 					'step 0'
 					event.list=game.filterPlayer(function(current){
