@@ -2541,7 +2541,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.node.name2.show();
 						player._group=lib.character[player.name1][1];
 						for(var j=0;j<player.hiddenSkills.length;j++){
-							player.addSkillTrigger(player.hiddenSkills[j],true);
+							player.addSkillTrigger(player.hiddenSkills[j],true,true);
 						}
 					},game.zhu);
 					game.zhu.showGiveup();
@@ -3034,7 +3034,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.node.name2.show();
 							player._group=lib.character[player.name1][1];
 							for(var j=0;j<player.hiddenSkills.length;j++){
-								player.addSkillTrigger(player.hiddenSkills[j],true);
+								player.addSkillTrigger(player.hiddenSkills[j],true,true);
 							}
 						},game.players[i]);
 					}
@@ -4071,9 +4071,24 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				limited:true,
 				audio:'yeyan',
 				enable:'chooseToUse',
-				trigger:{player:'chooseToRespondBegin',global:'revealXiaonei'},
+				trigger:{player:['chooseToRespondBegin','chooseToUseBefore'],global:'revealXiaonei'},
 				skillAnimation:'legend',
 				animationColor:'thunder',
+				filter:function(event,player){
+					if(event.name=='chooseToUse'){
+						// 不响应无懈，因为太多问题
+						if(event.type=='wuxie') return false;
+						// 回合内正常出牌：不显示询问
+						if(event.type=='phase'){
+							if(event._triggering) return false;
+						}
+						// 响应出牌：不显示技能按钮
+						else{
+							if(!event._triggering) return false;
+						}
+					}
+					return true;
+				},
 				filterTarget:function(card,player,target){
 					return target==player;
 				},
@@ -4084,14 +4099,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					if(player==game.me){
-						ui.revealXiaonei.classList.remove('glow');
-						ui.revealXiaonei.hide();
-					}
-					else if(player.isOnline2()){
-						player.send(function(){
+						if(ui.revealXiaonei){
 							ui.revealXiaonei.classList.remove('glow');
 							ui.revealXiaonei.hide();
-						});
+						}
+					}
+					else if(player.isOnline2()){
+						if(ui.revealXiaonei){
+							player.send(function(){
+								ui.revealXiaonei.classList.remove('glow');
+								ui.revealXiaonei.hide();
+							});
+						}
 					}
 					player.awakenSkill('woshixiaonei');
 					player.chooseControlList(true,function(event,player){
@@ -4117,20 +4136,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.broadcastAll(function(player){
 							player.showIdentity();
 						},player);
-					}
-					// event hierarchy:
-					// thisskillname/useSkill/chooseToUse/sha - huihewai, need redo
-					// thisskillname/useSkill/_wuxie/trigger/arrangeTrigger/tiesuo - huihewai, need redo
-					// thisskillname/useSkill/chooseToUse/phaseUse/phase - huihenei
-					// thisskillname/trigger/arrangeTrigger/chooseToRespond/wanjian
-					// we need to redo huihewai useSkill
-					var useSkillEvent=event.parent;
-					if(useSkillEvent&&useSkillEvent.name=='useSkill'){
-						if(useSkillEvent.parent) {
-							if(useSkillEvent.parent.name=='_wuxie'||useSkillEvent.parent.name=='chooseToUse'&&useSkillEvent.parent.parent.name!='phaseUse') {
-								useSkillEvent.parent.parent.redo();
-							}
-						}
 					}
 				},
 				ai:{
