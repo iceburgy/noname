@@ -3602,23 +3602,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						else characters=[this.name1,this.name2];
 						audioSkill=getCharacterSkillWithAudio(characters);
 						game.trySkillAudio(audioSkill,this,true);
-						if(_status.event.name=='chooseToUse'){
-							var that=this;
-							setTimeout(function(){
-								if(that==game.me){
-									delete _status.event._skillChoice;
-									delete _status.event._cardChoice;
-									game.check();
-								}
-								else if(that.isOnline2()){
-									that.send(function(){
-										delete _status.event._skillChoice;
-										delete _status.event._cardChoice;
-										game.check();
-									});
-								}
-							},100);
-						}
 					}
 					if(this.identity=='unknown'){
 						this.group=lib.character[this.name1][1];
@@ -3755,6 +3738,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					this.checkConflict();
+					// 按钮亮将，并且是出牌阶段正常出牌
+					if(playAudio&&_status.event.name=='chooseToUse'&&_status.event.type=='phase'&&this.isPhaseUsing()){
+						var that=this;
+						if(that.isOnline2()){
+							that.send(function(){
+								_status.event._modparent._result.bool=true;
+								game.resume();
+							});
+						}
+						setTimeout(function(){
+							_status.event.parent._result.bool=true;
+							game.resume();
+						},100);
+					}
 				},
 			}
 		},

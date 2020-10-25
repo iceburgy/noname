@@ -1900,12 +1900,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			reqizhou:{
-				trigger:{player:['equipEnd','loseEnd']},
+				trigger:{player:['equipEnd','loseEnd','showCharacterAfter']},
 				forced:true,
 				popup:false,
 				derivation:['reyingzi','qixi','rexuanfeng'],
 				filter:function(event,player){
 					if(player.equiping) return false;
+					if(event.name=='showCharacter'&&!game.isCharacterSeen(player,'re_heqi')) return false;
 					var suits=[];
 					var es=player.getCards('e');
 					for(var i=0;i<es.length;i++){

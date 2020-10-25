@@ -12908,47 +12908,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			baobian:{
-				enable:'phaseUse',
+				audio:2,
 				trigger:{player:['changeHp','showCharacterAfter']},
 				forced:true,
 				popup:false,
 				filter:function(event,player){
-					if(event.name=='chooseToUse'){
-						if(!game.isCharacterSeen(player,'xiahouba')) return true;
-						return false;
-					}
-					else if(event.name=='showCharacter'){
+					if(event.name=='showCharacter'){
 						return game.isCharacterSeen(player,'xiahouba');
 					}
 					return true;
 				},
-				init:function(player){
-					if(!game.isCharacterSeen(player,'xiahouba')) return;
-					player.removeAdditionalSkill('baobian');
-					game.broadcast(function(player){
-						player.removeAdditionalSkill('baobian');
-					},player);
-					var list=[];
-					if(player.hp<=3){
-						//if(trigger.num!=undefined&&trigger.num<0&&player.hp-trigger.num>1) player.logSkill('baobian');
-						list.push('retiaoxin');
-					}
-					if(player.hp<=2){
-						list.push('new_repaoxiao');
-					}
-					if(player.hp<=1){
-						list.push('xinshensu');
-					}
-					if(list.length){
-						player.addAdditionalSkill('baobian',list);
-						game.broadcast(function(player,list){
-							player.addAdditionalSkill('baobian',list);
-						},player,list);
-					}
-				},
 				derivation:['retiaoxin','new_repaoxiao','xinshensu'],
 				content:function(){
-					if(!game.isCharacterSeen(player,'xiahouba')) return;
 					game.broadcastAll(function(player){
 						player.removeAdditionalSkill('baobian');
 					},player);
