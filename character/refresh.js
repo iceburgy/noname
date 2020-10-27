@@ -1893,23 +1893,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.storage.reqimou3=player.getCardUsable('sha');
 					player.markSkill('reqimou3');
+					player.storage.usedExtraShas=player.getStat().card.sha-1;
 				},
 				onremove:true,
 			},
 			reqimou4:{
 				// this skill is only meant for liaohua with two use phases
-				trigger:{player:['phaseUseEnd','phaseUseBegin']},
+				trigger:{player:'phaseUseBegin'},
 				silent:true,
 				content:function(){
-					if(event.triggername=='phaseUseEnd'){
-						player.storage.usedExtraShas=player.getStat().card.sha-1;
-					}
-					else{
-						if(player.storage.usedExtraShas>0) player.storage.reqimou2-=player.storage.usedExtraShas;
-						if(player.storage.reqimou2<0) player.storage.reqimou2=0;
-						player.storage.reqimou3=player.storage.reqimou2+1;
-						player.markSkill('reqimou3');
-					}
+					if(player.storage.usedExtraShas&&player.storage.usedExtraShas>0) player.storage.reqimou2-=player.storage.usedExtraShas;
+					if(player.storage.reqimou2<0) player.storage.reqimou2=0;
+					player.storage.reqimou3=player.storage.reqimou2+1;
+					player.markSkill('reqimou3');
 				},
 				onremove:true,
 			},
