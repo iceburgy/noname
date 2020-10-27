@@ -440,7 +440,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					return get.type(event.card)=='equip';
 				},
-				direct:true,
+				frequent:true,
 				content:function(){
 					player.chooseUseTarget({name:'sha'},get.prompt('xinfu_qinguo'),'视为使用一张【杀】',false).logSkill='qinguo_use';
 				},
