@@ -7220,17 +7220,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				prompt:'将一张黑桃手牌当酒使用',
-				check:function(cardx){
+				check:function(cardx,player){
+					if(player&&player==cardx.player) return true;
 					if(_status.event.type=='dying') return 1;
 					var player=_status.event.player;
-					var shas=player.getCards('h','sha');
+					var shas=player.getCards('h',function(card){
+						return card!=cardx&&get.name(card,player)=='sha';
+					});
+					if(!shas.length) return -1;
 					if(shas.length>1&&(player.getCardUsable('sha')>1||player.countCards('h','zhuge'))){
 						return 0;
 					}
 					shas.sort(function(a,b){
 						return get.order(b)-get.order(a);
 					});
-					var card;
+					var card=false;
 					if(shas.length){
 						for(var i=0;i<shas.length;i++){
 							if(shas[i]!=cardx&&lib.filter.filterCard(shas[i],player)){
@@ -7254,7 +7258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 4-get.value(cardx);
 						}
 					}
-					return 0;
+					return -1;
 				},
 				ai:{
 					skillTagFilter:function(player){
@@ -7264,12 +7268,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					save:true,
 				},
 				trigger:{source:'damageEnd'},
-				forced:true,
+				locked:true,
+				direct:true,
 				filter:function(event,player){
 					if(event.name=='chooseToUse') return player.countCards('h',{suit:'spade'})>0;
 					return event.card&&event.card.name=='sha'&&event.getParent(2).jiu==true&&!player.hasSkill('oljiuchi_air');
 				},
 				content:function(){
+					player.logSkill('oljiuchi');
 					player.addTempSkill('oljiuchi_air');
 				},
 				subSkill:{
