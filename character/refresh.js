@@ -4389,9 +4389,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('new_repaoxiao2');
 				},
 				mod:{
-					targetInRange:function (card,player){
-						if(game.hasCharacter(player,'re_zhangfei')&&card.name=='sha'&&get.cardCount({name:'sha'},player)>0) return true;
-					},
 					cardUsable:function (card,player,num){
 						if(card.name=='sha') return Infinity;
 					},
@@ -4409,7 +4406,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 				mod:{
 					targetInRange:function (card,player){
-						if(card.name=='sha') return true;
+						if(game.hasCharacter(player,'re_zhangfei')&&card.name=='sha') return true;
 					},
 				},
 			},
