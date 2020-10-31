@@ -1823,6 +1823,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=event.map[result.control]||1;
 					player.storage.reqimou2=num; // for extra sha usable tracking
 					player.storage.reqimou5=num; // only for range tracking
+					player.storage.reqimou3=num+player.getCardUsable('sha'); // usable sha total count
 					player.loseHp(num);
 					player.draw(num);
 					player.addTempSkill('reqimou2');
@@ -1883,16 +1884,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				intro:{
 					content:function(storage,player){
-						return '可使用杀的次数'+(player.getCardUsable('sha')<=0?0:player.getCardUsable('sha')==Infinity?'无限制':player.getCardUsable('sha'))+',距离减'+player.storage.reqimou5;
-					},
-					markcount:function(storage,player){
-						return (player.getCardUsable('sha')<=0||player.getCardUsable('sha')==Infinity)?0:player.getCardUsable('sha');
+						return '可使用杀的次数'+storage+',距离减'+player.storage.reqimou5;
 					}
 				},
 				filter:function(event,player){
-					return get.name(event.card)=='sha';
+					return player.storage.reqimou3>0&&get.name(event.card)=='sha';
 				},
 				content:function(){
+					player.storage.reqimou3=player.getCardUsable('sha');
 					player.markSkill('reqimou3');
 					player.storage.usedExtraShas=player.getStat().card.sha-1;
 				},
@@ -1900,17 +1899,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			reqimou4:{
 				// this skill is only meant for liaohua with two use phases
-				trigger:{player:['phaseUseEnd','phaseUseBegin']},
+				trigger:{player:'phaseUseBegin'},
 				silent:true,
 				content:function(){
-					if(event.triggername=='phaseUseEnd'){
-						player.unmarkSkill('reqimou3');
-					}
-					else{
-						if(player.storage.usedExtraShas&&player.storage.usedExtraShas>0) player.storage.reqimou2-=player.storage.usedExtraShas;
-						if(player.storage.reqimou2<0) player.storage.reqimou2=0;
-						player.markSkill('reqimou3');
-					}
+					if(player.storage.usedExtraShas&&player.storage.usedExtraShas>0) player.storage.reqimou2-=player.storage.usedExtraShas;
+					if(player.storage.reqimou2<0) player.storage.reqimou2=0;
+					player.storage.reqimou3=player.storage.reqimou2+1;
+					player.markSkill('reqimou3');
 				},
 				onremove:true,
 			},
