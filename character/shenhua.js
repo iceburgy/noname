@@ -7462,7 +7462,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhoufei:"周妃",
 			
 			"nzry_jianxiang":"荐降",
-			"nzry_jianxiang_info":"当你成为其他角色使用牌的目标时，你可令手牌数最少的一名角色摸一张牌。",
+			"nzry_jianxiang_info":"当你成为其他角色使用牌的目标后，你可令手牌数最少的一名角色摸一张牌。",
 			"nzry_shenshi1":"审时",
 			"nzry_shenshi":"审时",
 			"nzry_shenshi_info":"转换技，阴：出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若该角色未失去此牌，你将手牌摸至四张。",
