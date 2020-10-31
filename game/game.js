@@ -10530,8 +10530,7 @@
 				cardsGotoOrdering:function(){
 					game.getGlobalHistory().cardMove.push(event);
 					for(var i=0;i<cards.length;i++){
-						cards[i].fix();
-						ui.ordering.appendChild(cards[i]);
+						cards[i].goto(ui.ordering);
 					}
 					var evt=event.relatedEvent||event.getParent();
 					if(!evt.orderingCards) evt.orderingCards=[];
