@@ -956,7 +956,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					event.card=get.cards()[0];
-					game.cardsGotoOrdering(event.card);
 					event.videoId=lib.status.videoId++;
 					var judgestr=get.translation(player)+'发动了【涯角】';
 					game.addVideo('judge1',player,[get.cardInfo(event.card),judgestr,event.videoId]);
