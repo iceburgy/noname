@@ -6847,6 +6847,7 @@
 					}
 
 					if(typeof time!='number') time=500;
+					this.style.transform+=' scale(0.2)';
 					this.classList.add('removing');
 
 					// handle muniu card used and immediately sync

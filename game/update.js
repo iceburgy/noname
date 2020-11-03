@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.10.31.3',
+	version:'2020.10.31.4',
 	update:'2020.10.20.1',
 	changeLog:[
 		'出牌阶段亮将后立即激活可用技能（比如董卓无限喝酒，张飞无限出杀）',

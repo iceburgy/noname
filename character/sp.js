@@ -3862,8 +3862,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt('lizhan'),'令任意名已受伤的角色各摸一张牌',[1,Infinity],function(card,player,target){
 						return target.isDamaged();
 					}).set('ai',function(target){
-						return get.attitude(player,target);
-					});
+						return get.attitude(_status.event.selfPlayer,target);
+					}).set('selfPlayer',player);
 					'step 1'
 					if(result.bool){
 						player.logSkill('lizhan',result.targets);
