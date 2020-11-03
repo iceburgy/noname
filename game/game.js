@@ -6858,6 +6858,7 @@
 							var cardOwner=get.muniuOwner();
 							if(cardOwner&&cardOwner!=game.me){
 								cardOwner.send(function(card){
+									card.style.transform+=' scale(0.2)';
 									card.classList.add('removing');
 								},this);
 							}
