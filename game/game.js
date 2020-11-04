@@ -44014,7 +44014,7 @@
 								_status.event.trigger('revealXiaonei');
 							});
 						}
-					},true);
+					});
 					ui.revealXiaonei.classList.add('glow');
 				}
 			},
