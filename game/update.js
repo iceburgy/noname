@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.11.05',
+	version:'2020.11.05.1',
 	update:'2020.10.20.1',
 	changeLog:[
 		'优化木牛塞牌/用牌/传递界面',

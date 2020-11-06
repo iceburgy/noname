@@ -494,7 +494,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			muniu_skill:{
 				equipSkill:true,
 				enable:'phaseUse',
-				usable:100,
+				usable:1,
 				filterCard:true,
 				check:function(card){
 					if(card.name=='du') return 20;
