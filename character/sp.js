@@ -12618,7 +12618,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				filter:function(event,player){
 					if(player==_status.currentPhase) return false;
-					if(event.name!='lose') return get.color(event.card,player)=='red';
+					if(event.name!='lose'){
+						if(get.isCardInMuniu(event.cards[0])) return false;
+						return get.color(event.card,player)=='red';
+					}
 					if(event.type!='discard') return false;
 					if(event.cards2){
 						for(var i=0;i<event.cards2.length;i++){
