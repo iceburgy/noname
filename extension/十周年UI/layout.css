@@ -139,6 +139,14 @@ body>.background {
 	transition-property: transform, opacity, left, top;
 }
 
+.hand-special>.special>.card {
+	margin: 0px;
+	width: 108px;
+    height: 150px;
+	position: absolute;
+	transition-property: transform, opacity, left, top;
+}
+
 .hand-cards>.handcards>.card.selected {
     boder-radius: 2px;
     /*transition-timing-function: linear;*/

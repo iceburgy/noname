@@ -23885,7 +23885,9 @@
 							(!this.parentNode.parentNode.classList.contains('scrollh')||(game.layout=='long2'||game.layout=='nova'))){
 							if(bool){
 								if(isInMuniu){
-									this.style.transform='translateY(-20px)';
+									if(!this.style.transform.includes('translateY(-20px)')){
+										this.style.transform=this.style.transform+'translateY(-20px)';
+									}
 								}
 								else{
 									this.style.transform=this._transform+' translateY(-20px)';
@@ -23893,7 +23895,7 @@
 							}
 							else{
 								if(isInMuniu){
-									this.style.transform='';
+									this.style.transform=this.style.transform.replace('translateY(-20px)','');
 								}
 								else{
 									this.style.transform=this._transform||'';
@@ -26648,12 +26650,19 @@
 								},player,muniu,muniu.cards);
 
 								var args=[];
-								args.push(function(player){
+								args.push(function(player,muniuCardWidth){
 									var muniu = player.getEquip(5);
 									if(!muniu.cards){
 										muniu.cards=[];
 									}
 									var cards=muniu.cards;
+
+									var newWidth=0;
+									if(muniuCardWidth){
+										newWidth=cards.length*muniuCardWidth/2;
+									}
+
+									ui.handSpecial.style.width=Math.max(150,newWidth)+'px';
 									var elements = ui.handSpecial.cards.childNodes;
 									for (var i = elements.length - 1; i >= 0; i--) {
 										if (cards && cards.contains(elements[i])) continue;
@@ -26663,7 +26672,20 @@
 									setTimeout(function(){
 										if (cards && cards.length) {
 											for (var i = 0; i < cards.length; i++) {
-												if (cards[i]&&!ui.handSpecial.cards.contains(cards[i])) ui.handSpecial.cards.appendChild(cards[i]);
+												if (cards[i]&&!ui.handSpecial.cards.contains(cards[i])){
+													ui.handSpecial.cards.appendChild(cards[i]);
+												}
+												var newTransform='translateX(-'+(i+(game.download?1:0))*cards[i].offsetWidth+'px)';
+												if(!cards[i].classList.contains('removing')&&
+													!cards[i].style.transform.includes('translateY(-20px)')&&
+													cards[i].style.transform!=newTransform){
+													cards[i].style.transform=newTransform;
+												}
+											}
+											if(!muniuCardWidth&&ui.handSpecial.cards.childNodes&&ui.handSpecial.cards.childNodes.length){
+												game.send('exec',function(muniuCardWidth){
+													game.muniuCardWidth=muniuCardWidth;
+												},ui.handSpecial.cards.childNodes[0].offsetWidth);
 											}
 										}
 									},100);
@@ -26671,6 +26693,7 @@
 									ui.handSpecial.show();
 								});
 								args.push(player);
+								args.push(game.muniuCardWidth);
 								sender.send.apply(sender,args);
 							}
 							break;

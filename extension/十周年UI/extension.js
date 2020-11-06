@@ -1124,6 +1124,12 @@ content:function(config, pack){
 					handSpecial:{
 						cards: decadeUI.dialog.create('special cards', ui.handSpecial),
 						reset:function(cards){
+							var newWidth=0;
+							if(game.muniuCardWidth){
+								newWidth=cards.length*game.muniuCardWidth/2;
+							}
+
+							ui.handSpecial.style.width=Math.max(150,newWidth)+'px';
 							var elements = ui.handSpecial.cards.childNodes;
 							for (var i = elements.length - 1; i >= 0; i--) {
 								if (cards && cards.contains(elements[i])) continue;
@@ -1132,8 +1138,20 @@ content:function(config, pack){
 							
 							if (cards && cards.length) {
 								for (var i = 0; i < cards.length; i++) {
-									if (cards[i]&&!ui.handSpecial.cards.contains(cards[i])) ui.handSpecial.cards.appendChild(cards[i]);
+									if (cards[i]&&!ui.handSpecial.cards.contains(cards[i])){
+										ui.handSpecial.cards.appendChild(cards[i]);
+									}
+									var newTransform='translateX(-'+(i+(game.download?1:0))*cards[i].offsetWidth+'px)';
+									if(!cards[i].classList.contains('removing')&&
+										!cards[i].style.transform.includes('translateY(-20px)')&&
+										cards[i].style.transform!=newTransform){
+										cards[i].style.transform=newTransform;
+									}
 								}
+							}
+
+							if(!game.muniuCardWidth&&ui.handSpecial.cards.childNodes&&ui.handSpecial.cards.childNodes.length){
+								game.muniuCardWidth=ui.handSpecial.cards.childNodes[0].offsetWidth;
 							}
 						},
 					}

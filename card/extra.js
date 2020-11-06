@@ -31,10 +31,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if (ui.handSpecial) {
 						if(player==game.me){
 							ui.handSpecial.hide();
+							for(var mc of ui.handSpecial.cards.childNodes){
+								mc.style.transform='';
+							}
+							ui.handSpecial.style.width='150px';
 						}
 						else if(player.isOnline2()){
 							player.send(function(){
 								ui.handSpecial.hide();
+								for(var mc of ui.handSpecial.cards.childNodes){
+									mc.style.transform='';
+								}
+								ui.handSpecial.style.width='150px';
 							});
 						}
 					}
@@ -486,7 +494,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			muniu_skill:{
 				equipSkill:true,
 				enable:'phaseUse',
-				usable:1,
+				usable:100,
 				filterCard:true,
 				check:function(card){
 					if(card.name=='du') return 20;
