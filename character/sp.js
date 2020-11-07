@@ -13937,8 +13937,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current.hasSkill('xinfu_jianjie');
 					})) return false;
 					if((player.getStat().skill.smh_lianhuan||0)+(player.getStat().skill.smh_lianhuan1||0)>=3) return false;
-					return player.countCards('h',{suit:'club'})>0;
+					return player.countCards('he',{suit:'club'})>0;
 				},
+				position:'he',
 				filterCard:function (card){
 					return get.suit(card)=='club';
 				},
@@ -14031,8 +14032,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if((player.getStat().skill.smh_lianhuan||0)+(player.getStat().skill.smh_lianhuan1||0)>=3) return false;
 					var tempCard={name:'tiesuo'};
 					var filter=event.filterCard;
-					return (filter(tempCard,player,event))&&player.countCards('h',{suit:'club'})>0;
+					return (filter(tempCard,player,event))&&player.countCards('he',{suit:'club'})>0;
 				},
+				position:'he',
 				filterCard:function (card){
 					return get.suit(card)=='club';
 				},

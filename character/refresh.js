@@ -663,18 +663,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				zhuSkill:true,
 				trigger:{global:'damageSource'},
 				filter:function(event,player){
-					if(!game.isCharacterSeen(player,'ol_dongzhuo')) return false;
 					if(player==event.source||!event.source||event.source.group!='qun') return false;
 					return player.hasZhuSkill('olbaonue',event.source);
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					event.count=trigger.num;
+					if(!game.isCharacterSeen(player,'ol_dongzhuo')){
+						player.chooseBool('是否明置'+get.translation('ol_dongzhuo')+'发动【暴虐】？').set('choice',get.attitude(trigger.source,player)>0);
+					}
+					else{
+						event.goto(2);
+					}
 					'step 1'
+					if(result.bool){
+						var index=game.getCharacterIndex(player,'ol_dongzhuo');
+						player.showCharacter(index);
+						player.logSkill('baonue');
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					event.count=trigger.num;
+					'step 3'
 					event.count--;
 					trigger.source.chooseBool('是否对'+get.translation(player)+'发动【暴虐】？').set('choice',get.attitude(trigger.source,player)>0);
-					'step 2'
+					'step 4'
 					if(result.bool){
 						player.logSkill('olbaonue');
 						trigger.source.line(player,'green')
@@ -686,7 +701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						event.finish();
 					}
-					'step 3'
+					'step 5'
 					if(result.suit=='spade'){
 						player.recover();
 						if(get.position(result.card)=='d') player.gain(result.card,'gain2','log')
