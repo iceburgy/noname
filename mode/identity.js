@@ -2116,19 +2116,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var addRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeyAddRole);
 							if(addRoleBalance){
 								found=true;
-								list.push('框');
+								list.push('增加选将框');
 							}
 						}
 						var pickRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeyPickRole);
 						if(pickRoleBalance){
 							found=true;
-							list.push('点');
+							list.push('点将卡');
 						}
 						if(list.length>0){
 							for(var j=0;j<list.length;j++){
 								list[j]=['','',list[j]];
 							}
-							usefuli.push([game.players[i],['是否使用福利',[list,'vcard']],1,false]);
+							usefuli.push([game.players[i],['是否使用道具',[list,'vcard']],1,false]);
 						}
 					}
 					if(found){
@@ -2149,7 +2149,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
 							for(var link of result[i].links){
 								event.usingFuli[distanceFromZhu].push(link[2]);
-								if(link[2]=='点'){
+								if(link[2]=='点将卡'){
 									game.dianjiangusers.push(lib.playerOL[i]);
 								}
 							}
@@ -2238,10 +2238,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else if(event.usingFuli[0]&&event.usingFuli[0].length){
 								for(var fuliname of event.usingFuli[0]){
 									switch(fuliname){
-										case '签':
-											choiceZhu++;
-											break;
-										case '框':
+										case '增加选将框':
 											choiceZhu++;
 											break;
 										default:break;
@@ -2337,7 +2334,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else if(event.usingFuli[0]&&event.usingFuli[0].length){
 								for(var fuliname of event.usingFuli[0]){
 									switch(fuliname){
-										case '框':
+										case '增加选将框':
 											choiceZhu++;
 											game.updateBonusBalance(game.players[i].nickname,lib.bonusKeyAddRole,-1);
 											break;
@@ -2553,7 +2550,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 17"
 					// zhu choose to show character
 					var liangjiang=[];
-					var list=['暗','主','副','全',];
+					var list=['否','主将明置','副将明置','全部明置',];
 					for(var i=0;i<list.length;i++){
 						list[i]=['','',list[i]];
 					}
@@ -2561,9 +2558,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 18"
 					var choice=result.links[0][2];
 					switch(choice){
-						case '主':game.zhu.showCharacter(0,true,true);event.goto(21);break;
-						case '副':game.zhu.showCharacter(1,true,true);event.goto(21);break;
-						case '全':game.zhu.showCharacter(2,true,true);event.goto(21);break;
+						case '主将明置':game.zhu.showCharacter(0,true,true);event.goto(21);break;
+						case '副将明置':game.zhu.showCharacter(1,true,true);event.goto(21);break;
+						case '全部明置':game.zhu.showCharacter(2,true,true);event.goto(21);break;
 						default:game.zhu.trySkillAnimate('不亮将','不亮将',false);break;
 					}
 					"step 19"
@@ -2651,10 +2648,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else if(event.usingFuli[distanceFromZhu]&&event.usingFuli[distanceFromZhu].length){
 								for(var fuliname of event.usingFuli[distanceFromZhu]){
 									switch(fuliname){
-										case '签':
-											num3++;
-											break;
-										case '框':
+										case '增加选将框':
 											num3++;
 											break;
 										default:break;
@@ -2808,7 +2802,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else if(event.usingFuli[distanceFromZhu]&&event.usingFuli[distanceFromZhu].length){
 								for(var fuliname of event.usingFuli[distanceFromZhu]){
 									switch(fuliname){
-										case '框':
+										case '增加选将框':
 											num3++;
 											game.updateBonusBalance(game.players[i].nickname,lib.bonusKeyAddRole,-1);
 											break;
@@ -3047,7 +3041,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					"step 30"
 					var liangjiang=[];
-					var list=['暗','主','副','全',];
+					var list=['否','主将明置','副将明置','全部明置',];
 					for(var i=0;i<list.length;i++){
 						list[i]=['','',list[i]];
 					}
@@ -3062,9 +3056,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(result[i]&&result[i].links) {
 							var choice=result[i].links[0][2];
 							switch(choice){
-								case '主':lib.playerOL[i].showCharacter(0,true,true);break;
-								case '副':lib.playerOL[i].showCharacter(1,true,true);break;
-								case '全':lib.playerOL[i].showCharacter(2,true,true);break;
+								case '主将明置':lib.playerOL[i].showCharacter(0,true,true);break;
+								case '副将明置':lib.playerOL[i].showCharacter(1,true,true);break;
+								case '全部明置':lib.playerOL[i].showCharacter(2,true,true);break;
 								default:break;
 							}
 						}
@@ -3631,9 +3625,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 					// adjust maxHp and hp if necessary
 					var info1=lib.character[this.name1];
+					var infoHp1=get.infoHp(info1[2]);
 					var maxHp1=get.infoMaxHp(info1[2]);
+
 					var info2=lib.character[this.name2];
+					var infoHp2=get.infoHp(info2[2]);
 					var maxHp2=get.infoMaxHp(info2[2]);
+
+					var infoHpToGain=0;
 					var maxHpToGain=0;
 
 					var updateRevealCharacterButtons=function(player,updateMain,updateVice){
@@ -3679,6 +3678,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							this.sex=lib.character[this.name][0];
 							this.smoothAvatar(false,true,true);
 							this.classList.remove('unseen');
+							infoHpToGain=game.getMaxHpToGain(infoHp1,infoHp2,this.isUnseen(1));
 							maxHpToGain=game.getMaxHpToGain(maxHp1,maxHp2,this.isUnseen(1));
 							updateRevealCharacterButtons(this,true,false);
 							break;
@@ -3689,6 +3689,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(this.name.indexOf('unknown')==0) this.name=this.name2;
 							this.smoothAvatar(true,true,true);
 							this.classList.remove('unseen2');
+							infoHpToGain=game.getMaxHpToGain(infoHp2,infoHp1,this.isUnseen(0));
 							maxHpToGain=game.getMaxHpToGain(maxHp2,maxHp1,this.isUnseen(0));
 							updateRevealCharacterButtons(this,false,true);
 							break;
@@ -3701,6 +3702,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							this.smoothAvatar(true,true,true);
 							this.classList.remove('unseen');
 							this.classList.remove('unseen2');
+							infoHpToGain=Math.max(infoHp1,infoHp2)-4;
 							maxHpToGain=Math.max(maxHp1,maxHp2)-4;
 							updateRevealCharacterButtons(this,true,true);
 							break;
@@ -3737,7 +3739,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					// adjust maxHp and hp if necessary
 					if(maxHpToGain>0){
 						this.gainMaxHp(maxHpToGain);
-						this.recover(maxHpToGain);
+					}
+					if(infoHpToGain>0){
+						this.recover(infoHpToGain);
 					}
 
 					this.checkConflict();

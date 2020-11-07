@@ -4,7 +4,10 @@ window.noname_update={
 	changeLog:[
 		'修复许攸恃才标记',
 		'修复董卓暴虐自动亮将的bug',
+		'修复吕布亮将蜀香触发良助crash的bug',
 		'司马徽连环可以用装备牌',
+		'道具名字变得friendly',
+		'孙坚亮将不长体力，只长上限',
 	],
 	files:[
 		'card/extra.js',
