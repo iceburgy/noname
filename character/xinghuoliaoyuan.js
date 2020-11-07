@@ -1482,10 +1482,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return true;
 						}
 					},
-					cardUsable:function (card,player,num){
-						if(typeof num=='number'&&player.countCards('j')&&card.name!='jiu'){
-							return Infinity;
-						}
+					cardUsableTarget:function(card,player,target){
+						if(player.countCards('j')&&player.inRange(target)) return true;
 					},
 					aiValue:function(player,card,num){
 						if(card.name=='zhangba') return 15;

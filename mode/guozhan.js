@@ -833,7 +833,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					use:{
 						trigger:{
-							player:"useCard",
+							global:"useCard",
 						},
 						filter:function (event,player){
 							return get.type(event.card)=='equip'&&event.player.isAlive()&&
@@ -1566,13 +1566,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							targetInRange:function (card,player,target){
 								if(target==player.storage.gzzhengbi_eff1) return true;
 							},
-							cardUsable:function (card,player,num){
-								if(typeof num=='number'&&player.storage.gzzhengbi_eff1.isAlive()&&player.storage.gzzhengbi_eff1.isUnseen()) return num+100;
-							},
-							playerEnabled:function (card,player,target){
-								if(player.storage.gzzhengbi_eff1.isAlive()&&player.storage.gzzhengbi_eff1.isUnseen()&&target!=player.storage.gzzhengbi_eff1){
-									var num=player.getCardUsable(card)-100;
-									if(num<=0) return false;
+							cardUsableTarget:function (card,player,target){
+								if(target==player.storage.gzzhengbi_eff1&&target.isUnseen()){
+									return true;
 								}
 							},
 						},
@@ -4652,7 +4648,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									fullimage:true,
 									image:'character:'+list[i]
 								}
-								lib.translate[cardname]=lib.translate[list[i]];
+								lib.translate[cardname]=get.rawName2(list[i]);
 								cards.push(game.createCard(cardname,'',''));
 							}
 							player.$draw(cards,'nobroadcast');
@@ -6601,7 +6597,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		game:{
 			getCharacterChoice:function(list,num){
 				var choice=list.splice(0,num);
-				var map={wei:[],shu:[],wu:[],qun:[]};
+				var map={wei:[],shu:[],wu:[],qun:[],key:[]};
 				for(var i=0;i<choice.length;i++){
 					var group=lib.character[choice[i]][1];
 					if(map[group]){
@@ -6856,11 +6852,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			checkResult:function(){
 				_status.overing=true;
+				var me=game.me._trueMe||game.me;
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].showCharacter(2);
 				}
-				if(game.me.identity=='ye'){
-					if(game.me.classList.contains('dead')){
+				if(me.identity=='ye'){
+					if(me.classList.contains('dead')){
 						game.over(false);
 					}
 					else{
@@ -6868,7 +6865,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 				else{
-					if(get.population(game.me.identity)==0){
+					if(get.population(me.identity)==0){
 						game.over(false);
 					}
 					else{
