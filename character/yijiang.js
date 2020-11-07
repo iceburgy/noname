@@ -20,7 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_guanzhang:['male','shu',4,['old_fuhun']],
 			old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
 			caozhang:['male','wei',4,['jiangchi']],
-			guohuai:['male','wei',4,['rejingce']],
+			guohuai:['male','wei',3,['rejingce']],
 			zhangchunhua:['female','wei',3,['jueqing','shangshi']],
 			caozhi:['male','wei',3,['luoying','jiushi']],
 			caochong:['male','wei',3,['chengxiang','renxin']],
