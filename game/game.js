@@ -26512,6 +26512,8 @@
 					game.voteGiveup(player);
 				},
 				revealCharacter:function(player,index,log,playAudio){
+					var msg=(index==0?'亮主将':'亮副将')
+					player.trySkillAnimate(msg,msg,false);
 					player.showCharacter(index,log,playAudio);
 				},
 				revealXiaonei:function(){
@@ -44042,11 +44044,17 @@
 						this.classList.remove('glow');
 						this.hide();
 						var player=game.me;
-						if(game.online){
-							game.send('revealCharacter',player,0,true,true);
+						if(_status.currentPhase==player&&_status.event.name=='chooseToUse'&&_status.event.player==player&&_status.paused){
+							ui.click.skill('_revealCharacterMainDo');
 						}
 						else{
-							player.showCharacter(0,true,true);
+							if(game.online){
+								game.send('revealCharacter',player,0,true,true);
+							}
+							else{
+								player.trySkillAnimate('明置主将','明置主将',false);
+								player.showCharacter(0,true,true);
+							}
 						}
 					},true);
 					ui.revealCharacterMain.classList.add('glow');
@@ -44057,11 +44065,17 @@
 						this.classList.remove('glow');
 						this.hide();
 						var player=game.me;
-						if(game.online){
-							game.send('revealCharacter',player,1,true,true);
+						if(_status.currentPhase==player&&_status.event.name=='chooseToUse'&&_status.event.player==player&&_status.paused){
+							ui.click.skill('_revealCharacterViceDo');
 						}
 						else{
-							player.showCharacter(1,true,true);
+							if(game.online){
+								game.send('revealCharacter',player,1,true,true);
+							}
+							else{
+								player.trySkillAnimate('明置副将','明置副将',false);
+								player.showCharacter(1,true,true);
+							}
 						}
 					},true);
 					ui.revealCharacterVice.classList.add('glow');

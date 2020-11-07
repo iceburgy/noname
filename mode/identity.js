@@ -3154,6 +3154,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			shengmingshiliqun:'群势力',
 			bumingzhi:'不明置',
 			tongshimingzhi:'同时明置',
+			_revealCharacterMainDo:'明置主将',
+			_revealCharacterViceDo:'明置副将',
 		},
 		element:{
 			content:{
@@ -3739,20 +3741,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					this.checkConflict();
-					// 按钮亮将，并且是出牌阶段正常出牌
-					if(playAudio&&_status.event.name=='chooseToUse'&&_status.event.type=='phase'&&this.isPhaseUsing()){
-						var that=this;
-						if(that.isOnline2()){
-							that.send(function(){
-								_status.event._modparent._result.bool=true;
-								game.resume();
-							});
-						}
-						setTimeout(function(){
-							_status.event.parent._result.bool=true;
-							game.resume();
-						},100);
-					}
 				},
 			}
 		},
@@ -4979,6 +4967,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							trigger.cancelled=true;
 						}
 					}
+				}
+			},
+			_revealCharacterMainDo:{
+				popup:false,
+				content:function(){
+					"step 0"
+					player.showCharacter(0,true,true)
+				}
+			},
+			_revealCharacterViceDo:{
+				popup:false,
+				content:function(){
+					"step 0"
+					player.showCharacter(1,true,true)
 				}
 			},
 		},
