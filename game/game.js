@@ -27950,6 +27950,17 @@
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},
+		updateBonusBalanceBuffer:function(nickname,bonusKey,delta){
+			if(!game.bonusBalanceBuffer) game.bonusBalanceBuffer=[];
+			game.bonusBalanceBuffer.push([nickname,bonusKey,delta]);
+		},
+		flushBonusBalanceBuffer:function(){
+			if(game.bonusBalanceBuffer){
+				for(var bonusBuf of game.bonusBalanceBuffer){
+					game.updateBonusBalance(bonusBuf[0],bonusBuf[1],bonusBuf[2]);
+				}
+			}
+		},
 		addChangeCardsBonusBySeat:function(seat){
 			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
 				game.updateBonusBalance(game.connectPlayers[seat].nickname,lib.bonusKeyChangeCards,1);
@@ -32244,6 +32255,10 @@
 					game.playAudio('effect','tie');
 				}
 			}
+
+			// update bonus balance only if a game properly ends
+			game.flushBonusBalanceBuffer();
+
 			var winnerId;
 			var tableStatistics;
 			var tableStatisticsByRole;

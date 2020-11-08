@@ -2253,7 +2253,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							event.zhuList.remove(tempChars);
 							if(event.pickedChars[0].length>0){
 								tempChars.unshift(event.pickedChars[0]);
-								game.updateBonusBalance(game.players[i].nickname,lib.bonusKeyPickRole,-1);
+								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyPickRole,-1);
 							}
 							list.push([game.players[i],[str,[tempChars,'character']],false]);
 						}
@@ -2336,7 +2336,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									switch(fuliname){
 										case '增加选将框':
 											choiceZhu++;
-											game.updateBonusBalance(game.players[i].nickname,lib.bonusKeyAddRole,-1);
+											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyAddRole,-1);
 											break;
 										default:break;
 									}
@@ -2662,7 +2662,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var tempChars=event.list.randomRemove(num+num3);
 							if(event.pickedChars[distanceFromZhu].length>0){
 								tempChars.unshift(event.pickedChars[distanceFromZhu]);
-								game.updateBonusBalance(game.players[i].nickname,lib.bonusKeyPickRole,-1);
+								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyPickRole,-1);
 							}
 							list.push([game.players[i],[str,[tempChars,'character']],selectButton,false]);
 						}
@@ -2804,7 +2804,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									switch(fuliname){
 										case '增加选将框':
 											num3++;
-											game.updateBonusBalance(game.players[i].nickname,lib.bonusKeyAddRole,-1);
+											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyAddRole,-1);
 											break;
 										default:break;
 									}

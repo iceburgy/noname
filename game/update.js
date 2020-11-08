@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.11.07',
+	version:'2020.11.07.1',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修复许攸恃才标记',
@@ -8,6 +8,7 @@ window.noname_update={
 		'司马徽连环可以用装备牌',
 		'道具名字变得friendly',
 		'孙坚亮将不长体力，只长上限',
+		'点将卡，选将框道具使用后仅在游戏正常结束后才消耗，如果游戏非正常结束则退还（比如半途重开）',
 	],
 	files:[
 		'card/extra.js',
