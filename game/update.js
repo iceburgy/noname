@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.11.08',
+	version:'2020.11.08.1',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修复许攸恃才标记',

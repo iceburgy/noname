@@ -2772,11 +2772,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:["new_luoyan_tianxiang","new_luoyan_liuli"],
 			},
 			"new_luoyan_tianxiang":{
-				inherit:"oltianxiang",
+				inherit:"retianxiang",
 				filter:function (event,player){
 					if(!player.storage.new_xingwu||!player.storage.new_xingwu.length) return false;
-					if(player.hasSkill('oltianxiang')) return false;
-					return lib.skill.oltianxiang.filter(event,player);
+					if(player.hasSkill('retianxiang')) return false;
+					return lib.skill.retianxiang.filter(event,player);
 				},
 				audio:"tianxiang",
 			},
