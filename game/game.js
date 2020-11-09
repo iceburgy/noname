@@ -44067,7 +44067,7 @@
 								game.send('revealCharacter',player,0,true,true);
 							}
 							else{
-								player.trySkillAnimate('明置主将','明置主将',false);
+								player.trySkillAnimate('亮主将','亮主将',false);
 								player.showCharacter(0,true,true);
 							}
 						}
@@ -44088,7 +44088,7 @@
 								game.send('revealCharacter',player,1,true,true);
 							}
 							else{
-								player.trySkillAnimate('明置副将','明置副将',false);
+								player.trySkillAnimate('亮副将','亮副将',false);
 								player.showCharacter(1,true,true);
 							}
 						}
