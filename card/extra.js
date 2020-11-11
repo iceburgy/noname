@@ -29,21 +29,21 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forceDie:true,
 				onLose:function(){
 					if (ui.handSpecial) {
-						if(player==game.me){
-							ui.handSpecial.hide();
-							for(var mc of ui.handSpecial.cards.childNodes){
-								mc.style.transform='';
-							}
-							ui.handSpecial.style.width='150px';
-						}
-						else if(player.isOnline2()){
+						if(player.isOnline2()){
 							player.send(function(){
-								ui.handSpecial.hide();
 								for(var mc of ui.handSpecial.cards.childNodes){
 									mc.style.transform='';
 								}
 								ui.handSpecial.style.width='150px';
+								ui.handSpecial.hide();
 							});
+						}
+						else{
+							for(var mc of ui.handSpecial.cards.childNodes){
+								mc.style.transform='';
+							}
+							ui.handSpecial.style.width='150px';
+							if(player==game.me) ui.handSpecial.hide();
 						}
 					}
 					player.unmarkSkill('muniu_skill6');
