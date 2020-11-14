@@ -454,8 +454,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var candiChar=undefined;
 						do{
 							candiChar=charPool.randomRemove(1)[0];
-						}while(charPool.length&&forbidChars.includes(candiChar));
-						if(!forbidChars.includes(candiChar)){
+						}while(!lib.config.enable_huanleju&&charPool.length&&forbidChars.includes(candiChar));
+						if(lib.config.enable_huanleju||!forbidChars.includes(candiChar)){
 							nextValidCharacters.push(candiChar);
 						}else{
 							console.log('===exhausted all characters without avoiding forbid, pool length: '+nextValidCharacters.length);
@@ -4214,6 +4214,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('xiaoneidantiao');
 					if(player.nickname&&player.nickname!='无名玩家'){
 						game.updateBonusBalance(player.nickname,lib.bonusKeyAddRole,1);
+						game.updateBonusBalance(player.nickname,lib.bonusKeyChangeCards,3);
 					}
 				},
 				ai:{

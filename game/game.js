@@ -4081,6 +4081,9 @@
 									// 2. import_forbid_lib
 									game.importForbidLib();
 
+									// 3. import_huanleju_lib
+									game.importHuanlejuLib();
+
 									that.innerHTML='<span>导入成功</span>';
 									setTimeout(function(){
 										game.reload();
@@ -4130,6 +4133,14 @@
 									game.reload();
 								},1000);
 							},1000);
+						},
+					},
+					enable_huanleju:{
+						name:'欢乐模式',
+						init:false,
+						intro:'无禁将组合，并开启部分单禁武将',
+						onclick:function(bool){
+							game.saveConfig('enable_huanleju',bool);
 						},
 					},
 
@@ -26750,6 +26761,9 @@
 					for(var i=0;i<lib.node.clients.length;i++){
 						if(lib.node.clients[i].id==this.id){
 							var sender=lib.node.clients[i];
+							if(lib.config.enable_huanleju){
+								ip+='<br/>欢乐模式！';
+							}
 							if(game.isQiandaoing()){
 								ip+='<br/>签到福利发放中！';
 								var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
@@ -36452,6 +36466,39 @@
 
 			var simpleForbidMap=simplifyForbidMap(forbidMap);
 			game.saveConfig('forbid_double',simpleForbidMap);
+		},
+		importHuanlejuLib:function(){
+			var httpReq = new XMLHttpRequest();
+			var url='https://api.dropboxapi.com/2/paper/docs/download';
+			httpReq.open("GET",url,false);
+			httpReq.setRequestHeader('Authorization','Bearer wzahoqHWjoQAAAAAAAAAFV2iwzrw_BFSgaena__5iraqztOyTepnnUc5J1S-73FM');
+			httpReq.setRequestHeader('Dropbox-API-Arg',"{\"doc_id\": \"uHz6tvJNP79wvBXY8w5mB\",\"export_format\": \"markdown\"}");
+			httpReq.send();
+			var huanlejuRaw=httpReq.responseText.split('\n');
+			huanlejuRaw.splice(0, 1);
+			huanlejuRaw=huanlejuRaw.join('\n');
+			var huanlejuList = JSON.parse(huanlejuRaw);
+
+			var parseDataKey=function(dataKey){
+				// sample dataKey: "步骘(BuZhi)"
+				var dataKey=dataKey.split("(");
+				var roleName=dataKey[0];
+				var dataKey=dataKey[1].split(")");
+				var roleKey=dataKey[0];
+				if(!lib.character[roleKey]) throw "unknown character: "+roleKey;
+				return [roleName,roleKey];
+			}
+			var simplifyHuanlejuList=function(listInput){
+				var listOutput=[];
+				for(var role of listInput){
+					var parsedRoles=parseDataKey(role);
+					listOutput.push(parsedRoles[1])
+				}
+				return listOutput;
+			}
+
+			var simpleHuanlejuList=simplifyHuanlejuList(huanlejuList);
+			game.saveConfig('huanleju_lib',simpleHuanlejuList);
 		},
 		importDropboxConfig:function(){
 			var httpReq = new XMLHttpRequest();
@@ -46244,6 +46291,9 @@
 					game.send('displayQiandaoingServer',ip);
 				}
 				else{
+					if(lib.config.enable_huanleju){
+						ip+='<br/>欢乐模式！';
+					}
 					if(game.isQiandaoing()){
 						ip+='<br/>签到福利发放中！';
 						var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
@@ -51671,8 +51721,9 @@
 					if(lib.character[j]) libCharacter[j]=pack[j];
 				}
 			}
+			var huanlejuLib=lib.config.huanleju_lib||[];
 			for(i in libCharacter){
-				if(lib.filter.characterDisabled(i,libCharacter)) continue;
+				if(lib.filter.characterDisabled(i,libCharacter)&&(!lib.config.enable_huanleju||!huanlejuLib.contains(i))) continue;
 				allList.push(i);
 				if(lib.character[i][4]&&lib.character[i][4].contains('zhu')){
 					zhuList.push(i);
