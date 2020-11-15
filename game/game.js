@@ -4143,6 +4143,13 @@
 							game.saveConfig('enable_huanleju',bool);
 						},
 					},
+					enable_liftcomboban:{
+						name:'解禁组合禁将',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('enable_liftcomboban',bool);
+						},
+					},
 
 					update:function(config,map){
 						if(lib.device||lib.node){
@@ -26764,6 +26771,9 @@
 							if(lib.config.enable_huanleju){
 								ip+='<br/>欢乐模式！';
 							}
+							if(lib.config.enable_liftcomboban){
+								ip+='<br/>解禁组合禁将！';
+							}
 							if(game.isQiandaoing()){
 								ip+='<br/>签到福利发放中！';
 								var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
@@ -27909,6 +27919,8 @@
 			return lib.config.alertDup;
 		},
 		isARealGame:function(){
+			if(lib.config.enable_huanleju) return false;
+			if(lib.config.enable_liftcomboban) return false;
 			var clients=game.players.concat(game.dead);
 			var numHuman=0;
 			for(var i=0;i<clients.length;i++){
@@ -46294,6 +46306,9 @@
 					if(lib.config.enable_huanleju){
 						ip+='<br/>欢乐模式！';
 					}
+					if(lib.config.enable_liftcomboban){
+						ip+='<br/>解禁组合禁将！';
+					}
 					if(game.isQiandaoing()){
 						ip+='<br/>签到福利发放中！';
 						var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
@@ -51721,12 +51736,22 @@
 					if(lib.character[j]) libCharacter[j]=pack[j];
 				}
 			}
-			var huanlejuLib=lib.config.huanleju_lib||[];
 			for(i in libCharacter){
-				if(lib.filter.characterDisabled(i,libCharacter)&&(!lib.config.enable_huanleju||!huanlejuLib.contains(i))) continue;
+				if(lib.filter.characterDisabled(i,libCharacter)) continue;
 				allList.push(i);
 				if(lib.character[i][4]&&lib.character[i][4].contains('zhu')){
 					zhuList.push(i);
+				}
+			}
+			if(lib.config.enable_huanleju){
+				var huanlejuLib=lib.config.huanleju_lib||[];
+				for(var x of huanlejuLib){
+					if(!allList.contains(x)){
+						allList.unshift(x);
+						if(lib.character[x][4]&&lib.character[x][4].contains('zhu')){
+							zhuList.unshift(x);
+						}
+					}
 				}
 			}
 		},

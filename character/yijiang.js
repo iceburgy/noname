@@ -228,7 +228,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i of trigger.cards) player.storage.rejingce2.add(get.suit(i,player));
 					player.storage.rejingce2.sort();
 					player.addTempSkill('rejingce2');
-					player.markSkill('rejingce2');
+					if(game.isCharacterSeen(player,'guohuai')){
+						player.markSkill('rejingce2');
+					}
+					if(!player.storage.rejingce3) player.storage.rejingce3=[];
+					for(var i of trigger.cards) player.storage.rejingce3.add(get.type2(i));
+					player.storage.rejingce3.sort();
+					player.addTempSkill('rejingce3');
+					if(game.isCharacterSeen(player,'guohuai')){
+						player.markSkill('rejingce3');
+					}
 				},
 			},
 			rejingce2:{
@@ -240,6 +249,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					maxHandcard:function(player,num){
 						return num+player.getStorage('rejingce2').length;
 					},
+				},
+			},
+			rejingce3:{
+				onremove:true,
+				intro:{
+					content:'当前已使用类别：$',
 				},
 			},
 			rejueqing:{
@@ -12914,7 +12929,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reshangshi_2nd:'伤逝',
 			reshangshi_info:'当你受到伤害时，你可以弃置一张牌。当你的手牌数小于X时，你可以将手牌摸至X张。（X为你已损失的体力值）',
 			rejingce:'精策',
-			rejingce2:'精策',
+			rejingce2:'花色精策',
+			rejingce3:'类别精策',
 			rejingce_add:'精策',
 			rejingce_info:'当你于一回合内首次使用某种花色的手牌时，你的手牌上限+1。出牌阶段结束时，你可以摸X张牌（X为你本阶段内使用过的牌的类型数）。',
 

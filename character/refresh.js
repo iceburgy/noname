@@ -7999,6 +7999,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"reguhuo_phase":"蛊惑",
 			"reguhuo_phase_info":"",
 			rehuashen:'化身',
+			rehuashen_init:'化身',
 			rehuashen_info:'游戏开始后，你随机获得三张未加入游戏的武将牌，选一张置于你面前并声明该武将牌的一项技能，你拥有该技能且同时将性别和势力属性变成与该武将相同直到该化身被替换。你的每个准备阶段和结束后，你可以选择一项：①弃置至多两张未展示的化身牌并重新获得等量化身牌；②更换所展示的化身牌或技能。（你不可声明限定技、觉醒技或主公技）。',
 			rexinsheng:'新生',
 			rexinsheng_info:'当你受到1点伤害后，你可以获得一张新的化身牌。',

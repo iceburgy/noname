@@ -454,8 +454,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var candiChar=undefined;
 						do{
 							candiChar=charPool.randomRemove(1)[0];
-						}while(!lib.config.enable_huanleju&&charPool.length&&forbidChars.includes(candiChar));
-						if(lib.config.enable_huanleju||!forbidChars.includes(candiChar)){
+						}while(!lib.config.enable_liftcomboban&&charPool.length&&forbidChars.includes(candiChar));
+						if(lib.config.enable_liftcomboban||!forbidChars.includes(candiChar)){
 							nextValidCharacters.push(candiChar);
 						}else{
 							console.log('===exhausted all characters without avoiding forbid, pool length: '+nextValidCharacters.length);
