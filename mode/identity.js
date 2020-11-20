@@ -722,13 +722,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					return;
 				}
+				if(!game.zhu.isAlive()&&get.population('fan')==0&&get.population('zhong')==1&&get.population('nei')==1) return;
 				if(game.zhu.isAlive()&&get.population('fan')+get.population('nei')>0) return;
 				if(game.zhong){
 					game.zhong.identity='zhong';
 				}
 				game.showIdentity();
 				if(me.identity=='zhu'||me.identity=='zhong'||me.identity=='mingzhong'){
-					if(game.zhu.classList.contains('dead')){
+					if(game.zhu.classList.contains('dead')&&(!_status._xiaoneiaozhan||game.players[0].identity=='nei')){
 						game.over(false);
 					}
 					else{
@@ -745,7 +746,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				else{
 					if((get.population('fan')+get.population('zhong')>0||get.population('nei')>1)&&
-						game.zhu.classList.contains('dead')){
+						game.zhu.classList.contains('dead')&&
+						!_status._xiaoneiaozhan){
 						game.over(true);
 					}
 					else{
@@ -759,7 +761,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(_status.loser.contains(player)) return false;
 					if(_status.winner.contains(player)) return true;
 				}
-				if(game.zhu.isAlive()){
+				if(game.zhu.isAlive()||_status._xiaoneiaozhan&&game.players[0].identity=="zhong"){
 					return (player.identity=='zhu'||player.identity=='zhong'||player.identity=='mingzhong');
 				}
 				else if(game.players.length==1&&game.players[0].identity=='nei'){
@@ -3133,7 +3135,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）增加一点体力上限，然后回复一点体力并且摸2张牌；2）获得限定技‘知己知彼’，然后回复一点体力并且摸3张牌。（知己知彼：村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废）',
 			xiaoneizhibi:'知己知彼',
 			xiaoneizhibi_info:'限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废',
-			xiaoneidantiao:'主内单挑',
+			xiaoneidantiao:'小内单挑',
 			xiaoneihuosheng:'小内获胜',
 			zhikezhugong:'制克主公',
 			zhikezhugong_info:'村规主公限定技：如果场上玩家数是6人或者更多，而且为偶数，则主公在第一回合内可以2选1：1）准备阶段使用一次手气卡；2）如果没有对其他玩家使用牌，可以跳过弃牌阶段',
@@ -4237,7 +4239,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				animationColor:'thunder',
 				filter:function (event,player){
 					// activate xiaonei dianjiang bonus if nei wins
-					return game.players.length==2&&event.player==game.zhu&&player.identity=='nei';
+					return game.players.length==2&&event.player.identity!='nei';
 				},
 				content:function(){
 					'step 0'
@@ -4253,6 +4255,45 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return 1;
 						},
 					},
+				},
+			},
+			_xiaoneiaozhan:{
+				trigger:{global:'die'},
+				forced:true,
+				priority:22,
+				filter:function (event,player){
+					if(game.zhu.isAlive()&&get.population('fan')==0&&get.population('zhong')==1&&get.population('nei')==1){
+						return true;
+					}
+					return false;
+				},
+				content:function (){
+					_status._xiaoneiaozhan=true;
+					player.$fullscreenpop('小内鏖战','fire');
+					if(player==game.zhu){
+						game.broadcastAll(function(){
+							ui.xiaoneiaozhanInfo=ui.create.system('小内鏖战',null);
+							lib.setPopped(ui.xiaoneiaozhanInfo,function(){
+								var uiintro=ui.create.dialog('hidden');
+								uiintro.add('小内鏖战');
+								var list=[
+									'当游戏只剩主忠内三名角色时，如果主公首先阵亡，游戏继续且最后存活的角色获胜。'
+								];
+								var intro='<ul style="text-align:left;margin-top:0;width:450px">';
+								for(var i=0;i<list.length;i++){
+									intro+='<li>'+list[i];
+								}
+								intro+='</ul>'
+								uiintro.add('<div class="text center">'+intro+'</div>');
+								var ul=uiintro.querySelector('ul');
+								if(ul){
+									ul.style.width='180px';
+								}
+								uiintro.add(ui.create.div('.placeholder'));
+								return uiintro;
+							},250);
+						});
+					}
 				},
 			},
 			zhikezhugong:{
