@@ -210,6 +210,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					target.chooseCard(true).ai=function(card){
+						// fix bug: ai can respond with equip and judge card
+						if(card&&get.position(card)=='e') return -1;
 						if(_status.event.getRand()<0.5) return Math.random();
 						return get.value(card);
 					};

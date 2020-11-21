@@ -1,8 +1,9 @@
 window.noname_update={
-	version:'2020.11.19',
+	version:'2020.11.21',
 	update:'2020.11.06.2',
 	changeLog:[
-		'引入小内鏖战模式',
+		'修复托管玩家被火攻时会展示装备的bug',
+		'修正涅槃文字错误',
 	],
 	files:[
 		'card/extra.js',

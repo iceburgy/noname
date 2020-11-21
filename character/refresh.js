@@ -2258,7 +2258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				mark:true,
 				skillAnimation:true,
-				animationStr:'涅盘',
+				animationStr:'涅槃',
 				limited:true,
 				animationColor:'orange',
 				init:function(player){
