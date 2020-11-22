@@ -7026,7 +7026,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:{suit:'diamond'},
 				filterTarget:function(card,player,target){
 					if(player==target) return false;
-					if(target.hasJudge('lebu')) return true;
+					if(target.hasJudge('lebu')) {
+						if(card&&card.cards&&card.cards.length&&get.position(card.cards[0])=='s') return false;
+						else return true;
+					}
 					return lib.filter.targetEnabled({name:'lebu'},player,target);
 				},
 				check:function(card){
@@ -7038,7 +7041,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						var next=player.useCard({name:'lebu'},target,cards);
-						next.animate=false;
 						next.audio=false;
 					}
 					player.draw();
