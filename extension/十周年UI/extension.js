@@ -2807,6 +2807,7 @@ content:function(config, pack){
 				        break;
 				    case 'useSkill':
 				        eventName = '发动';
+				        if(event.skill) eventName+=get.translation(event.skill);
 				        break;
 				    case 'die':
 				        card.classList.add('invalided');

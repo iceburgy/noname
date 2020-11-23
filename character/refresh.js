@@ -7041,6 +7041,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						var next=player.useCard({name:'lebu'},target,cards);
+						next.animate=false;
 						next.audio=false;
 					}
 					player.draw();
