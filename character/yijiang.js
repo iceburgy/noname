@@ -217,11 +217,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				firstDo:true,
 				filter:function(event,player){
 					if(event.getParent().name!='useCard'||player!=_status.currentPhase) return false;
-					var list=player.getStorage('rejingce2');
-					for(var i of event.cards){
-						if(!list.contains(get.suit(i,player))) return true;
-					}
-					return false;
+					return true;
 				},
 				content:function(){
 					if(!player.storage.rejingce2) player.storage.rejingce2=[];

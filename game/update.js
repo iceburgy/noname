@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.11.22',
+	version:'2020.11.22.1',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修复托管玩家被火攻时会展示装备的bug',
