@@ -4150,6 +4150,44 @@
 							game.saveConfig('enable_liftcomboban',bool);
 						},
 					},
+					addrolebonus_unit:{
+						name:'选将框发放个数',
+						init:1,
+						item:{
+							'1':'1',
+							'2':'2',
+							'3':'3'
+						},
+						onclick:function(unit){
+							game.saveConfig('addrolebonus_unit',parseInt(unit));
+						},
+					},
+					pickrolebonus_unit:{
+						name:'点将卡发放个数',
+						init:1,
+						item:{
+							'1':'1',
+							'2':'2',
+							'3':'3'
+						},
+						onclick:function(unit){
+							game.saveConfig('pickrolebonus_unit',parseInt(unit));
+						},
+					},
+					changecardsbonus_unit:{
+						name:'手气卡发放个数',
+						init:3,
+						item:{
+							'3':'3',
+							'5':'5',
+							'10':'10',
+							'15':'15',
+							'20':'20'
+						},
+						onclick:function(unit){
+							game.saveConfig('changecardsbonus_unit',parseInt(unit));
+						},
+					},
 
 					update:function(config,map){
 						if(lib.device||lib.node){
@@ -26775,7 +26813,7 @@
 								ip+='<br/>解禁组合禁将！';
 							}
 							if(game.isQiandaoing()){
-								ip+='<br/>签到福利发放中！';
+								ip+='<br/>签到福利发放中！选将框x'+lib.config.addrolebonus_unit+'，点将卡x'+lib.config.pickrolebonus_unit+'，手气卡x'+lib.config.changecardsbonus_unit;
 								var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
 								ip+='<br/>截止到：'+cutoff.toLocaleString();
 							}
@@ -28108,9 +28146,9 @@
 			}
 			if(!(ip in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])){
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][ip]=new Date();
-				game.updateBonusBalance(nickname,lib.bonusKeyChangeCards,3);
-				game.updateBonusBalance(nickname,lib.bonusKeyAddRole,1);
-				game.updateBonusBalance(nickname,lib.bonusKeyPickRole,1);
+				game.updateBonusBalance(nickname,lib.bonusKeyChangeCards,lib.config.changecardsbonus_unit);
+				game.updateBonusBalance(nickname,lib.bonusKeyAddRole,lib.config.addrolebonus_unit);
+				game.updateBonusBalance(nickname,lib.bonusKeyPickRole,lib.config.pickrolebonus_unit);
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},
@@ -46310,7 +46348,7 @@
 						ip+='<br/>解禁组合禁将！';
 					}
 					if(game.isQiandaoing()){
-						ip+='<br/>签到福利发放中！';
+						ip+='<br/>签到福利发放中！选将框x'+lib.config.addrolebonus_unit+'，点将卡x'+lib.config.pickrolebonus_unit+'，手气卡x'+lib.config.changecardsbonus_unit;
 						var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
 						ip+='<br/>截止到：'+cutoff.toLocaleString();
 					}
