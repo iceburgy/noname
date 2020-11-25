@@ -44150,6 +44150,7 @@
 				},true);
 			},
 			revealCharacter:function(){
+				ui.revealCharacterSkills=ui.create.controlRevealCharacter(['_revealCharacterMainDo','_revealCharacterViceDo'].concat([ui.click.skill]));
 				if(!ui.revealCharacterMain){
 					ui.revealCharacterMain=ui.create.system('亮主将',function(){
 						if(this.classList.contains('hidden')) return;
@@ -44157,8 +44158,7 @@
 						this.hide();
 						var player=game.me;
 						if(_status.currentPhase==player&&_status.event.name=='chooseToUse'&&_status.event.player==player&&_status.paused){
-							_status.clicked=true;
-							ui.click.skill('_revealCharacterMainDo');
+							ui.revealCharacterSkills.childNodes[0].click();
 						}
 						else{
 							if(game.online){
@@ -44179,8 +44179,7 @@
 						this.hide();
 						var player=game.me;
 						if(_status.currentPhase==player&&_status.event.name=='chooseToUse'&&_status.event.player==player&&_status.paused){
-							_status.clicked=true;
-							ui.click.skill('_revealCharacterViceDo');
+							ui.revealCharacterSkills.childNodes[1].click();
 						}
 						else{
 							if(game.online){
@@ -45188,6 +45187,41 @@
 				}
 
 				ui.updatec();
+				return control;
+			},
+			controlRevealCharacter:function(){
+				var i,controls;
+				if(Array.isArray(arguments[0])) controls=arguments[0];
+				else controls=arguments;
+				var control=ui.create.div('.control');
+				for(i in lib.element.control){
+					control[i]=lib.element.control[i];
+				}
+				for(i=0;i<controls.length;i++){
+					if(typeof controls[i]=='function'){
+						control.custom=controls[i];
+					}
+					else{
+						control.add(controls[i]);
+					}
+				}
+				control.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.control2);
+
+				if(lib.config.button_press){
+					control.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(){
+						if(this.classList.contains('disabled')) return;
+						this.classList.add('controlpressdown');
+						if(typeof this._offset=='number'){
+							this.style.transform='translateX('+this._offset+'px) scale(0.97)';
+						}
+					});
+					control.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(){
+						this.classList.remove('controlpressdown');
+						if(typeof this._offset=='number'){
+							this.style.transform='translateX('+this._offset+'px)';
+						}
+					});
+				}
 				return control;
 			},
 			confirm:function(str,func){

@@ -1,8 +1,8 @@
 window.noname_update={
-	version:'2020.11.25',
+	version:'2020.11.25.1',
 	update:'2020.11.06.2',
 	changeLog:[
-		'尝试修复回合内亮将失败的bug',
+		'修复回合内亮将失败的bug',
 	],
 	files:[
 		'card/extra.js',
