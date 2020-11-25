@@ -28064,7 +28064,7 @@
 			}
 			return balance;
 		},
-		updateBonusBalance:function(nickname,bonusKey,delta){
+		updateBonusBalance:function(nickname,bonusKey,delta,nopopup){
 			if(!lib.config[lib.bonusKeyFuliInfo]){
 				lib.config[lib.bonusKeyFuliInfo]={};
 			}
@@ -28083,18 +28083,21 @@
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 			var curPlayer=game.getPlayerByNickname(nickname);
-			if(delta>0&&curPlayer){
-				if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[0]==curPlayer||game.me&&game.me==curPlayer){
-					curPlayer.$fullscreenpopnobroadcast('获得：'+get.translation(bonusKey)+' x'+delta,'fire');
-				}
-				else{
-					curPlayer.send(function(bonusKey,delta){
-						var curPlayer;
-						if(game.connectPlayers&&game.connectPlayers.length) curPlayer=game.connectPlayers[0];
-						else curPlayer=game.me;
-						curPlayer.$fullscreenpopnobroadcast('获得：'+get.translation(bonusKey)+' x'+delta,'fire');
-					},bonusKey,delta);
-				}
+			if(!nopopup&&delta>0&&curPlayer){
+				game.fullscreenpopbyplayer(curPlayer,'获得：'+get.translation(bonusKey)+' x'+delta);
+			}
+		},
+		fullscreenpopbyplayer:function(curPlayer,msg){
+			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[0]==curPlayer||game.me&&game.me==curPlayer){
+				curPlayer.$fullscreenpopnobroadcast(msg,'fire');
+			}
+			else{
+				curPlayer.send(function(msg){
+					var curPlayer;
+					if(game.connectPlayers&&game.connectPlayers.length) curPlayer=game.connectPlayers[0];
+					else curPlayer=game.me;
+					curPlayer.$fullscreenpopnobroadcast(msg,'fire');
+				},msg);
 			}
 		},
 		getPlayerByNickname:function(nickname){
@@ -28247,15 +28250,16 @@
 			}
 			if(!(ip in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])){
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][ip]=new Date();
-				setTimeout(function(){
-					game.updateBonusBalance(nickname,lib.bonusKeyChangeCards,lib.config.changecardsbonus_unit);
-				},500);
-				setTimeout(function(){
-					game.updateBonusBalance(nickname,lib.bonusKeyAddRole,lib.config.addrolebonus_unit);
-				},2000);
-				setTimeout(function(){
-					game.updateBonusBalance(nickname,lib.bonusKeyPickRole,lib.config.pickrolebonus_unit);
-				},3500);
+				game.updateBonusBalance(nickname,lib.bonusKeyChangeCards,lib.config.changecardsbonus_unit,true);
+				game.updateBonusBalance(nickname,lib.bonusKeyAddRole,lib.config.addrolebonus_unit,true);
+				game.updateBonusBalance(nickname,lib.bonusKeyPickRole,lib.config.pickrolebonus_unit,true);
+
+				var curPlayer=game.getPlayerByNickname(nickname);
+				var msg='获得：'+get.translation(lib.bonusKeyChangeCards)+' x'+lib.config.changecardsbonus_unit;
+				msg+='<br/>获得：'+get.translation(lib.bonusKeyAddRole)+' x'+lib.config.addrolebonus_unit;
+				msg+='<br/>获得：'+get.translation(lib.bonusKeyPickRole)+' x'+lib.config.pickrolebonus_unit;
+
+				game.fullscreenpopbyplayer(curPlayer,msg);
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},
