@@ -44157,6 +44157,7 @@
 						this.hide();
 						var player=game.me;
 						if(_status.currentPhase==player&&_status.event.name=='chooseToUse'&&_status.event.player==player&&_status.paused){
+							_status.clicked=true;
 							ui.click.skill('_revealCharacterMainDo');
 						}
 						else{
@@ -44178,6 +44179,7 @@
 						this.hide();
 						var player=game.me;
 						if(_status.currentPhase==player&&_status.event.name=='chooseToUse'&&_status.event.player==player&&_status.paused){
+							_status.clicked=true;
 							ui.click.skill('_revealCharacterViceDo');
 						}
 						else{

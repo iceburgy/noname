@@ -1,10 +1,8 @@
 window.noname_update={
-	version:'2020.11.23',
+	version:'2020.11.25',
 	update:'2020.11.06.2',
 	changeLog:[
-		'修复托管玩家被火攻时会展示装备的bug',
-		'修正涅槃文字错误',
-		'修复大乔能用木牛里面的方片牌拆乐的bug',
+		'尝试修复回合内亮将失败的bug',
 	],
 	files:[
 		'card/extra.js',
