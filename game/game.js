@@ -28255,11 +28255,18 @@
 				game.updateBonusBalance(nickname,lib.bonusKeyPickRole,lib.config.pickrolebonus_unit,true);
 
 				var curPlayer=game.getPlayerByNickname(nickname);
-				var msg='获得：'+get.translation(lib.bonusKeyChangeCards)+' x'+lib.config.changecardsbonus_unit;
-				msg+='<br/>获得：'+get.translation(lib.bonusKeyAddRole)+' x'+lib.config.addrolebonus_unit;
-				msg+='<br/>获得：'+get.translation(lib.bonusKeyPickRole)+' x'+lib.config.pickrolebonus_unit;
-
-				game.fullscreenpopbyplayer(curPlayer,msg);
+				setTimeout(function(){
+					var msg='获得：'+get.translation(lib.bonusKeyChangeCards)+' x'+lib.config.changecardsbonus_unit;
+					game.fullscreenpopbyplayer(curPlayer,msg);
+				},500);
+				setTimeout(function(){
+					var msg='获得：'+get.translation(lib.bonusKeyAddRole)+' x'+lib.config.addrolebonus_unit;
+					game.fullscreenpopbyplayer(curPlayer,msg);
+				},2000);
+				setTimeout(function(){
+					var msg='获得：'+get.translation(lib.bonusKeyPickRole)+' x'+lib.config.pickrolebonus_unit;
+					game.fullscreenpopbyplayer(curPlayer,msg);
+				},3500);
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},

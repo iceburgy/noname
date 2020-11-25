@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.11.25.3',
+	version:'2020.11.25.4',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修复回合内亮将失败的bug',
