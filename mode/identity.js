@@ -3152,6 +3152,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			tongshimingzhi:'同时明置',
 			_revealCharacterMainDo:'明置主将',
 			_revealCharacterViceDo:'明置副将',
+			changeCards:'手气卡',
+			pickRole:'点将卡',
+			addRole:'选将框',
 		},
 		element:{
 			content:{

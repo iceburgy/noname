@@ -1,8 +1,9 @@
 window.noname_update={
-	version:'2020.11.25.1',
+	version:'2020.11.25.2',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修复回合内亮将失败的bug',
+		'获得福利特效',
 	],
 	files:[
 		'card/extra.js',

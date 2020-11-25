@@ -11629,6 +11629,10 @@
 					ui.create.connectPlayers(game.ip);
 					if(!window.isNonameServer){
 						var me=game.connectPlayers[0];
+						me.setIdentity('zhu');
+						me.initOL(lib.config.connect_nickname,lib.config.connect_avatar,winRate);
+						me.playerid='1';
+						game.onlinezhu='1';
 
 						// set qiandaofuli if applicable
 						if(game.isQiandaoing()){
@@ -11655,10 +11659,7 @@
 							if(winRate&&winRate.length) winRate+='<br/>生日福利';
 							else winRate='生日福利';
 						}
-						me.setIdentity('zhu');
 						me.initOL(lib.config.connect_nickname,lib.config.connect_avatar,winRate);
-						me.playerid='1';
-						game.onlinezhu='1';
 					}
 					_status.waitingForPlayer=true;
 					if(window.isNonameServer){
@@ -23407,6 +23408,72 @@
 						node.style.transform='scale(1.5)'
 					},avatar?1600:1000);
 				},
+				$fullscreenpopnobroadcast:function(str,nature,avatar){
+					game.addVideo('fullscreenpop',this,[str,nature,avatar]);
+					var node=ui.create.div('.damage');
+					if(avatar&&this.node){
+						if(avatar=='vice'){
+							if(lib.character[this.name2]){
+								avatar=this.node.avatar2;
+							}
+						}
+						else{
+							if(lib.character[this.name]){
+								avatar=this.node.avatar;
+							}
+						}
+						if(!get.is.div(avatar)){
+							avatar=false;
+						}
+					}
+					else{
+						avatar=false;
+					}
+					if(avatar){
+						node.classList.add('fullscreenavatar');
+						ui.create.div('',ui.create.div(node));
+						// ui.create.div('',str.split('').join('<br>'),ui.create.div('.text.textbg',node));
+						ui.create.div('','<div>'+str.split('').join('</div><br><div>')+'</div>',ui.create.div('.text',node));
+						node.firstChild.firstChild.style.backgroundImage=avatar.style.backgroundImage;
+						node.dataset.nature=nature||'unknown';
+						var num=0;
+						var nodes=node.lastChild.firstChild.querySelectorAll('div');
+						var interval=setInterval(function(){
+							if(num<nodes.length){
+								nodes[num].classList.add('flashtext');
+								num++;
+							}
+							else{
+								clearInterval(interval);
+							}
+						},100);
+					}
+					else{
+						avatar=false;
+						node.innerHTML=str;
+						node.dataset.nature=nature||'soil';
+					}
+					if(avatar){
+						var rect1=ui.window.getBoundingClientRect();
+						var rect2=this.getBoundingClientRect();
+						var dx=Math.round(2*rect2.left+rect2.width-rect1.width);
+						var dy=Math.round(2*rect2.top+rect2.height-rect1.height);
+						node.style.transform='scale(0.5) translate('+dx+'px,'+dy+'px)';
+					}
+					ui.window.appendChild(node);
+					ui.refresh(node);
+					if(avatar){
+						node.style.transform='scale(1)';
+						node.style.opacity=1;
+					}
+					else{
+						node.classList.add('damageadded');
+					}
+					setTimeout(function(){
+						node.delete();
+						node.style.transform='scale(1.5)'
+					},avatar?1600:1000);
+				},
 				$damagepop:function(num,nature,font,nobroadcast){
 					if(typeof num=='number'||typeof num=='string'){
 						game.addVideo('damagepop',this,[num,nature,font]);
@@ -26422,6 +26489,9 @@
 						for(var i=0;i<game.connectPlayers.length;i++){
 							if(game.connectPlayers[i].classList.contains('unselectable2')) continue;
 							if(game.connectPlayers[i]!=game.me&&!game.connectPlayers[i].playerid){
+								game.connectPlayers[i].initOL(this.nickname,this.avatar,winRate);
+								game.connectPlayers[i].ws=this;
+
 								// set qiandaofuli if applicable
 								if(this.ws._socket&&this.ws._socket.remoteAddress&&game.isQiandaoing()){
 									game.addQiandaofuli(this.ws._socket.remoteAddress,this.nickname);
@@ -26449,7 +26519,6 @@
 									else winRate='生日福利';
 								}
 								game.connectPlayers[i].initOL(this.nickname,this.avatar,winRate);
-								game.connectPlayers[i].ws=this;
 								break;
 							}
 						}
@@ -28013,6 +28082,38 @@
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nickname][bonusKey]=0;
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
+			var curPlayer=game.getPlayerByNickname(nickname);
+			if(delta>0&&curPlayer){
+				if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[0]==curPlayer||game.me&&game.me==curPlayer){
+					curPlayer.$fullscreenpopnobroadcast('获得：'+get.translation(bonusKey)+' x'+delta,'fire');
+				}
+				else{
+					curPlayer.send(function(bonusKey,delta){
+						var curPlayer;
+						if(game.connectPlayers&&game.connectPlayers.length) curPlayer=game.connectPlayers[0];
+						else curPlayer=game.me;
+						curPlayer.$fullscreenpopnobroadcast('获得：'+get.translation(bonusKey)+' x'+delta,'fire');
+					},bonusKey,delta);
+				}
+			}
+		},
+		getPlayerByNickname:function(nickname){
+			var allPlayers=[];
+			if(game.connectPlayers){
+				allPlayers.add(...game.connectPlayers);
+			}
+			if(lib.node&&lib.node.observing){
+				allPlayers.add(...lib.node.observing);
+			}
+			if(game.players){
+				allPlayers.add(...game.players);
+			}
+			if(game.dead){
+				allPlayers.add(...game.dead);
+			}
+			for(var p of allPlayers){
+				if(p.nickname==nickname) return p;
+			}
 		},
 		updateBonusBalanceBuffer:function(nickname,bonusKey,delta){
 			if(!game.bonusBalanceBuffer) game.bonusBalanceBuffer=[];
@@ -28146,9 +28247,15 @@
 			}
 			if(!(ip in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])){
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][ip]=new Date();
-				game.updateBonusBalance(nickname,lib.bonusKeyChangeCards,lib.config.changecardsbonus_unit);
-				game.updateBonusBalance(nickname,lib.bonusKeyAddRole,lib.config.addrolebonus_unit);
-				game.updateBonusBalance(nickname,lib.bonusKeyPickRole,lib.config.pickrolebonus_unit);
+				setTimeout(function(){
+					game.updateBonusBalance(nickname,lib.bonusKeyChangeCards,lib.config.changecardsbonus_unit);
+				},500);
+				setTimeout(function(){
+					game.updateBonusBalance(nickname,lib.bonusKeyAddRole,lib.config.addrolebonus_unit);
+				},2000);
+				setTimeout(function(){
+					game.updateBonusBalance(nickname,lib.bonusKeyPickRole,lib.config.pickrolebonus_unit);
+				},3500);
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},
