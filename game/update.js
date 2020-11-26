@@ -1,9 +1,9 @@
 window.noname_update={
-	version:'2020.11.25.4',
+	version:'2020.11.26',
 	update:'2020.11.06.2',
 	changeLog:[
-		'修复回合内亮将失败的bug',
-		'获得福利特效',
+		'修复旁观者领福利报错的bug',
+		'修复小内单挑获得道具特效动画重合的bug',
 	],
 	files:[
 		'card/extra.js',

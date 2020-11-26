@@ -4218,8 +4218,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.awakenSkill('xiaoneidantiao');
 					if(player.nickname&&player.nickname!='无名玩家'){
-						game.updateBonusBalance(player.nickname,lib.bonusKeyAddRole,1);
-						game.updateBonusBalance(player.nickname,lib.bonusKeyChangeCards,3);
+						game.updateBonusBalance(player.nickname,lib.bonusKeyChangeCards,lib.config.changecardsbonus_unit,true);
+						game.updateBonusBalance(player.nickname,lib.bonusKeyAddRole,lib.config.addrolebonus_unit,true);
+						setTimeout(function(){
+							var msg='获得：'+get.translation(lib.bonusKeyChangeCards)+' x'+lib.config.changecardsbonus_unit;
+							game.fullscreenpopbyplayer(player,msg);
+						},500);
+						setTimeout(function(){
+							var msg='获得：'+get.translation(lib.bonusKeyAddRole)+' x'+lib.config.addrolebonus_unit;
+							game.fullscreenpopbyplayer(player,msg);
+						},2000);
 					}
 				},
 				ai:{
@@ -4248,7 +4256,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.awakenSkill('xiaoneihuosheng');
 					if(player.nickname&&player.nickname!='无名玩家'){
-						game.updateBonusBalance(player.nickname,lib.bonusKeyPickRole,1);
+						game.updateBonusBalance(player.nickname,lib.bonusKeyPickRole,lib.config.pickrolebonus_unit);
 					}
 				},
 				ai:{

@@ -26437,11 +26437,6 @@
 							}
 
 							if(!isDup){
-								// set qiandaofuli if applicable
-								if(this.ws._socket&&this.ws._socket.remoteAddress&&game.isQiandaoing()){
-									game.addQiandaofuli(this.ws._socket.remoteAddress,this.nickname);
-								}
-
 								lib.node.observing.push(this);
 								this.send('reinit',lib.configOL,get.arenaState(),game.getState?game.getState():{},game.ip,game.players[0].playerid);
 								if(!ui.showObserveButton){
@@ -26458,6 +26453,10 @@
 										}
 										ui.click.hoverpopped.call(ui.showObserveButton);
 									});
+								}
+								// set qiandaofuli if applicable
+								if(this.ws._socket&&this.ws._socket.remoteAddress&&game.isQiandaoing()){
+									game.addQiandaofuli(this.ws._socket.remoteAddress,this.nickname);
 								}
 							}
 						}
