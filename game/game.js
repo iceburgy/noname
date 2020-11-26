@@ -17011,6 +17011,9 @@
 						this.send(ui.create.giveup);
 					}
 				},
+				showOvertie:function(){
+					ui.create.overtie();
+				},
 				showRevealCharacter:function(){
 					if(this==game.me){
 						ui.create.revealCharacter();
@@ -32352,7 +32355,7 @@
 					dialog.content.firstChild.innerHTML='战斗失败'+result2WinnerText;
 				}
 				else{
-					dialog.content.firstChild.innerHTML='战斗结束'+result2WinnerText;
+					dialog.content.firstChild.innerHTML=result2WinnerText||'战斗结束';
 				}
 				ui.update();
 				dialog.add(ui.create.div('.placeholder'));
@@ -32390,6 +32393,10 @@
 				if(ui.giveup){
 					ui.giveup.remove();
 					delete ui.giveup;
+				}
+				if(ui.overtie){
+					ui.overtie.remove();
+					delete ui.overtie;
 				}
 				if(ui.revealCharacterMain){
 					ui.revealCharacterMain.remove();
@@ -33147,7 +33154,12 @@
 			var clients=game.players.concat(game.dead);
 			for(var i=0;i<clients.length;i++){
 				if(clients[i].isOnline2()){
-					clients[i].send(game.over,dialog.content.innerHTML,game.checkOnlineResult(clients[i]),winnerText);
+					if(result=='和了'){
+						clients[i].send(game.over,dialog.content.innerHTML,undefined,result);
+					}
+					else{
+						clients[i].send(game.over,dialog.content.innerHTML,game.checkOnlineResult(clients[i]),winnerText);
+					}
 				}
 			}
 
@@ -33281,6 +33293,10 @@
 			if(ui.giveup){
 				ui.giveup.remove();
 				delete ui.giveup;
+			}
+			if(ui.overtie){
+				ui.overtie.remove();
+				delete ui.overtie;
 			}
 			if(ui.revealCharacterMain){
 				ui.revealCharacterMain.remove();
@@ -44265,6 +44281,29 @@
 						},1000);
 					}
 				},true);
+			},
+			overtie:function(){
+				if(ui.overtie) return;
+				ui.overtie=ui.create.system('和了',function(){
+					if(this.classList.contains('hidden')) return;
+					if(this.innerHTML=='<span>确认</span>'){
+						clearTimeout(this.confirmTimeout);
+						game.over('和了');
+						this.hide();
+						var that=this;
+						setTimeout(function(){
+							that.innerHTML='<span>和了</span>';
+							that.show();
+						},1000);
+					}
+					else{
+						this.innerHTML='<span>确认</span>';
+						var that=this;
+						this.confirmTimeout=setTimeout(function(){
+							that.innerHTML='<span>和了</span>';
+						},1000);
+					}
+				},true,ui.replay);
 			},
 			revealCharacter:function(){
 				ui.revealCharacterSkills=ui.create.controlRevealCharacter(['_revealCharacterMainDo','_revealCharacterViceDo'].concat([ui.click.skill]));

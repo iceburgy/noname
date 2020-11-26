@@ -3066,6 +3066,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					"step 32"
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]==game.me){
+							game.players[i].showOvertie();
+						}
+					}
 					setTimeout(function(){
 						game.broadcastAll(function(){
 							ui.arena.classList.remove('choose-character');
