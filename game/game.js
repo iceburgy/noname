@@ -26493,13 +26493,12 @@
 							if(game.connectPlayers[i]!=game.me&&!game.connectPlayers[i].playerid){
 								game.connectPlayers[i].initOL(this.nickname,this.avatar,winRate);
 								game.connectPlayers[i].ws=this;
+								game.connectPlayers[i].playerid=this.id;
 
 								// set qiandaofuli if applicable
 								if(this.ws._socket&&this.ws._socket.remoteAddress&&game.isQiandaoing()){
 									game.addQiandaofuli(this.ws._socket.remoteAddress,this.nickname);
 								}
-
-								game.connectPlayers[i].playerid=this.id;
 								//var winRate=game.getWinRateByNickname(this.nickname);
 								var winRate='';
 								var addRoleBalance=game.getBonusBalance(this.nickname,lib.bonusKeyAddRole);
