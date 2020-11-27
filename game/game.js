@@ -32355,7 +32355,7 @@
 					dialog.content.firstChild.innerHTML='战斗失败'+result2WinnerText;
 				}
 				else{
-					dialog.content.firstChild.innerHTML=result2WinnerText||'战斗结束';
+					dialog.content.firstChild.innerHTML='战斗结束'+result2WinnerText;
 				}
 				ui.update();
 				dialog.add(ui.create.div('.placeholder'));
@@ -32452,8 +32452,31 @@
 			var tableStatisticsByRole;
 			var winnerText='';
 			var clients=game.players.concat(game.dead);
+			for(i=0;i<clients.length;i++){
+				var playerWin=game.checkOnlineResult(clients[i]);
+				if(playerWin&&(!winnerId||playerIdentity=='zhong')){
+					winnerId=clients[i].identity;
+				}
+			}
+			switch(winnerId){
+				case 'zhu':
+					winnerText='，主公获胜';
+					break;
+				case 'zhong':
+					winnerText='，主忠获胜';
+					break;
+				case 'fan':
+					winnerText='，反贼获胜';
+					break;
+				case 'nei':
+					winnerText='，内奸获胜';
+					break;
+				default:
+					winnerText='，和了';
+					break;
+			}
 			// only record statistics if there are at least certain human players
-			if(_status.connectMode&&game.isARealGame()){
+			if(!_status.overtie&&_status.connectMode&&game.isARealGame()){
 				// game statistics
 				/* lib.config.stats_game
 				{
@@ -32610,7 +32633,6 @@
 					}
 					var playerIdentity=clients[i].identity;
 					var playerWin=game.checkOnlineResult(clients[i]);
-					if(playerWin&&(!winnerId||playerIdentity=='zhong')) winnerId=playerIdentity;
 					playersStatistics[nameol]['lastID']=playerIdentity;
 					if(playerWin){
 						playersStatistics[nameol]['numWin']++;
@@ -32661,19 +32683,13 @@
 				// gather identity statistics
 				switch(winnerId){
 					case 'zhu':
-						winnerText='，主公获胜';
-						identityStatistics.zhuzhong++;
-						break;
 					case 'zhong':
-						winnerText='，主忠获胜';
 						identityStatistics.zhuzhong++;
 						break;
 					case 'fan':
-						winnerText='，反贼获胜';
 						identityStatistics.fan++;
 						break;
 					case 'nei':
-						winnerText='，内奸获胜';
 						identityStatistics.nei++;
 						break;
 					default:
@@ -33154,12 +33170,7 @@
 			var clients=game.players.concat(game.dead);
 			for(var i=0;i<clients.length;i++){
 				if(clients[i].isOnline2()){
-					if(result=='和了'){
-						clients[i].send(game.over,dialog.content.innerHTML,undefined,result);
-					}
-					else{
-						clients[i].send(game.over,dialog.content.innerHTML,game.checkOnlineResult(clients[i]),winnerText);
-					}
+					clients[i].send(game.over,dialog.content.innerHTML,game.checkOnlineResult(clients[i]),winnerText);
 				}
 			}
 
@@ -44288,6 +44299,7 @@
 					if(this.classList.contains('hidden')) return;
 					if(this.innerHTML=='<span>确认</span>'){
 						clearTimeout(this.confirmTimeout);
+						_status.overtie=true;
 						game.over('和了');
 						this.hide();
 						var that=this;

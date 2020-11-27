@@ -761,6 +761,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(_status.loser.contains(player)) return false;
 					if(_status.winner.contains(player)) return true;
 				}
+				if(_status.overtie) return null;
 				if(game.zhu.isAlive()||_status._xiaoneiaozhan&&game.players[0].identity=="zhong"){
 					return (player.identity=='zhu'||player.identity=='zhong'||player.identity=='mingzhong');
 				}
