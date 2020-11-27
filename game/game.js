@@ -11641,14 +11641,14 @@
 
 						//var winRate=game.getWinRateByNickname(lib.config.connect_nickname);
 						var winRate='';
-						var addRoleBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeyAddRole);
-						if(addRoleBalance){
-							winRate='选将框x'+addRoleBalance;
-						}
 						var changeCardsBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeyChangeCards);
 						if(changeCardsBalance){
 							if(winRate&&winRate.length) winRate+='<br/>';
 							winRate+='手气卡x'+changeCardsBalance;
+						}
+						var addRoleBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeyAddRole);
+						if(addRoleBalance){
+							winRate='选将框x'+addRoleBalance;
 						}
 						var pickRoleBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeyPickRole);
 						if(pickRoleBalance){
@@ -26501,14 +26501,14 @@
 								}
 								//var winRate=game.getWinRateByNickname(this.nickname);
 								var winRate='';
-								var addRoleBalance=game.getBonusBalance(this.nickname,lib.bonusKeyAddRole);
-								if(addRoleBalance){
-									winRate='选将框x'+addRoleBalance;
-								}
 								var changeCardsBalance=game.getBonusBalance(this.nickname,lib.bonusKeyChangeCards);
 								if(changeCardsBalance){
 									if(winRate&&winRate.length) winRate+='<br/>';
 									winRate+='手气卡x'+changeCardsBalance;
+								}
+								var addRoleBalance=game.getBonusBalance(this.nickname,lib.bonusKeyAddRole);
+								if(addRoleBalance){
+									winRate='选将框x'+addRoleBalance;
 								}
 								var pickRoleBalance=game.getBonusBalance(this.nickname,lib.bonusKeyPickRole);
 								if(pickRoleBalance){
@@ -28091,6 +28091,18 @@
 				game.fullscreenpopbyplayer(curPlayer,'获得：'+get.translation(bonusKey)+' x'+delta);
 			}
 		},
+		fullscreenpopbyplayerDelayed:function(curPlayer,messages){
+			if(messages&&Array.isArray(messages)){
+				var delayMS=500;
+				var incrementMS=1500;
+				for(var msg of messages){
+					setTimeout(function(m){
+						game.fullscreenpopbyplayer(curPlayer,m);
+					},delayMS,msg);
+					delayMS+=incrementMS;
+				}
+			}
+		},
 		fullscreenpopbyplayer:function(curPlayer,msg){
 			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[0]==curPlayer||game.me&&game.me==curPlayer){
 				curPlayer.$fullscreenpopnobroadcast(msg,'fire');
@@ -28259,18 +28271,11 @@
 				game.updateBonusBalance(nickname,lib.bonusKeyPickRole,lib.config.pickrolebonus_unit,true);
 
 				var curPlayer=game.getPlayerByNickname(nickname);
-				setTimeout(function(){
-					var msg='获得：'+get.translation(lib.bonusKeyChangeCards)+' x'+lib.config.changecardsbonus_unit;
-					game.fullscreenpopbyplayer(curPlayer,msg);
-				},500);
-				setTimeout(function(){
-					var msg='获得：'+get.translation(lib.bonusKeyAddRole)+' x'+lib.config.addrolebonus_unit;
-					game.fullscreenpopbyplayer(curPlayer,msg);
-				},2000);
-				setTimeout(function(){
-					var msg='获得：'+get.translation(lib.bonusKeyPickRole)+' x'+lib.config.pickrolebonus_unit;
-					game.fullscreenpopbyplayer(curPlayer,msg);
-				},3500);
+				var messages=[];
+				messages.push('获得：'+get.translation(lib.bonusKeyChangeCards)+' x'+lib.config.changecardsbonus_unit);
+				messages.push('获得：'+get.translation(lib.bonusKeyAddRole)+' x'+lib.config.addrolebonus_unit);
+				messages.push('获得：'+get.translation(lib.bonusKeyPickRole)+' x'+lib.config.pickrolebonus_unit);
+				game.fullscreenpopbyplayerDelayed(curPlayer,messages);
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},
@@ -28809,14 +28814,14 @@
 				if(player.playerid){
 					//var winRate=game.getWinRateByNickname(player.nickname);
 					var winRate='';
-					var addRoleBalance=game.getBonusBalance(player.nickname,lib.bonusKeyAddRole);
-					if(addRoleBalance){
-						winRate='选将框x'+addRoleBalance;
-					}
 					var changeCardsBalance=game.getBonusBalance(player.nickname,lib.bonusKeyChangeCards);
 					if(changeCardsBalance){
 						if(winRate&&winRate.length) winRate+='<br/>';
 						winRate+='手气卡x'+changeCardsBalance;
+					}
+					var addRoleBalance=game.getBonusBalance(player.nickname,lib.bonusKeyAddRole);
+					if(addRoleBalance){
+						winRate='选将框x'+addRoleBalance;
 					}
 					var pickRoleBalance=game.getBonusBalance(player.nickname,lib.bonusKeyPickRole);
 					if(pickRoleBalance){

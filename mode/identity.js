@@ -4226,14 +4226,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(player.nickname&&player.nickname!='无名玩家'){
 						game.updateBonusBalance(player.nickname,lib.bonusKeyChangeCards,lib.config.changecardsbonus_unit,true);
 						game.updateBonusBalance(player.nickname,lib.bonusKeyAddRole,lib.config.addrolebonus_unit,true);
-						setTimeout(function(){
-							var msg='获得：'+get.translation(lib.bonusKeyChangeCards)+' x'+lib.config.changecardsbonus_unit;
-							game.fullscreenpopbyplayer(player,msg);
-						},500);
-						setTimeout(function(){
-							var msg='获得：'+get.translation(lib.bonusKeyAddRole)+' x'+lib.config.addrolebonus_unit;
-							game.fullscreenpopbyplayer(player,msg);
-						},2000);
+						var messages=[];
+						messages.push('获得：'+get.translation(lib.bonusKeyChangeCards)+' x'+lib.config.changecardsbonus_unit);
+						messages.push('获得：'+get.translation(lib.bonusKeyAddRole)+' x'+lib.config.addrolebonus_unit);
+						game.fullscreenpopbyplayerDelayed(player,messages);
 					}
 				},
 				ai:{
