@@ -28084,6 +28084,9 @@
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nickname][bonusKey]=0;
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
+			if(_status.waitingForPlayer){
+				game.updateWaiting();
+			}
 			var curPlayer=game.getPlayerByNickname(nickname);
 			if(!nopopup&&delta>0&&curPlayer){
 				game.fullscreenpopbyplayer(curPlayer,'获得：'+get.translation(bonusKey)+' x'+delta);
@@ -28843,7 +28846,7 @@
 					map[i]=null;
 				}
 			}
-			game.broadcast('updateWaiting',map);
+			game.broadcastAll('updateWaiting',map);
 		},
 		waitForPlayer:function(func){
 			var next=game.createEvent('waitForPlayer',false);
@@ -45374,22 +45377,6 @@
 					}
 				}
 				control.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.control2);
-
-				if(lib.config.button_press){
-					control.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(){
-						if(this.classList.contains('disabled')) return;
-						this.classList.add('controlpressdown');
-						if(typeof this._offset=='number'){
-							this.style.transform='translateX('+this._offset+'px) scale(0.97)';
-						}
-					});
-					control.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(){
-						this.classList.remove('controlpressdown');
-						if(typeof this._offset=='number'){
-							this.style.transform='translateX('+this._offset+'px)';
-						}
-					});
-				}
 				return control;
 			},
 			confirm:function(str,func){
