@@ -11648,7 +11648,8 @@
 						}
 						var addRoleBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeyAddRole);
 						if(addRoleBalance){
-							winRate='选将框x'+addRoleBalance;
+							if(winRate&&winRate.length) winRate+='<br/>';
+							winRate+='选将框x'+addRoleBalance;
 						}
 						var pickRoleBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeyPickRole);
 						if(pickRoleBalance){
@@ -26508,7 +26509,8 @@
 								}
 								var addRoleBalance=game.getBonusBalance(this.nickname,lib.bonusKeyAddRole);
 								if(addRoleBalance){
-									winRate='选将框x'+addRoleBalance;
+									if(winRate&&winRate.length) winRate+='<br/>';
+									winRate+='选将框x'+addRoleBalance;
 								}
 								var pickRoleBalance=game.getBonusBalance(this.nickname,lib.bonusKeyPickRole);
 								if(pickRoleBalance){
@@ -26883,7 +26885,7 @@
 								ip+='<br/>解禁组合禁将！';
 							}
 							if(game.isQiandaoing()){
-								ip+='<br/>签到福利发放中！选将框x'+lib.config.addrolebonus_unit+'，点将卡x'+lib.config.pickrolebonus_unit+'，手气卡x'+lib.config.changecardsbonus_unit;
+								ip+='<br/>签到福利发放中！手气卡x'+lib.config.changecardsbonus_unit+'，选将框x'+lib.config.addrolebonus_unit+'，点将卡x'+lib.config.pickrolebonus_unit;
 								var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
 								ip+='<br/>截止到：'+cutoff.toLocaleString();
 							}
@@ -28821,7 +28823,8 @@
 					}
 					var addRoleBalance=game.getBonusBalance(player.nickname,lib.bonusKeyAddRole);
 					if(addRoleBalance){
-						winRate='选将框x'+addRoleBalance;
+						if(winRate&&winRate.length) winRate+='<br/>';
+						winRate+='选将框x'+addRoleBalance;
 					}
 					var pickRoleBalance=game.getBonusBalance(player.nickname,lib.bonusKeyPickRole);
 					if(pickRoleBalance){
@@ -46543,7 +46546,7 @@
 						ip+='<br/>解禁组合禁将！';
 					}
 					if(game.isQiandaoing()){
-						ip+='<br/>签到福利发放中！选将框x'+lib.config.addrolebonus_unit+'，点将卡x'+lib.config.pickrolebonus_unit+'，手气卡x'+lib.config.changecardsbonus_unit;
+						ip+='<br/>签到福利发放中！手气卡x'+lib.config.changecardsbonus_unit+'，选将框x'+lib.config.addrolebonus_unit+'，点将卡x'+lib.config.pickrolebonus_unit;
 						var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
 						ip+='<br/>截止到：'+cutoff.toLocaleString();
 					}
