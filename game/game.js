@@ -28266,8 +28266,10 @@
 			if(!lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers]){
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers]={};
 			}
-			if(!(ip in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])){
+			if(!(ip in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])&&
+			!(nickname.toLowerCase() in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])){
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][ip]=new Date();
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][nickname.toLowerCase()]=new Date();
 				game.updateBonusBalance(nickname,lib.bonusKeyChangeCards,lib.config.changecardsbonus_unit,true);
 				game.updateBonusBalance(nickname,lib.bonusKeyAddRole,lib.config.addrolebonus_unit,true);
 				game.updateBonusBalance(nickname,lib.bonusKeyPickRole,lib.config.pickrolebonus_unit,true);

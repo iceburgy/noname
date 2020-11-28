@@ -345,6 +345,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(players[i].identity=='zhu'&&players.length>=6&&players.length%2==0){
 					game.broadcastAll(function(player){
 						player.addSkill('kejizhugong');
+						player.addSkill('anlezhugong');
 					},players[i]);
 				}
 			}
@@ -3143,9 +3144,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			xiaoneidantiao:'小内单挑',
 			xiaoneihuosheng:'小内获胜',
 			kejizhugong:'克己主公',
-			kejizhugong_info:'村规主公限定技：主公在第一回合内如果没有对其他角色使用牌，则获得【安乐主公】，并且可以跳过弃牌阶段。（【安乐主公】村规主公限定技：第二轮回合开始时如果判定区有【乐不思蜀】，则可以跳过判定阶段）',
+			kejizhugong_info:'村规主公限定技：主公在第一回合内如果没有对其他角色使用牌，可以跳过弃牌阶段。',
 			anlezhugong:'安乐主公',
-			anlezhugong_info:'村规主公限定技：第二轮回合开始时如果判定区有【乐不思蜀】，则可以跳过判定阶段。',
+			anlezhugong_info:'村规主公限定技：主公如果在第一轮被乐而且中乐，则手牌上限为体力上限',
+			anlezhugong2:'安乐主公',
 			shengmingshiliwei:'魏势力',
 			shengmingshilishu:'蜀势力',
 			shengmingshiliwu:'吴势力',
@@ -4326,9 +4328,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return false;
 						});
 						if(usedCards.length==0) {
-							game.broadcastAll(function(player){
-								player.addSkill('anlezhugong');
-							},player);
 							return true;
 						}
 					}
@@ -4363,14 +4362,24 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				limited:true,
 				skillAnimation:'legend',
 				animationColor:'thunder',
-				trigger:{player:'phaseJudgeBefore'},
+				trigger:{player:['judgeEnd','phaseAfter']},
 				filter:function(event,player){
-					if(game.roundNumber<=2&&player.getJudge('lebu')){
-						return true;
+					if(event.name=='phase'){
+						if(game.roundNumber>=2){
+							game.broadcastAll(function(player){
+								player.removeSkill('anlezhugong');
+							},player);
+						}
+					}else if(event.name=='judge'){
+						if(game.roundNumber<=2&&player==game.zhu&&event.judgestr=='乐不思蜀'){
+							if(event.result.bool==false){
+								return true;
+							}
+							game.broadcastAll(function(player){
+								player.removeSkill('anlezhugong');
+							},player);
+						}
 					}
-					game.broadcastAll(function(player){
-						player.removeSkill('anlezhugong');
-					},player);
 					return false;
 				},
 				ai:{
@@ -4382,16 +4391,35 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				content:function(){
-					trigger.cancel();
 					game.broadcastAll(function(player){
 						player.removeSkill('anlezhugong');
 					},player);
+					player.addTempSkill('anlezhugong2');
 				},
 				oncancel:function(event,player){
 					game.broadcastAll(function(player){
 						player.removeSkill('anlezhugong');
 					},player);
 				},
+			},
+			anlezhugong2:{
+				audio:'guose',
+				forced:true,
+				trigger:{player:'phaseDiscardBefore'},
+				content:function(){},
+				ai:{
+					order:10,
+					result:{
+						player:function(player){
+							return 1;
+						},
+					}
+				},
+				mod:{
+					maxHandcardBase:function(player,num){
+						return player.maxHp;
+					}
+				}
 			},
 			shengmingshiliwei:{
 				unique:true,
