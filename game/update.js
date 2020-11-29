@@ -1,10 +1,11 @@
 window.noname_update={
-	version:'2020.11.28',
+	version:'2020.11.29',
 	update:'2020.11.06.2',
 	changeLog:[
 		'调整【安乐主公】村规主公限定技：中乐则手牌上限改为体力上限',
 		'魏延奇谋去掉摸牌效果',
 		'修复于吉',
+		'修复新马谡与廖化配合不能重复发动散谣的bug',
 	],
 	files:[
 		'card/extra.js',

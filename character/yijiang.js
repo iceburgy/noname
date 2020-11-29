@@ -8619,7 +8619,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							position:'he',
 							content:function(){
-								player.addTempSkill('olsanyao'+lib.skill[event.name].index)
+								player.addTempSkill('olsanyao'+lib.skill[event.name].index,'phaseUseAfter')
 								target.damage('nocard');
 							},
 							ai:lib.skill.sanyao.ai,
