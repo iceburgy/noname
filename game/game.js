@@ -44312,6 +44312,7 @@
 					if(this.innerHTML=='<span>确认</span>'){
 						clearTimeout(this.confirmTimeout);
 						_status.overtie=true;
+						game.showIdentity();
 						game.over('和了');
 						this.hide();
 						var that=this;

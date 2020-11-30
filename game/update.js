@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.11.29',
+	version:'2020.11.30',
 	update:'2020.11.06.2',
 	changeLog:[
 		'调整【安乐主公】村规主公限定技：中乐则手牌上限改为体力上限',
