@@ -28104,6 +28104,18 @@
 				game.fullscreenpopbyplayer(curPlayer,'获得：'+get.translation(bonusKey)+' x'+delta);
 			}
 		},
+		updateBonusBalanceDelayed:function(nickname,data){
+			var messages=[];
+			for(var key in data){
+				var value=data[key];
+				game.updateBonusBalance(nickname,key,value,true);
+				if(value>0){
+					messages.push('获得：'+get.translation(key)+' x'+value);
+				}
+			}
+			var curPlayer=game.getPlayerByNickname(nickname);
+			game.fullscreenpopbyplayerDelayed(curPlayer,messages);
+		},
 		fullscreenpopbyplayerDelayed:function(curPlayer,messages){
 			if(messages&&Array.isArray(messages)){
 				var delayMS=500;
@@ -28281,16 +28293,11 @@
 			!(nickname.toLowerCase() in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])){
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][ip]=new Date();
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][nickname.toLowerCase()]=new Date();
-				game.updateBonusBalance(nickname,lib.bonusKeyChangeCards,lib.config.changecardsbonus_unit,true);
-				game.updateBonusBalance(nickname,lib.bonusKeyAddRole,lib.config.addrolebonus_unit,true);
-				game.updateBonusBalance(nickname,lib.bonusKeyPickRole,lib.config.pickrolebonus_unit,true);
-
-				var curPlayer=game.getPlayerByNickname(nickname);
-				var messages=[];
-				messages.push('获得：'+get.translation(lib.bonusKeyChangeCards)+' x'+lib.config.changecardsbonus_unit);
-				messages.push('获得：'+get.translation(lib.bonusKeyAddRole)+' x'+lib.config.addrolebonus_unit);
-				messages.push('获得：'+get.translation(lib.bonusKeyPickRole)+' x'+lib.config.pickrolebonus_unit);
-				game.fullscreenpopbyplayerDelayed(curPlayer,messages);
+				var updateData={};
+				updateData[lib.bonusKeyChangeCards]=lib.config.changecardsbonus_unit;
+				updateData[lib.bonusKeyAddRole]=lib.config.addrolebonus_unit;
+				updateData[lib.bonusKeyPickRole]=lib.config.pickrolebonus_unit;
+				game.updateBonusBalanceDelayed(nickname,updateData);
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},

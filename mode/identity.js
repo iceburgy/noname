@@ -4217,12 +4217,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.awakenSkill('xiaoneidantiao');
 					if(player.nickname&&player.nickname!='无名玩家'){
-						game.updateBonusBalance(player.nickname,lib.bonusKeyChangeCards,lib.config.changecardsbonus_unit,true);
-						game.updateBonusBalance(player.nickname,lib.bonusKeyAddRole,lib.config.addrolebonus_unit,true);
-						var messages=[];
-						messages.push('获得：'+get.translation(lib.bonusKeyChangeCards)+' x'+lib.config.changecardsbonus_unit);
-						messages.push('获得：'+get.translation(lib.bonusKeyAddRole)+' x'+lib.config.addrolebonus_unit);
-						game.fullscreenpopbyplayerDelayed(player,messages);
+						var updateData={};
+						updateData[lib.bonusKeyChangeCards]=lib.config.changecardsbonus_unit;
+						updateData[lib.bonusKeyAddRole]=lib.config.addrolebonus_unit;
+						game.updateBonusBalanceDelayed(player.nickname,updateData);
 					}
 				},
 				ai:{
