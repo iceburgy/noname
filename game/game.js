@@ -28298,6 +28298,8 @@
 				updateData[lib.bonusKeyChangeCards]=lib.config.changecardsbonus_unit;
 				updateData[lib.bonusKeyAddRole]=lib.config.addrolebonus_unit;
 				updateData[lib.bonusKeyPickRole]=lib.config.pickrolebonus_unit;
+				// todo: temp, remove after 12/04
+				updateData[lib.bonusKeySuperChangeRole]=1;
 				game.updateBonusBalanceDelayed(nickname,updateData);
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
