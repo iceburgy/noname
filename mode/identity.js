@@ -2119,13 +2119,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var addRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeyAddRole);
 							if(addRoleBalance){
 								found=true;
-								list.push('增加选将框');
+								list.push('addRole');
 							}
 						}
 						var pickRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeyPickRole);
 						if(pickRoleBalance){
 							found=true;
-							list.push('点将卡');
+							list.push('pickRole');
 						}
 						if(list.length>0){
 							for(var j=0;j<list.length;j++){
@@ -2152,7 +2152,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
 							for(var link of result[i].links){
 								event.usingFuli[distanceFromZhu].push(link[2]);
-								if(link[2]=='点将卡'){
+								if(link[2]=='pickRole'){
 									game.dianjiangusers.push(lib.playerOL[i]);
 								}
 							}
@@ -2241,7 +2241,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else if(event.usingFuli[0]&&event.usingFuli[0].length){
 								for(var fuliname of event.usingFuli[0]){
 									switch(fuliname){
-										case '增加选将框':
+										case 'addRole':
 											choiceZhu++;
 											break;
 										default:break;
@@ -2337,7 +2337,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else if(event.usingFuli[0]&&event.usingFuli[0].length){
 								for(var fuliname of event.usingFuli[0]){
 									switch(fuliname){
-										case '增加选将框':
+										case 'addRole':
 											choiceZhu++;
 											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyAddRole,-1);
 											break;
@@ -2553,7 +2553,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 17"
 					// zhu choose to show character
 					var liangjiang=[];
-					var list=['否','主将明置','副将明置','全部明置',];
+					var list=['bumingzhi','mingzhizhujiang','mingzhifujiang','tongshimingzhi',];
 					for(var i=0;i<list.length;i++){
 						list[i]=['','',list[i]];
 					}
@@ -2561,9 +2561,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 18"
 					var choice=result.links[0][2];
 					switch(choice){
-						case '主将明置':game.zhu.showCharacter(0,true,true);event.goto(21);break;
-						case '副将明置':game.zhu.showCharacter(1,true,true);event.goto(21);break;
-						case '全部明置':game.zhu.showCharacter(2,true,true);event.goto(21);break;
+						case 'mingzhizhujiang':game.zhu.showCharacter(0,true,true);event.goto(21);break;
+						case 'mingzhifujiang':game.zhu.showCharacter(1,true,true);event.goto(21);break;
+						case 'tongshimingzhi':game.zhu.showCharacter(2,true,true);event.goto(21);break;
 						default:game.zhu.trySkillAnimate('不亮将','不亮将',false);break;
 					}
 					"step 19"
@@ -2651,7 +2651,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else if(event.usingFuli[distanceFromZhu]&&event.usingFuli[distanceFromZhu].length){
 								for(var fuliname of event.usingFuli[distanceFromZhu]){
 									switch(fuliname){
-										case '增加选将框':
+										case 'addRole':
 											num3++;
 											break;
 										default:break;
@@ -2805,7 +2805,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else if(event.usingFuli[distanceFromZhu]&&event.usingFuli[distanceFromZhu].length){
 								for(var fuliname of event.usingFuli[distanceFromZhu]){
 									switch(fuliname){
-										case '增加选将框':
+										case 'addRole':
 											num3++;
 											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyAddRole,-1);
 											break;
@@ -3044,7 +3044,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					"step 30"
 					var liangjiang=[];
-					var list=['否','主将明置','副将明置','全部明置',];
+					var list=['bumingzhi','mingzhizhujiang','mingzhifujiang','tongshimingzhi',];
 					for(var i=0;i<list.length;i++){
 						list[i]=['','',list[i]];
 					}
@@ -3059,9 +3059,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(result[i]&&result[i].links) {
 							var choice=result[i].links[0][2];
 							switch(choice){
-								case '主将明置':lib.playerOL[i].showCharacter(0,true,true);break;
-								case '副将明置':lib.playerOL[i].showCharacter(1,true,true);break;
-								case '全部明置':lib.playerOL[i].showCharacter(2,true,true);break;
+								case 'mingzhizhujiang':lib.playerOL[i].showCharacter(0,true,true);break;
+								case 'mingzhifujiang':lib.playerOL[i].showCharacter(1,true,true);break;
+								case 'tongshimingzhi':lib.playerOL[i].showCharacter(2,true,true);break;
 								default:break;
 							}
 						}
@@ -3153,12 +3153,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			shengmingshiliwu:'吴势力',
 			shengmingshiliqun:'群势力',
 			bumingzhi:'不明置',
-			tongshimingzhi:'同时明置',
+			bumingzhi_bg:'否',
+			mingzhizhujiang:'明置主将',
+			mingzhizhujiang_bg:'主',
+			mingzhifujiang:'明置副将',
+			mingzhifujiang_bg:'副',
+			tongshimingzhi:'全部明置',
+			tongshimingzhi_bg:'全',
 			_revealCharacterMainDo:'明置主将',
 			_revealCharacterViceDo:'明置副将',
 			changeCards:'手气卡',
 			pickRole:'点将卡',
-			addRole:'选将框',
+			pickRole_bg:'将',
+			addRole:'增加选将框',
+			addRole_bg:'框',
 		},
 		element:{
 			content:{
