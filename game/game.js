@@ -23470,6 +23470,7 @@
 						var dy=Math.round(2*rect2.top+rect2.height-rect1.height);
 						node.style.transform='scale(0.5) translate('+dx+'px,'+dy+'px)';
 					}
+					node.classList.add('fullscreenpopnobroadcast');
 					ui.window.appendChild(node);
 					ui.refresh(node);
 					if(avatar){

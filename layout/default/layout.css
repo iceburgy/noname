@@ -2358,6 +2358,9 @@ div:not(.handcards)>.card>.info>span,
 	left: 20px;
 	font-size: 40px;
 }
+#window>.fullscreenpopnobroadcast{
+	font-family: 'shousha' !important;
+}
 #window>.damage.fullscreenavatar.removing{
 	transition: all 0.3s;
 }
