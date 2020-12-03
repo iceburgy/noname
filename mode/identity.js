@@ -3149,7 +3149,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			changeCards:'手气卡',
 			pickRole:'点将卡',
 			pickRole_bg:'将',
-			addRole:'增加选将框',
+			addRole:'选将框',
 			addRole_bg:'框',
 			changeRole:'换将卡',
 			superChangeRole:'超级换将卡',

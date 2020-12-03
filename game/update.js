@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.12.02.2',
+	version:'2020.12.02.3',
 	update:'2020.11.06.2',
 	changeLog:[
 		'引入新道具：超级换将卡（N换N，获取方式：小内获胜）',
