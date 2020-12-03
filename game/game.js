@@ -39,6 +39,7 @@
 		bonusKeyChangeCards:'changeCards',
 		bonusKeyPickRole:'pickRole',
 		bonusKeyAddRole:'addRole',
+		bonusKeySuperChangeRole:'superChangeRole',
 		bonusKeyBirthdaybonus:'birthdaybonus',
 		bonusKeyQiandaofuli:'qiandaofuli',
 		bonusKeyQianDaoCutoff:'qianDaoCutoff',
@@ -11655,6 +11656,11 @@
 						if(pickRoleBalance){
 							if(winRate&&winRate.length) winRate+='<br/>';
 							winRate+='点将卡x'+pickRoleBalance;
+						}
+						var superChangeRoleBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeySuperChangeRole);
+						if(superChangeRoleBalance){
+							if(winRate&&winRate.length) winRate+='<br/>';
+							winRate+='换将卡x'+superChangeRoleBalance;
 						}
 						if(game.getBonusBirthdaybonus(lib.config.connect_nickname)){
 							if(winRate&&winRate.length) winRate+='<br/>生日福利';
@@ -26517,6 +26523,11 @@
 									if(winRate&&winRate.length) winRate+='<br/>';
 									winRate+='点将卡x'+pickRoleBalance;
 								}
+								var superChangeRoleBalance=game.getBonusBalance(this.nickname,lib.bonusKeySuperChangeRole);
+								if(superChangeRoleBalance){
+									if(winRate&&winRate.length) winRate+='<br/>';
+									winRate+='换将卡x'+superChangeRoleBalance;
+								}
 								if(game.getBonusBirthdaybonus(this.nickname)){
 									if(winRate&&winRate.length) winRate+='<br/>生日福利';
 									else winRate='生日福利';
@@ -28832,6 +28843,11 @@
 					if(pickRoleBalance){
 						if(winRate&&winRate.length) winRate+='<br/>';
 						winRate+='点将卡x'+pickRoleBalance;
+					}
+					var superChangeRoleBalance=game.getBonusBalance(player.nickname,lib.bonusKeySuperChangeRole);
+					if(superChangeRoleBalance){
+						if(winRate&&winRate.length) winRate+='<br/>';
+						winRate+='换将卡x'+superChangeRoleBalance;
 					}
 					if(game.getBonusBirthdaybonus(player.nickname)){
 						if(winRate&&winRate.length) winRate+='<br/>生日福利';

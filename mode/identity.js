@@ -2107,6 +2107,23 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						event.pickedChars[i]="";
 					}
+					event.choiceNum=new Array(game.players.length);
+					for(var i=0;i<game.players.length;i++){
+						event.choiceNum[i]=0;
+					}
+					event.choiceNumChangeRole=new Array(game.players.length);
+					for(var i=0;i<game.players.length;i++){
+						var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
+						switch(game.players[i].identity){
+							case 'zhu':
+							case 'nei':
+								event.choiceNumChangeRole[distanceFromZhu]=2;
+								break;
+							default:
+								event.choiceNumChangeRole[distanceFromZhu]=1;
+								break;
+						}
+					}
 
 					// everyone choose to use bonus, if any
 					var found=false;
@@ -2126,6 +2143,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(pickRoleBalance){
 							found=true;
 							list.push('pickRole');
+						}
+						var superChangeRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeySuperChangeRole);
+						if(superChangeRoleBalance){
+							found=true;
+							list.push('superChangeRole');
 						}
 						if(list.length>0){
 							for(var j=0;j<list.length;j++){
@@ -2231,6 +2253,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==game.zhu){
 							var choiceZhu=5;
+							var useSuperChangeRole=false;
 							if(lib.configOL.choice_zhu){
 								choiceZhu=parseInt(lib.configOL.choice_zhu);
 							}
@@ -2243,10 +2266,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									switch(fuliname){
 										case 'addRole':
 											choiceZhu++;
+											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyAddRole,-1);
+											break;
+										case 'superChangeRole':
+											useSuperChangeRole=true;
+											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeySuperChangeRole,-1);
 											break;
 										default:break;
 									}
 								}
+							}
+							event.choiceNum[0]=choiceZhu;
+							if(useSuperChangeRole){
+								event.choiceNumChangeRole[0]=choiceZhu;
 							}
 							var str='选择角色1';
 							if(game.players[i].special_identity){
@@ -2292,12 +2324,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==game.zhu){
-							game.players[i].trySkillAnimate('换将卡','换将卡',false);
-							var choiceZhu=2;
-							var str='换将卡：X换'+choiceZhu;
-							if(game.players[i].special_identity){
-								str+='（'+get.translation(game.players[i].special_identity)+'）';
+							var strAnimation=get.translation('changeRole');
+							if(event.choiceNum[0]==event.choiceNumChangeRole[0]){
+								strAnimation=get.translation('superChangeRole');
 							}
+							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
+							var choiceZhu=event.choiceNumChangeRole[0];
+							var str=strAnimation+'：'+event.choiceNum[0]+'换'+event.choiceNumChangeRole[0];
 							var tempChars=event.allList.randomRemove(choiceZhu);
 							event.zhuList.remove(tempChars);
 							list.push([game.players[i],[str,[tempChars,'character']],true]);
@@ -2326,24 +2359,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==game.zhu){
-							var choiceZhu=5;
-							if(lib.configOL.choice_zhu){
-								choiceZhu=parseInt(lib.configOL.choice_zhu);
-							}
+							var choiceZhu=event.choiceNum[0];
 							if(game.getBonusBirthdaybonus(game.players[i].nickname)){
-								choiceZhu++;
 								game.players[i].trySkillAnimate('生日福利','生日福利',false);
-							}
-							else if(event.usingFuli[0]&&event.usingFuli[0].length){
-								for(var fuliname of event.usingFuli[0]){
-									switch(fuliname){
-										case 'addRole':
-											choiceZhu++;
-											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyAddRole,-1);
-											break;
-										default:break;
-									}
-								}
 							}
 							var str='选择角色2';
 							if(game.players[i].special_identity){
@@ -2390,12 +2408,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==game.zhu){
-							game.players[i].trySkillAnimate('换将卡','换将卡',false);
-							var choiceZhu=2;
-							var str='换将卡：X换'+choiceZhu;
-							if(game.players[i].special_identity){
-								str+='（'+get.translation(game.players[i].special_identity)+'）';
+							var strAnimation=get.translation('changeRole');
+							if(event.choiceNum[0]==event.choiceNumChangeRole[0]){
+								strAnimation=get.translation('superChangeRole');
 							}
+							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
+							var choiceZhu=event.choiceNumChangeRole[0];
+							var str=strAnimation+'：'+event.choiceNum[0]+'换'+event.choiceNumChangeRole[0];
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[0],choiceZhu,event.allList);
 							list.push([game.players[i],[str,[nextValidCharacters,'character']],true]);
 						}
@@ -2614,6 +2633,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=game.zhu){
+							var useSuperChangeRole=false;
 							var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
 							var num3=0;
 							if(event.zhongmode){
@@ -2653,10 +2673,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									switch(fuliname){
 										case 'addRole':
 											num3++;
+											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyAddRole,-1);
+											break;
+										case 'superChangeRole':
+											useSuperChangeRole=true;
+											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeySuperChangeRole,-1);
 											break;
 										default:break;
 									}
 								}
+							}
+							event.choiceNum[distanceFromZhu]=num+num3;
+							if(useSuperChangeRole){
+								event.choiceNumChangeRole[distanceFromZhu]=num+num3;
 							}
 							var str='选择角色1';
 							if(game.players[i].special_identity){
@@ -2712,15 +2741,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
 						if(event.chosenChars[distanceFromZhu].length==0){
-							game.players[i].trySkillAnimate('换将卡','换将卡',false);
-							var totalChoice=1;
-							if(game.players[i].identity=='nei'){
-								totalChoice=2;
+							var strAnimation=get.translation('changeRole');
+							if(event.choiceNum[distanceFromZhu]==event.choiceNumChangeRole[distanceFromZhu]){
+								strAnimation=get.translation('superChangeRole');
 							}
-							var str='换将卡：X换'+totalChoice;
-							if(game.players[i].special_identity){
-								str+='（'+get.translation(game.players[i].special_identity)+'）';
-							}
+							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
+							var totalChoice=event.choiceNumChangeRole[distanceFromZhu];
+							var str=strAnimation+'：'+event.choiceNum[distanceFromZhu]+'换'+event.choiceNumChangeRole[distanceFromZhu];
 							list.push([game.players[i],[str,[event.list.randomRemove(totalChoice),'character']],selectButton,true]);
 						}
 					}
@@ -2769,55 +2796,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=game.zhu){
 							var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
-							var num3=0;
-							if(event.zhongmode){
-								if(game.players[i].identity=='nei'||game.players[i].identity=='zhu'){
-									num3=2;
-								}
-							}
-							else{
-								switch(game.players[i].identity){
-									case 'zhong':
-										if(lib.configOL.choice_zhong){
-											num3=parseInt(lib.configOL.choice_zhong)-num;
-										}
-										break;
-									case 'fan':
-										if(lib.configOL.choice_fan){
-											num3=parseInt(lib.configOL.choice_fan)-num;
-										}
-										break;
-									case 'nei':
-										if(lib.configOL.choice_nei){
-											num3=parseInt(lib.configOL.choice_nei)-num;
-										}else{
-											num3=num2;
-										}
-										break;
-									default:
-										break;
-								}
-							}
 							if(game.getBonusBirthdaybonus(game.players[i].nickname)){
-								num3++;
 								game.players[i].trySkillAnimate('生日福利','生日福利',false);
-							}
-							else if(event.usingFuli[distanceFromZhu]&&event.usingFuli[distanceFromZhu].length){
-								for(var fuliname of event.usingFuli[distanceFromZhu]){
-									switch(fuliname){
-										case 'addRole':
-											num3++;
-											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyAddRole,-1);
-											break;
-										default:break;
-									}
-								}
 							}
 							var str='选择角色2';
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[distanceFromZhu][0],num+num3,event.list);
+							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[distanceFromZhu][0],event.choiceNum[distanceFromZhu],event.list);
 							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,false]);
 						}
 					}
@@ -2864,15 +2850,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
 						if(event.chosenChars[distanceFromZhu].length==1){
-							game.players[i].trySkillAnimate('换将卡','换将卡',false);
-							var totalChoice=1;
-							if(game.players[i].identity=='nei'){
-								totalChoice=2;
+							var strAnimation=get.translation('changeRole');
+							if(event.choiceNum[distanceFromZhu]==event.choiceNumChangeRole[distanceFromZhu]){
+								strAnimation=get.translation('superChangeRole');
 							}
-							var str='换将卡：X换'+totalChoice;
-							if(game.players[i].special_identity){
-								str+='（'+get.translation(game.players[i].special_identity)+'）';
-							}
+							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
+							var totalChoice=event.choiceNumChangeRole[distanceFromZhu];
+							var str=strAnimation+'：'+event.choiceNum[distanceFromZhu]+'换'+event.choiceNumChangeRole[distanceFromZhu];
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[distanceFromZhu][0],totalChoice,event.list);
 							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,true]);
 						}
@@ -3167,6 +3151,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			pickRole_bg:'将',
 			addRole:'增加选将框',
 			addRole_bg:'框',
+			changeRole:'换将卡',
+			superChangeRole:'超级换将卡',
+			superChangeRole_bg:'换',
 		},
 		element:{
 			content:{
@@ -4264,7 +4251,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.awakenSkill('xiaoneihuosheng');
 					if(player.nickname&&player.nickname!='无名玩家'){
-						game.updateBonusBalance(player.nickname,lib.bonusKeyPickRole,lib.config.pickrolebonus_unit);
+						game.updateBonusBalance(player.nickname,lib.bonusKeySuperChangeRole,1);
 					}
 				},
 				ai:{
