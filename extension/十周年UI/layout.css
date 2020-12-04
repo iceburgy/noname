@@ -222,6 +222,10 @@ body>.background {
 	background-size: 100% 100%;
 }
 
+.button.card.superchangerole {
+    height: 108px !important;
+    width: 90px !important;
+}
 
 .card,
 #window:not(*[data-radius_size='']) .card {

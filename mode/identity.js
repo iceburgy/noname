@@ -2108,8 +2108,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.pickedChars[i]="";
 					}
 					event.choiceNum=new Array(game.players.length);
+					event.choiceNumSuperChangeRole=new Array(game.players.length);
 					for(var i=0;i<game.players.length;i++){
 						event.choiceNum[i]=0;
+						event.choiceNumSuperChangeRole[i]=0;
 					}
 					event.choiceNumChangeRole=new Array(game.players.length);
 					for(var i=0;i<game.players.length;i++){
@@ -2143,11 +2145,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(pickRoleBalance){
 							found=true;
 							list.push('pickRole');
-						}
-						var superChangeRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeySuperChangeRole);
-						if(superChangeRoleBalance){
-							found=true;
-							list.push('superChangeRole');
 						}
 						if(list.length>0){
 							for(var j=0;j<list.length;j++){
@@ -2253,7 +2250,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==game.zhu){
 							var choiceZhu=5;
-							var useSuperChangeRole=false;
 							if(lib.configOL.choice_zhu){
 								choiceZhu=parseInt(lib.configOL.choice_zhu);
 							}
@@ -2268,17 +2264,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 											choiceZhu++;
 											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyAddRole,-1);
 											break;
-										case 'superChangeRole':
-											useSuperChangeRole=true;
-											break;
 										default:break;
 									}
 								}
 							}
 							event.choiceNum[0]=choiceZhu;
-							if(useSuperChangeRole){
-								event.choiceNumChangeRole[0]=choiceZhu;
-							}
+							event.choiceNumSuperChangeRole[0]=choiceZhu;
 							var str='选择角色1';
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
@@ -2289,11 +2280,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								tempChars.unshift(event.pickedChars[0]);
 								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyPickRole,-1);
 							}
+							var superChangeRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeySuperChangeRole);
+							if(superChangeRoleBalance){
+								tempChars.push(lib.bonusKeySuperChangeRole);
+							}
 							list.push([game.players[i],[str,[tempChars,'character']],false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
-						if(result.links&&(game.online||player==game.me)) {
+						var isSelectionMade=false;
+						var isUsingSuperChangeRole=result.bool&&Array.isArray(result.links[0])&&result.links[0].length>=3&&result.links[0][2]==lib.bonusKeySuperChangeRole
+						isSelectionMade=result.bool&&!isUsingSuperChangeRole;
+						if(isSelectionMade&&(game.online||player==game.me)) {
 							player.init(result.links[0],false);
 							player.chosenChar1=result.links[0];
 							var info=lib.character[result.links[0]];
@@ -2306,7 +2304,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 8"
 					var isSelectionMade=false;
 					for(var i in result){
-						isSelectionMade=result[i].bool;
+						var isUsingSuperChangeRole=result[i].bool&&Array.isArray(result[i].links[0])&&result[i].links[0].length>=3&&result[i].links[0][2]==lib.bonusKeySuperChangeRole
+						isSelectionMade=result[i].bool&&!isUsingSuperChangeRole;
 					}
 
 					if(!isSelectionMade){
@@ -2320,17 +2319,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					// choose char 1, again with use of change char
 					var list=[];
 					var selectButton=1;
+					var isUsingSuperChangeRole=false;
+					for(var i in result){
+						isUsingSuperChangeRole=result[i].bool&&Array.isArray(result[i].links[0])&&result[i].links[0].length>=3&&result[i].links[0][2]==lib.bonusKeySuperChangeRole
+					}
 
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==game.zhu){
 							var strAnimation=get.translation('changeRole');
-							if(event.choiceNum[0]==event.choiceNumChangeRole[0]){
-								strAnimation=get.translation('superChangeRole');
+							if(isUsingSuperChangeRole){
+								strAnimation=get.translation(lib.bonusKeySuperChangeRole);
 								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeySuperChangeRole,-1);
 							}
 							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
-							var choiceZhu=event.choiceNumChangeRole[0];
-							var str=strAnimation+'：'+event.choiceNum[0]+'换'+event.choiceNumChangeRole[0];
+							var choiceZhu=isUsingSuperChangeRole?event.choiceNumSuperChangeRole[0]:event.choiceNumChangeRole[0];
+							var str=strAnimation+'：'+event.choiceNum[0]+'换'+choiceZhu;
 							var tempChars=event.allList.randomRemove(choiceZhu);
 							event.zhuList.remove(tempChars);
 							list.push([game.players[i],[str,[tempChars,'character']],true]);
@@ -2373,11 +2376,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								event.allList.remove(nextValidZhu);
 							}
 							var nextValidRest=game.getNextValidCharacters([...event.chosenChars[0],...nextValidZhu],choiceZhu,event.allList);
+							var superChangeRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeySuperChangeRole);
+							if(superChangeRoleBalance){
+								nextValidRest.push(lib.bonusKeySuperChangeRole);
+							}
 							list.push([game.players[i],[str,[[...nextValidZhu,...nextValidRest],'character']],false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
-						if(result.links&&(game.online||player==game.me)){
+						var isSelectionMade=false;
+						var isUsingSuperChangeRole=result.bool&&Array.isArray(result.links[0])&&result.links[0].length>=3&&result.links[0][2]==lib.bonusKeySuperChangeRole
+						isSelectionMade=result.bool&&!isUsingSuperChangeRole;
+						if(isSelectionMade&&(game.online||player==game.me)) {
 							player.chosenChar2=result.links[0];
 							player.init(player.chosenChar1,player.chosenChar2,false);
 							var info=lib.character[player.chosenChar2];
@@ -2391,7 +2401,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 11"
 					var isSelectionMade=false;
 					for(var i in result){
-						isSelectionMade=result[i].bool;
+						var isUsingSuperChangeRole=result[i].bool&&Array.isArray(result[i].links[0])&&result[i].links[0].length>=3&&result[i].links[0][2]==lib.bonusKeySuperChangeRole
+						isSelectionMade=result[i].bool&&!isUsingSuperChangeRole;
 					}
 
 					if(!isSelectionMade){
@@ -2405,17 +2416,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					// choose char 2 again with use of change char
 					var list=[];
 					var selectButton=1;
+					var isUsingSuperChangeRole=false;
+					for(var i in result){
+						isUsingSuperChangeRole=result[i].bool&&Array.isArray(result[i].links[0])&&result[i].links[0].length>=3&&result[i].links[0][2]==lib.bonusKeySuperChangeRole
+					}
 
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==game.zhu){
 							var strAnimation=get.translation('changeRole');
-							if(event.choiceNum[0]==event.choiceNumChangeRole[0]){
-								strAnimation=get.translation('superChangeRole');
+							if(isUsingSuperChangeRole){
+								strAnimation=get.translation(lib.bonusKeySuperChangeRole);
 								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeySuperChangeRole,-1);
 							}
 							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
-							var choiceZhu=event.choiceNumChangeRole[0];
-							var str=strAnimation+'：'+event.choiceNum[0]+'换'+event.choiceNumChangeRole[0];
+							var choiceZhu=isUsingSuperChangeRole?event.choiceNumSuperChangeRole[0]:event.choiceNumChangeRole[0];
+							var str=strAnimation+'：'+event.choiceNum[0]+'换'+choiceZhu;
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[0],choiceZhu,event.allList);
 							list.push([game.players[i],[str,[nextValidCharacters,'character']],true]);
 						}
@@ -2634,7 +2649,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=game.zhu){
-							var useSuperChangeRole=false;
 							var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
 							var num3=0;
 							if(event.zhongmode){
@@ -2676,17 +2690,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 											num3++;
 											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyAddRole,-1);
 											break;
-										case 'superChangeRole':
-											useSuperChangeRole=true;
-											break;
 										default:break;
 									}
 								}
 							}
 							event.choiceNum[distanceFromZhu]=num+num3;
-							if(useSuperChangeRole){
-								event.choiceNumChangeRole[distanceFromZhu]=num+num3;
-							}
+							event.choiceNumSuperChangeRole[distanceFromZhu]=num+num3;
 							var str='选择角色1';
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
@@ -2696,11 +2705,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								tempChars.unshift(event.pickedChars[distanceFromZhu]);
 								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyPickRole,-1);
 							}
+							var superChangeRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeySuperChangeRole);
+							if(superChangeRoleBalance){
+								tempChars.push(lib.bonusKeySuperChangeRole);
+							}
 							list.push([game.players[i],[str,[tempChars,'character']],selectButton,false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
-						if(result.links&&(game.online||player==game.me)){
+						var isSelectionMade=false;
+						var isUsingSuperChangeRole=result.bool&&Array.isArray(result.links[0])&&result.links[0].length>=3&&result.links[0][2]==lib.bonusKeySuperChangeRole
+						isSelectionMade=result.bool&&!isUsingSuperChangeRole;
+						if(isSelectionMade&&(game.online||player==game.me)) {
 							player.init(result.links[0],false);
 							player.chosenChar1=result.links[0];
 							var info=lib.character[result.links[0]];
@@ -2717,7 +2733,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							continue;
 						}
 						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
-						if(!result[i].bool){
+						var isUsingSuperChangeRole=result[i].bool&&Array.isArray(result[i].links[0])&&result[i].links[0].length>=3&&result[i].links[0][2]==lib.bonusKeySuperChangeRole
+						isSelectionMade=result[i].bool&&!isUsingSuperChangeRole;
+						if(!isSelectionMade){
 							isChar1SelectionMadeFully=false;
 						}
 						else{
@@ -2738,18 +2756,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					var selectButton=1;
 
-					for(var i=0;i<game.players.length;i++){
-						var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
+					for(var i in result){
+						var player=lib.playerOL[i]
+						var isUsingSuperChangeRole=result[i].bool&&Array.isArray(result[i].links[0])&&result[i].links[0].length>=3&&result[i].links[0][2]==lib.bonusKeySuperChangeRole
+						var distanceFromZhu=get.distance(game.zhu, player, 'absolute');
 						if(event.chosenChars[distanceFromZhu].length==0){
 							var strAnimation=get.translation('changeRole');
-							if(event.choiceNum[distanceFromZhu]==event.choiceNumChangeRole[distanceFromZhu]){
-								strAnimation=get.translation('superChangeRole');
-								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeySuperChangeRole,-1);
+							if(isUsingSuperChangeRole){
+								strAnimation=get.translation(lib.bonusKeySuperChangeRole);
+								game.updateBonusBalanceBuffer(player.nickname,lib.bonusKeySuperChangeRole,-1);
 							}
-							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
-							var totalChoice=event.choiceNumChangeRole[distanceFromZhu];
-							var str=strAnimation+'：'+event.choiceNum[distanceFromZhu]+'换'+event.choiceNumChangeRole[distanceFromZhu];
-							list.push([game.players[i],[str,[event.list.randomRemove(totalChoice),'character']],selectButton,true]);
+							player.trySkillAnimate(strAnimation,strAnimation,false);
+							var totalChoice=isUsingSuperChangeRole?event.choiceNumSuperChangeRole[distanceFromZhu]:event.choiceNumChangeRole[distanceFromZhu];
+							var str=strAnimation+'：'+event.choiceNum[distanceFromZhu]+'换'+totalChoice;
+							list.push([player,[str,[event.list.randomRemove(totalChoice),'character']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2805,11 +2825,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[distanceFromZhu][0],event.choiceNum[distanceFromZhu],event.list);
+							var superChangeRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeySuperChangeRole);
+							if(superChangeRoleBalance){
+								nextValidCharacters.push(lib.bonusKeySuperChangeRole);
+							}
 							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
-						if(result.links&&(game.online||player==game.me)){
+						var isSelectionMade=false;
+						var isUsingSuperChangeRole=result.bool&&Array.isArray(result.links[0])&&result.links[0].length>=3&&result.links[0][2]==lib.bonusKeySuperChangeRole
+						isSelectionMade=result.bool&&!isUsingSuperChangeRole;
+						if(isSelectionMade&&(game.online||player==game.me)) {
 							player.chosenChar2=result.links[0];
 							player.init(player.chosenChar1,player.chosenChar2,false);
 							var info=lib.character[player.chosenChar2];
@@ -2827,7 +2854,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							continue;
 						}
 						var distanceFromZhu=get.distance(game.zhu, lib.playerOL[i], 'absolute');
-						if(!result[i].bool){
+						var isUsingSuperChangeRole=result[i].bool&&Array.isArray(result[i].links[0])&&result[i].links[0].length>=3&&result[i].links[0][2]==lib.bonusKeySuperChangeRole
+						isSelectionMade=result[i].bool&&!isUsingSuperChangeRole;
+						if(!isSelectionMade){
 							isChar2SelectionMadeFully=false;
 						}
 						else{
@@ -2848,19 +2877,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					var selectButton=1;
 
-					for(var i=0;i<game.players.length;i++){
-						var distanceFromZhu=get.distance(game.zhu, game.players[i], 'absolute');
+					for(var i in result){
+						var player=lib.playerOL[i]
+						var isUsingSuperChangeRole=result[i].bool&&Array.isArray(result[i].links[0])&&result[i].links[0].length>=3&&result[i].links[0][2]==lib.bonusKeySuperChangeRole
+						var distanceFromZhu=get.distance(game.zhu, player, 'absolute');
 						if(event.chosenChars[distanceFromZhu].length==1){
 							var strAnimation=get.translation('changeRole');
-							if(event.choiceNum[distanceFromZhu]==event.choiceNumChangeRole[distanceFromZhu]){
-								strAnimation=get.translation('superChangeRole');
-								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeySuperChangeRole,-1);
+							if(isUsingSuperChangeRole){
+								strAnimation=get.translation(lib.bonusKeySuperChangeRole);
+								game.updateBonusBalanceBuffer(player.nickname,lib.bonusKeySuperChangeRole,-1);
 							}
-							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
-							var totalChoice=event.choiceNumChangeRole[distanceFromZhu];
-							var str=strAnimation+'：'+event.choiceNum[distanceFromZhu]+'换'+event.choiceNumChangeRole[distanceFromZhu];
+							player.trySkillAnimate(strAnimation,strAnimation,false);
+							var totalChoice=isUsingSuperChangeRole?event.choiceNumSuperChangeRole[distanceFromZhu]:event.choiceNumChangeRole[distanceFromZhu];
+							var str=strAnimation+'：'+event.choiceNum[distanceFromZhu]+'换'+totalChoice;
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[distanceFromZhu][0],totalChoice,event.list);
-							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,true]);
+							list.push([player,[str,[nextValidCharacters,'character']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -3156,6 +3187,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			changeRole:'换将卡',
 			superChangeRole:'超级换将卡',
 			superChangeRole_bg:'换',
+			superChangeRole_info:'N换N，获取方式：小内获胜',
 		},
 		element:{
 			content:{

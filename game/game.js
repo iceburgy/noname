@@ -46327,6 +46327,15 @@
 					break;
 
 					case 'character':case 'player':
+					if(typeof item=='string'&&item==lib.bonusKeySuperChangeRole){
+						item=[get.type(item),'',item];
+						node=ui.create.card(position,'noclick',noclick);
+						node.classList.add('button');
+						node.classList.add('superchangerole');
+						node.init(item);
+						node.link=item;
+						break;
+					}
 					if(node){
 						node.classList.add('button');
 						node.classList.add('character');
