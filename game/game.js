@@ -28213,11 +28213,6 @@
 			if(!lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli]){
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli]={};
 			}
-			var now=new Date();
-			if(now.getDay()==5){
-				game.setQiandaofuliCutoffByHour(lib.config['qiandaofuli_cutoff']);
-			}
-
 			if(!game.isQiandaoing()){
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers]={};
 			}
