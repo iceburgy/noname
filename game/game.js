@@ -28161,13 +28161,13 @@
 			}
 		},
 		updateBonusBalanceBuffer:function(nickname,bonusKey,delta){
-			if(!game.bonusBalanceBuffer) game.bonusBalanceBuffer=[];
-			game.bonusBalanceBuffer.push([nickname,bonusKey,delta]);
+			if(!game.bonusBalanceBuffer) game.bonusBalanceBuffer={};
+			game.bonusBalanceBuffer[nickname]=[bonusKey,delta];
 		},
 		flushBonusBalanceBuffer:function(){
 			if(game.bonusBalanceBuffer){
-				for(var bonusBuf of game.bonusBalanceBuffer){
-					game.updateBonusBalance(bonusBuf[0],bonusBuf[1],bonusBuf[2]);
+				for(var key in game.bonusBalanceBuffer){
+					game.updateBonusBalance(key,game.bonusBalanceBuffer[key][0],game.bonusBalanceBuffer[key][1]);
 				}
 			}
 		},

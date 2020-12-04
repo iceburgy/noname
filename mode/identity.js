@@ -2270,7 +2270,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 											break;
 										case 'superChangeRole':
 											useSuperChangeRole=true;
-											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeySuperChangeRole,-1);
 											break;
 										default:break;
 									}
@@ -2327,6 +2326,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var strAnimation=get.translation('changeRole');
 							if(event.choiceNum[0]==event.choiceNumChangeRole[0]){
 								strAnimation=get.translation('superChangeRole');
+								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeySuperChangeRole,-1);
 							}
 							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
 							var choiceZhu=event.choiceNumChangeRole[0];
@@ -2411,6 +2411,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var strAnimation=get.translation('changeRole');
 							if(event.choiceNum[0]==event.choiceNumChangeRole[0]){
 								strAnimation=get.translation('superChangeRole');
+								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeySuperChangeRole,-1);
 							}
 							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
 							var choiceZhu=event.choiceNumChangeRole[0];
@@ -2677,7 +2678,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 											break;
 										case 'superChangeRole':
 											useSuperChangeRole=true;
-											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeySuperChangeRole,-1);
 											break;
 										default:break;
 									}
@@ -2744,6 +2744,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var strAnimation=get.translation('changeRole');
 							if(event.choiceNum[distanceFromZhu]==event.choiceNumChangeRole[distanceFromZhu]){
 								strAnimation=get.translation('superChangeRole');
+								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeySuperChangeRole,-1);
 							}
 							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
 							var totalChoice=event.choiceNumChangeRole[distanceFromZhu];
@@ -2853,6 +2854,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var strAnimation=get.translation('changeRole');
 							if(event.choiceNum[distanceFromZhu]==event.choiceNumChangeRole[distanceFromZhu]){
 								strAnimation=get.translation('superChangeRole');
+								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeySuperChangeRole,-1);
 							}
 							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
 							var totalChoice=event.choiceNumChangeRole[distanceFromZhu];
