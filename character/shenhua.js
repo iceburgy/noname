@@ -1915,7 +1915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var history=player.getHistory('useCard');
 					var evt=name=='useCardAfter'?event:event.getParent();
 					for(var i=0;i<history.length;i++){
-						if(history[i]!=evt&&get.type(history[i].card)==get.type(event.card)) return false;
+						if(history[i]!=evt&&get.type2(history[i].card)==get.type2(event.card)) return false;
 						else if(history[i]==evt) return true;
 					}
 					return false;
@@ -1958,7 +1958,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.nzry_shicai3=['basic','trick','equip'];
 						var history=player.getHistory('useCard');
 						for(var i=0;i<history.length;i++){
-							var index = player.storage.nzry_shicai3.indexOf(get.type(history[i].card));
+							var index = player.storage.nzry_shicai3.indexOf(get.type2(history[i].card));
 							if (index !== -1) player.storage.nzry_shicai3.splice(index, 1);
 						}
 						player.markSkill('nzry_shicai3');
@@ -1997,7 +1997,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					var history=player.getHistory('useCard');
 					for(var i=0;i<history.length;i++){
-						var index = player.storage.nzry_shicai3.indexOf(get.type(history[i].card));
+						var index = player.storage.nzry_shicai3.indexOf(get.type2(history[i].card));
 						if (index !== -1) player.storage.nzry_shicai3.splice(index, 1);
 					}
 					player.markSkill('nzry_shicai3');
@@ -2015,7 +2015,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.nzry_shicai3=['basic','trick','equip'];
 						var history=player.getHistory('useCard');
 						for(var i=0;i<history.length;i++){
-							var index = player.storage.nzry_shicai3.indexOf(get.type(history[i].card));
+							var index = player.storage.nzry_shicai3.indexOf(get.type2(history[i].card));
 							if (index !== -1) player.storage.nzry_shicai3.splice(index, 1);
 						}
 						player.markSkill('nzry_shicai3');

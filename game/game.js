@@ -27930,7 +27930,7 @@
 			}
 			tempVotersIDs=new Set([...tempVotersIDs,...game.votersIDs]);
 
-			var popzhuzhong=1+get.population('zhong');
+			var popzhuzhong=get.population('zhu')+get.population('zhong');
 			var popfan=get.population('fan');
 			var popnei=get.population('nei');
 			var todie=[];
