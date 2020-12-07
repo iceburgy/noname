@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.12.05',
+	version:'2020.12.06',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修复许攸使用延时锦囊牌后再用普通锦囊还能发动恃才的bug',

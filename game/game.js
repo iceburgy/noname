@@ -28162,12 +28162,13 @@
 		},
 		updateBonusBalanceBuffer:function(nickname,bonusKey,delta){
 			if(!game.bonusBalanceBuffer) game.bonusBalanceBuffer={};
-			game.bonusBalanceBuffer[nickname]=[bonusKey,delta];
+			game.bonusBalanceBuffer[nickname+','+bonusKey]=[nickname,bonusKey,delta];
 		},
 		flushBonusBalanceBuffer:function(){
 			if(game.bonusBalanceBuffer){
 				for(var key in game.bonusBalanceBuffer){
-					game.updateBonusBalance(key,game.bonusBalanceBuffer[key][0],game.bonusBalanceBuffer[key][1]);
+					var value=game.bonusBalanceBuffer[key];
+					game.updateBonusBalance(value[0],value[1],value[2]);
 				}
 			}
 		},
