@@ -381,9 +381,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				game.eligiblePlayers=[];
 				for(var i=0;i<numberOfPlayers;i++){
 					if(game.players[i].nickname&&game.players[i].nickname!='无名玩家'){
-						var shouqikaBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeyChangeCards);
-						if(shouqikaBalance>0){
-							game.players[i].replaceHandcardsBalance=shouqikaBalance;
+						var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i].nickname,lib.bonusKeyFulibi);
+						if(fulibiBalance>=lib.bonusKeyChangeCardsCost){
+							game.players[i].replaceHandcardsBalance=fulibiBalance;
 							game.eligiblePlayers.push(game.players[i]);
 						}
 					}
@@ -2134,15 +2134,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						if(!game.players[i].isOnline2&&game.players[i]!=game.me) continue;
 						var list=[];
+						var fulibiBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeyFulibi);
 						if(!game.getBonusBirthdaybonus(game.players[i].nickname)){
-							var addRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeyAddRole);
-							if(addRoleBalance){
+							if(fulibiBalance>=lib.bonusKeyAddRoleCost){
 								found=true;
 								list.push('addRole');
 							}
 						}
-						var pickRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeyPickRole);
-						if(pickRoleBalance){
+						if(fulibiBalance>=lib.bonusKeyPickRoleCost){
 							found=true;
 							list.push('pickRole');
 						}
@@ -2262,7 +2261,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									switch(fuliname){
 										case 'addRole':
 											choiceZhu++;
-											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyAddRole,-1);
+											game.updateBonusBalanceBuffer(game.players[i].nickname,-lib.bonusKeyAddRoleCost);
 											break;
 										default:break;
 									}
@@ -2278,10 +2277,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							event.zhuList.remove(tempChars);
 							if(event.pickedChars[0].length>0){
 								tempChars.unshift(event.pickedChars[0]);
-								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyPickRole,-1);
+								game.updateBonusBalanceBuffer(game.players[i].nickname,-lib.bonusKeyPickRoleCost);
 							}
-							var superChangeRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeySuperChangeRole);
-							if(superChangeRoleBalance){
+							var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i].nickname,lib.bonusKeyFulibi);
+							if(fulibiBalance>=lib.bonusKeySuperChangeRoleCost){
 								tempChars.push(lib.bonusKeySuperChangeRole);
 							}
 							list.push([game.players[i],[str,[tempChars,'character']],false]);
@@ -2329,7 +2328,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var strAnimation=get.translation('changeRole');
 							if(isUsingSuperChangeRole){
 								strAnimation=get.translation(lib.bonusKeySuperChangeRole);
-								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeySuperChangeRole,-1);
+								game.updateBonusBalanceBuffer(game.players[i].nickname,-lib.bonusKeySuperChangeRoleCost);
 							}
 							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
 							var choiceZhu=isUsingSuperChangeRole?event.choiceNumSuperChangeRole[0]:event.choiceNumChangeRole[0];
@@ -2376,8 +2375,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								event.allList.remove(nextValidZhu);
 							}
 							var nextValidRest=game.getNextValidCharacters([...event.chosenChars[0],...nextValidZhu],choiceZhu,event.allList);
-							var superChangeRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeySuperChangeRole);
-							if(superChangeRoleBalance){
+							var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i].nickname,lib.bonusKeyFulibi);
+							if(fulibiBalance>=lib.bonusKeySuperChangeRoleCost){
 								nextValidRest.push(lib.bonusKeySuperChangeRole);
 							}
 							list.push([game.players[i],[str,[[...nextValidZhu,...nextValidRest],'character']],false]);
@@ -2426,7 +2425,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var strAnimation=get.translation('changeRole');
 							if(isUsingSuperChangeRole){
 								strAnimation=get.translation(lib.bonusKeySuperChangeRole);
-								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeySuperChangeRole,-1);
+								game.updateBonusBalanceBuffer(game.players[i].nickname,-lib.bonusKeySuperChangeRoleCost);
 							}
 							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
 							var choiceZhu=isUsingSuperChangeRole?event.choiceNumSuperChangeRole[0]:event.choiceNumChangeRole[0];
@@ -2688,7 +2687,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									switch(fuliname){
 										case 'addRole':
 											num3++;
-											game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyAddRole,-1);
+											game.updateBonusBalanceBuffer(game.players[i].nickname,-lib.bonusKeyAddRoleCost);
 											break;
 										default:break;
 									}
@@ -2703,10 +2702,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var tempChars=event.list.randomRemove(num+num3);
 							if(event.pickedChars[distanceFromZhu].length>0){
 								tempChars.unshift(event.pickedChars[distanceFromZhu]);
-								game.updateBonusBalanceBuffer(game.players[i].nickname,lib.bonusKeyPickRole,-1);
+								game.updateBonusBalanceBuffer(game.players[i].nickname,-lib.bonusKeyPickRoleCost);
 							}
-							var superChangeRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeySuperChangeRole);
-							if(superChangeRoleBalance){
+							var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i].nickname,lib.bonusKeyFulibi);
+							if(fulibiBalance>=lib.bonusKeySuperChangeRoleCost){
 								tempChars.push(lib.bonusKeySuperChangeRole);
 							}
 							list.push([game.players[i],[str,[tempChars,'character']],selectButton,false]);
@@ -2764,7 +2763,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var strAnimation=get.translation('changeRole');
 							if(isUsingSuperChangeRole){
 								strAnimation=get.translation(lib.bonusKeySuperChangeRole);
-								game.updateBonusBalanceBuffer(player.nickname,lib.bonusKeySuperChangeRole,-1);
+								game.updateBonusBalanceBuffer(player.nickname,-lib.bonusKeySuperChangeRoleCost);
 							}
 							player.trySkillAnimate(strAnimation,strAnimation,false);
 							var totalChoice=isUsingSuperChangeRole?event.choiceNumSuperChangeRole[distanceFromZhu]:event.choiceNumChangeRole[distanceFromZhu];
@@ -2825,8 +2824,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[distanceFromZhu][0],event.choiceNum[distanceFromZhu],event.list);
-							var superChangeRoleBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeySuperChangeRole);
-							if(superChangeRoleBalance){
+							var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i].nickname,lib.bonusKeyFulibi);
+							if(fulibiBalance>=lib.bonusKeySuperChangeRoleCost){
 								nextValidCharacters.push(lib.bonusKeySuperChangeRole);
 							}
 							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,false]);
@@ -2885,7 +2884,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var strAnimation=get.translation('changeRole');
 							if(isUsingSuperChangeRole){
 								strAnimation=get.translation(lib.bonusKeySuperChangeRole);
-								game.updateBonusBalanceBuffer(player.nickname,lib.bonusKeySuperChangeRole,-1);
+								game.updateBonusBalanceBuffer(player.nickname,-lib.bonusKeySuperChangeRoleCost);
 							}
 							player.trySkillAnimate(strAnimation,strAnimation,false);
 							var totalChoice=isUsingSuperChangeRole?event.choiceNumSuperChangeRole[distanceFromZhu]:event.choiceNumChangeRole[distanceFromZhu];
@@ -3188,6 +3187,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			superChangeRole:'超级换将卡',
 			superChangeRole_bg:'换',
 			superChangeRole_info:'N换N，获取方式：小内获胜',
+			fulibi:'福利币',
 		},
 		element:{
 			content:{
@@ -4251,10 +4251,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.awakenSkill('xiaoneidantiao');
 					if(player.nickname&&player.nickname!='无名玩家'){
-						var updateData={};
-						updateData[lib.bonusKeyChangeCards]=lib.config.changecardsbonus_unit;
-						updateData[lib.bonusKeyAddRole]=lib.config.addrolebonus_unit;
-						game.updateBonusBalanceDelayed(player.nickname,updateData);
+						game.updateBonusBalance(player.nickname,lib.bonusKeyFulibi,lib.config.fulibibonus_unit/2);
 					}
 				},
 				ai:{
@@ -4283,7 +4280,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.awakenSkill('xiaoneihuosheng');
 					if(player.nickname&&player.nickname!='无名玩家'){
-						game.updateBonusBalance(player.nickname,lib.bonusKeySuperChangeRole,1);
+						game.updateBonusBalance(player.nickname,lib.bonusKeyFulibi,lib.config.fulibibonus_unit/2);
 					}
 				},
 				ai:{

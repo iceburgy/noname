@@ -37,13 +37,19 @@
 		bonusKeyFuliInfo:'fuliInfo',
 		bonusKeyFuliByUsers:'fuliByUsers',
 		bonusKeyChangeCards:'changeCards',
+		bonusKeyChangeCardsCost:1,
 		bonusKeyPickRole:'pickRole',
+		bonusKeyPickRoleCost:3,
 		bonusKeyAddRole:'addRole',
+		bonusKeyAddRoleCost:2,
 		bonusKeySuperChangeRole:'superChangeRole',
+		bonusKeySuperChangeRoleCost:3,
 		bonusKeyBirthdaybonus:'birthdaybonus',
 		bonusKeyQiandaofuli:'qiandaofuli',
 		bonusKeyQianDaoCutoff:'qianDaoCutoff',
 		bonusKeyQiandaoByUsers:'qiandaoByUsers',
+		bonusKeyFulibi:'fulibi',
+		bonusKeyFulibiMaxBalance:30,
 		configprefix:'noname_0.9_',
 		versionOL:27,
 		updateURLS:{
@@ -3876,49 +3882,25 @@
 						'<button style="width:40px">确定</button></div>',
 						clear:true,
 					},
-					addaddrolebonus_by_seat:{
-						name:'选将框',
-						init:'0',
+					fulibibonus_unit:{
+						name:'福利币发放个数',
+						init:10,
 						item:{
-							'0':'一号位',
-							'1':'二号位',
-							'2':'三号位',
-							'3':'四号位',
-							'4':'五号位',
-							'5':'六号位',
-							'6':'七号位',
-							'7':'八号位',
-							'8':'九号位',
-							'9':'十号位'
+							'1':'1',
+							'2':'2',
+							'3':'3',
+							'4':'4',
+							'5':'5',
+							'10':'10',
+							'15':'15',
+							'20':'20'
 						},
-						frequent:true,
-						restart:true,
-						onclick:function(seat,label){
-							this.innerHTML=this.innerHTML.replace('选将框','奖励中...');
-							game.saveConfig('addaddrolebonus_by_seat',seat);
-							var result=game.addAddRoleBonusBySeat(seat);
-							var that=this;
-							if(result){
-								setTimeout(function(){
-									that.innerHTML=that.innerHTML.replace('奖励中...','奖励成功');
-									setTimeout(function(){
-										game.reload();
-									},1000);
-								},1000);
-							}
-							else{
-								setTimeout(function(){
-									that.innerHTML=that.innerHTML.replace('奖励中...',label.innerHTML+'没有人！');
-									setTimeout(function(){
-										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','选将框');
-									},1000);
-								},1000);
-							}
+						onclick:function(unit){
+							game.saveConfig('fulibibonus_unit',parseInt(unit));
 						},
-						intro:'按照座位号发选将框',
 					},
-					addpickrolebonus_by_seat:{
-						name:'点将卡',
+					addfulibibonus_by_seat:{
+						name:'发放福利币',
 						init:'0',
 						item:{
 							'0':'一号位',
@@ -3933,58 +3915,17 @@
 							'9':'十号位'
 						},
 						frequent:true,
-						restart:true,
+						restart:false,
 						onclick:function(seat,label){
-							this.innerHTML=this.innerHTML.replace('点将卡','奖励中...');
-							game.saveConfig('addpickrolebonus_by_seat',seat);
-							var result=game.addPickRoleBonusBySeat(seat);
-							var that=this;
-							if(result){
-								setTimeout(function(){
-									that.innerHTML=that.innerHTML.replace('奖励中...','奖励成功');
-									setTimeout(function(){
-										game.reload();
-									},1000);
-								},1000);
-							}
-							else{
-								setTimeout(function(){
-									that.innerHTML=that.innerHTML.replace('奖励中...',label.innerHTML+'没有人！');
-									setTimeout(function(){
-										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','点将卡');
-									},1000);
-								},1000);
-							}
-						},
-						intro:'按照座位号发点将卡',
-					},
-					addchangecardsbonus_by_seat:{
-						name:'手气卡',
-						init:'0',
-						item:{
-							'0':'一号位',
-							'1':'二号位',
-							'2':'三号位',
-							'3':'四号位',
-							'4':'五号位',
-							'5':'六号位',
-							'6':'七号位',
-							'7':'八号位',
-							'8':'九号位',
-							'9':'十号位'
-						},
-						frequent:true,
-						restart:true,
-						onclick:function(seat,label){
-							this.innerHTML=this.innerHTML.replace('手气卡','发放中...');
-							game.saveConfig('addchangecardsbonus_by_seat',seat);
-							var result=game.addChangeCardsBonusBySeat(seat);
+							this.innerHTML=this.innerHTML.replace('发放福利币','发放中...');
+							game.saveConfig('addfulibibonus_by_seat',seat);
+							var result=game.addFulibiBonusBySeat(seat);
 							var that=this;
 							if(result){
 								setTimeout(function(){
 									that.innerHTML=that.innerHTML.replace('发放中...','发放成功');
 									setTimeout(function(){
-										game.reload();
+										that.innerHTML=that.innerHTML.replace('发放成功','发放福利币');
 									},1000);
 								},1000);
 							}
@@ -3992,12 +3933,12 @@
 								setTimeout(function(){
 									that.innerHTML=that.innerHTML.replace('发放中...',label.innerHTML+'没有人！');
 									setTimeout(function(){
-										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','手气卡');
+										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','发放福利币');
 									},1000);
 								},1000);
 							}
 						},
-						intro:'按照座位号发放手气卡',
+						intro:'按照座位号发放福利币',
 					},
 					addbirthdaybonus_by_seat:{
 						name:'生日福利或者移除',
@@ -4149,44 +4090,6 @@
 						init:false,
 						onclick:function(bool){
 							game.saveConfig('enable_liftcomboban',bool);
-						},
-					},
-					addrolebonus_unit:{
-						name:'选将框发放个数',
-						init:1,
-						item:{
-							'1':'1',
-							'2':'2',
-							'3':'3'
-						},
-						onclick:function(unit){
-							game.saveConfig('addrolebonus_unit',parseInt(unit));
-						},
-					},
-					pickrolebonus_unit:{
-						name:'点将卡发放个数',
-						init:1,
-						item:{
-							'1':'1',
-							'2':'2',
-							'3':'3'
-						},
-						onclick:function(unit){
-							game.saveConfig('pickrolebonus_unit',parseInt(unit));
-						},
-					},
-					changecardsbonus_unit:{
-						name:'手气卡发放个数',
-						init:3,
-						item:{
-							'3':'3',
-							'5':'5',
-							'10':'10',
-							'15':'15',
-							'20':'20'
-						},
-						onclick:function(unit){
-							game.saveConfig('changecardsbonus_unit',parseInt(unit));
 						},
 					},
 
@@ -11642,25 +11545,10 @@
 
 						//var winRate=game.getWinRateByNickname(lib.config.connect_nickname);
 						var winRate='';
-						var changeCardsBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeyChangeCards);
-						if(changeCardsBalance){
+						var fulibiBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeyFulibi);
+						if(fulibiBalance){
 							if(winRate&&winRate.length) winRate+='<br/>';
-							winRate+='手气卡x'+changeCardsBalance;
-						}
-						var addRoleBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeyAddRole);
-						if(addRoleBalance){
-							if(winRate&&winRate.length) winRate+='<br/>';
-							winRate+='选将框x'+addRoleBalance;
-						}
-						var pickRoleBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeyPickRole);
-						if(pickRoleBalance){
-							if(winRate&&winRate.length) winRate+='<br/>';
-							winRate+='点将卡x'+pickRoleBalance;
-						}
-						var superChangeRoleBalance=game.getBonusBalance(lib.config.connect_nickname,lib.bonusKeySuperChangeRole);
-						if(superChangeRoleBalance){
-							if(winRate&&winRate.length) winRate+='<br/>';
-							winRate+='超级换x'+superChangeRoleBalance;
+							winRate+=get.translation(lib.bonusKeyFulibi)+'x'+fulibiBalance;
 						}
 						if(game.getBonusBirthdaybonus(lib.config.connect_nickname)){
 							if(winRate&&winRate.length) winRate+='<br/>生日福利';
@@ -11741,9 +11629,9 @@
 							}
 							else{
 								player.replaceHandcardsBalance--;
-								game.updateBonusBalance(player.nickname,lib.bonusKeyChangeCards,-1);
+								game.updateBonusBalance(player.nickname,lib.bonusKeyFulibi,-lib.bonusKeyChangeCardsCost);
 							}
-							if(!game.getBonusBalance(player.nickname,lib.bonusKeyChangeCards)){
+							if(!game.getBonusBalanceWithBuffer(player.nickname,lib.bonusKeyFulibi)){
 								game.eligiblePlayers.remove(player);
 							}
 						}
@@ -26509,25 +26397,10 @@
 								}
 								//var winRate=game.getWinRateByNickname(this.nickname);
 								var winRate='';
-								var changeCardsBalance=game.getBonusBalance(this.nickname,lib.bonusKeyChangeCards);
-								if(changeCardsBalance){
+								var fulibiBalance=game.getBonusBalance(this.nickname,lib.bonusKeyFulibi);
+								if(fulibiBalance){
 									if(winRate&&winRate.length) winRate+='<br/>';
-									winRate+='手气卡x'+changeCardsBalance;
-								}
-								var addRoleBalance=game.getBonusBalance(this.nickname,lib.bonusKeyAddRole);
-								if(addRoleBalance){
-									if(winRate&&winRate.length) winRate+='<br/>';
-									winRate+='选将框x'+addRoleBalance;
-								}
-								var pickRoleBalance=game.getBonusBalance(this.nickname,lib.bonusKeyPickRole);
-								if(pickRoleBalance){
-									if(winRate&&winRate.length) winRate+='<br/>';
-									winRate+='点将卡x'+pickRoleBalance;
-								}
-								var superChangeRoleBalance=game.getBonusBalance(this.nickname,lib.bonusKeySuperChangeRole);
-								if(superChangeRoleBalance){
-									if(winRate&&winRate.length) winRate+='<br/>';
-									winRate+='超级换x'+superChangeRoleBalance;
+									winRate+=get.translation(lib.bonusKeyFulibi)+'x'+fulibiBalance;
 								}
 								if(game.getBonusBirthdaybonus(this.nickname)){
 									if(winRate&&winRate.length) winRate+='<br/>生日福利';
@@ -26897,7 +26770,7 @@
 								ip+='<br/>解禁组合禁将！';
 							}
 							if(game.isQiandaoing()){
-								ip+='<br/>签到福利发放中！手气卡x'+lib.config.changecardsbonus_unit+'，选将框x'+lib.config.addrolebonus_unit+'，点将卡x'+lib.config.pickrolebonus_unit;
+								ip+='<br/>签到福利发放中！'+get.translation(lib.bonusKeyFulibi)+'x'+lib.config.fulibibonus_unit;
 								var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
 								ip+='<br/>截止到：'+cutoff.toLocaleString();
 							}
@@ -28079,7 +27952,12 @@
 			}
 			return balance;
 		},
-		updateBonusBalance:function(nickname,bonusKey,delta,nopopup){
+		getBonusBalanceWithBuffer:function(nickname,bonusKey){
+			var balance=game.getBonusBalance(nickname,lib.bonusKeyFulibi);
+			var balanceBuffer=game.getBonusBalanceBuffer(nickname,lib.bonusKeyFulibi);
+			return balance+balanceBuffer;
+		},
+		updateBonusBalance:function(nickname,bonusKey,delta){
 			if(!lib.config[lib.bonusKeyFuliInfo]){
 				lib.config[lib.bonusKeyFuliInfo]={};
 			}
@@ -28101,32 +27979,8 @@
 				game.updateWaiting();
 			}
 			var curPlayer=game.getPlayerByNickname(nickname);
-			if(!nopopup&&delta>0&&curPlayer){
+			if(delta>0&&curPlayer){
 				game.fullscreenpopbyplayer(curPlayer,'获得：'+get.translation(bonusKey)+' x'+delta);
-			}
-		},
-		updateBonusBalanceDelayed:function(nickname,data){
-			var messages=[];
-			for(var key in data){
-				var value=data[key];
-				game.updateBonusBalance(nickname,key,value,true);
-				if(value>0){
-					messages.push('获得：'+get.translation(key)+' x'+value);
-				}
-			}
-			var curPlayer=game.getPlayerByNickname(nickname);
-			game.fullscreenpopbyplayerDelayed(curPlayer,messages);
-		},
-		fullscreenpopbyplayerDelayed:function(curPlayer,messages){
-			if(messages&&Array.isArray(messages)){
-				var delayMS=500;
-				var incrementMS=1500;
-				for(var msg of messages){
-					setTimeout(function(m){
-						game.fullscreenpopbyplayer(curPlayer,m);
-					},delayMS,msg);
-					delayMS+=incrementMS;
-				}
 			}
 		},
 		fullscreenpopbyplayer:function(curPlayer,msg){
@@ -28160,35 +28014,29 @@
 				if(p.nickname==nickname) return p;
 			}
 		},
-		updateBonusBalanceBuffer:function(nickname,bonusKey,delta){
+		updateBonusBalanceBuffer:function(nickname,delta){
 			if(!game.bonusBalanceBuffer) game.bonusBalanceBuffer={};
-			game.bonusBalanceBuffer[nickname+','+bonusKey]=[nickname,bonusKey,delta];
+			if(!(nickname in game.bonusBalanceBuffer)) game.bonusBalanceBuffer[nickname]=0;
+			game.bonusBalanceBuffer[nickname]+=delta;
 		},
 		flushBonusBalanceBuffer:function(){
 			if(game.bonusBalanceBuffer){
-				for(var key in game.bonusBalanceBuffer){
-					var value=game.bonusBalanceBuffer[key];
-					game.updateBonusBalance(value[0],value[1],value[2]);
+				for(var nickname in game.bonusBalanceBuffer){
+					var value=game.bonusBalanceBuffer[nickname];
+					game.updateBonusBalance(nickname,lib.bonusKeyFulibi,value);
 				}
 			}
 		},
-		addChangeCardsBonusBySeat:function(seat){
-			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
-				game.updateBonusBalance(game.connectPlayers[seat].nickname,lib.bonusKeyChangeCards,1);
-				return true;
+		getBonusBalanceBuffer:function(nickname,bonusKey){
+			var balance=0;
+			if(game.bonusBalanceBuffer&&(nickname in game.bonusBalanceBuffer)){
+				balance=game.bonusBalanceBuffer[nickname];
 			}
-			return false;
+			return balance;
 		},
-		addAddRoleBonusBySeat:function(seat){
+		addFulibiBonusBySeat:function(seat){
 			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
-				game.updateBonusBalance(game.connectPlayers[seat].nickname,lib.bonusKeyAddRole,1);
-				return true;
-			}
-			return false;
-		},
-		addPickRoleBonusBySeat:function(seat){
-			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
-				game.updateBonusBalance(game.connectPlayers[seat].nickname,lib.bonusKeyPickRole,1);
+				game.updateBonusBalance(game.connectPlayers[seat].nickname,lib.bonusKeyFulibi,lib.config.fulibibonus_unit);
 				return true;
 			}
 			return false;
@@ -28290,13 +28138,7 @@
 			!(nickname.toLowerCase() in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])){
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][ip]=new Date();
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][nickname.toLowerCase()]=new Date();
-				var updateData={};
-				updateData[lib.bonusKeyChangeCards]=lib.config.changecardsbonus_unit;
-				updateData[lib.bonusKeyAddRole]=lib.config.addrolebonus_unit;
-				updateData[lib.bonusKeyPickRole]=lib.config.pickrolebonus_unit;
-				// todo: temp, remove after 12/04
-				updateData[lib.bonusKeySuperChangeRole]=1;
-				game.updateBonusBalanceDelayed(nickname,updateData);
+				game.updateBonusBalance(nickname,lib.bonusKeyFulibi,lib.config.fulibibonus_unit);
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},
@@ -28835,25 +28677,10 @@
 				if(player.playerid){
 					//var winRate=game.getWinRateByNickname(player.nickname);
 					var winRate='';
-					var changeCardsBalance=game.getBonusBalance(player.nickname,lib.bonusKeyChangeCards);
-					if(changeCardsBalance){
+					var fulibiBalance=game.getBonusBalance(player.nickname,lib.bonusKeyFulibi);
+					if(fulibiBalance){
 						if(winRate&&winRate.length) winRate+='<br/>';
-						winRate+='手气卡x'+changeCardsBalance;
-					}
-					var addRoleBalance=game.getBonusBalance(player.nickname,lib.bonusKeyAddRole);
-					if(addRoleBalance){
-						if(winRate&&winRate.length) winRate+='<br/>';
-						winRate+='选将框x'+addRoleBalance;
-					}
-					var pickRoleBalance=game.getBonusBalance(player.nickname,lib.bonusKeyPickRole);
-					if(pickRoleBalance){
-						if(winRate&&winRate.length) winRate+='<br/>';
-						winRate+='点将卡x'+pickRoleBalance;
-					}
-					var superChangeRoleBalance=game.getBonusBalance(player.nickname,lib.bonusKeySuperChangeRole);
-					if(superChangeRoleBalance){
-						if(winRate&&winRate.length) winRate+='<br/>';
-						winRate+='超级换x'+superChangeRoleBalance;
+						winRate+=get.translation(lib.bonusKeyFulibi)+'x'+fulibiBalance;
 					}
 					if(game.getBonusBirthdaybonus(player.nickname)){
 						if(winRate&&winRate.length) winRate+='<br/>生日福利';
@@ -46580,7 +46407,7 @@
 						ip+='<br/>解禁组合禁将！';
 					}
 					if(game.isQiandaoing()){
-						ip+='<br/>签到福利发放中！手气卡x'+lib.config.changecardsbonus_unit+'，选将框x'+lib.config.addrolebonus_unit+'，点将卡x'+lib.config.pickrolebonus_unit;
+						ip+='<br/>签到福利发放中！'+get.translation(lib.bonusKeyFulibi)+'x'+lib.config.fulibibonus_unit;
 						var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
 						ip+='<br/>截止到：'+cutoff.toLocaleString();
 					}
