@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.12.07',
+	version:'2020.12.08',
 	update:'2020.11.06.2',
 	changeLog:[
 		'合并所有道具为福利币（手气卡=福利币x1，选将框=福利币x2，点将卡=福利币x3，超级换将卡=福利币x3）',

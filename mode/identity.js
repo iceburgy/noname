@@ -4280,7 +4280,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.awakenSkill('xiaoneihuosheng');
 					if(player.nickname&&player.nickname!='无名玩家'){
-						game.updateBonusBalance(player.nickname,lib.bonusKeyFulibi,lib.config.fulibibonus_unit/2);
+						setTimeout(function(){
+							game.updateBonusBalance(player.nickname,lib.bonusKeyFulibi,lib.config.fulibibonus_unit/2);
+						},2000);
 					}
 				},
 				ai:{

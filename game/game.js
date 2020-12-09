@@ -27979,21 +27979,33 @@
 				game.updateWaiting();
 			}
 			var curPlayer=game.getPlayerByNickname(nickname);
-			if(delta>0&&curPlayer){
-				game.fullscreenpopbyplayer(curPlayer,'获得：'+get.translation(bonusKey)+' x'+delta);
+			if(curPlayer){
+				var msg='';
+				var color='';
+				if(delta>0){
+					msg='获得：'+get.translation(bonusKey)+' x'+delta;
+					color='fire';
+				}
+				else if(delta<0){
+					msg='消耗：'+get.translation(bonusKey)+' x'+(-delta);
+					color='water';
+				}
+				if(msg&&color){
+					game.fullscreenpopbyplayer(curPlayer,msg,color);
+				}
 			}
 		},
-		fullscreenpopbyplayer:function(curPlayer,msg){
+		fullscreenpopbyplayer:function(curPlayer,msg,color){
 			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[0]==curPlayer||game.me&&game.me==curPlayer){
-				curPlayer.$fullscreenpopnobroadcast(msg,'fire');
+				curPlayer.$fullscreenpopnobroadcast(msg,color);
 			}
 			else{
-				curPlayer.send(function(msg){
+				curPlayer.send(function(msg,color){
 					var curPlayer;
 					if(game.connectPlayers&&game.connectPlayers.length) curPlayer=game.connectPlayers[0];
 					else curPlayer=game.me;
-					curPlayer.$fullscreenpopnobroadcast(msg,'fire');
-				},msg);
+					curPlayer.$fullscreenpopnobroadcast(msg,color);
+				},msg,color);
 			}
 		},
 		getPlayerByNickname:function(nickname){
