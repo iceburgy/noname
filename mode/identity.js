@@ -3187,7 +3187,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			superChangeRole:'超级换将卡',
 			superChangeRole_bg:'换',
 			superChangeRole_info:'N换N，获取方式：小内获胜',
-			fulibi:'福利币',
+			fulibi:'杀币',
 		},
 		element:{
 			content:{

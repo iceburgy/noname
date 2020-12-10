@@ -3883,7 +3883,7 @@
 						clear:true,
 					},
 					fulibibonus_unit:{
-						name:'福利币发放个数',
+						name:'杀币发放个数',
 						init:10,
 						item:{
 							'1':'1',
@@ -3900,7 +3900,7 @@
 						},
 					},
 					addfulibibonus_by_seat:{
-						name:'发放福利币',
+						name:'发放杀币',
 						init:'0',
 						item:{
 							'0':'一号位',
@@ -3917,7 +3917,7 @@
 						frequent:true,
 						restart:false,
 						onclick:function(seat,label){
-							this.innerHTML=this.innerHTML.replace('发放福利币','发放中...');
+							this.innerHTML=this.innerHTML.replace('发放杀币','发放中...');
 							game.saveConfig('addfulibibonus_by_seat',seat);
 							var result=game.addFulibiBonusBySeat(seat);
 							var that=this;
@@ -3925,7 +3925,7 @@
 								setTimeout(function(){
 									that.innerHTML=that.innerHTML.replace('发放中...','发放成功');
 									setTimeout(function(){
-										that.innerHTML=that.innerHTML.replace('发放成功','发放福利币');
+										that.innerHTML=that.innerHTML.replace('发放成功','发放杀币');
 									},1000);
 								},1000);
 							}
@@ -3933,12 +3933,12 @@
 								setTimeout(function(){
 									that.innerHTML=that.innerHTML.replace('发放中...',label.innerHTML+'没有人！');
 									setTimeout(function(){
-										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','发放福利币');
+										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','发放杀币');
 									},1000);
 								},1000);
 							}
 						},
-						intro:'按照座位号发放福利币',
+						intro:'按照座位号发放杀币',
 					},
 					addbirthdaybonus_by_seat:{
 						name:'生日福利或者移除',
