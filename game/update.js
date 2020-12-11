@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.12.11',
+	version:'2020.12.11.1',
 	update:'2020.11.06.2',
 	changeLog:[
 		'合并所有道具为杀币（手气卡=杀币x1，选将框=杀币x2，点将卡=杀币x3，超级换将卡=杀币x3）',

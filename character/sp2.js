@@ -1927,6 +1927,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
 						return current.countCards('e')>0;
+					})&&
+					game.hasPlayer(function(current){
+						return player.canUse('sha',current);
 					});
 				},
 				content:function(){
