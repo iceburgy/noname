@@ -359,6 +359,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			});
 
 			// only jiangyouwei has shouqika
+			event.changeCardCount=parseInt(lib.configOL.change_card);
 			if(_status.connectMode&&lib.configOL.change_card) {
 				var numberOfPlayers=game.players.length;
 				var numberOfEligiblePlayers=0;
@@ -412,7 +413,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"step 7"
 			game.replaceHandcards(game.eligiblePlayers);
 			"step 8"
-			if(game.eligiblePlayers.length>0) event.goto(7);
+			if(!isNaN(event.changeCardCount)) event.changeCardCount--;
+			if((isNaN(event.changeCardCount)||event.changeCardCount>0)&&game.eligiblePlayers.length>0) event.goto(7);
 			"step 9"
 			game.phaseLoop(_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me);
 		},

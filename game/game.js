@@ -4509,9 +4509,17 @@
 					},
 					connect_change_card:{
 						name:'启用手气卡',
-						init:false,
-						frequent:true,
-						restart:true,
+						init:3,
+						item:{
+							0:'禁用',
+							1:'一次',
+							2:'两次',
+							3:'三次',
+							4:'四次',
+							5:'五次',
+							10:'十次',
+							unlimited:'无限',
+						}
 					},
 					connect_special_identity:{
 						name:'特殊身份',
