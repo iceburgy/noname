@@ -849,7 +849,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['sp_key_yuri'],
 				trigger:{player:'phaseUseBegin'},
-				direct:true,
+				forced:true,
 				filter:function(event,player){
 					return player.countCards('he')>0;
 				},
