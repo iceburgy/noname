@@ -1879,6 +1879,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.lose(result.cards,ui.special,'toStorage');
 						player.storage.qixing=player.storage.qixing.concat(result.cards);
 						player.syncStorage('qixing');
+						player.markSkill('qixing');
 						event.num=result.cards.length;
 					}
 					else{
@@ -1902,6 +1903,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.qixing.remove(result.links[i]);
 					}
 					player.syncStorage('qixing');
+					player.markSkill('qixing');
 					if(player==game.me&&_status.auto){
 						game.delay(0.5);
 					}
@@ -1959,6 +1961,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.lose(result.cards,ui.special,'toStorage');
 						player.storage.qixing=player.storage.qixing.concat(result.cards);
 						player.syncStorage('qixing');
+						player.markSkill('qixing');
 						event.num=result.cards.length;
 					}
 					else{
@@ -1982,6 +1985,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.qixing.remove(result.links[i]);
 					}
 					player.syncStorage('qixing');
+					player.markSkill('qixing');
 					if(player==game.me&&_status.auto){
 						game.delay(0.5);
 					}

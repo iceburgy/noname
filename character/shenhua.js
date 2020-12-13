@@ -2841,11 +2841,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('prompt','失去任意点体力').set('goon',num);
 					'step 1'
 					var num=event.map[result.control]||1;
-					player.storage.defaultCardUsable=player.getCardUsable('sha');
-					player.storage.qimou2=num;
-					player.storage.qimou5=num;
-					player.storage.qimou3=num+player.storage.defaultCardUsable;
+					player.storage.qimou2=num; // for extra sha usable tracking
+					player.storage.qimou5=num; // only for range tracking
+					player.storage.qimou3=num+player.getCardUsable('sha'); // usable sha total count
 					player.loseHp(num);
+					player.draw(num);
 					player.addTempSkill('qimou2');
 					player.addTempSkill('qimou3');
 					player.markSkill('qimou3');
@@ -2900,31 +2900,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qimou3:{
-				trigger:{player:'useCardAfter'},
+				trigger:{global:'useCardAfter'},
 				silent:true,
 				intro:{
-					content:function(storage){
-						return '可使用杀的次数'+storage;
+					content:function(storage,player){
+						return '可使用杀的次数'+storage+',距离减'+player.storage.qimou5;
 					}
 				},
 				filter:function(event,player){
 					return player.storage.qimou3>0&&get.name(event.card)=='sha';
 				},
 				content:function(){
-					player.storage.qimou3--;
+					player.storage.qimou3=player.getCardUsable('sha');
 					player.markSkill('qimou3');
+					player.storage.usedExtraShas=player.getStat().card.sha-1;
 				},
 				onremove:true,
 			},
 			qimou4:{
-				trigger:{player:'phaseUseEnd'},
+				// this skill is only meant for liaohua with two use phases
+				trigger:{player:'phaseUseBegin'},
 				silent:true,
 				content:function(){
-					var usedShas=player.getHistory('useCard',function(evt){
-						return evt.card&&evt.card.name=='sha';
-					}).length;
-					player.storage.qimou2-=(usedShas-player.storage.defaultCardUsable);
-					player.storage.qimou3+=player.storage.defaultCardUsable;
+					if(player.storage.usedExtraShas&&player.storage.usedExtraShas>0) player.storage.qimou2-=player.storage.usedExtraShas;
+					if(player.storage.qimou2<0) player.storage.qimou2=0;
+					player.storage.qimou3=player.storage.qimou2+1;
+					player.markSkill('qimou3');
 				},
 				onremove:true,
 			},

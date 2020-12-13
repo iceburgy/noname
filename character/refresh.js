@@ -2168,7 +2168,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.reqimou5=num; // only for range tracking
 					player.storage.reqimou3=num+player.getCardUsable('sha'); // usable sha total count
 					player.loseHp(num);
-					//player.draw(num);
+					player.draw(num);
 					player.addTempSkill('reqimou2');
 					player.addTempSkill('reqimou3');
 					player.markSkill('reqimou3');
