@@ -45720,7 +45720,19 @@
 				ui.system1=ui.create.div('#system1',ui.system);
 				ui.system2=ui.create.div('#system2',ui.system);
 
-				ui.replay=ui.create.system('重来',game.reload,true);
+				ui.replay=ui.create.system('重来',function(){
+					if(this.innerHTML=='<span>确认</span>'){
+						clearTimeout(this.confirmTimeout);
+						game.reload();
+					}
+					else{
+						this.innerHTML='<span>确认</span>';
+						var that=this;
+						this.confirmTimeout=setTimeout(function(){
+							that.innerHTML='<span>重来</span>';
+						},1000);
+					}
+				},true);
 				ui.replay.id='restartbutton';
 				ui.config2=ui.create.system('选项',ui.click.config);
 				ui.pause=ui.create.system('暂停',ui.click.pause);
