@@ -3982,7 +3982,7 @@
 						intro:'按照座位号发生日福利卡，重复发将会移除生日福利卡',
 					},
 					qiandaofuli_cutoff:{
-						name:'签到福利截止时间',
+						name:'早到福利截止时间',
 						init:'19',
 						item:{
 							'-1':'关闭',
@@ -3993,9 +3993,9 @@
 						},
 						frequent:true,
 						restart:true,
-						intro:'签到福利截止时间',
+						intro:'早到福利截止时间',
 						onclick:function(hour,label){
-							this.innerHTML=this.innerHTML.replace('签到福利截止时间','设置中...');
+							this.innerHTML=this.innerHTML.replace('早到福利截止时间','设置中...');
 							game.setQiandaofuliCutoffByHour(hour);
 							game.saveConfig('qiandaofuli_cutoff',hour);
 							var that=this;
@@ -26780,7 +26780,7 @@
 							if(game.isQiandaoing()){
 								ip+='<br/>签到福利发放中！'+get.translation(lib.bonusKeyFulibi)+'x'+lib.config.fulibibonus_unit;
 								var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
-								ip+='<br/>截止到：'+cutoff.toLocaleString();
+								ip+='<br/>早到福利截止到：'+cutoff.toLocaleString();
 							}
 							var args=[];
 							args.push(function(ip){
@@ -28139,7 +28139,7 @@
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli]&&
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff]){
 				var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
-				return new Date()<=cutoff;
+				return (new Date()).toDateString()==cutoff.toDateString();
 			}
 			return false;
 		},
@@ -28156,9 +28156,12 @@
 			}
 			if(!(ip in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])&&
 			!(nickname.toLowerCase() in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])){
-				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][ip]=new Date();
-				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][nickname.toLowerCase()]=new Date();
-				game.updateBonusBalance(nickname,lib.bonusKeyFulibi,lib.config.fulibibonus_unit);
+				var now=new Date();
+				var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
+				var dividend=now<=cutoff?1:2;
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][ip]=now;
+				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][nickname.toLowerCase()]=now;
+				game.updateBonusBalance(nickname,lib.bonusKeyFulibi,lib.config.fulibibonus_unit/dividend);
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},
@@ -46441,7 +46444,7 @@
 					if(game.isQiandaoing()){
 						ip+='<br/>签到福利发放中！'+get.translation(lib.bonusKeyFulibi)+'x'+lib.config.fulibibonus_unit;
 						var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
-						ip+='<br/>截止到：'+cutoff.toLocaleString();
+						ip+='<br/>早到福利截止到：'+cutoff.toLocaleString();
 					}
 					game.displayQiandaofuli(ip);
 				}
