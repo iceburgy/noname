@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.12.17',
+	version:'2020.12.18',
 	update:'2020.11.06.2',
 	changeLog:[
 		'签到奖励机制改为10-5（七点前奖励10个杀币，七点后奖励减半）',

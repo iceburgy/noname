@@ -2845,7 +2845,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.qimou5=num; // only for range tracking
 					player.storage.qimou3=num+player.getCardUsable('sha'); // usable sha total count
 					player.loseHp(num);
-					player.draw(num);
 					player.addTempSkill('qimou2');
 					player.addTempSkill('qimou3');
 					player.markSkill('qimou3');
