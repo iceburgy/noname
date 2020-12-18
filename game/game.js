@@ -3986,6 +3986,7 @@
 						init:'19',
 						item:{
 							'-1':'关闭',
+							'6':'早上6点',
 							'18':'晚上6点',
 							'19':'晚上7点',
 							'20':'晚上8点',
@@ -26778,7 +26779,7 @@
 								ip+='<br/>解禁组合禁将！';
 							}
 							if(game.isQiandaoing()){
-								ip+='<br/>签到福利发放中！'+get.translation(lib.bonusKeyFulibi)+'x'+lib.config.fulibibonus_unit;
+								ip+='<br/>签到福利发放中！'+get.translation(lib.bonusKeyFulibi)+'x'+game.getQiandaofuliUnit();
 								var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
 								ip+='<br/>早到福利截止到：'+cutoff.toLocaleString();
 							}
@@ -28009,10 +28010,12 @@
 			}
 			else{
 				curPlayer.send(function(msg,color){
-					var curPlayer;
-					if(game.connectPlayers&&game.connectPlayers.length) curPlayer=game.connectPlayers[0];
-					else curPlayer=game.me;
-					curPlayer.$fullscreenpopnobroadcast(msg,color);
+					setTimeout(function(){
+						var curPlayer;
+						if(game.connectPlayers&&game.connectPlayers.length) curPlayer=game.connectPlayers[0];
+						else curPlayer=game.me;
+						curPlayer.$fullscreenpopnobroadcast(msg,color);
+					},500);
 				},msg,color);
 			}
 		},
@@ -28157,13 +28160,21 @@
 			if(!(ip in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])&&
 			!(nickname.toLowerCase() in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers])){
 				var now=new Date();
-				var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
-				var dividend=now<=cutoff?1:2;
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][ip]=now;
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][nickname.toLowerCase()]=now;
-				game.updateBonusBalance(nickname,lib.bonusKeyFulibi,lib.config.fulibibonus_unit/dividend);
+				game.updateBonusBalance(nickname,lib.bonusKeyFulibi,game.getQiandaofuliUnit());
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
+		},
+		getQiandaofuliUnit:function(){
+			var qiandaofuliUnit=0;
+			if(game.isQiandaoing()){
+				var now=new Date();
+				var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
+				var dividend=now<=cutoff?1:2;
+				qiandaofuliUnit=parseInt(lib.config.fulibibonus_unit/dividend);
+			}
+			return qiandaofuliUnit;
 		},
 		displayQiandaofuli:function(ip){
 			var bar=ui.create.div(ui.window);
@@ -46442,7 +46453,7 @@
 						ip+='<br/>解禁组合禁将！';
 					}
 					if(game.isQiandaoing()){
-						ip+='<br/>签到福利发放中！'+get.translation(lib.bonusKeyFulibi)+'x'+lib.config.fulibibonus_unit;
+						ip+='<br/>签到福利发放中！'+get.translation(lib.bonusKeyFulibi)+'x'+game.getQiandaofuliUnit();
 						var cutoff=lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQianDaoCutoff];
 						ip+='<br/>早到福利截止到：'+cutoff.toLocaleString();
 					}
