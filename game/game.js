@@ -43,7 +43,7 @@
 		bonusKeyAddRole:'addRole',
 		bonusKeyAddRoleCost:2,
 		bonusKeySuperChangeRole:'superChangeRole',
-		bonusKeySuperChangeRoleCost:3,
+		bonusKeySuperChangeRoleCost:5,
 		bonusKeyBirthdaybonus:'birthdaybonus',
 		bonusKeyQiandaofuli:'qiandaofuli',
 		bonusKeyQianDaoCutoff:'qianDaoCutoff',
@@ -27932,7 +27932,7 @@
 					numHuman++;
 				}
 			}
-			return numHuman>=6&&(clients.length==8||clients.length==10);
+			return numHuman>=6&&(clients.length==8||clients.length==10)&&!_status.overtie;
 		},
 		getAllFuliInfo:function(){
 			if(lib.config[lib.bonusKeyFuliInfo]&&lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]){
@@ -32342,36 +32342,13 @@
 			// update bonus balance only if a game properly ends
 			game.flushBonusBalanceBuffer();
 
-			var winnerId;
+			var winnerId="";
 			var tableStatistics;
 			var tableStatisticsByRole;
 			var winnerText='';
 			var clients=game.players.concat(game.dead);
-			for(i=0;i<clients.length;i++){
-				var playerWin=game.checkOnlineResult(clients[i]);
-				if(playerWin&&(!winnerId||playerIdentity=='zhong')){
-					winnerId=clients[i].identity;
-				}
-			}
-			switch(winnerId){
-				case 'zhu':
-					winnerText='，主公获胜';
-					break;
-				case 'zhong':
-					winnerText='，主忠获胜';
-					break;
-				case 'fan':
-					winnerText='，反贼获胜';
-					break;
-				case 'nei':
-					winnerText='，内奸获胜';
-					break;
-				default:
-					winnerText='，和了';
-					break;
-			}
 			// only record statistics if there are at least certain human players
-			if(!_status.overtie&&_status.connectMode&&game.isARealGame()){
+			if(_status.connectMode){
 				// game statistics
 				/* lib.config.stats_game
 				{
@@ -32466,6 +32443,9 @@
 					}
 				});
 				for(i=0;i<clients.length;i++){
+					var playerIdentity=clients[i].identity;
+					var playerWin=game.checkOnlineResult(clients[i]);
+					if(playerWin&&(!winnerId||playerIdentity=='zhong')) winnerId=playerIdentity;
 					if(!clients[i].nickname||clients[i].nickname=='无名玩家') continue;
 					var nameol=clients[i].nickname;
 					if(!playersStatistics[nameol]){
@@ -32488,7 +32468,7 @@
 							'fanRate':'0%',
 						}
 					}
-					if(!rolesStatistics[clients[i].name1]){
+					if(game.isARealGame()&&!rolesStatistics[clients[i].name1]){
 						rolesStatistics[clients[i].name1]={
 							'numWin':0,
 							'numLose':0,
@@ -32507,7 +32487,7 @@
 							'fanRate':'0',
 						}
 					}
-					if(!rolesStatistics[clients[i].name2]){
+					if(game.isARealGame()&&!rolesStatistics[clients[i].name2]){
 						rolesStatistics[clients[i].name2]={
 							'numWin':0,
 							'numLose':0,
@@ -32526,9 +32506,11 @@
 							'fanRate':'0',
 						}
 					}
-					var playerIdentity=clients[i].identity;
-					var playerWin=game.checkOnlineResult(clients[i]);
 					playersStatistics[nameol]['lastID']=playerIdentity;
+
+					// stop collecting statistics if it is a tie game
+					if(!game.isARealGame()) continue;
+
 					if(playerWin){
 						playersStatistics[nameol]['numWin']++;
 						playersStatistics[nameol][playerIdentity+'Win']++;
@@ -32578,132 +32560,141 @@
 				// gather identity statistics
 				switch(winnerId){
 					case 'zhu':
+						winnerText='，主公获胜';
+						if(game.isARealGame()) identityStatistics.zhuzhong++;
+						break;
 					case 'zhong':
-						identityStatistics.zhuzhong++;
+						winnerText='，主忠获胜';
+						if(game.isARealGame()) identityStatistics.zhuzhong++;
 						break;
 					case 'fan':
-						identityStatistics.fan++;
+						winnerText='，反贼获胜';
+						if(game.isARealGame()) identityStatistics.fan++;
 						break;
 					case 'nei':
-						identityStatistics.nei++;
+						winnerText='，内奸获胜';
+						if(game.isARealGame()) identityStatistics.nei++;
 						break;
 					default:
+						winnerText='，和了';
 						break;
 				}
 
-				tableStatistics=document.createElement('table');
-				tr=document.createElement('tr');
-				tr.appendChild(document.createElement('td'));
-				td=document.createElement('td');
-				td.innerHTML='主忠';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='反贼';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='内奸';
-				tr.appendChild(td);
-				tableStatistics.appendChild(tr);
+				if(game.isARealGame()){
+					tableStatistics=document.createElement('table');
+					tr=document.createElement('tr');
+					tr.appendChild(document.createElement('td'));
+					td=document.createElement('td');
+					td.innerHTML='主忠';
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML='反贼';
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML='内奸';
+					tr.appendChild(td);
+					tableStatistics.appendChild(tr);
 
-				tr=document.createElement('tr');
-				td=document.createElement('td');
-				td.innerHTML='胜场';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML=identityStatistics.zhuzhong;
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML=identityStatistics.fan;
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML=identityStatistics.nei;
-				tr.appendChild(td);
-				tableStatistics.appendChild(tr);
-
-				// table by roles
-				var roles=[];
-				for(i=0;i<clients.length;i++){
-					if(!clients[i].nickname||clients[i].nickname=='无名玩家') continue;
-					roles.push(clients[i].name1);
-					roles.push(clients[i].name2);
-				}
-
-				roles.sort((a, b) => {
-					var statsGame=lib.config[lib.statsKeyGame];
-					if(!statsGame){
-						statsGame={};
-					}
-					var statsByZones=statsGame[lib.statsKeyStatsByZones];
-					if(!statsByZones){
-						statsByZones={};
-					}
-					var statsLocal=statsByZones[lib.statsKeyLocal];
-					if(!statsLocal){
-						statsLocal={};
-					}
-					var rolesStatistics=statsLocal[lib.statsKeyRole];
-					if(rolesStatistics){
-						if(rolesStatistics[a].winRate!=rolesStatistics[b].winRate){
-							return rolesStatistics[a].winRate>rolesStatistics[b].winRate?-1:1;
-						}
-						if(rolesStatistics[a].numWin!=rolesStatistics[b].numWin){
-							return rolesStatistics[a].numWin>rolesStatistics[b].numWin?-1:1;
-						}
-						return a<=b?-1:1;
-					}
-				});
-
-				tableStatisticsByRole=document.createElement('table');
-				tr=document.createElement('tr');
-				td=document.createElement('td');
-				td.innerHTML='武将';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='身份';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='战况';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='胜场';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='负场';
-				tr.appendChild(td);
-				td=document.createElement('td');
-				td.innerHTML='胜率';
-				tr.appendChild(td);
-				tableStatisticsByRole.appendChild(tr);
-
-				for(i=0;i<roles.length;i++){
 					tr=document.createElement('tr');
 					td=document.createElement('td');
-					td.innerHTML=get.translation(roles[i]);
+					td.innerHTML='胜场';
 					tr.appendChild(td);
 					td=document.createElement('td');
-					var roleIdentity='unknown';
-					var roleWin=false;
-					for(j=0;j<clients.length;j++){
-						if(clients[j].name1==roles[i]||clients[j].name2==roles[i]){
-							roleIdentity=clients[j].identity;
-							roleWin=game.checkOnlineResult(clients[j]);
-						}
+					td.innerHTML=identityStatistics.zhuzhong;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=identityStatistics.fan;
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=identityStatistics.nei;
+					tr.appendChild(td);
+					tableStatistics.appendChild(tr);
+
+					// table by roles
+					var roles=[];
+					for(i=0;i<clients.length;i++){
+						if(!clients[i].nickname||clients[i].nickname=='无名玩家') continue;
+						roles.push(clients[i].name1);
+						roles.push(clients[i].name2);
 					}
-					td.innerHTML=get.translation(roleIdentity);
+
+					roles.sort((a, b) => {
+						var statsGame=lib.config[lib.statsKeyGame];
+						if(!statsGame){
+							statsGame={};
+						}
+						var statsByZones=statsGame[lib.statsKeyStatsByZones];
+						if(!statsByZones){
+							statsByZones={};
+						}
+						var statsLocal=statsByZones[lib.statsKeyLocal];
+						if(!statsLocal){
+							statsLocal={};
+						}
+						var rolesStatistics=statsLocal[lib.statsKeyRole];
+						if(rolesStatistics){
+							if(rolesStatistics[a].winRate!=rolesStatistics[b].winRate){
+								return rolesStatistics[a].winRate>rolesStatistics[b].winRate?-1:1;
+							}
+							if(rolesStatistics[a].numWin!=rolesStatistics[b].numWin){
+								return rolesStatistics[a].numWin>rolesStatistics[b].numWin?-1:1;
+							}
+							return a<=b?-1:1;
+						}
+					});
+
+					tableStatisticsByRole=document.createElement('table');
+					tr=document.createElement('tr');
+					td=document.createElement('td');
+					td.innerHTML='武将';
 					tr.appendChild(td);
 					td=document.createElement('td');
-					td.innerHTML=get.translation(roleWin?'获胜':'-');
+					td.innerHTML='身份';
 					tr.appendChild(td);
 					td=document.createElement('td');
-					td.innerHTML=rolesStatistics[roles[i]]['numWin'];
+					td.innerHTML='战况';
 					tr.appendChild(td);
 					td=document.createElement('td');
-					td.innerHTML=rolesStatistics[roles[i]]['numLose'];
+					td.innerHTML='胜场';
 					tr.appendChild(td);
 					td=document.createElement('td');
-					td.innerHTML=rolesStatistics[roles[i]]['winRate'];
+					td.innerHTML='负场';
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML='胜率';
 					tr.appendChild(td);
 					tableStatisticsByRole.appendChild(tr);
+
+					for(i=0;i<roles.length;i++){
+						tr=document.createElement('tr');
+						td=document.createElement('td');
+						td.innerHTML=get.translation(roles[i]);
+						tr.appendChild(td);
+						td=document.createElement('td');
+						var roleIdentity='unknown';
+						var roleWin=false;
+						for(j=0;j<clients.length;j++){
+							if(clients[j].name1==roles[i]||clients[j].name2==roles[i]){
+								roleIdentity=clients[j].identity;
+								roleWin=game.checkOnlineResult(clients[j]);
+							}
+						}
+						td.innerHTML=get.translation(roleIdentity);
+						tr.appendChild(td);
+						td=document.createElement('td');
+						td.innerHTML=get.translation(roleWin?'获胜':'-');
+						tr.appendChild(td);
+						td=document.createElement('td');
+						td.innerHTML=rolesStatistics[roles[i]]['numWin'];
+						tr.appendChild(td);
+						td=document.createElement('td');
+						td.innerHTML=rolesStatistics[roles[i]]['numLose'];
+						tr.appendChild(td);
+						td=document.createElement('td');
+						td.innerHTML=rolesStatistics[roles[i]]['winRate'];
+						tr.appendChild(td);
+						tableStatisticsByRole.appendChild(tr);
+					}
 				}
 
 				statsLocal[lib.statsKeyIdentity]=identityStatistics;
