@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.12.19',
+	version:'2020.12.19.1',
 	update:'2020.11.06.2',
 	changeLog:[
 		'超级换将卡价格上调为5个杀币',

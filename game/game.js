@@ -3700,7 +3700,6 @@
 							else{
 								game.getDB('config',null,function(data1){
 									game.getDB('data',null,function(data2){
-										game.purgeLibConfigData(data1,false);
 										export_data({
 											config:data1,
 											data:data2
@@ -27905,18 +27904,16 @@
 			}
 			return false;
 		},
-		purgeLibConfigData:function(data1,cleanPersonalData){
+		purgeLibConfigData:function(data1){
 			delete data1.alertDup;
 			delete data1[lib.bonusKeyFuliInfo];
 			delete data1.players_info;
 			delete data1[lib.statsKeyGame];
-			if(cleanPersonalData){
-				delete data1.connect_nickname;
-				delete data1.connect_nickname_mode_config_connect;
-				delete data1.connect_avatar;
-				delete data1.connect_avatar_mode_config_connect;
-				delete data1.recentIP;
-			}
+			delete data1.connect_nickname;
+			delete data1.connect_nickname_mode_config_connect;
+			delete data1.connect_avatar;
+			delete data1.connect_avatar_mode_config_connect;
+			delete data1.recentIP;
 		},
 		updateAlertDup:function(val){
 			game.saveConfig('alertDup',val);
@@ -36666,7 +36663,7 @@
 			else{
 				game.getDB('config',null,function(data1){
 					game.getDB('data',null,function(data2){
-						game.purgeLibConfigData(data1,true);
+						game.purgeLibConfigData(data1);
 						uploadConfig({
 							config:data1,
 							data:data2
