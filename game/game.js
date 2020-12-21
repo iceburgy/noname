@@ -11548,7 +11548,7 @@
 
 						// set qiandaofuli if applicable
 						if(game.isQiandaoing()){
-							game.addQiandaofuli(game.ip,lib.config.connect_nickname);
+							game.addQiandaofuli(game.ip,me);
 						}
 
 						//var winRate=game.getWinRateByNickname(lib.config.connect_nickname);
@@ -11637,7 +11637,7 @@
 							}
 							else{
 								player.replaceHandcardsBalance--;
-								game.updateBonusBalance(player.nickname,lib.bonusKeyFulibi,-lib.bonusKeyChangeCardsCost);
+								game.updateBonusBalance(player,lib.bonusKeyFulibi,-lib.bonusKeyChangeCardsCost);
 							}
 							if(!game.getBonusBalanceWithBuffer(player.nickname,lib.bonusKeyFulibi)){
 								game.eligiblePlayers.remove(player);
@@ -26363,7 +26363,7 @@
 								}
 								// set qiandaofuli if applicable
 								if(this.ws._socket&&this.ws._socket.remoteAddress&&game.isQiandaoing()){
-									game.addQiandaofuli(this.ws._socket.remoteAddress,this.nickname);
+									game.addQiandaofuli(this.ws._socket.remoteAddress,this);
 								}
 							}
 						}
@@ -26401,7 +26401,7 @@
 
 								// set qiandaofuli if applicable
 								if(this.ws._socket&&this.ws._socket.remoteAddress&&game.isQiandaoing()){
-									game.addQiandaofuli(this.ws._socket.remoteAddress,this.nickname);
+									game.addQiandaofuli(this.ws._socket.remoteAddress,this);
 								}
 								//var winRate=game.getWinRateByNickname(this.nickname);
 								var winRate='';
@@ -27963,7 +27963,9 @@
 			var balanceBuffer=game.getBonusBalanceBuffer(nickname,lib.bonusKeyFulibi);
 			return balance+balanceBuffer;
 		},
-		updateBonusBalance:function(nickname,bonusKey,delta){
+		updateBonusBalance:function(player,bonusKey,delta){
+			if(!player) return;
+			var nickname=player.nickname;
 			if(!lib.config[lib.bonusKeyFuliInfo]){
 				lib.config[lib.bonusKeyFuliInfo]={};
 			}
@@ -27984,21 +27986,18 @@
 			if(_status.waitingForPlayer){
 				game.updateWaiting();
 			}
-			var curPlayer=game.getPlayerByNickname(nickname);
-			if(curPlayer){
-				var msg='';
-				var color='';
-				if(delta>0){
-					msg='获得：'+get.translation(bonusKey)+' x'+delta;
-					color='fire';
-				}
-				else if(delta<0){
-					msg='消耗：'+get.translation(bonusKey)+' x'+(-delta);
-					color='water';
-				}
-				if(msg&&color){
-					game.fullscreenpopbyplayer(curPlayer,msg,color);
-				}
+			var msg='';
+			var color='';
+			if(delta>0){
+				msg='获得：'+get.translation(bonusKey)+' x'+delta;
+				color='fire';
+			}
+			else if(delta<0){
+				msg='消耗：'+get.translation(bonusKey)+' x'+(-delta);
+				color='water';
+			}
+			if(msg&&color){
+				game.fullscreenpopbyplayer(player,msg,color);
 			}
 		},
 		fullscreenpopbyplayer:function(curPlayer,msg,color){
@@ -28016,34 +28015,18 @@
 				},msg,color);
 			}
 		},
-		getPlayerByNickname:function(nickname){
-			var allPlayers=[];
-			if(game.connectPlayers){
-				allPlayers.add(...game.connectPlayers);
-			}
-			if(lib.node&&lib.node.observing){
-				allPlayers.add(...lib.node.observing);
-			}
-			if(game.players){
-				allPlayers.add(...game.players);
-			}
-			if(game.dead){
-				allPlayers.add(...game.dead);
-			}
-			for(var p of allPlayers){
-				if(p.nickname==nickname) return p;
-			}
-		},
-		updateBonusBalanceBuffer:function(nickname,delta){
+		updateBonusBalanceBuffer:function(player,delta){
+			if(!player||!player.playerid) return;
 			if(!game.bonusBalanceBuffer) game.bonusBalanceBuffer={};
-			if(!(nickname in game.bonusBalanceBuffer)) game.bonusBalanceBuffer[nickname]=0;
-			game.bonusBalanceBuffer[nickname]+=delta;
+			var id=player.playerid;
+			if(!(id in game.bonusBalanceBuffer)) game.bonusBalanceBuffer[id]=0;
+			game.bonusBalanceBuffer[id]+=delta;
 		},
 		flushBonusBalanceBuffer:function(){
 			if(game.bonusBalanceBuffer){
-				for(var nickname in game.bonusBalanceBuffer){
-					var value=game.bonusBalanceBuffer[nickname];
-					game.updateBonusBalance(nickname,lib.bonusKeyFulibi,value);
+				for(var id in game.bonusBalanceBuffer){
+					var value=game.bonusBalanceBuffer[id];
+					game.updateBonusBalance(lib.playerOL[id],lib.bonusKeyFulibi,value);
 				}
 			}
 		},
@@ -28056,7 +28039,7 @@
 		},
 		addFulibiBonusBySeat:function(seat){
 			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
-				game.updateBonusBalance(game.connectPlayers[seat].nickname,lib.bonusKeyFulibi,lib.config.fulibibonus_unit);
+				game.updateBonusBalance(game.connectPlayers[seat],lib.bonusKeyFulibi,lib.config.fulibibonus_unit);
 				return true;
 			}
 			return false;
@@ -28143,7 +28126,9 @@
 			}
 			return false;
 		},
-		addQiandaofuli:function(ip,nickname){
+		addQiandaofuli:function(ip,player){
+			if(!player) return;
+			var nickname=player.nickname;
 			if(!nickname||nickname=='无名玩家') return;
 			if(!lib.config[lib.bonusKeyFuliInfo]){
 				lib.config[lib.bonusKeyFuliInfo]={};
@@ -28159,7 +28144,7 @@
 				var now=new Date();
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][ip]=now;
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyQiandaofuli][lib.bonusKeyQiandaoByUsers][nickname.toLowerCase()]=now;
-				game.updateBonusBalance(nickname,lib.bonusKeyFulibi,game.getQiandaofuliUnit());
+				game.updateBonusBalance(player,lib.bonusKeyFulibi,game.getQiandaofuliUnit());
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
 		},
@@ -44182,9 +44167,19 @@
 					if(this.classList.contains('hidden')) return;
 					if(this.innerHTML=='<span>确认</span>'){
 						clearTimeout(this.confirmTimeout);
-						_status.overtie=true;
-						game.showIdentity();
-						game.over('和了');
+
+						// award xiaoneikongchang
+						game.createEvent('awardXiaoneikongchang',false).setContent(function(){
+							_status.event.trigger('awardXiaoneikongchang');
+						});
+
+						// end game with tie
+						game.createEvent('initiateOvertie',false).setContent(function(){
+							_status.overtie=true;
+							game.showIdentity();
+							game.over('和了');
+						});
+
 						this.hide();
 						var that=this;
 						setTimeout(function(){

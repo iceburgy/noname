@@ -2263,7 +2263,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									switch(fuliname){
 										case 'addRole':
 											choiceZhu++;
-											game.updateBonusBalanceBuffer(game.players[i].nickname,-lib.bonusKeyAddRoleCost);
+											game.updateBonusBalanceBuffer(game.players[i],-lib.bonusKeyAddRoleCost);
 											break;
 										default:break;
 									}
@@ -2279,7 +2279,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							event.zhuList.remove(tempChars);
 							if(event.pickedChars[0].length>0){
 								tempChars.unshift(event.pickedChars[0]);
-								game.updateBonusBalanceBuffer(game.players[i].nickname,-lib.bonusKeyPickRoleCost);
+								game.updateBonusBalanceBuffer(game.players[i],-lib.bonusKeyPickRoleCost);
 							}
 							var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i].nickname,lib.bonusKeyFulibi);
 							if(fulibiBalance>=lib.bonusKeySuperChangeRoleCost){
@@ -2330,7 +2330,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var strAnimation=get.translation('changeRole');
 							if(isUsingSuperChangeRole){
 								strAnimation=get.translation(lib.bonusKeySuperChangeRole);
-								game.updateBonusBalanceBuffer(game.players[i].nickname,-lib.bonusKeySuperChangeRoleCost);
+								game.updateBonusBalanceBuffer(game.players[i],-lib.bonusKeySuperChangeRoleCost);
 							}
 							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
 							var choiceZhu=isUsingSuperChangeRole?event.choiceNumSuperChangeRole[0]:event.choiceNumChangeRole[0];
@@ -2427,7 +2427,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var strAnimation=get.translation('changeRole');
 							if(isUsingSuperChangeRole){
 								strAnimation=get.translation(lib.bonusKeySuperChangeRole);
-								game.updateBonusBalanceBuffer(game.players[i].nickname,-lib.bonusKeySuperChangeRoleCost);
+								game.updateBonusBalanceBuffer(game.players[i],-lib.bonusKeySuperChangeRoleCost);
 							}
 							game.players[i].trySkillAnimate(strAnimation,strAnimation,false);
 							var choiceZhu=isUsingSuperChangeRole?event.choiceNumSuperChangeRole[0]:event.choiceNumChangeRole[0];
@@ -2689,7 +2689,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									switch(fuliname){
 										case 'addRole':
 											num3++;
-											game.updateBonusBalanceBuffer(game.players[i].nickname,-lib.bonusKeyAddRoleCost);
+											game.updateBonusBalanceBuffer(game.players[i],-lib.bonusKeyAddRoleCost);
 											break;
 										default:break;
 									}
@@ -2704,7 +2704,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var tempChars=event.list.randomRemove(num+num3);
 							if(event.pickedChars[distanceFromZhu].length>0){
 								tempChars.unshift(event.pickedChars[distanceFromZhu]);
-								game.updateBonusBalanceBuffer(game.players[i].nickname,-lib.bonusKeyPickRoleCost);
+								game.updateBonusBalanceBuffer(game.players[i],-lib.bonusKeyPickRoleCost);
 							}
 							var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i].nickname,lib.bonusKeyFulibi);
 							if(fulibiBalance>=lib.bonusKeySuperChangeRoleCost){
@@ -2765,7 +2765,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var strAnimation=get.translation('changeRole');
 							if(isUsingSuperChangeRole){
 								strAnimation=get.translation(lib.bonusKeySuperChangeRole);
-								game.updateBonusBalanceBuffer(player.nickname,-lib.bonusKeySuperChangeRoleCost);
+								game.updateBonusBalanceBuffer(player,-lib.bonusKeySuperChangeRoleCost);
 							}
 							player.trySkillAnimate(strAnimation,strAnimation,false);
 							var totalChoice=isUsingSuperChangeRole?event.choiceNumSuperChangeRole[distanceFromZhu]:event.choiceNumChangeRole[distanceFromZhu];
@@ -2886,7 +2886,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var strAnimation=get.translation('changeRole');
 							if(isUsingSuperChangeRole){
 								strAnimation=get.translation(lib.bonusKeySuperChangeRole);
-								game.updateBonusBalanceBuffer(player.nickname,-lib.bonusKeySuperChangeRoleCost);
+								game.updateBonusBalanceBuffer(player,-lib.bonusKeySuperChangeRoleCost);
 							}
 							player.trySkillAnimate(strAnimation,strAnimation,false);
 							var totalChoice=isUsingSuperChangeRole?event.choiceNumSuperChangeRole[distanceFromZhu]:event.choiceNumChangeRole[distanceFromZhu];
@@ -4236,6 +4236,32 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			_xiaoneikongchang:{
+				trigger:{global:['die','awardXiaoneikongchang']},
+				forced:true,
+				filter:function (event,player){
+					if(!game.isARealGame()) return false;
+					if(event.name=='awardXiaoneikongchang') return true;
+					return game.players.length==4&&game.zhu.isAlive()&&player.isAlive()&&get.population('zhong')<2;
+				},
+				content:function(){
+					'step 0'
+					player.$fullscreenpop('小内控场','fire');
+					if(player.identity=='nei'&&player.nickname&&player.nickname!='无名玩家'){
+						setTimeout(function(){
+							game.updateBonusBalance(player,lib.bonusKeyFulibi,lib.config.fulibibonus_unit/2);
+						},2000);
+					}
+				},
+				ai:{
+					order:10,
+					result:{
+						player:function(player){
+							return 1;
+						},
+					},
+				},
+			},
 			xiaoneidantiao:{
 				unique:true,
 				mark:false,
@@ -4253,7 +4279,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.awakenSkill('xiaoneidantiao');
 					if(player.nickname&&player.nickname!='无名玩家'){
-						game.updateBonusBalance(player.nickname,lib.bonusKeyFulibi,lib.config.fulibibonus_unit/2);
+						game.updateBonusBalance(player,lib.bonusKeyFulibi,lib.config.fulibibonus_unit);
 					}
 				},
 				ai:{
@@ -4283,7 +4309,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('xiaoneihuosheng');
 					if(player.nickname&&player.nickname!='无名玩家'){
 						setTimeout(function(){
-							game.updateBonusBalance(player.nickname,lib.bonusKeyFulibi,lib.config.fulibibonus_unit/2);
+							game.updateBonusBalance(player,lib.bonusKeyFulibi,lib.config.fulibibonus_unit*2);
 						},2000);
 					}
 				},
