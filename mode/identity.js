@@ -4241,11 +4241,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				filter:function (event,player){
 					if(!game.isARealGame()) return false;
+					if(_status.xiaoneikongchangUsed) return false;
 					if(event.name=='awardXiaoneikongchang') return true;
 					return game.players.length==4&&game.zhu.isAlive()&&player.isAlive()&&get.population('zhong')<2;
 				},
 				content:function(){
 					'step 0'
+					_status.xiaoneikongchangUsed=true;
 					player.$fullscreenpop('小内控场','fire');
 					if(player.identity=='nei'&&player.nickname&&player.nickname!='无名玩家'){
 						setTimeout(function(){
