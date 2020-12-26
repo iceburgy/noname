@@ -28850,12 +28850,12 @@
 			switch(eventName){
 				case 'createCharacterDialog':
 				case '选择角色1':
+				case '超级换将卡':
 					if(lib.configOL.choose_timeout_char_1){
 						num=lib.configOL.choose_timeout_char_1;
 					}
 					break;
 				case '选择角色2':
-				case '超级换将卡':
 					if(lib.configOL.choose_timeout_char_2){
 						num=lib.configOL.choose_timeout_char_2;
 					}

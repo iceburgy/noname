@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.12.26.1',
+	version:'2020.12.26.2',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修复郭汜发动伺盗时不亮将的bug',
