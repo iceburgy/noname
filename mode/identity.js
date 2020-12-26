@@ -4243,7 +4243,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(!game.isARealGame()) return false;
 					if(_status.xiaoneikongchangUsed) return false;
 					if(event.name=='awardXiaoneikongchang') return true;
-					return game.players.length==4&&game.zhu.isAlive()&&player.isAlive()&&get.population('zhong')<2;
+					return game.players.length==4&&game.zhu.isAlive()&&get.population('nei')>0&&get.population('zhong')<2;
 				},
 				content:function(){
 					'step 0'

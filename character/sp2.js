@@ -4909,7 +4909,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
-				direct:true,
+				frequent:true,
 				content:function(){
 					var targets=player.getLastUsed(1).targets;
 					var next=player.chooseToUse();
