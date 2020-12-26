@@ -19962,6 +19962,11 @@
 						if(this.ws&&!this.ws.closed){
 							var player=this;
 							var numAndBool=game.getChooseTimeByEvent();
+							var numTimeout,skipMoonlight;
+							if(numAndBool){
+								numTimeout=numAndBool[0];
+								skipMoonlight=numAndBool[1];
+							}
 							var numTimeout=numAndBool[0];
 							if(!numTimeout) numTimeout=lib.configOL.choose_timeout;
 							var time=parseInt(numTimeout)*1000;
@@ -28917,8 +28922,11 @@
 			if(_status.connectMode&&!_status.countDown){
 				ui.timer.show();
 				var numAndBool=game.getChooseTimeByEvent();
-				var num=numAndBool[0];
-				var skipMoonlight=numAndBool[1];
+				var num,skipMoonlight;
+				if(numAndBool){
+					num=numAndBool[0];
+					skipMoonlight=numAndBool[1];
+				}
 
 				//这么一大行都是为了祢衡
 				if(!num){
