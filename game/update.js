@@ -1,8 +1,9 @@
 window.noname_update={
-	version:'2020.12.26',
+	version:'2020.12.26.1',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修复郭汜发动伺盗时不亮将的bug',
+		'以下询问不触发月光宝盒：使用道具，选择神武将的势力，亮将，声明势力，置换手牌，普通换将卡',
 	],
 	files:[
 		'card/extra.js',

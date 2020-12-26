@@ -19961,7 +19961,8 @@
 						clearTimeout(lib.node.torespondtimeout[this.playerid]);
 						if(this.ws&&!this.ws.closed){
 							var player=this;
-							var numTimeout=game.getChooseTimeByEvent();
+							var numAndBool=game.getChooseTimeByEvent();
+							var numTimeout=numAndBool[0];
 							if(!numTimeout) numTimeout=lib.configOL.choose_timeout;
 							var time=parseInt(numTimeout)*1000;
 							if(_status.event.getParent().skillHidden){
@@ -28727,7 +28728,7 @@
 			next.func=func;
 			next.setContent('waitForPlayer');
 		},
-		countDown:function(time,onEnd){
+		countDown:function(time,onEnd,skipMoonlight){
 			game.timerTime=parseInt(time);
 			if(!game.timerTime) return;
 			if(game.timerTime<=0) return;
@@ -28746,7 +28747,7 @@
 						game.invokePlayMoonlightAlert(game.me,game.timerCurrent);
 					}
 				}
-				else if(game.me.mlBalance){
+				else if(!skipMoonlight&&game.me.mlBalance){
 					if(!moonlightActivated){
 						moonlightActivated=true;
 						game.invokeMoonlight(game.me);
@@ -28766,7 +28767,7 @@
 				}
 				if(isDone){
 					game.invokeTimeUpAlert();
-					game.send('exec',game.useMoonlight,game.me,0,true);
+					if(!skipMoonlight) game.send('exec',game.useMoonlight,game.me,0,true);
 					ui.timer.set(0,0);
 					clearInterval(_status.countDown);
 					delete _status.countDown;
@@ -28830,6 +28831,7 @@
 		},
 		getChooseTimeByEvent:function(){
 			var num;
+			var skipMoonlight=false;
 			// choose character specific timer count
 			var eventName;
 			if(_status.event&&_status.event.createDialog&&_status.event.createDialog.length){
@@ -28843,6 +28845,8 @@
 			}
 			if(!eventName) return num;
 			if(typeof eventName=='string'&&eventName.startsWith('是否置换手牌')) eventName='是否置换手牌';
+			if(typeof eventName=='string'&&eventName.startsWith('换将卡：')) eventName='换将卡';
+			if(typeof eventName=='string'&&eventName.startsWith('超级换将卡：')) eventName='超级换将卡';
 			switch(eventName){
 				case 'createCharacterDialog':
 				case '选择角色1':
@@ -28851,6 +28855,7 @@
 					}
 					break;
 				case '选择角色2':
+				case '超级换将卡':
 					if(lib.configOL.choose_timeout_char_2){
 						num=lib.configOL.choose_timeout_char_2;
 					}
@@ -28859,8 +28864,9 @@
 					if(lib.configOL.choose_timeout_main_vice){
 						num=lib.configOL.choose_timeout_main_vice;
 					}
+					skipMoonlight=true;
 					break;
-				case '是否使用福利':
+				case '是否使用道具':
 				case '请选择神武将的势力':
 				case '是否亮将':
 				case '是否声明势力':
@@ -28868,17 +28874,18 @@
 					if(lib.configOL.choose_timeout_shen_group){
 						num=lib.configOL.choose_timeout_shen_group;
 					}
+					skipMoonlight=true;
 					break;
-				case '换将卡：X换1':
-				case '换将卡：X换2':
+				case '换将卡':
 					if(lib.configOL.choose_timeout_change_char){
 						num=lib.configOL.choose_timeout_change_char;
 					}
+					skipMoonlight=true;
 					break;
 				default:
 					break;
 			}
-			return num;
+			return [num,skipMoonlight];
 		},
 		getWinRateByNickname:function(nickname){
 			var winRate='0%';
@@ -28909,7 +28916,9 @@
 			_status.imchoosing=true;
 			if(_status.connectMode&&!_status.countDown){
 				ui.timer.show();
-				var num=game.getChooseTimeByEvent();
+				var numAndBool=game.getChooseTimeByEvent();
+				var num=numAndBool[0];
+				var skipMoonlight=numAndBool[1];
 
 				//这么一大行都是为了祢衡
 				if(!num){
@@ -28928,7 +28937,7 @@
 				game.countDown(parseInt(num),function(){
 					ui.click.auto();
 					ui.timer.hide();
-				});
+				},skipMoonlight);
 				if(!game.online&&game.me){
 					if(_status.event.getParent().skillHidden){
 						for(var i=0;i<game.players.length;i++){
