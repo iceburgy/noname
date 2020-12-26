@@ -19962,12 +19962,10 @@
 						if(this.ws&&!this.ws.closed){
 							var player=this;
 							var numAndBool=game.getChooseTimeByEvent();
-							var numTimeout,skipMoonlight;
+							var numTimeout;
 							if(numAndBool){
 								numTimeout=numAndBool[0];
-								skipMoonlight=numAndBool[1];
 							}
-							var numTimeout=numAndBool[0];
 							if(!numTimeout) numTimeout=lib.configOL.choose_timeout;
 							var time=parseInt(numTimeout)*1000;
 							if(_status.event.getParent().skillHidden){
@@ -28848,7 +28846,7 @@
 			if(!eventName&&_status.event&&_status.event._args&&_status.event._args[0]){
 				eventName=Array.isArray(_status.event._args[0])?_status.event._args[0][0]:_status.event._args[0];
 			}
-			if(!eventName) return num;
+			if(!eventName) return [num,skipMoonlight];
 			if(typeof eventName=='string'&&eventName.startsWith('是否置换手牌')) eventName='是否置换手牌';
 			if(typeof eventName=='string'&&eventName.startsWith('换将卡：')) eventName='换将卡';
 			if(typeof eventName=='string'&&eventName.startsWith('超级换将卡：')) eventName='超级换将卡';
