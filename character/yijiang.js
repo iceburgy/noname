@@ -7881,7 +7881,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.getParent(2).reanjian_buffed=true;
 				},
 				content:function(){
-					player.addTempSkill('reanjian3',{global:['dyingEnd','phaseEnd']});
+					player.addTempSkill('reanjian3',{player:'dyingEnd'});
 				},
 			},
 			reduodao:{
