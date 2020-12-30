@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.12.29',
+	version:'2020.12.30',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修复潘璋马忠暗箭触发后玩家濒死救活后仍然不能吃桃自救的bug',

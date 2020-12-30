@@ -26320,7 +26320,7 @@
 									var msg='【'+this.nickname+'】【'+obIP+'】尝试双开旁观';
 									console.log((new Date()).toLocaleString());
 									console.log(msg);
-									console.log(game.getPlayerInfo(obIP));
+									console.log(game.getPlayerInfo(obIP,this.nickname));
 									if(lib.config.alertDup){
 										alert('【'+this.nickname+'】尝试双开旁观');
 									}
@@ -26340,7 +26340,7 @@
 									var msgconsole='【'+this.nickname+'】【'+obIP+'】加入旁观';
 									console.log((new Date()).toLocaleString());
 									console.log(msgconsole);
-									console.log(game.getPlayerInfo(obIP));
+									console.log(game.getPlayerInfo(obIP,this.nickname));
 
 									var msg='【'+this.nickname+'】加入旁观';
 									game.log(msg);
@@ -26393,7 +26393,7 @@
 							game.savePlayerInfo(playerIP,this.nickname);
 							console.log((new Date()).toLocaleString());
 							console.log('【'+this.nickname+'】【'+playerIP+'】加入房间');
-							console.log(game.getPlayerInfo(playerIP));
+							console.log(game.getPlayerInfo(playerIP,this.nickname));
 						}
 
 						for(var i=0;i<game.connectPlayers.length;i++){
@@ -28241,11 +28241,14 @@
 				game.saveConfig(playerInfoRootKey,playerInfoRoot);
 			}
 		},
-		getPlayerInfo:function(playerIP){
+		getPlayerInfo:function(playerIP,nickname){
 			var playerInfoRootKey='players_info';
 			var playerInfoRoot=lib.config[playerInfoRootKey];
 			if(playerInfoRoot&&playerInfoRoot[playerIP]){
-				return JSON.stringify(playerInfoRoot[playerIP],null,4);
+				var thisPlayerInfo=playerInfoRoot[playerIP]
+				var fulibiBalance=game.getBonusBalance(nickname,lib.bonusKeyFulibi);
+				thisPlayerInfo[lib.bonusKeyFulibi]=fulibiBalance;
+				return JSON.stringify(thisPlayerInfo,null,4);
 			}
 			return 'NA';
 		},
