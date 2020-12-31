@@ -2702,10 +2702,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseTarget('是否发动【连环】，额外选择一名目标？',[1,1],function(card,player,target){
 						if(game.online){
-							return !this._modparent._trigger.targets.contains(target)&&player.canUse({name:'tiesuo'},target);
+							return !this._modparent._trigger.targets.contains(target)&&player.canUse({name:'tiesuo',suit:get.suit(this._modparent._trigger.card,player)},target);
 						}
 						else{
-							return !trigger.targets.contains(target)&&player.canUse({name:'tiesuo'},target);
+							return !trigger.targets.contains(target)&&player.canUse({name:'tiesuo',suit:get.suit(trigger.card,player)},target);
 						}
 					}).ai=function(target){
 						return get.effect(target,{name:'tiesuo'},_status.event.player);

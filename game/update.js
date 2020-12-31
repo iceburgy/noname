@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2020.12.31',
+	version:'2020.12.31.1',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修改界庞统铁索操作：提示第三个',
