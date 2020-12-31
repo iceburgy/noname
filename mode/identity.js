@@ -331,8 +331,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 				if(players[i].identity=='nei'){
 					if(game.isARealGame()){
+						players[i].hiddenSkills.add('xiaoneikongchang');
 						players[i].hiddenSkills.add('xiaoneidantiao');
 						players[i].hiddenSkills.add('xiaoneihuosheng');
+						players[i].addSkillTrigger('xiaoneikongchang',true);
 						players[i].addSkillTrigger('xiaoneidantiao',true);
 						players[i].addSkillTrigger('xiaoneihuosheng',true);
 					}
@@ -357,9 +359,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(_status.mode=='purple'&&player.seatNum>5) return 5;
 				return 4;
 			});
-
-			// only jiangyouwei has shouqika
 			event.changeCardCount=parseInt(lib.configOL.change_card);
+
+			"step 7"
+			// only jiangyouwei has free shouqika
 			if(_status.connectMode&&lib.configOL.change_card) {
 				var numberOfPlayers=game.players.length;
 				var numberOfEligiblePlayers=0;
@@ -382,7 +385,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				game.eligiblePlayers=[];
 				for(var i=0;i<numberOfPlayers;i++){
 					if(game.players[i].nickname&&game.players[i].nickname!='无名玩家'){
-						var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i].nickname,lib.bonusKeyFulibi);
+						var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i],lib.bonusKeyFulibi);
 						if(fulibiBalance>=lib.bonusKeyChangeCardsCost){
 							game.players[i].replaceHandcardsBalance=fulibiBalance;
 							game.eligiblePlayers.push(game.players[i]);
@@ -408,14 +411,61 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			}
 			else{
-				event.goto(9);
+				event.goto(11);
 			}
-			"step 7"
-			game.replaceHandcards(game.eligiblePlayers);
 			"step 8"
-			if(!isNaN(event.changeCardCount)) event.changeCardCount--;
-			if((isNaN(event.changeCardCount)||event.changeCardCount>0)&&game.eligiblePlayers.length>0) event.goto(7);
+			var useChangeCards=[];
+			for(var i=0;i<game.eligiblePlayers.length;i++){
+				var list=['否','是'];
+				for(var j=0;j<list.length;j++){
+					list[j]=['','',list[j]];
+				}
+				var balance=game.eligiblePlayers[i].replaceHandcardsBalance;
+				var free=game.eligiblePlayers[i].replaceHandcardsFree;
+				var prompt='是否置换手牌？';
+				if(free&&free>0){
+					prompt+='（免费手气卡）';
+				}
+				else if(balance&&balance>0){
+					prompt+='（手气卡余额：x'+balance+'）';
+				}
+				useChangeCards.push([game.eligiblePlayers[i],[prompt,[list,'vcard']],1,true]);
+			}
+			game.me.chooseButtonOL(useChangeCards,function(player,result){});
 			"step 9"
+			for(var i in result){
+				if(result[i]&&result[i].bool&&result[i].links) {
+					var player=lib.playerOL[i];
+					if(result[i].links[0][2]=='是'){
+						var hs=player.getCards('h')
+						game.broadcastAll(function(player,hs){
+							game.addVideo('lose',player,[get.cardsInfo(hs),[],[]]);
+							for(var i=0;i<hs.length;i++){
+								hs[i].discard(false);
+							}
+						},player,hs);
+						player.directgain(get.cards(hs.length));
+						player.trySkillAnimate('手气卡','手气卡',false);
+						if(player.replaceHandcardsFree&&player.replaceHandcardsFree>0){
+							player.replaceHandcardsFree--;
+						}
+						else{
+							player.replaceHandcardsBalance--;
+							game.updateBonusBalanceBuffer(player,-lib.bonusKeyChangeCardsCost);
+						}
+						if(!game.getBonusBalanceWithBuffer(player,lib.bonusKeyFulibi)){
+							game.eligiblePlayers.remove(player);
+						}
+					}
+					else{
+						game.eligiblePlayers.remove(player);
+					}
+				}
+			}
+			"step 10"
+			if(!isNaN(event.changeCardCount)) event.changeCardCount--;
+			if((isNaN(event.changeCardCount)||event.changeCardCount>0)&&game.eligiblePlayers.length>0) event.goto(8);
+			"step 11"
 			game.phaseLoop(_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me);
 		},
 		game:{
@@ -2281,7 +2331,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								tempChars.unshift(event.pickedChars[0]);
 								game.updateBonusBalanceBuffer(game.players[i],-lib.bonusKeyPickRoleCost);
 							}
-							var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i].nickname,lib.bonusKeyFulibi);
+							var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i],lib.bonusKeyFulibi);
 							if(fulibiBalance>=lib.bonusKeySuperChangeRoleCost){
 								tempChars.push(lib.bonusKeySuperChangeRole);
 							}
@@ -2377,7 +2427,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								event.allList.remove(nextValidZhu);
 							}
 							var nextValidRest=game.getNextValidCharacters([...event.chosenChars[0],...nextValidZhu],choiceZhu,event.allList);
-							var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i].nickname,lib.bonusKeyFulibi);
+							var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i],lib.bonusKeyFulibi);
 							if(fulibiBalance>=lib.bonusKeySuperChangeRoleCost){
 								nextValidRest.push(lib.bonusKeySuperChangeRole);
 							}
@@ -2706,7 +2756,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								tempChars.unshift(event.pickedChars[distanceFromZhu]);
 								game.updateBonusBalanceBuffer(game.players[i],-lib.bonusKeyPickRoleCost);
 							}
-							var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i].nickname,lib.bonusKeyFulibi);
+							var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i],lib.bonusKeyFulibi);
 							if(fulibiBalance>=lib.bonusKeySuperChangeRoleCost){
 								tempChars.push(lib.bonusKeySuperChangeRole);
 							}
@@ -2826,7 +2876,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[distanceFromZhu][0],event.choiceNum[distanceFromZhu],event.list);
-							var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i].nickname,lib.bonusKeyFulibi);
+							var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i],lib.bonusKeyFulibi);
 							if(fulibiBalance>=lib.bonusKeySuperChangeRoleCost){
 								nextValidCharacters.push(lib.bonusKeySuperChangeRole);
 							}
@@ -3159,6 +3209,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）增加一点体力上限，然后回复一点体力并且摸2张牌；2）获得限定技‘知己知彼’，然后回复一点体力并且摸3张牌。（知己知彼：村规小内限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废）',
 			xiaoneizhibi:'知己知彼',
 			xiaoneizhibi_info:'限定技，出牌阶段对一名其他角色使用，观看其暗置武将牌。如场上无其它暗将则作废',
+			xiaoneikongchang:'小内控场',
 			xiaoneidantiao:'小内单挑',
 			xiaoneihuosheng:'小内获胜',
 			kejizhugong:'克己主公',
@@ -4236,20 +4287,30 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			_xiaoneikongchang:{
+			xiaoneikongchang:{
 				trigger:{global:['die','awardXiaoneikongchang']},
 				forced:true,
+				skillAnimation:'legend',
+				animationColor:'thunder',
 				filter:function (event,player){
 					if(!game.isARealGame()) return false;
-					if(_status.xiaoneikongchangUsed) return false;
-					if(event.name=='awardXiaoneikongchang') return true;
-					return game.players.length==4&&game.zhu.isAlive()&&get.population('nei')>0&&get.population('zhong')<2;
+					if(player.storage.xiaoneikongchangUsed) return false;
+					var shouldDo=event.name=='awardXiaoneikongchang'||(game.players.length==4&&game.zhu.isAlive()&&get.population('nei')>0&&get.population('zhong')<2);
+					if(shouldDo&&!player.identityShown){
+						var info=lib.skill['xiaoneikongchang'];
+						info.log=false;
+						delete info.skillAnimation;
+						delete info.animationColor;
+					}
+					return shouldDo;
 				},
 				content:function(){
 					'step 0'
-					_status.xiaoneikongchangUsed=true;
-					player.$fullscreenpop('小内控场','fire');
-					if(player.identity=='nei'&&player.nickname&&player.nickname!='无名玩家'){
+					player.storage.xiaoneikongchangUsed=true;
+					if(!player.identityShown){
+						player.$fullscreenpop('小内控场','thunder');
+					}
+					if(player.nickname&&player.nickname!='无名玩家'){
 						setTimeout(function(){
 							game.updateBonusBalance(player,lib.bonusKeyFulibi,lib.config.fulibibonus_unit/2);
 						},2000);
@@ -4957,7 +5018,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				priority:10,
 				content:function(){
 					"step 0"
-					if(get.info(trigger.skill).silent||trigger.skill=='woshixiaonei'||trigger.skill=='xiaoneidantiao'||trigger.skill=='xiaoneihuosheng'||trigger.skill.startsWith('shengmingshili')){
+					if(get.info(trigger.skill).silent||trigger.skill=='woshixiaonei'||trigger.skill=='xiaoneikongchang'||trigger.skill=='xiaoneidantiao'||trigger.skill=='xiaoneihuosheng'||trigger.skill.startsWith('shengmingshili')){
 						event.finish();
 					}
 					else{

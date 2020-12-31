@@ -2690,10 +2690,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(card){return 6-get.value(card)},
 			},
 			lianhuan4:{
-				mod:{
-					selectTarget:function(card,player,range){
-						if(card.name=='tiesuo'&&range[1]!=-1) range[1]++;
-					},
+				audio:2,
+				trigger:{
+					player:'useCard2',
+				},
+				direct:true,
+				filter:function(event,player){
+					return event.card&&event.card.name=='tiesuo'&&event.targets&&event.targets.length==2;
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget('是否发动【连环】，额外选择一名目标？',[1,1],function(card,player,target){
+						if(game.online){
+							return !this._modparent._trigger.targets.contains(target)&&player.canUse({name:'tiesuo'},target);
+						}
+						else{
+							return !trigger.targets.contains(target)&&player.canUse({name:'tiesuo'},target);
+						}
+					}).ai=function(target){
+						return get.effect(target,{name:'tiesuo'},_status.event.player);
+					};
+					'step 1'
+					if(result.bool&&result.targets&&result.targets.length){
+						var targets=result.targets;
+						player.logSkill('ollianhuan',targets);
+						player.line(targets);
+						trigger.targets.addArray(targets);
+					}
 				},
 			},
 			reluanji:{

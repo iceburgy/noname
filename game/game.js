@@ -11621,6 +11621,10 @@
 				},
 				replaceHandcardsOL:function(){
 					'step 0'
+					var send=function(){
+						game.me.chooseBool('是否置换手牌？');
+						game.resume();
+					};
 					var sendback=function(result,player){
 						if(result&&result.bool){
 							var hs=player.getCards('h')
@@ -11631,48 +11635,17 @@
 								}
 							},player,hs);
 							player.directgain(get.cards(hs.length));
-							player.trySkillAnimate('手气卡','手气卡',false);
-							if(player.replaceHandcardsFree&&player.replaceHandcardsFree>0){
-								player.replaceHandcardsFree--;
-							}
-							else{
-								player.replaceHandcardsBalance--;
-								game.updateBonusBalance(player,lib.bonusKeyFulibi,-lib.bonusKeyChangeCardsCost);
-							}
-							if(!game.getBonusBalanceWithBuffer(player.nickname,lib.bonusKeyFulibi)){
-								game.eligiblePlayers.remove(player);
-							}
-						}
-						else{
-							game.eligiblePlayers.remove(player);
 						}
 					};
 					for(var i=0;i<event.players.length;i++){
-						var balance=event.players[i].replaceHandcardsBalance;
-						var free=event.players[i].replaceHandcardsFree;
-						var prompt='是否置换手牌？';
-
-						if(free&&free>0){
-							prompt+='（免费手气卡）';
-						}
-						else if(balance&&balance>0){
-							prompt+='（手气卡余额：x'+balance+'）';
-						}
-						if(event.players[i].isOnline2()){
+						if(event.players[i].isOnline()){
 							event.withol=true;
-							event.players[i].send(function(prompt){
-								game.me.chooseBool(prompt).ai=function(){
-									return false;
-								};
-								game.resume();
-							},prompt);
+							event.players[i].send(send);
 							event.players[i].wait(sendback);
 						}
 						else if(event.players[i]==game.me){
 							event.withme=true;
-							game.me.chooseBool(prompt).ai=function(){
-								return false;
-							};
+							game.me.chooseBool('是否置换手牌？');
 							game.me.wait(sendback);
 						}
 					}
@@ -21717,7 +21690,7 @@
 					var name2=this.name2;
 					if(lib.character[name2]&&(!showonly||unseen1)){
 						var skills=game.expandSkills(lib.character[name2][3].slice(0));
-						if(skills.contains(skill)||(unseen0&&!unseen1&&(skill=='woshixiaonei'||skill=='xiaoneidantiao'||skill=='xiaoneihuosheng'||skill=='kejizhugong'||skill=='anlezhugong'||skill=='xiaoneizhibi'||skill=='smh_yeyan'))){
+						if(skills.contains(skill)||(unseen0&&!unseen1&&(skill=='woshixiaonei'||skill=='xiaoneikongchang'||skill=='xiaoneidantiao'||skill=='xiaoneihuosheng'||skill=='kejizhugong'||skill=='anlezhugong'||skill=='xiaoneizhibi'||skill=='smh_yeyan'))){
 							if(!noshow&&this.isUnseen(1))
 							    this.showCharacter(1);
 							return 'vice';
@@ -27962,14 +27935,32 @@
 			}
 			return balance;
 		},
-		getBonusBalanceWithBuffer:function(nickname,bonusKey){
-			var balance=game.getBonusBalance(nickname,lib.bonusKeyFulibi);
-			var balanceBuffer=game.getBonusBalanceBuffer(nickname,lib.bonusKeyFulibi);
+		getBonusBalanceWithBuffer:function(player,bonusKey){
+			var balance=game.getBonusBalance(player.nickname,lib.bonusKeyFulibi);
+			var balanceBuffer=game.getBonusBalanceBuffer(player.playerid,lib.bonusKeyFulibi);
 			return balance+balanceBuffer;
 		},
 		updateBonusBalance:function(player,bonusKey,delta){
 			if(!player) return;
-			var nickname=player.nickname;
+			game.updateBonusBalanceByNickname(player.nickname,bonusKey,delta);
+			if(_status.waitingForPlayer){
+				game.updateWaiting();
+			}
+			var msg='';
+			var color='';
+			if(delta>0){
+				msg='获得：'+get.translation(bonusKey)+' x'+delta;
+				color='fire';
+			}
+			else if(delta<0){
+				msg='消耗：'+get.translation(bonusKey)+' x'+(-delta);
+				color='water';
+			}
+			if(msg&&color){
+				game.fullscreenpopbyplayer(player,msg,color);
+			}
+		},
+		updateBonusBalanceByNickname:function(nickname,bonusKey,delta){
 			if(!lib.config[lib.bonusKeyFuliInfo]){
 				lib.config[lib.bonusKeyFuliInfo]={};
 			}
@@ -27987,22 +27978,6 @@
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nickname][bonusKey]=0;
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
-			if(_status.waitingForPlayer){
-				game.updateWaiting();
-			}
-			var msg='';
-			var color='';
-			if(delta>0){
-				msg='获得：'+get.translation(bonusKey)+' x'+delta;
-				color='fire';
-			}
-			else if(delta<0){
-				msg='消耗：'+get.translation(bonusKey)+' x'+(-delta);
-				color='water';
-			}
-			if(msg&&color){
-				game.fullscreenpopbyplayer(player,msg,color);
-			}
 		},
 		fullscreenpopbyplayer:function(curPlayer,msg,color){
 			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[0]==curPlayer||game.me&&game.me==curPlayer){
@@ -28034,10 +28009,10 @@
 				}
 			}
 		},
-		getBonusBalanceBuffer:function(nickname,bonusKey){
+		getBonusBalanceBuffer:function(playerid,bonusKey){
 			var balance=0;
-			if(game.bonusBalanceBuffer&&(nickname in game.bonusBalanceBuffer)){
-				balance=game.bonusBalanceBuffer[nickname];
+			if(game.bonusBalanceBuffer&&(playerid in game.bonusBalanceBuffer)){
+				balance=game.bonusBalanceBuffer[playerid];
 			}
 			return balance;
 		},
@@ -28850,6 +28825,7 @@
 				eventName=Array.isArray(_status.event._args[0])?_status.event._args[0][0]:_status.event._args[0];
 			}
 			if(!eventName) return [num,skipMoonlight];
+			if(typeof eventName=='string'&&eventName.startsWith('点将冲突')) eventName='点将冲突';
 			if(typeof eventName=='string'&&eventName.startsWith('是否置换手牌')) eventName='是否置换手牌';
 			if(typeof eventName=='string'&&eventName.startsWith('换将卡：')) eventName='换将卡';
 			if(typeof eventName=='string'&&eventName.startsWith('超级换将卡：')) eventName='超级换将卡';
@@ -28876,6 +28852,7 @@
 				case '请选择神武将的势力':
 				case '是否亮将':
 				case '是否声明势力':
+				case '点将冲突':
 				case '是否置换手牌':
 					if(lib.configOL.choose_timeout_shen_group){
 						num=lib.configOL.choose_timeout_shen_group;
