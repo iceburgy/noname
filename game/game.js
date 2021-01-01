@@ -27471,6 +27471,13 @@
 							for(var si=0;si<info.skills.length;si++){
 								player.addSkill(info.skills[si]);
 							}
+							game.send('exec',function(player,skills){
+								setTimeout(function(){
+									for(var si of skills){
+										player.markSkill(si);
+									}
+								},500);
+							},player,info.skills);
 							for(var si=0;si<info.hiddenSkills.length;si++){
 								player.hiddenSkills.add(info.hiddenSkills[si]);
 								player.addSkillTrigger(info.hiddenSkills[si],true);
@@ -29044,7 +29051,7 @@
 			_status.ip=ip;
 		},
 		send:function(){
-			if(game.observe&&arguments[0]!='reinited') return;
+			if(game.observe&&arguments[0]!='reinited'&&arguments[0]!='exec') return;
 			if(game.ws){
 				var args=Array.from(arguments);
 				if(typeof args[0]=='function'){

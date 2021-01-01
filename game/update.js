@@ -1,10 +1,11 @@
 window.noname_update={
-	version:'2020.12.31.1',
+	version:'2020.12.31.2',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修改界庞统铁索操作：提示第三个',
 		'修正潘凤狂斧技能描述',
 		'手气卡非正常重开也退还',
+		'修复断线重连不显示技能标记的bug（比如张鲁的米）',
 	],
 	files:[
 		'card/extra.js',
