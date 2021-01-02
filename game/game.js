@@ -27950,6 +27950,9 @@
 		updateBonusBalance:function(player,bonusKey,delta){
 			if(!player) return;
 			game.updateBonusBalanceByNickname(player.nickname,bonusKey,delta);
+			if(_status.waitingForPlayer){
+				game.updateWaiting();
+			}
 			var msg='';
 			var color='';
 			if(delta>0){
@@ -27982,9 +27985,6 @@
 				lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyFuliByUsers][nickname][bonusKey]=0;
 			}
 			game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
-			if(_status.waitingForPlayer){
-				game.updateWaiting();
-			}
 		},
 		fullscreenpopbyplayer:function(curPlayer,msg,color){
 			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[0]==curPlayer||game.me&&game.me==curPlayer){
