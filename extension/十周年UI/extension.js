@@ -1992,7 +1992,7 @@ content:function(config, pack){
 					if (!event.card2) {
 						if (event.resultOL[target.playerid].skill && lib.skill[event.resultOL[target.playerid].skill] && lib.skill[event.resultOL[target.playerid].skill].onCompare) {
 							target.logSkill(event.resultOL[target.playerid].skill);
-							event.resultOL[target.playerid].cards = lib.skill[target.resultOL[target.playerid].skill].onCompare(player);
+							event.resultOL[target.playerid].cards = lib.skill[event.resultOL[target.playerid].skill].onCompare(player);
 						}
 						
 						event.card2 = event.resultOL[target.playerid].cards[0];
