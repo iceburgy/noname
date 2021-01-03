@@ -347,6 +347,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(players[i].identity=='zhu'&&players.length>=6&&players.length%2==0){
 					game.broadcastAll(function(player){
 						player.addSkill('kejizhugong');
+						player.addSkill('xiuluozhugong');
 						player.addSkill('anlezhugong');
 					},players[i]);
 				}
@@ -3214,6 +3215,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			xiaoneihuosheng:'小内获胜',
 			kejizhugong:'克己主公',
 			kejizhugong_info:'村规主公限定技：主公在第一回合内如果没有对其他角色使用牌，可以跳过弃牌阶段。',
+			xiuluozhugong:'修罗主公',
+			xiuluozhugong_info:'村规主公限定技：主公第二轮准备阶段，若判定区有牌，可以弃置两张牌，然后弃置判定区内一张与之前弃置的两张牌中任意一张同花色的判定牌。你可以重复此流程。',
 			anlezhugong:'安乐主公',
 			anlezhugong_info:'村规主公限定技：主公如果在第一轮被乐而且中乐，则手牌上限为体力上限',
 			anlezhugong2:'安乐主公',
@@ -4385,6 +4388,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
+			/*
 			_xiaoneiaozhan:{
 				trigger:{global:'die'},
 				forced:true,
@@ -4424,6 +4428,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
+			*/
 			kejizhugong:{
 				audio:'keji',
 				unique:true,
@@ -4472,6 +4477,88 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return 1;
 						},
 					},
+				},
+			},
+			xiuluozhugong:{
+				audio:'xiuluo',
+				limited:true,
+				skillAnimation:'legend',
+				animationColor:'thunder',
+				trigger:{player:['phaseZhunbeiBegin','phaseAfter']},
+				filter:function(event,player){
+					if(event.name=='phaseZhunbei'&&game.roundNumber==2){
+						return player.countCards('j')>0&&player.countCards('he')>=player.countCards('j')*2;
+					}
+					if(event.name=='phase'&&game.roundNumber>=2){
+						game.broadcastAll(function(player){
+							player.removeSkill('xiuluozhugong');
+						},player);
+					}
+					return false;
+				},
+				ai:{
+					order:10,
+					result:{
+						player:function(player){
+							return 1;
+						},
+					}
+				},
+				content:function(){
+					"step 0"
+					var next=player.discardPlayerCard(player,3,'hej','是否发动【修罗主公】来弃置判定牌？');
+					next.filterButton=function(button){
+						var card=button.link;
+						if(!lib.filter.cardDiscardable(card,player)) return false;
+						var suitj='';
+						var suithe=[];
+						for(var selected of ui.selected.buttons){
+							var selectedSuit=get.suit(selected.link,player);
+							switch(get.position(selected.link)){
+								case 'j':
+									suitj=selectedSuit;
+									break;
+								default:
+									suithe.push(selectedSuit);
+									break;
+							}
+						}
+						if(suithe.length==2){
+							if(get.position(card)!='j') return false;
+						}
+						if(suitj){
+							if(!'he'.includes(get.position(card))) return false;
+						}
+						if(ui.selected.buttons.length==2){
+							var nextSuit=get.suit(card,player);
+							if(get.position(card)=='j') suitj=nextSuit;
+							else suithe.push(nextSuit);
+							return suithe.includes(suitj);
+						}
+						return true;
+					};
+					next.ai=function(button){
+						var card=button.link;
+						if(get.position(card)=='h'){
+							return 11-get.value(card);
+						}
+						if(card.name=='lebu') return 5;
+						if(card.name=='bingliang') return 4;
+						if(card.name=='guiyoujie') return 3;
+						return 2;
+					};
+					next.logSkill='xiuluo';
+					"step 1"
+					if(result.bool&&player.countCards('j')) event.goto(0);
+					"step 2"
+					game.broadcastAll(function(player){
+						player.removeSkill('xiuluozhugong');
+					},player);
+				},
+				oncancel:function(event,player){
+					game.broadcastAll(function(player){
+						player.removeSkill('xiuluozhugong');
+					},player);
 				},
 			},
 			anlezhugong:{
