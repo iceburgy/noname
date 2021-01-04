@@ -4540,11 +4540,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var lebuSuit='';
 						var bingliangSuit='';
 						if(arguments&&arguments.length>1){
-							for(var c of arguments[1]){
-								if(get.position(c.link)=='j'){
-									var s=get.suit(c.link);
-									if(c.name=='lebu') lebuSuit=s;
-									else if(c.name=='bingliang') bingliangSuit=s;
+							for(var b of arguments[1]){
+								var c=b.link;
+								if(get.position(c)=='j'){
+									var s=get.suit(c);
+									var judgeType=c.node.judgeMark.node.judge.innerHTML;
+									if(judgeType=='乐') lebuSuit=s;
+									else if(judgeType=='兵') bingliangSuit=s;
 								}
 							}
 						}
@@ -4559,8 +4561,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							else return 11-get.value(card);
 						}
-						if(card.name=='lebu') return 100;
-						if(card.name=='bingliang') return 50;
+						var curJudgeType=card.node.judgeMark.node.judge.innerHTML;
+						if(curJudgeType=='乐') return 100;
+						if(curJudgeType=='兵') return 50;
 						return -1;
 					};
 					next.logSkill='xiuluo';
