@@ -4539,13 +4539,31 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					};
 					next.ai=function(button){
 						var card=button.link;
-						if(get.position(card)=='h'){
-							return 11-get.value(card);
+						var lebuSuit='';
+						var bingliangSuit='';
+						if(arguments&&arguments.length>1){
+							for(var c of arguments[1]){
+								if(get.position(c.link)=='j'){
+									var s=get.suit(c.link);
+									if(c.name=='lebu') lebuSuit=s;
+									else if(c.name=='bingliang') bingliangSuit=s;
+								}
+							}
 						}
-						if(card.name=='lebu') return 5;
-						if(card.name=='bingliang') return 4;
-						if(card.name=='guiyoujie') return 3;
-						return 2;
+						if('he'.includes(get.position(card))){
+							if(lebuSuit){
+								if(get.suit(card)==lebuSuit) return 100-get.value(card);
+								else return 51;
+							}
+							else if(bingliangSuit){
+								if(get.suit(card)==bingliangSuit) return 50-get.value(card);
+								else return 31;
+							}
+							else return 11-get.value(card);
+						}
+						if(card.name=='lebu') return 100;
+						if(card.name=='bingliang') return 50;
+						return -1;
 					};
 					next.logSkill='xiuluo';
 					"step 1"
