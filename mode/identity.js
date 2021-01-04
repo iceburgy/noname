@@ -4539,6 +4539,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var card=button.link;
 						var lebuSuit='';
 						var bingliangSuit='';
+						game.needDiscardLebu=game.needDiscardLebu||false;
 						if(arguments&&arguments.length>1){
 							for(var b of arguments[1]){
 								var c=b.link;
@@ -4549,20 +4550,26 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									else if(judgeType=='兵') bingliangSuit=s;
 								}
 							}
+							for(var b of arguments[1]){
+								var c=b.link;
+								if('he'.includes(get.position(c))&&get.suit(c)==lebuSuit){
+									game.needDiscardLebu=true;
+									break;
+								}
+							}
 						}
 						if('he'.includes(get.position(card))){
-							if(lebuSuit){
+							if(game.needDiscardLebu){
 								if(get.suit(card)==lebuSuit) return 100-get.value(card);
-								else return 51;
+								else return 70-get.value(card);
 							}
 							else if(bingliangSuit){
 								if(get.suit(card)==bingliangSuit) return 50-get.value(card);
-								else return 31;
 							}
-							else return 11-get.value(card);
+							return 11-get.value(card);
 						}
 						var curJudgeType=card.node.judgeMark.node.judge.innerHTML;
-						if(curJudgeType=='乐') return 100;
+						if(curJudgeType=='乐') return game.needDiscardLebu?100:-1;
 						if(curJudgeType=='兵') return 50;
 						return -1;
 					};
