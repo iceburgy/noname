@@ -4478,7 +4478,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			xiuluozhugong:{
-				audio:'xiuluo',
+				audio:['xiuluo',2],
 				limited:true,
 				skillAnimation:'legend',
 				animationColor:'thunder',
