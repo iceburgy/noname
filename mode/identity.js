@@ -411,9 +411,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					numberOfEligiblePlayers--;
 				}
 			}
-			else{
-				event.goto(11);
-			}
+			if(!game.eligiblePlayers||game.eligiblePlayers.length==0) event.goto(11);
 			"step 8"
 			var useChangeCards=[];
 			for(var i=0;i<game.eligiblePlayers.length;i++){
