@@ -4485,7 +4485,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['phaseZhunbeiBegin','phaseAfter']},
 				filter:function(event,player){
 					if(event.name=='phaseZhunbei'&&game.roundNumber==2){
-						return player.countCards('j')>0&&player.countCards('he')>=player.countCards('j')*2;
+						return player.countCards('j')>0&&player.countCards('he')>=2;
 					}
 					if(event.name=='phase'&&game.roundNumber>=2){
 						game.broadcastAll(function(player){
