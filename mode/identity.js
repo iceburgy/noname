@@ -4433,12 +4433,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				limited:true,
 				skillAnimation:'legend',
 				animationColor:'thunder',
-				trigger:{player:'phaseDiscardBefore'},
+				trigger:{player:['phaseDiscardBefore','phaseAfter']},
 				frequent:function(event,player){
 					return player.needsToDiscard();
 				},
 				filter:function(event,player){
-					if(game.roundNumber==1&&player==game.zhu){
+					if(event.name=='phaseDiscard'&&game.roundNumber==1&&player==game.zhu){
 						var usedCards=player.getHistory('useCard',function(evt){
 							if(evt.targets&&evt.targets.length&&evt.isPhaseUsing()){
 								var targets=evt.targets.slice(0);
