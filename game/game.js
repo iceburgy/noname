@@ -42847,10 +42847,10 @@
 											var version1=version.split('.');
 											var version2=update.update.split('.');
 											for(var i=0;i<version1.length&&i<version2.length;i++){
-												if(version2[i]>version1[i]){
+												if(parseInt(version2[i])>parseInt(version1[i])){
 													files=false;break;
 												}
-												else if(version1[i]>version2[i]){
+												else if(parseInt(version1[i])>parseInt(version2[i])){
 													files=update.files.slice(0);break;
 												}
 											}
