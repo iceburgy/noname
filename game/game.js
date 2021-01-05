@@ -44199,7 +44199,7 @@
 				},true,ui.replay);
 			},
 			revealCharacter:function(){
-				ui.revealCharacterSkills=ui.create.controlRevealCharacter(['_revealCharacterMainDo','_revealCharacterViceDo'].concat([ui.click.skill]));
+				ui.revealCharacterSkills=ui.create.hiddenControl(['_revealCharacterMainDo','_revealCharacterViceDo'].concat([ui.click.skill]));
 				if(!ui.revealCharacterMain){
 					ui.revealCharacterMain=ui.create.system('亮主将',function(){
 						if(this.classList.contains('hidden')) return;
@@ -44244,18 +44244,25 @@
 				}
 			},
 			revealXiaonei:function(){
+				ui.revealXiaoneiHiddenControl=ui.create.hiddenControl(['woshixiaonei'].concat([ui.click.skill]));
 				if(!ui.revealXiaonei){
 					ui.revealXiaonei=ui.create.system('亮小内',function(){
 						if(this.classList.contains('hidden')) return;
-						ui.revealXiaonei.classList.remove('glow');
-						ui.revealXiaonei.hide();
-						if(game.online){
-							game.send('revealXiaonei');
+						this.classList.remove('glow');
+						this.hide();
+						var player=game.me;
+						if(_status.currentPhase==player&&_status.event.name=='chooseToUse'&&_status.event.player==player&&_status.paused){
+							ui.revealXiaoneiHiddenControl.childNodes[0].click();
 						}
 						else{
-							game.createEvent('revealXiaonei',false).setContent(function(){
-								_status.event.trigger('revealXiaonei');
-							});
+							if(game.online){
+								game.send('revealXiaonei');
+							}
+							else{
+								game.createEvent('revealXiaonei',false).setContent(function(){
+									_status.event.trigger('revealXiaonei');
+								});
+							}
 						}
 					});
 					ui.revealXiaonei.classList.add('glow');
@@ -45238,7 +45245,7 @@
 				ui.updatec();
 				return control;
 			},
-			controlRevealCharacter:function(){
+			hiddenControl:function(){
 				var i,controls;
 				if(Array.isArray(arguments[0])) controls=arguments[0];
 				else controls=arguments;
