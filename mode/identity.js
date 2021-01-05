@@ -4167,9 +4167,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			woshixiaonei:{
 				forced:true,
 				audio:['jianxiong',2],
-				trigger:{global:'revealXiaonei'},
+				trigger:{global:'revealXiaonei',player:['phaseBeginStart','dyingBefore']},
 				skillAnimation:'legend',
 				animationColor:'thunder',
+				filter:function(event,player){
+					if(event.name=='revealXiaonei') return true;
+					// only for AI to trigger
+					return !player.isOnline2()&&player!=game.me;
+				},
 				content:function(){
 					'step 0'
 					if(player==game.me){
@@ -4208,6 +4213,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.broadcastAll(function(player){
 						player.showIdentity();
 					},player);
+					player.removeSkill('woshixiaonei');
 				},
 				ai:{
 					order:10,
