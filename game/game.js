@@ -51235,6 +51235,7 @@
 				var info=lib.skill[skill];
 				if(info.locked==false) return false;
 				if(info.trigger&&info.forced) return true;
+				if(info.mod) return true;
 				if(info.locked) return true;
 				return false;
 			},
