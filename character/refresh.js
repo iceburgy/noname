@@ -7651,6 +7651,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				locked:true,
 				direct:true,
+				clearTime:true,
 				filter:function(event,player){
 					if(event.name=='chooseToUse') return player.countCards('h',{suit:'spade'})>0;
 					return event.card&&event.card.name=='sha'&&event.getParent(2).jiu==true&&!player.hasSkill('oljiuchi_air');
