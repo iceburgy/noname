@@ -2185,7 +2185,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						if(!game.players[i].isOnline2&&game.players[i]!=game.me) continue;
 						var list=[];
-						var fulibiBalance=game.getBonusBalance(game.players[i].nickname,lib.bonusKeyFulibi);
+						var fulibiBalance=game.getBonusBalanceWithBuffer(game.players[i],lib.bonusKeyFulibi);
 						if(!game.getBonusBirthdaybonus(game.players[i].nickname)){
 							if(fulibiBalance>=lib.bonusKeyAddRoleCost){
 								found=true;
