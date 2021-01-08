@@ -1,5 +1,6 @@
 window.noname_package={
 	character:{
+		cunguiyuanchuang:'村规原创',
 		standard:'标准',
 		refresh:'界限突破',
 		shenhua:'神话再临',

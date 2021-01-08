@@ -14,7 +14,7 @@ window.config={
 	forbiddouble:['miheng','swd_kangnalishi','wutugu','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'],
 	forbidthreecard:['qiankunbiao','shenhuofeiya','gw_ciguhanshuang','gw_birinongwu','gw_qinpendayu','gw_poxiao'],
 	all:{
-		sgscharacters:['standard','shenhua','xinghuoliaoyuan','refresh','yijiang','sp','sp2','extra','old','mobile','tw'],
+		sgscharacters:['cunguiyuanchuang','standard','shenhua','xinghuoliaoyuan','refresh','yijiang','sp','sp2','extra','old','mobile','tw'],
 		sgscards:['standard','extra','sp','guozhan','zhulu'],
 		sgsmodes:['identity','guozhan','versus','doudizhu','single','brawl','connect'],
 		stockmode:['identity','guozhan','versus','boss','doudizhu','single','chess','stone','connect','brawl','tafang'],
@@ -127,7 +127,7 @@ window.config={
 	sort:'type_sort',
 
 	cards:['standard','ex','extra','sp','classic','basic'],
-	characters:['standard','shenhua','sp','sp2','yijiang','refresh','xinghuoliaoyuan','mobile','extra'],
+	characters:['cunguiyuanchuang','standard','shenhua','sp','sp2','yijiang','refresh','xinghuoliaoyuan','mobile','extra'],
 	connect_characters:['diy'],
 	connect_cards:['huanlekapai','guozhan','sp','zhulu'],
 	plays:[],

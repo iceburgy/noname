@@ -1515,7 +1515,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:true,
 				group:'kongcheng1',
 				audio:2,
-				audioname:['re_zhugeliang'],
+				audioname:['re_zhugeliang','cun_zhugeliang'],
 				trigger:{target:'useCardToTarget'},
 				forced:true,
 				priority:15,
@@ -1548,7 +1548,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'loseEnd'},
 				forced:true,
 				firstDo:true,
-				audioname:['re_zhugeliang'],
+				audioname:['re_zhugeliang','cun_zhugeliang'],
 				filter:function(event,player){
 					if(player.countCards('h')) return false;
 					for(var i=0;i<event.cards.length;i++){

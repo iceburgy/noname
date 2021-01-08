@@ -30,6 +30,7 @@ window.noname_source_list=[
 	'character/swd.js',
 	'character/tw.js',
 	'character/xianjian.js',
+	'character/cunguiyuanchuang.js',
 	'character/xinghuoliaoyuan.js',
 	'character/yijiang.js',
 	'character/yxs.js',
