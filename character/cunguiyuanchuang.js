@@ -20,7 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function (){
 					"step 0"
-					player.chooseBool("是否放弃摸牌改为获得【"+get.translation("reshensuan2")+"】？").ai=function(){
+					player.chooseBool("是否少摸一张牌并获得【"+get.translation("reshensuan2")+"】："+get.skillInfoTranslation("reshensuan")+")？").ai=function(){
 						return false;
 					};
 					"step 1"
