@@ -5140,6 +5140,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
 						game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
+						if(player==game.me){
+							if(top.length) game.lognobroadcast(player,'将',top.reverse(),'置于牌堆顶');
+							if(bottom.length) game.lognobroadcast(player,'将',bottom,'置于牌堆底');
+						}
+						else{
+							player.send(function(player,topCards,bottomCards){
+								if(topCards.length) game.lognobroadcast(player,'将',topCards.reverse(),'置于牌堆顶');
+								if(bottomCards.length) game.lognobroadcast(player,'将',bottomCards,'置于牌堆底');
+							},player,top,bottom);
+						}
 						game.delay(2);
 					};
 					var chooseButton=function(online,player,cards){
@@ -5179,19 +5189,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									for(i=0;i<event.top.length;i++){
 										ui.cardPile.insertBefore(event.top[i].link,ui.cardPile.firstChild);
 									}
-									for(i=0;i<event.bottom.length;i++){
-										ui.cardPile.appendChild(event.bottom[i].link);
-									}
 									for(i=0;i<event.dialog.buttons.length;i++){
 										if(event.dialog.buttons[i].classList.contains('glow')==false&&
 											event.dialog.buttons[i].classList.contains('target')==false)
-										ui.cardPile.appendChild(event.dialog.buttons[i].link);
+										event.bottom.push(event.dialog.buttons[i]);
+									}
+									for(i=0;i<event.bottom.length;i++){
+										ui.cardPile.appendChild(event.bottom[i].link);
 									}
 									if(event.triggername=='phaseZhunbeiBegin'&&event.top.length==0){
 										player.addTempSkill('reguanxing_on');
 									}
 									player.popup(get.cnNumber(event.top.length)+'上'+get.cnNumber(event.cards.length-event.top.length)+'下');
 									game.log(player,'将'+get.cnNumber(event.top.length)+'张牌置于牌堆顶');
+									var topLinkCards=[];
+									var bottomLinkCards=[];
+									for(var tlc of event.top) topLinkCards.push(tlc.link);
+									for(var blc of event.bottom) bottomLinkCards.push(blc.link);
+									if(player==game.me){
+										if(event.top.length) game.lognobroadcast(player,'将',topLinkCards.reverse(),'置于牌堆顶');
+										if(event.bottom.length) game.lognobroadcast(player,'将',bottomLinkCards,'置于牌堆底');
+									}
+									else{
+										player.send(function(player,topCards,bottomCards){
+											if(topCards.length) game.lognobroadcast(player,'将',topCards.reverse(),'置于牌堆顶');
+											if(bottomCards.length) game.lognobroadcast(player,'将',bottomCards,'置于牌堆底');
+										},player,topLinkCards,bottomLinkCards);
+									}
 								}
 								event.dialog.close();
 								event.control.close();
@@ -5210,27 +5234,49 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<event.dialog.buttons.length;i++){
 							event.dialog.buttons[i].classList.add('selectable');
 						}
+						var updateInfo=function(event){
+							for(var sequence=0;sequence<event.top.length;sequence++){
+								var topCard=event.top[sequence];
+								var info=topCard.querySelector('.info');
+								info.innerHTML='牌堆顶第：'+(event.top.length-sequence)+'张';
+							}
+							for(var sequence=0;sequence<event.bottom.length;sequence++){
+								var bottomCard=event.bottom[sequence];
+								var info=bottomCard.querySelector('.info');
+								info.innerHTML='牌堆底倒数第：'+(event.bottom.length-sequence)+'张';
+							}
+						}
 						event.custom.replace.button=function(link){
 							var event=_status.event;
 							if(link.classList.contains('target')){
 								link.classList.remove('target');
 								event.top.remove(link);
+								var info=link.querySelector('.info');
+								info.innerHTML='';
+								updateInfo(event);
 							}
 							else if(link.classList.contains('glow')){
 								link.classList.remove('glow');
 								event.bottom.remove(link);
+								var info=link.querySelector('.info');
+								info.innerHTML='';
+								updateInfo(event);
 							}
 							else if(event.status){
 								link.classList.add('target');
 								event.top.unshift(link);
+								updateInfo(event);
 							}
 							else{
 								link.classList.add('glow');
 								event.bottom.push(link);
+								updateInfo(event);
 							}
 						}
 						event.custom.replace.window=function(){
 							for(var i=0;i<_status.event.dialog.buttons.length;i++){
+								var info=_status.event.dialog.buttons[i].querySelector('.info');
+								info.innerHTML='';
 								_status.event.dialog.buttons[i].classList.remove('target');
 								_status.event.dialog.buttons[i].classList.remove('glow');
 								_status.event.top.length=0;
@@ -5265,19 +5311,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<top.length;i++){
 							ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
 						}
-						for(i=0;i<bottom.length;i++){
-							ui.cardPile.appendChild(bottom[i]);
-						}
 						for(i=0;i<event.cards.length;i++){
 							if(!top.contains(event.cards[i])&&!bottom.contains(event.cards[i])){
-								ui.cardPile.appendChild(event.cards[i]);
+								bottom.push(event.cards[i]);
 							}
+						}
+						for(i=0;i<bottom.length;i++){
+							ui.cardPile.appendChild(bottom[i]);
 						}
 						if(event.triggername=='phaseZhunbeiBegin'&&top.length==0){
 							player.addTempSkill('reguanxing_on');
 						}
 						player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(event.cards.length-top.length)+'下');
 						game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
+						if(player==game.me){
+							if(top.length) game.lognobroadcast(player,'将',top.reverse(),'置于牌堆顶');
+							if(bottom.length) game.lognobroadcast(player,'将',bottom,'置于牌堆底');
+						}
+						else{
+							player.send(function(player,topCards,bottomCards){
+								if(topCards.length) game.lognobroadcast(player,'将',topCards.reverse(),'置于牌堆顶');
+								if(bottomCards.length) game.lognobroadcast(player,'将',bottomCards,'置于牌堆底');
+							},player,top,bottom);
+						}
 						game.updateRoundNumber();
 						game.delay(2);
 					}

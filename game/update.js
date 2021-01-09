@@ -1,8 +1,10 @@
 window.noname_update={
-	version:'2021.01.09.1',
+	version:'2021.01.09.2',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修正审配刚直的技能描述',
+		'调整村诸葛亮神算技能',
+		'改善观星操作界面',
 	],
 	files:[
 		'card/extra.js',

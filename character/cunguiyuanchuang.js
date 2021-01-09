@@ -16,19 +16,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				locked:false,
 				trigger:{
-					player:"phaseDrawBegin1",
+					player:"phaseDrawEnd",
 				},
 				content:function (){
 					"step 0"
-					player.chooseBool("是否少摸一张牌并获得【"+get.translation("reshensuan2")+"】："+get.skillInfoTranslation("reshensuan")+")？").ai=function(){
+					player.chooseBool("是否弃置一张牌以发动【"+get.translation("reshensuan2")+"】："+get.skillInfoTranslation("reshensuan")+")？").ai=function(){
 						return false;
 					};
 					"step 1"
 					if(result.bool){
-						trigger.num-=1;
+						player.chooseToDiscard(1,'he',true);
 						player.addTempSkill('reshensuan2',{player:'phaseUseAfter'});
 						player.storage.reshensuan2=[];
 						player.markSkill('reshensuan2');
+						player.storage.shaUsed=0;
 						player.addTempSkill('reshensuan4');
 					}
 				},
@@ -84,8 +85,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var bool=game.hasPlayer(function(current){
 						return target.canUse(event.cards[0],current);
 					});
+					if(bool&&event.cardsname=='sha'&&target==player){
+						bool=player.getCardUsable('sha')>0;
+					}
 					if(bool){
 						target.chooseUseTarget(event.cards[0],true,false);
+						if(event.cardsname=='sha'&&target==player){
+							player.storage.shaUsed++;
+						}
 					}
 					else{
 						target.gain(event.cards,'gain2');
@@ -103,15 +110,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			reshensuan3:{},
 			reshensuan4:{
-				direct:true,
-				trigger:{
-					player:"phaseDrawEnd",
+				mod:{
+					cardUsable:function(card,player,num){
+						if(card.name=='sha'){
+							return num-player.storage.shaUsed;
+						}
+					},
 				},
-				content:function (){
-					"step 0"
-						player.chooseToDiscard(1,'he',true);
-				},
-				onremove:function(player){},
+				onremove:true,
 			},
 		},
 		translate:{
@@ -119,7 +125,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			cun_zhugeliang:'村诸葛亮',
 			reshensuan:'神算',
 			reshensuan2:'神算',
-			reshensuan_info:'摸牌阶段，你可以少摸一张牌。若如此做，摸牌阶段摸牌后弃置一张牌，出牌阶段的空闲时点，你可以声明牌的类别，并亮出牌堆顶的一张牌。若相同且此阶段未亮出过同名的牌，你指定一名角色，其使用之，如无法使用则改为获得之。否则你弃置一张牌，并且此技能无效直到此阶段结束。',
+			reshensuan_info:'摸牌阶段结束时，你可以弃置一张牌。若如此做，出牌阶段的空闲时点，你可以声明牌的类别，并亮出牌堆顶的一张牌。若相同且此阶段未亮出过同名的牌，你指定一名角色，其使用此牌，不能使用则获得。否则你弃置一张牌，然后此技能无效直到此阶段结束。',
 		},
 	};
 });
