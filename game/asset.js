@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.105.10',
+	'v1.9.105.11',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -5046,6 +5046,7 @@ window.noname_skin_list={
 	chengyu:4,
 	chenlin:3,
 	chenqun:4,
+	cun_zhugeliang:2,
 	daqiao:19,
 	daxiaoqiao:6,
 	dengai:8,
