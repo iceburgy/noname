@@ -13,23 +13,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			reshensuan:{
 				audio:"guanxing",
-				forced:true,
-				locked:false,
 				trigger:{player:'phaseUseBegin'},
 				content:function (){
 					"step 0"
-					player.chooseBool("是否弃置一张牌以发动【"+get.translation("reshensuan2")+"】："+get.skillInfoTranslation("reshensuan")+")？").ai=function(){
-						return false;
-					};
-					"step 1"
-					if(result.bool){
-						player.chooseToDiscard(1,'he',true);
-						player.addTempSkill('reshensuan2',{player:'phaseUseAfter'});
-						player.storage.reshensuan2=[];
-						player.markSkill('reshensuan2');
-						player.storage.shaUsed=0;
-						player.addTempSkill('reshensuan4');
-					}
+					player.chooseToDiscard(1,'he',true);
+					player.addTempSkill('reshensuan2',{player:'phaseUseAfter'});
+					player.storage.reshensuan2=[];
+					player.markSkill('reshensuan2');
+					player.storage.shaUsed=0;
+					player.addTempSkill('reshensuan4');
 				},
 			},
 			reshensuan2:{
