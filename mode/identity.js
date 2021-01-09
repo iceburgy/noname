@@ -2334,7 +2334,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(fulibiBalance>=lib.bonusKeySuperChangeRoleCost){
 								tempChars.push(lib.bonusKeySuperChangeRole);
 							}
-							list.push([game.players[i],[str,[tempChars,'character']],false]);
+							list.push([game.players[i],[str,[tempChars,'character']],selectButton,false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2386,7 +2386,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var str=strAnimation+'：'+event.choiceNum[0]+'换'+choiceZhu;
 							var tempChars=event.allList.randomRemove(choiceZhu);
 							event.zhuList.remove(tempChars);
-							list.push([game.players[i],[str,[tempChars,'character']],true]);
+							list.push([game.players[i],[str,[tempChars,'character']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2430,7 +2430,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(fulibiBalance>=lib.bonusKeySuperChangeRoleCost){
 								nextValidRest.push(lib.bonusKeySuperChangeRole);
 							}
-							list.push([game.players[i],[str,[[...nextValidZhu,...nextValidRest],'character']],false]);
+							list.push([game.players[i],[str,[[...nextValidZhu,...nextValidRest],'character']],selectButton,false]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -2482,7 +2482,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var choiceZhu=isUsingSuperChangeRole?event.choiceNumSuperChangeRole[0]:event.choiceNumChangeRole[0];
 							var str=strAnimation+'：'+event.choiceNum[0]+'换'+choiceZhu;
 							var nextValidCharacters=game.getNextValidCharacters(event.chosenChars[0],choiceZhu,event.allList);
-							list.push([game.players[i],[str,[nextValidCharacters,'character']],true]);
+							list.push([game.players[i],[str,[nextValidCharacters,'character']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
