@@ -27,7 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						trigger.num-=1;
 						player.addTempSkill('reshensuan2',{player:'phaseUseAfter'});
-						player.storage.reshensuan2=['basic','trick','equip'];
+						player.storage.reshensuan2=[];
 						player.markSkill('reshensuan2');
 					}
 				},
@@ -37,29 +37,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				marktext:'算',
 				filter:function(event,player){
-					return !player.hasSkill('reshensuan3')&&player.storage.reshensuan2&&player.storage.reshensuan2.length;
+					return !player.hasSkill('reshensuan3');
 				},
 				filterTarget:function(card,player,target){
 					return true;
 				},
 				intro:{
 					content:function(storage){
-						if(storage&&storage.length) return '发动神算可用类别：'+get.translation(storage);
-						else return '神算已用完'
+						if(storage&&storage.length) return '发动神算已用牌名：'+get.translation(storage);
+						else return '尚未使用神算'
 					}
 				},
 				content:function (){
 					"step 0"
-					player.chooseControl(player.storage.reshensuan2).set('ai',function(){
+					player.chooseControl(['basic','trick','equip']).set('ai',function(){
 						return player.storage.reshensuan2[Math.floor(Math.random()*player.storage.reshensuan2.length)];
 					});
 					"step 1"
 					player.popup(result.control);
 					game.log(player,'选择了【'+get.translation(result.control)+'】');
 					var cards=get.cards(1);
+					var name=get.name(cards[0]);
 					game.cardsGotoOrdering(cards);
 					player.showCards(cards,get.translation('reshensuan2'));
-					if(get.type(cards[0],'trick')==result.control){
+					if(get.type(cards[0],'trick')==result.control&&!player.storage.reshensuan2.contains(name)){
 						var bool=game.hasPlayer(function(current){
 							return target.canUse(cards[0],current);
 						});
@@ -69,14 +70,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							target.gain(cards,'gain2');
 						}
-						player.storage.reshensuan2.remove(result.control);
+						player.storage.reshensuan2.add(name);
 						player.markSkill('reshensuan2');
-
 					}
 					else{
 						player.chooseToDiscard(1,'he',true);
 						player.addTempSkill('reshensuan3',{player:'phaseUseAfter'});
-						player.unmarkSkill('reshensuan2');
 					}
 				},
 				ai:{
