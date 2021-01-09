@@ -15,9 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:"guanxing",
 				forced:true,
 				locked:false,
-				trigger:{
-					player:"phaseDrawEnd",
-				},
+				trigger:{player:'phaseUseBegin'},
 				content:function (){
 					"step 0"
 					player.chooseBool("是否弃置一张牌以发动【"+get.translation("reshensuan2")+"】："+get.skillInfoTranslation("reshensuan")+")？").ai=function(){
@@ -125,7 +123,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			cun_zhugeliang:'村诸葛亮',
 			reshensuan:'神算',
 			reshensuan2:'神算',
-			reshensuan_info:'摸牌阶段结束时，你可以弃置一张牌。若如此做，出牌阶段的空闲时点，你可以声明牌的类别，并亮出牌堆顶的一张牌。若相同且此阶段未亮出过同名的牌，你指定一名角色，其使用此牌，不能使用则获得。否则你弃置一张牌，然后此技能无效直到此阶段结束。',
+			reshensuan_info:'出牌阶段开始时，你可以弃置一张牌。若如此做，出牌阶段的空闲时点，你可以声明牌的类别，并亮出牌堆顶的一张牌。若相同且此阶段未亮出过同名的牌，你指定一名角色，其使用此牌，不能使用则获得。否则你弃置一张牌，然后此技能无效直到此阶段结束。',
 		},
 	};
 });

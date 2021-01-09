@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2021.01.09.2',
+	version:'2021.01.09.3',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修正审配刚直的技能描述',
