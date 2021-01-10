@@ -4165,13 +4165,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			woshixiaonei:{
-				forced:true,
 				audio:['jianxiong',2],
-				trigger:{global:'revealXiaonei',player:['phaseBeginStart','dyingBefore']},
+				trigger:{global:'revealXiaonei',player:['phaseBeginStart','chooseToUseBefore']},
 				skillAnimation:'legend',
 				animationColor:'thunder',
 				filter:function(event,player){
-					if(event.name=='revealXiaonei') return true;
+					if(event.name=='revealXiaonei'||event.name=='chooseToUse'&&event.type=='dying') return true;
 					// only for AI to trigger
 					return !player.isOnline2()&&player!=game.me;
 				},
@@ -4222,6 +4221,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return 1;
 						},
 					},
+				},
+				oncancel:function(event,player){
+					var isButtonTriggered=event&&event.name=='revealXiaonei';
+					if(!isButtonTriggered||player.storage.buttonAttempted) return;
+					player.storage.buttonAttempted=true;
+					if(player.isOnline2()){
+						player.send(function(){
+							ui.revealXiaonei.classList.add('glow');
+							ui.revealXiaonei.show();
+						})
+					}
+					else if(player==game.me){
+						ui.revealXiaonei.classList.add('glow');
+						ui.revealXiaonei.show();
+					}
 				},
 			},
 			xiaoneizhibi:{
