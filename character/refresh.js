@@ -706,7 +706,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover();
 						if(get.position(result.card)=='d') player.gain(result.card,'gain2','log')
 					}
-					if(event.count) event.goto(1);
+					if(event.count) event.goto(3);
 				}
 			},
 			rezishou:{
