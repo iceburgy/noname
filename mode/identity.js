@@ -4172,7 +4172,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.name=='revealXiaonei'||event.name=='chooseToUse'&&event.type=='dying') return true;
 					// only for AI to trigger
-					return !player.isOnline2()&&player!=game.me;
+					return !player.isOnline2()&&player!=game.me&&event.name=='phaseBegin';
 				},
 				content:function(){
 					'step 0'
