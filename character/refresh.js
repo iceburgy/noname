@@ -5155,6 +5155,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var chooseButton=function(online,player,cards){
 						var event=_status.event;
 						player=player||event.player;
+						if(!event.player) event.player=player;
 						cards=cards||event.cards;
 						event.top=[];
 						event.bottom=[];
