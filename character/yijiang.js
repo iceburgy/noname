@@ -10225,24 +10225,141 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				content:function(){
-					"step 0"
+					'step 0'
 					var cards=[];
 					for(var i=0;i<trigger.cards2.length;i++){
 						if(get.position(trigger.cards2[i],true)=='d'){
 							cards.push(trigger.cards2[i]);
 						}
 					}
-					player.chooseCardButton(cards,[1,cards.length],'纵玄：将弃置的牌按任意顺序置于牌堆顶（先选择的在上）').set('ai',function(){
-						return -1;
-					});
-					"step 1"
-					if(result&&result.bool&&result.links&&result.links.length){
-						var cards=result.links.slice(0);
-						while(cards.length){
-							ui.cardPile.insertBefore(cards.pop(),ui.cardPile.firstChild);
-						}
-						player.logSkill(event.name);
+
+					event.cards=cards;
+					if(cards.length==0){
+						event.finish();
 					}
+					'step 1'
+					var switchToAuto=function(){
+						_status.imchoosing=false;
+						if(event.dialog) event.dialog.close();
+						if(event.control) event.control.close();
+					};
+					var chooseButton=function(online,player,cards){
+						var event=_status.event;
+						player=player||event.player;
+						cards=cards||event.cards;
+						if(!event.player) event.player=player;
+						event.top=[];
+						event.dialog=ui.create.dialog('纵玄：将弃置的牌按任意顺序置于牌堆顶（先选择的在上）',cards);
+						for(var i=0;i<event.dialog.buttons.length;i++){
+							event.dialog.buttons[i].classList.add('pointerdiv');
+						}
+						event.switchToAuto=function(){
+							event._result='ai';
+							event.dialog.close();
+							event.control.close();
+							_status.imchoosing=false;
+						};
+						event.control=ui.create.control('ok',function(link){
+							var event=_status.event;
+							if(online){
+								event._result={
+									top:[],
+								}
+								for(var i=0;i<event.top.length;i++){
+									event._result.top.push(event.top[i].link);
+								}
+							}
+							else{
+								var i;
+								for(i=0;i<event.top.length;i++){
+									ui.cardPile.insertBefore(event.top[i].link,ui.cardPile.firstChild);
+								}
+								game.log(player,'将'+get.cnNumber(event.top.length)+'张牌置于牌堆顶');
+								var topLinkCards=[];
+								for(var tlc of event.top) topLinkCards.push(tlc.link);
+								if(event.top.length) game.lognobroadcast(player,'将',topLinkCards.reverse(),'置于牌堆顶');
+							}
+							event.dialog.close();
+							event.control.close();
+							game.resume();
+							_status.imchoosing=false;
+						});
+						for(var i=0;i<event.dialog.buttons.length;i++){
+							event.dialog.buttons[i].classList.add('selectable');
+							var info=event.dialog.buttons[i].querySelector('.info');
+							info.innerHTML='弃置';
+						}
+						var updateInfo=function(event){
+							for(var sequence=0;sequence<event.top.length;sequence++){
+								var topCard=event.top[sequence];
+								var info=topCard.querySelector('.info');
+								info.innerHTML='牌堆顶第：'+(event.top.length-sequence)+'张';
+							}
+							if(event.top.length<_status.event.dialog.buttons.length){
+								for(var i=0;i<_status.event.dialog.buttons.length;i++){
+									if(!event.top.contains(_status.event.dialog.buttons[i])){
+										var info=_status.event.dialog.buttons[i].querySelector('.info');
+										info.innerHTML='弃置';
+									}
+								}
+							}
+						}
+						event.custom.replace.button=function(link){
+							var event=_status.event;
+							if(link.classList.contains('target')){
+								link.classList.remove('target');
+								event.top.remove(link);
+								var info=link.querySelector('.info');
+								info.innerHTML='';
+								updateInfo(event);
+							}
+							else{
+								link.classList.add('target');
+								event.top.unshift(link);
+								updateInfo(event);
+							}
+						}
+						event.custom.replace.window=function(){
+							_status.event.top.length=0;
+							for(var i=0;i<_status.event.dialog.buttons.length;i++){
+								_status.event.dialog.buttons[i].classList.remove('target');
+								var info=_status.event.dialog.buttons[i].querySelector('.info');
+								info.innerHTML='弃置';
+							}
+						}
+						game.pause();
+						game.countChoose();
+					};
+					event.switchToAuto=switchToAuto;
+					if(event.isMine()){
+						chooseButton();
+						event.finish();
+					}
+					else if(event.isOnline()){
+						event.player.send(chooseButton,true,event.player,event.cards);
+						event.player.wait();
+						game.pause();
+					}
+					else{
+						event.switchToAuto();
+						event.finish();
+					}
+					"step 2"
+					if(event.result=='ai'||!event.result){
+						event.switchToAuto();
+					}
+					else{
+						var top=event.result.top||[];
+						for(var i=0;i<top.length;i++){
+							ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
+						}
+						game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
+						player.send(function(player,topCards){
+							if(topCards.length) game.lognobroadcast(player,'将',topCards.reverse(),'置于牌堆顶');
+						},player,top);
+					}
+					game.updateRoundNumber();
+					game.delay(2);
 				},
 			},
 			zhiyan:{

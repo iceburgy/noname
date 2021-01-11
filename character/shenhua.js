@@ -711,7 +711,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else if(link.classList.contains('pointerdiv')){
 								link.classList.add('target');
 								event.top.unshift(link);
-								event.gain.unshift('aaa');
 								updateInfo(event);
 							}
 						}
