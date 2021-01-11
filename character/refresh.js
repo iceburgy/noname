@@ -5155,8 +5155,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var chooseButton=function(online,player,cards){
 						var event=_status.event;
 						player=player||event.player;
-						if(!event.player) event.player=player;
 						cards=cards||event.cards;
+						if(!event.player) event.player=player;
 						event.top=[];
 						event.bottom=[];
 						event.status=true;
@@ -5207,16 +5207,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									var bottomLinkCards=[];
 									for(var tlc of event.top) topLinkCards.push(tlc.link);
 									for(var blc of event.bottom) bottomLinkCards.push(blc.link);
-									if(player==game.me){
-										if(event.top.length) game.lognobroadcast(player,'将',topLinkCards.reverse(),'置于牌堆顶');
-										if(event.bottom.length) game.lognobroadcast(player,'将',bottomLinkCards,'置于牌堆底');
-									}
-									else{
-										player.send(function(player,topCards,bottomCards){
-											if(topCards.length) game.lognobroadcast(player,'将',topCards.reverse(),'置于牌堆顶');
-											if(bottomCards.length) game.lognobroadcast(player,'将',bottomCards,'置于牌堆底');
-										},player,topLinkCards,bottomLinkCards);
-									}
+									if(event.top.length) game.lognobroadcast(player,'将',topLinkCards.reverse(),'置于牌堆顶');
+									if(event.bottom.length) game.lognobroadcast(player,'将',bottomLinkCards,'置于牌堆底');
 								}
 								event.dialog.close();
 								event.control.close();
@@ -5325,16 +5317,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(event.cards.length-top.length)+'下');
 						game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
-						if(player==game.me){
-							if(top.length) game.lognobroadcast(player,'将',top.reverse(),'置于牌堆顶');
-							if(bottom.length) game.lognobroadcast(player,'将',bottom,'置于牌堆底');
-						}
-						else{
-							player.send(function(player,topCards,bottomCards){
-								if(topCards.length) game.lognobroadcast(player,'将',topCards.reverse(),'置于牌堆顶');
-								if(bottomCards.length) game.lognobroadcast(player,'将',bottomCards,'置于牌堆底');
-							},player,top,bottom);
-						}
+						player.send(function(player,topCards,bottomCards){
+							if(topCards.length) game.lognobroadcast(player,'将',topCards.reverse(),'置于牌堆顶');
+							if(bottomCards.length) game.lognobroadcast(player,'将',bottomCards,'置于牌堆底');
+						},player,top,bottom);
 						game.updateRoundNumber();
 						game.delay(2);
 					}

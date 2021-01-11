@@ -558,44 +558,224 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).length) event.num++;
 					if(!player.isMinHandcard()) event.num++;
 					if(!player.getStat('damage')) event.num++;
-					'step 1'
 					if(event.num==0){
 						player.gain(event.cards,'draw');
 						event.finish();
-					}else{
+					}
+					'step 1'
+					var switchToAuto=function(){
+						_status.imchoosing=false;
+						if(event.dialog) event.dialog.close();
+						if(event.control) event.control.close();
+						var top=[];
+						var gain=[];
+						cards.sort(function(a,b){
+							return get.value(a,player)-get.value(b,player);
+						});
+						for(var i=0;i<cards.length;i++){
+							if(i<event.num) top.push(cards[i]);
+							else gain.push(cards[i]);
+						}
+						for(var i=0;i<top.length;i++){
+							ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
+						}
+						game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
+						if(player==game.me){
+							if(top.length) game.lognobroadcast(player,'将',top.reverse(),'置于牌堆顶');
+						}
+						else{
+							player.send(function(player,topCards){
+								if(topCards.length) game.lognobroadcast(player,'将',topCards.reverse(),'置于牌堆顶');
+							},player,top);
+						}
+						if(gain.length){
+							player.gain(gain,'draw');
+						}
+						else{
+							player.chooseTarget('请选择一名角色，与其一同失去1点体力',true,function(card,player,target){
+								return target!=player;
+							}).ai=function(target){
+								return -get.attitude(_status.event.player,target);
+							};
+						}
+						game.delay(2);
+					};
+					var chooseButton=function(online,player,cards,eventNum){
+						var event=_status.event;
+						player=player||event.player;
+						cards=cards||event.cards;
+						if(!event.player) event.player=player;
+						if(eventNum!=undefined) event.num=eventNum;
+						event.top=[];
+						event.gain=[];
 						var prompt;
 						if(event.num==3) prompt="罪论：请按顺将卡牌置于牌堆顶（先选择的在上）";
 						else prompt="罪论：请按顺将"+get.cnNumber(event.num)+"张卡牌置于牌堆顶（先选择的在上），然后获得其余的牌。";
-						player.chooseCardButton(event.num,true,event.cards,prompt).set('ai',function(button){
-							return 100-get.value(button.link);
-						});
-					}
-					'step 2'
-					if(result.bool){
-						var list=result.links.slice(0);
-						var num=list.length-1;
-						for(var i=0;i<list.length;i++){
-							event.cards.remove(list[num-i]);
-							ui.cardPile.insertBefore(list[num-i],ui.cardPile.firstChild);
+						event.dialog=ui.create.dialog(prompt,cards);
+						for(var i=0;i<event.dialog.buttons.length;i++){
+							event.dialog.buttons[i].classList.add('pointerdiv');
 						}
+						event.switchToAuto=function(){
+							event._result='ai';
+							event.dialog.close();
+							event.control.close();
+							_status.imchoosing=false;
+						};
+						event.showControl=function(event){
+							event.control=ui.create.control('ok',function(link){
+								var event=_status.event;
+								if(online){
+									event._result={
+										top:[],
+										gain:[],
+									}
+									for(var i=0;i<event.top.length;i++){
+										event._result.top.push(event.top[i].link);
+									}
+									for(var i=0;i<event.gain.length;i++){
+										event._result.gain.push(event.gain[i].link);
+									}
+								}
+								else{
+									var i;
+									for(i=0;i<event.top.length;i++){
+										ui.cardPile.insertBefore(event.top[i].link,ui.cardPile.firstChild);
+									}
+									game.log(player,'将'+get.cnNumber(event.top.length)+'张牌置于牌堆顶');
+									var topLinkCards=[];
+									for(var tlc of event.top) topLinkCards.push(tlc.link);
+									if(event.top.length) game.lognobroadcast(player,'将',topLinkCards.reverse(),'置于牌堆顶');
+									if(event.gain.length){
+										var gainCards=[];
+										for(var gb of event.gain) gainCards.push(gb.link);
+										player.gain(gainCards,'draw');
+									}
+									else{
+										player.chooseTarget('请选择一名角色，与其一同失去1点体力',true,function(card,player,target){
+											return target!=player;
+										}).ai=function(target){
+											return -get.attitude(_status.event.player,target);
+										};
+									}
+								}
+								event.dialog.close();
+								event.control.close();
+								game.resume();
+								_status.imchoosing=false;
+							});
+						}
+						for(var i=0;i<event.dialog.buttons.length;i++){
+							event.dialog.buttons[i].classList.add('selectable');
+						}
+						var updateInfo=function(event){
+							for(var sequence=0;sequence<event.top.length;sequence++){
+								var topCard=event.top[sequence];
+								var info=topCard.querySelector('.info');
+								info.innerHTML='牌堆顶第：'+(event.top.length-sequence)+'张';
+							}
+							if(event.top.length==event.num){
+								if(event.control) event.control.close();
+								event.showControl(event);
+								event.gain.length=0;
+								for(var i=0;i<_status.event.dialog.buttons.length;i++){
+									if(!event.top.contains(_status.event.dialog.buttons[i])){
+										event.gain.push(_status.event.dialog.buttons[i]);
+										_status.event.dialog.buttons[i].classList.remove('pointerdiv');
+										_status.event.dialog.buttons[i].classList.add('unselectable');
+										var info=_status.event.dialog.buttons[i].querySelector('.info');
+										info.innerHTML='你将获得';
+									}
+								}
+							}
+							else{
+								if(event.control) event.control.close();
+								for(var i=0;i<_status.event.dialog.buttons.length;i++){
+									if(!event.top.contains(_status.event.dialog.buttons[i])){
+										_status.event.dialog.buttons[i].classList.add('pointerdiv');
+										_status.event.dialog.buttons[i].classList.remove('unselectable');
+										var info=_status.event.dialog.buttons[i].querySelector('.info');
+										info.innerHTML='';
+									}
+								}
+							}
+						}
+						event.custom.replace.button=function(link){
+							var event=_status.event;
+							if(link.classList.contains('target')){
+								link.classList.remove('target');
+								event.top.remove(link);
+								var info=link.querySelector('.info');
+								info.innerHTML='';
+								updateInfo(event);
+							}
+							else if(link.classList.contains('pointerdiv')){
+								link.classList.add('target');
+								event.top.unshift(link);
+								event.gain.unshift('aaa');
+								updateInfo(event);
+							}
+						}
+						event.custom.replace.window=function(){
+							_status.event.top.length=0;
+							_status.event.gain.length=0;
+							if(event.control) event.control.close();
+							for(var i=0;i<_status.event.dialog.buttons.length;i++){
+								_status.event.dialog.buttons[i].classList.add('pointerdiv');
+								_status.event.dialog.buttons[i].classList.remove('unselectable');
+								_status.event.dialog.buttons[i].classList.remove('target');
+								var info=_status.event.dialog.buttons[i].querySelector('.info');
+								info.innerHTML='';
+							}
+						}
+						game.pause();
+						game.countChoose();
+					};
+					event.switchToAuto=switchToAuto;
+					if(event.isMine()){
+						chooseButton();
+						event.goto(3);
 					}
-					'step 3'
-					game.updateRoundNumber();
-					if(event.cards.length){
-						player.gain(event.cards,'draw');
-						event.finish();
+					else if(event.isOnline()){
+						event.player.send(chooseButton,true,event.player,event.cards,event.num);
+						event.player.wait();
+						game.pause();
 					}
 					else{
-						player.chooseTarget('请选择一名角色，与其一同失去1点体力',true,function(card,player,target){
-							return target!=player;
-						}).ai=function(target){
-							return -get.attitude(_status.event.player,target);
-						};
+						event.switchToAuto();
+						event.goto(3);
 					}
-					'step 4'
-					player.line(result.targets[0],'fire');
-					player.loseHp();
-					result.targets[0].loseHp();
+					"step 2"
+					if(event.result=='ai'||!event.result){
+						event.switchToAuto();
+					}
+					else{
+						var top=event.result.top||[];
+						var gain=event.result.gain||[];
+						for(var i=0;i<top.length;i++){
+							ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
+						}
+						game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
+						player.send(function(player,topCards){
+							if(topCards.length) game.lognobroadcast(player,'将',topCards.reverse(),'置于牌堆顶');
+						},player,top);
+						if(gain.length){
+							player.gain(gain,'draw');
+						}
+						else{
+							player.chooseTarget('请选择一名角色，与其一同失去1点体力',true,function(card,player,target){
+								return target!=player;
+							}).ai=function(target){
+								return -get.attitude(_status.event.player,target);
+							};
+						}
+					}
+					game.updateRoundNumber();
+					'step 3'
+					if(result.targets&&result.targets.length){
+						player.line(result.targets[0],'fire');
+						player.loseHp();
+						result.targets[0].loseHp();
+					}
 				},
 			},
 			xinfu_zuilun2:{
