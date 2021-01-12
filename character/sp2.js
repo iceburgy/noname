@@ -5362,21 +5362,217 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//priority:10,
 				content:function (){
 					"step 0"
-					event.cards=get.cards(4);
-					player.chooseCardButton(true,event.cards,2,'选择两张牌置于牌堆顶').set('ai',ai.get.buttonValue);
+					var cards=get.cards(4);
+					event.cards=cards;
+					var switchToAuto=function(){
+						_status.imchoosing=false;
+						if(event.dialog) event.dialog.close();
+						if(event.control) event.control.close();
+						var top=[];
+						var bottom=[];
+						cards.sort(function(a,b){
+							return get.value(b,player)-get.value(a,player);
+						});
+						while(cards.length>2){
+							top.unshift(cards.shift());
+						}
+						bottom=cards;
+						for(var i=0;i<top.length;i++){
+							ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
+						}
+						for(i=0;i<bottom.length;i++){
+							ui.cardPile.appendChild(bottom[i]);
+						}
+						if(player==game.me){
+							if(top.length) game.lognobroadcast(player,'将',top.reverse(),'置于牌堆顶');
+							if(bottom.length) game.lognobroadcast(player,'将',bottom,'置于牌堆底');
+						}
+						else{
+							player.send(function(player,topCards,bottomCards){
+								if(topCards.length) game.lognobroadcast(player,'将',topCards.reverse(),'置于牌堆顶');
+								if(bottomCards.length) game.lognobroadcast(player,'将',bottomCards,'置于牌堆底');
+							},player,top,bottom);
+						}
+						game.delay(2);
+					};
+					var chooseButton=function(online,player,cards){
+						var event=_status.event;
+						player=player||event.player;
+						cards=cards||event.cards;
+						if(!event.player) event.player=player;
+						event.top=[];
+						event.bottom=[];
+						event.status=true;
+						event.dialog=ui.create.dialog('选择将两张牌置于牌堆顶，另外两张牌置于牌堆底',cards);
+						for(var i=0;i<event.dialog.buttons.length;i++){
+							event.dialog.buttons[i].classList.add('pointerdiv');
+						}
+						event.switchToAuto=function(){
+							event._result='ai';
+							if(event.dialog) event.dialog.close();
+							if(event.control) event.control.close();
+							_status.imchoosing=false;
+						},
+						event.showControl=function(event){
+							event.control=ui.create.control('ok',function(link){
+								var event=_status.event;
+								if(link=='ok'){
+									if(online){
+										event._result={
+											top:[],
+											bottom:[]
+										}
+										for(var i=0;i<event.top.length;i++){
+											event._result.top.push(event.top[i].link);
+										}
+										for(var i=0;i<event.bottom.length;i++){
+											event._result.bottom.push(event.bottom[i].link);
+										}
+									}
+									else{
+										var i;
+										for(i=0;i<event.top.length;i++){
+											ui.cardPile.insertBefore(event.top[i].link,ui.cardPile.firstChild);
+										}
+										for(i=0;i<event.bottom.length;i++){
+											ui.cardPile.appendChild(event.bottom[i].link);
+										}
+										var topLinkCards=[];
+										var bottomLinkCards=[];
+										for(var tlc of event.top) topLinkCards.push(tlc.link);
+										for(var blc of event.bottom) bottomLinkCards.push(blc.link);
+										if(event.top.length) game.lognobroadcast(player,'将',topLinkCards.reverse(),'置于牌堆顶');
+										if(event.bottom.length) game.lognobroadcast(player,'将',bottomLinkCards,'置于牌堆底');
+									}
+									event.dialog.close();
+									event.control.close();
+									game.resume();
+									_status.imchoosing=false;
+								}
+							});
+						}
+
+						for(var i=0;i<event.dialog.buttons.length;i++){
+							event.dialog.buttons[i].classList.add('selectable');
+						}
+						var updateInfo=function(event){
+							for(var sequence=0;sequence<event.top.length;sequence++){
+								var topCard=event.top[sequence];
+								var info=topCard.querySelector('.info');
+								info.innerHTML='牌堆顶第：'+(event.top.length-sequence)+'张';
+							}
+							if(event.top.length==2){
+								event.status=false;
+							}
+							else{
+								event.status=true;
+								for(var i=0;i<_status.event.dialog.buttons.length;i++){
+									if(!event.top.contains(_status.event.dialog.buttons[i])){
+										_status.event.dialog.buttons[i].classList.remove('glow');
+										event.bottom.remove(_status.event.dialog.buttons[i]);
+										var info=_status.event.dialog.buttons[i].querySelector('.info');
+										info.innerHTML='';
+									}
+								}
+							}
+							if(!event.status){
+								for(var sequence=0;sequence<event.bottom.length;sequence++){
+									var bottomCard=event.bottom[sequence];
+									var info=bottomCard.querySelector('.info');
+									info.innerHTML='牌堆底倒数第：'+(event.bottom.length-sequence)+'张';
+								}
+							}
+							if(event.top.length+event.bottom.length==4){
+								if(event.control) event.control.close();
+								event.showControl(event);
+							}
+							else{
+								if(event.control) event.control.close();
+							}
+						}
+						event.custom.replace.button=function(link){
+							var event=_status.event;
+							if(link.classList.contains('target')){
+								link.classList.remove('target');
+								event.top.remove(link);
+								var info=link.querySelector('.info');
+								info.innerHTML='';
+								updateInfo(event);
+							}
+							else if(link.classList.contains('glow')){
+								link.classList.remove('glow');
+								event.bottom.remove(link);
+								var info=link.querySelector('.info');
+								info.innerHTML='';
+								updateInfo(event);
+							}
+							else if(event.status){
+								link.classList.add('target');
+								event.top.unshift(link);
+								if(event.top.length==2){
+									for(var i=0;i<_status.event.dialog.buttons.length;i++){
+										if(!event.top.contains(_status.event.dialog.buttons[i])){
+											_status.event.dialog.buttons[i].classList.add('glow');
+											event.bottom.push(_status.event.dialog.buttons[i]);
+										}
+									}
+								}
+								updateInfo(event);
+							}
+							else{
+								link.classList.add('glow');
+								event.bottom.push(link);
+								updateInfo(event);
+							}
+						}
+						event.custom.replace.window=function(){
+							_status.event.top.length=0;
+							_status.event.bottom.length=0;
+							if(event.control) event.control.close();
+							for(var i=0;i<_status.event.dialog.buttons.length;i++){
+								var info=_status.event.dialog.buttons[i].querySelector('.info');
+								info.innerHTML='';
+								_status.event.dialog.buttons[i].classList.remove('target');
+								_status.event.dialog.buttons[i].classList.remove('glow');
+							}
+						}
+						game.pause();
+						game.countChoose();
+					}
+					event.switchToAuto=switchToAuto;
+
+					if(event.isMine()){
+						chooseButton();
+						event.finish();
+					}
+					else if(event.isOnline()){
+						event.player.send(chooseButton,true,event.player,event.cards);
+						event.player.wait();
+						game.pause();
+					}
+					else{
+						event.switchToAuto();
+						event.finish();
+					}
 					"step 1"
-					if(result.bool){
-						var choice=[];
-						for(var i=0;i<result.links.length;i++){
-							choice.push(result.links[i]);
-							cards.remove(result.links[i]);
+					if(event.result=='ai'||!event.result){
+						event.switchToAuto();
+					}
+					else{
+						var top=event.result.top||[];
+						var bottom=event.result.bottom||[];
+						for(var i=0;i<top.length;i++){
+							ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
 						}
-						for(var i=0;i<cards.length;i++){
-							ui.cardPile.appendChild(cards[i]);
+						for(i=0;i<bottom.length;i++){
+							ui.cardPile.appendChild(bottom[i]);
 						}
-						while(choice.length){
-							ui.cardPile.insertBefore(choice.pop(),ui.cardPile.firstChild);
-						}
+						player.send(function(player,topCards,bottomCards){
+							if(topCards.length) game.lognobroadcast(player,'将',topCards.reverse(),'置于牌堆顶');
+							if(bottomCards.length) game.lognobroadcast(player,'将',bottomCards,'置于牌堆底');
+						},player,top,bottom);
+						game.updateRoundNumber();
+						game.delay(2);
 					}
 				},
 			},
