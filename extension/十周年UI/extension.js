@@ -3016,6 +3016,9 @@ content:function(config, pack){
                 this.fixed = true;
                 this.moving = true;
                 var x = Math.round((player.offsetWidth - this.offsetWidth) / 2 + player.offsetLeft);
+				if(player==game.me) {
+					x=player.offsetWidth + player.node.handcards1.offsetWidth;
+				}
                 var y = Math.round((player.offsetHeight - this.offsetHeight) / 2 + player.offsetTop);
                 var scale = decadeUI.getCardBestScale();
                 this.style.transform = 'translate(' + x + 'px,' + y + 'px)scale(' + scale + ')';
@@ -3158,7 +3161,7 @@ content:function(config, pack){
 					
 					node.style.transform = 'translate(' + x + 'px,' + y + 'px)scale(' + scale + ')';
 					
-                    tx = x - marginOffset;
+                    tx = (this==game.me)?x+marginOffset:x-marginOffset;
                     ty = (this.offsetHeight - node.offsetHeight) / 2 + this.offsetTop;
                     
                     setTimeout(function(mnode, mnodes, mtx, mty, mscale){
@@ -4129,7 +4132,7 @@ content:function(config, pack){
 				for(var i = 0; i < handCards.length; i++){
 					if (!handCards[i].scaled){
 					    handCards[i].classList.add('transition-none');
-					    x = -Math.round(scaleMargin) + 'px';
+					    x = (parentNode.offsetWidth-Math.round(scaleMargin)) + 'px';
 					    handCards[i].style.transform = 'translate(' + x + ',' + y + ')scale(' + scale + ')';
 					    ui.refresh(handCards[i]);
 					    handCards[i].scaled = true;

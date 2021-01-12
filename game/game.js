@@ -14928,7 +14928,7 @@
 						sort=lib.config.sort_card(cards[num]);
 						if(lib.config.reverse_sort) sort=-sort;
 						cards[num].fix();
-						cards[num].style.transform='';
+						cards[num].style.transform='translate(' + player.node.handcards1.offsetWidth + 'px)';
 						if(_status.discarded){
 							_status.discarded.remove(cards[num]);
 						}
@@ -14958,8 +14958,8 @@
 						game.pause();
 						setTimeout(function(){
 							addv();
-							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
-							player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
+							player.node.handcards1.appendChild(frag1);
+							player.node.handcards2.appendChild(frag2);
 							player.update();
 							if(player==game.me) ui.updatehl();
 							broadcast();
@@ -14971,8 +14971,8 @@
 						game.pause();
 						setTimeout(function(){
 							addv();
-							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
-							player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
+							player.node.handcards1.appendChild(frag1);
+							player.node.handcards2.appendChild(frag2);
 							player.update();
 							if(player==game.me) ui.updatehl();
 							broadcast();
@@ -14987,8 +14987,8 @@
 						game.pause();
 						setTimeout(function(){
 							addv();
-							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
-							player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
+							player.node.handcards1.appendChild(frag1);
+							player.node.handcards2.appendChild(frag2);
 							player.update();
 							if(player==game.me) ui.updatehl();
 							broadcast();
@@ -15008,8 +15008,8 @@
 						game.pause();
 						setTimeout(function(){
 							addv();
-							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
-							player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
+							player.node.handcards1.appendChild(frag1);
+							player.node.handcards2.appendChild(frag2);
 							player.update();
 							if(player==game.me) ui.updatehl();
 							broadcast();
@@ -15018,8 +15018,8 @@
 					}
 					else{
 						addv();
-						player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
-						player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
+						player.node.handcards1.appendChild(frag1);
+						player.node.handcards2.appendChild(frag2);
 						player.update();
 						if(player==game.me) ui.updatehl();
 						broadcast();
@@ -19226,10 +19226,10 @@
 							cards[i].classList.add('drawinghidden');
 						}
 						if(get.is.singleHandcard()||sort>0){
-							this.node.handcards1.insertBefore(cards[i],this.node.handcards1.firstChild);
+							this.node.handcards1.appendChild(cards[i]);
 						}
 						else{
-							this.node.handcards2.insertBefore(cards[i],this.node.handcards2.firstChild);
+							this.node.handcards2.appendChild(cards[i]);
 						}
 					}
 					if(this==game.me||_status.video) ui.updatehl();
@@ -30772,7 +30772,7 @@
 					var cards2=get.infoCards(cards12[1]);
 					for(var i=0;i<cards1.length;i++){
 						cards1[i].classList.add('drawinghidden');
-						player.node.handcards1.insertBefore(cards1[i],player.node.handcards1.firstChild);
+						player.node.handcards1.appendChild(cards1[i]);
 					}
 					for(var i=0;i<cards2.length;i++){
 						cards2[i].classList.add('drawinghidden');
