@@ -2760,6 +2760,9 @@ content:function(config, pack){
 					x = ((this.offsetWidth - card.offsetWidth) / 2 + this.offsetLeft) + 'px';
 					y = ((this.offsetHeight - card.offsetHeight) / 2 + this.offsetTop) + 'px';
 				}
+				if(this==game.me) {
+					x=(this.offsetWidth + this.node.handcards1.offsetWidth) + 'px';
+				}
 
 				card.style.transform = 'translate(' + x + ', ' + y + ')' + 'scale(' + decadeUI.getCardBestScale() + ')';
 				ui.refresh(card);
