@@ -23,6 +23,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.shaUsed=0;
 					player.addTempSkill('reshensuan4');
 				},
+				ai:{
+					order:0,
+					result:{player:0},
+				},
 			},
 			reshensuan2:{
 				audio:"guanxing",

@@ -2760,7 +2760,7 @@ content:function(config, pack){
 					x = ((this.offsetWidth - card.offsetWidth) / 2 + this.offsetLeft) + 'px';
 					y = ((this.offsetHeight - card.offsetHeight) / 2 + this.offsetTop) + 'px';
 				}
-				if(this==game.me) {
+				if(this==game.me&&!(_status.event.name=='phaseJudge'&&get.position2(card)=='j')) {
 					x=(this.offsetWidth + this.node.handcards1.offsetWidth) + 'px';
 				}
 
@@ -3164,7 +3164,11 @@ content:function(config, pack){
 					
 					node.style.transform = 'translate(' + x + 'px,' + y + 'px)scale(' + scale + ')';
 					
-                    tx = (this==game.me)?x+marginOffset:x-marginOffset;
+                    tx = x - marginOffset;
+					if(this==game.me){
+						tx=x+marginOffset;
+					}
+
                     ty = (this.offsetHeight - node.offsetHeight) / 2 + this.offsetTop;
                     
                     setTimeout(function(mnode, mnodes, mtx, mty, mscale){
