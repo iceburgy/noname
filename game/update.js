@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2021.01.13',
+	version:'2021.01.13.1',
 	update:'2020.11.06.2',
 	changeLog:[
 		'改善观星，罪论，纵玄，恂恂操作界面',

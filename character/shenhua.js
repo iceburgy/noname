@@ -2558,14 +2558,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						direct:true,
 						audio:'jiewei',
 						filter:function(event,player){
-							return !player.isTurnedOver()&&player.canMoveCard();
+							return !player.isTurnedOver();
 						},
 						content:function(){
 							"step 0"
+							var check=game.hasPlayer(function(current){
+								return get.attitude(player,current)>0&&current.countCards('j')||get.attitude(player,current)<0&&current.countCards('e');
+							});
 							player.chooseToDiscard('he',get.prompt('xinjiewei'),'弃置一张牌并移动场上的一张牌',lib.filter.cardDiscardable).set('ai',function(card){
 								if(!_status.event.check) return 0;
 								return 7-get.value(card);
-							}).set('check',player.canMoveCard(true)).set('logSkill','xinjiewei');
+							}).set('check',check).set('logSkill','xinjiewei');
 							"step 1"
 							if(result.bool){
 								player.moveCard(true);
