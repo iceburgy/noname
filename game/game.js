@@ -22314,7 +22314,9 @@
 					else{
 						var node;
 						if(card==undefined||card.length==0) return;
-						node=this.$throwordered(card.copy('thrown'),nosource,actualevent);
+						var cardCopy=card.copy('thrown');
+						if(get.position(card)=='j') cardCopy.classList.add('fromJudgeArea');
+						node=this.$throwordered(cardCopy,nosource,actualevent);
 						if(time!=undefined){
 							node.fixed=true;
 							setTimeout(function(){node.delete()},time);
@@ -52854,19 +52856,6 @@
 			if(card.parentNode.id=='special') return 's';
 			if(card.parentNode.id=='ordering') return ordering?'o':'d';
 			return null;
-		},
-		position2:function(card){
-			for(var cn of card.childNodes){
-				if(cn.classList.contains('judge-mark')){
-					for(var jmn of cn.childNodes){
-						if(jmn.classList.contains('judge')){
-							if(jmn.innerHTML) return 'j';
-							return get.position(card);
-						}
-					}
-				}
-			}
-			return get.position(card);
 		},
 		skillTranslation:function(str,player){
 			var str2;

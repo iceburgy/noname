@@ -1563,13 +1563,17 @@ content:function(config, pack){
 						player.node.judges.insertBefore(card, player.node.judges.firstChild);
 						ui.updatej(player);
 						if (card.clone && (card.clone.parentNode == player.parentNode || card.clone.parentNode == ui.arena)){
-							card.clone.moveDelete(player);
+							var cloneCard=card.clone;
+							cloneCard.classList.add('isAddJudge');
+							cloneCard.moveDelete(player);
 							game.addVideo('gain2', player, get.cardsInfo([card]));
 						}
 					}, player, cards[0], viewAs);
 					
 					if (cards[0].clone && (cards[0].clone.parentNode == player.parentNode || cards[0].clone.parentNode == ui.arena)){
-						cards[0].clone.moveDelete(player);
+						var cloneCard=cards[0].clone;
+						cloneCard.classList.add('isAddJudge');
+						cloneCard.moveDelete(player);
 						game.addVideo('gain2', player, get.cardsInfo(cards));
 					}
 
@@ -2759,7 +2763,7 @@ content:function(config, pack){
 				}else{
 					x = ((this.offsetWidth - card.offsetWidth) / 2 + this.offsetLeft) + 'px';
 					y = ((this.offsetHeight - card.offsetHeight) / 2 + this.offsetTop) + 'px';
-					if(this==game.me&&!(_status.event.name=='phaseJudge'&&get.position2(card)=='j')) {
+					if(this==game.me&&!card.classList.contains('fromJudgeArea')) {
 						x=(this.offsetWidth + this.node.handcards1.offsetWidth) + 'px';
 					}
 				}
@@ -3019,7 +3023,7 @@ content:function(config, pack){
                 this.fixed = true;
                 this.moving = true;
                 var x = Math.round((player.offsetWidth - this.offsetWidth) / 2 + player.offsetLeft);
-				if(player==game.me&&_status.event.name!='addJudge') {
+				if(player==game.me&&!this.classList.contains('isAddJudge')) {
 					x=player.offsetWidth + player.node.handcards1.offsetWidth;
 				}
                 var y = Math.round((player.offsetHeight - this.offsetHeight) / 2 + player.offsetTop);
