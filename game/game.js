@@ -22315,7 +22315,8 @@
 						var node;
 						if(card==undefined||card.length==0) return;
 						var cardCopy=card.copy('thrown');
-						if(get.position(card)=='j') cardCopy.classList.add('fromJudgeArea');
+						var oriPos=get.position(card)||card.original;
+						if(oriPos) cardCopy.original=oriPos;
 						node=this.$throwordered(cardCopy,nosource,actualevent);
 						if(time!=undefined){
 							node.fixed=true;

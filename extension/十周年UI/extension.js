@@ -2763,7 +2763,7 @@ content:function(config, pack){
 				}else{
 					x = ((this.offsetWidth - card.offsetWidth) / 2 + this.offsetLeft) + 'px';
 					y = ((this.offsetHeight - card.offsetHeight) / 2 + this.offsetTop) + 'px';
-					if(this==game.me&&!card.classList.contains('fromJudgeArea')) {
+					if(this==game.me&&card.original!='j') {
 						x=(this.offsetWidth + this.node.handcards1.offsetWidth) + 'px';
 					}
 				}
@@ -3023,7 +3023,7 @@ content:function(config, pack){
                 this.fixed = true;
                 this.moving = true;
                 var x = Math.round((player.offsetWidth - this.offsetWidth) / 2 + player.offsetLeft);
-				if(player==game.me&&!this.classList.contains('isAddJudge')) {
+				if(player==game.me&&!this.classList.contains('isAddJudge')&&this.original!='j') {
 					x=player.offsetWidth + player.node.handcards1.offsetWidth;
 				}
                 var y = Math.round((player.offsetHeight - this.offsetHeight) / 2 + player.offsetTop);
@@ -3269,6 +3269,8 @@ content:function(config, pack){
                         var node;
                         if (get.itemtype(card) == 'card') {
                             node = card.copy('card', 'thrown', false);
+                            var oriPos=get.position(card)||card.original;
+                            if(oriPos) node.original=oriPos;
                         } else {
                             node = ui.create.div('.card.thrown');
                         }
@@ -3334,6 +3336,8 @@ content:function(config, pack){
                         var node;
                         if (get.itemtype(card) == 'card') {
                             node = card.copy('card', 'thrown', false);
+                            var oriPos=get.position(card)||card.original;
+                            if(oriPos) node.original=oriPos;
                         } else {
                             node = ui.create.div('.card.thrown');
                         }
@@ -3380,8 +3384,10 @@ content:function(config, pack){
                         if (!update){
                             update = ui.thrown.indexOf(cards[i].clone) != -1;
                         }
-                        
-                        cards[i].clone.moveDelete(this, true);
+                        var cardClone=cards[i].clone;
+						var oriPos=get.position(cards[i])||cards[i].original;
+						if(oriPos) cardClone.original=oriPos;
+                        cardClone.moveDelete(this, true);
                         list2.push(cards[i].clone);
                     } else {
                         list.push(cards[i]);
