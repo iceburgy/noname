@@ -4391,6 +4391,11 @@ content:function(config, pack){
 					ui.me.style.right = Math.round(equipsWidth + 30)+ 'px';
 					ui.me.style.width = 'auto';
 				}
+				if(_status.playback){
+					ui.me.style.left = '150px';
+					ui.me.style.right = '150px';
+					ui.me.style.width = 'auto';
+				}
 				
 				decadeUI.zooms.card = decadeUI.getCardBestScale();
 				if (ui.me) {
