@@ -4593,7 +4593,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							},player);
 						}
 					}else if(event.name=='judge'){
-						if(game.roundNumber<=2&&player==game.zhu&&event.judgestr=='乐不思蜀'){
+						if(game.roundNumber==2&&player==game.zhu&&event.judgestr=='乐不思蜀'){
 							if(event.result.bool==false){
 								return true;
 							}

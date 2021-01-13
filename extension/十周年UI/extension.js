@@ -2759,9 +2759,9 @@ content:function(config, pack){
 				}else{
 					x = ((this.offsetWidth - card.offsetWidth) / 2 + this.offsetLeft) + 'px';
 					y = ((this.offsetHeight - card.offsetHeight) / 2 + this.offsetTop) + 'px';
-				}
-				if(this==game.me&&!(_status.event.name=='phaseJudge'&&get.position2(card)=='j')) {
-					x=(this.offsetWidth + this.node.handcards1.offsetWidth) + 'px';
+					if(this==game.me&&!(_status.event.name=='phaseJudge'&&get.position2(card)=='j')) {
+						x=(this.offsetWidth + this.node.handcards1.offsetWidth) + 'px';
+					}
 				}
 
 				card.style.transform = 'translate(' + x + ', ' + y + ')' + 'scale(' + decadeUI.getCardBestScale() + ')';
@@ -3019,7 +3019,7 @@ content:function(config, pack){
                 this.fixed = true;
                 this.moving = true;
                 var x = Math.round((player.offsetWidth - this.offsetWidth) / 2 + player.offsetLeft);
-				if(player==game.me) {
+				if(player==game.me&&_status.event.name!='addJudge') {
 					x=player.offsetWidth + player.node.handcards1.offsetWidth;
 				}
                 var y = Math.round((player.offsetHeight - this.offsetHeight) / 2 + player.offsetTop);
