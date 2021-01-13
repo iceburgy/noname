@@ -4159,7 +4159,7 @@ content:function(config, pack){
 					if (overflow){
 						x = Math.round((i * (cardWidth - offset) - scaleMargin)) + 'px';
 					}else{
-						x = Math.round((offset + i * cardWidth + margin - scaleMargin)) + 'px';
+						x = Math.round((i * cardWidth + margin - scaleMargin)) + 'px';
 					}
 
 					handCards[i].style.transform = 'translate(' + x + ',' + y + ')scale(' + scale + ')';
