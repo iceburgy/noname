@@ -2763,9 +2763,9 @@ content:function(config, pack){
 				}else{
 					x = ((this.offsetWidth - card.offsetWidth) / 2 + this.offsetLeft) + 'px';
 					y = ((this.offsetHeight - card.offsetHeight) / 2 + this.offsetTop) + 'px';
-					if(this==game.me&&card.original!='j') {
-						x=(this.offsetWidth + this.node.handcards1.offsetWidth) + 'px';
-					}
+//					if(this==game.me&&card.original!='j') {
+//						x=(this.offsetWidth + this.node.handcards1.offsetWidth) + 'px';
+//					}
 				}
 
 				card.style.transform = 'translate(' + x + ', ' + y + ')' + 'scale(' + decadeUI.getCardBestScale() + ')';
