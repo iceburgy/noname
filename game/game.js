@@ -27477,6 +27477,7 @@
 							game.send('exec',function(player,skills){
 								setTimeout(function(){
 									for(var si of skills){
+										if(si=='xingshuai'&&!player.hasZhuSkill('xingshuai')) continue;
 										player.markSkill(si);
 									}
 								},500);

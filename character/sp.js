@@ -13952,7 +13952,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:"凤",
 				intro:{
 					name:"凤印",
-					content:"<li>一回合限三次，你可以将你的任意一张梅花手牌当作【铁索连环】使用或重铸。",
+					content:"<li>一回合限三次，你可以将你的任意一张梅花牌当作【铁索连环】使用或重铸。",
 				},
 				group:["smh_lianhuan1","smh_lianhuan2"],
 			},
