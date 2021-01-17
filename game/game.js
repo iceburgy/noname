@@ -29,6 +29,7 @@
 		statsKeyIdentity:'stats_identity',
 		statsKeyRole:'stats_role',
 		statsKeyPlayer:'stats_player',
+		statsKeyBanAttendTopN:'ban_attend_topn_key',
 		statsKeySortKey:'sort_key',
 		statsKeySortKeyRoleName:'role_name',
 		statsKeySortKeyNumTotal:'num_total',
@@ -3838,6 +3839,11 @@
 							},1000);
 						},
 						clear:true
+					},
+					ban_attend_topn:{
+						name:'单禁登场率topN武将',
+						input:true,
+						frequent:true,
 					},
 					reset_leaderboard:{
 						name:'重置战况',
@@ -26345,6 +26351,7 @@
 								if(this.ws._socket&&this.ws._socket.remoteAddress&&game.isQiandaoing()){
 									game.addQiandaofuli(this.ws._socket.remoteAddress,this);
 								}
+								game.broadcastLocalLeaderBoard([this]);
 							}
 						}
 						else{
@@ -26399,6 +26406,7 @@
 							}
 						}
 						this.send('init',this.id,lib.configOL,game.ip,window.isNonameServer,game.roomId);
+						game.broadcastLocalLeaderBoard([this]);
 					}
 				},
 				inited:function(){
@@ -27723,6 +27731,33 @@
 				}
 			}
 		},
+		broadcastLocalLeaderBoard:function(allClients){
+			if(!allClients||allClients.length==0) return;
+			var hostPlayer;
+			if(game.connectPlayers&&game.connectPlayers.length) hostPlayer=game.connectPlayers[0];
+			else hostPlayer=game.me;
+			var hostZone=hostPlayer.nickname;
+			if(!hostZone||hostZone=='无名玩家') return;
+			var statsLocal;
+			if(lib.config[lib.statsKeyGame]&&lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]&&lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal]){
+				statsLocal=lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal];
+				statsLocal[lib.statsKeyBanAttendTopN]=get.charactersAttendTopN();
+				game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
+			}
+			if(!statsLocal) return;
+			for(var cl of allClients){
+				cl.send(function(zoneKey,data){
+					if(!lib.config[lib.statsKeyGame]){
+						lib.config[lib.statsKeyGame]={};
+					}
+					if(!lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]){
+						lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]={};
+					}
+					lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][zoneKey]=data;
+					game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
+				},hostZone,statsLocal);
+			}
+		},
 		leaderboardSortButton:function(){
 			var idinfo=this.id.split(',');
 			if(idinfo&&idinfo.length==2){
@@ -27902,6 +27937,7 @@
 			delete data1.connect_avatar;
 			delete data1.connect_avatar_mode_config_connect;
 			delete data1.recentIP;
+			delete data1.mode_config.connect.recentCharacter;
 		},
 		updateAlertDup:function(val){
 			game.saveConfig('alertDup',val);
@@ -32691,19 +32727,11 @@
 				lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal]=statsLocal;
 				game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
 
-				var hostZone=game.me.nickname;
-				if(hostZone){
-					game.broadcast(function(zoneKey,data){
-						if(!lib.config[lib.statsKeyGame]){
-							lib.config[lib.statsKeyGame]={};
-						}
-						if(!lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]){
-							lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]={};
-						}
-						lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][zoneKey]=data;
-						game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
-					},hostZone,statsLocal);
+				var allClients=game.players.concat(game.dead);
+				if(lib.node&&lib.node.observing&&lib.node.observing.length){
+					allClients=allClients.concat(lib.node.observing);
 				}
+				game.broadcastLocalLeaderBoard(allClients);
 			}
 			var resultbool=result;
 			if(typeof resultbool!=='boolean'){
@@ -37345,6 +37373,30 @@
 								}
 								input.innerHTML=input.innerHTML.replace(/<br>/g,'');
 								game.saveConfig('hall_ip',input.innerHTML,'connect');
+							}
+						}
+						else if(config.name=='单禁登场率topN武将'){
+							input.innerHTML=config.init||'0';
+							input.onblur=function(){
+								if(!input.innerHTML){
+									input.innerHTML='0';
+								}
+								input.innerHTML=input.innerHTML.replace(/<br>/g,'');
+								var valTopN=parseInt(input.innerHTML);
+								if(isNaN(valTopN)||valTopN<0) alert('请输入大于等于零的数字');
+								else{
+									game.saveConfig('ban_attend_topn',valTopN);
+									var statsGame=lib.config[lib.statsKeyGame];
+									if(!statsGame) return;
+									var statsByZones=statsGame[lib.statsKeyStatsByZones];
+									if(!statsByZones) return;
+									var statsByZone=statsByZones[lib.statsKeyLocal];
+									if(!statsByZone) return;
+									if(lib.config[lib.statsKeyGame]&&lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]&&lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal]){
+										lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal][lib.statsKeyBanAttendTopN]=get.charactersAttendTopN();
+										game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
+									}
+								}
 							}
 						}
 						else{
@@ -47746,6 +47798,22 @@
 				pwrap.appendChild(p);
 				uiintro.add(pwrap);
 
+				// display ban_attend_topn characters
+				var banAttendTopNChars=statsByZone[lib.statsKeyBanAttendTopN];
+				if(banAttendTopNChars){
+					var p=document.createElement('p');
+					for(var bc of banAttendTopNChars){
+						if(!p.innerHTML) p.innerHTML='本局单禁登场率 top '+banAttendTopNChars.length+' 的武将：';
+						else{
+							p.innerHTML+='；';
+						}
+						p.innerHTML+=get.translation(bc);
+					}
+					var pwrap=ui.create.div();
+					pwrap.appendChild(p);
+					uiintro.add(pwrap);
+				}
+
 				tableStatistics=document.createElement('table');
 				tableStatistics.style.width='-webkit-fill-available';
 				tableStatistics.style.textAlign='center';
@@ -51868,6 +51936,10 @@
 		},
 		charactersAndZhuOL:function(allList,zhuList){
 			var libCharacter={};
+			var bannedTopN;
+			if(lib.config[lib.statsKeyGame]&&lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]&&lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal]){
+				bannedTopN=lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal][lib.statsKeyBanAttendTopN];
+			}
 			for(var i=0;i<lib.configOL.characterPack.length;i++){
 				var pack=lib.characterPack[lib.configOL.characterPack[i]];
 				for(var j in pack){
@@ -51876,7 +51948,7 @@
 				}
 			}
 			for(i in libCharacter){
-				if(lib.filter.characterDisabled(i,libCharacter)) continue;
+				if(lib.filter.characterDisabled(i,libCharacter)||bannedTopN&&bannedTopN.contains(i)) continue;
 				allList.push(i);
 				if(lib.character[i][4]&&lib.character[i][4].contains('zhu')){
 					zhuList.push(i);
@@ -51893,6 +51965,26 @@
 					}
 				}
 			}
+		},
+		charactersAttendTopN:function(){
+			var statsGame=lib.config[lib.statsKeyGame];
+			if(!statsGame) return;
+			var statsByZones=statsGame[lib.statsKeyStatsByZones];
+			if(!statsByZones) return;
+			var statsByZone=statsByZones[lib.statsKeyLocal];
+			if(!statsByZone) return;
+			var rolesStatistics=statsByZone[lib.statsKeyRole];
+			if(!rolesStatistics) return;
+			var sortedStats=game.sortProperties(rolesStatistics,lib.statsKeySortKeyNumTotal);
+			var banTopN=lib.config.ban_attend_topn;
+			if(!banTopN) return;
+			var banTopN=Math.min(banTopN,sortedStats.length);
+			if(!banTopN) return;
+			var topNChars=[];
+			for(var i=0;i<banTopN;i++){
+				topNChars.add(sortedStats[i][0]);
+			}
+			return topNChars;
 		},
 		trimip:function(str){
 			var len=str.length-5;
