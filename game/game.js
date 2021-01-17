@@ -27937,7 +27937,7 @@
 			delete data1.connect_avatar;
 			delete data1.connect_avatar_mode_config_connect;
 			delete data1.recentIP;
-			delete data1.mode_config.connect.recentCharacter;
+			delete data1.recentCharacter_mode_config_connect;
 		},
 		updateAlertDup:function(val){
 			game.saveConfig('alertDup',val);
