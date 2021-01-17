@@ -28083,6 +28083,7 @@
 			game.syncQiandaofuli();
 			game.syncFuliByUsers();
 			game.syncBirthdayBonus();
+			game.syncBanAttendTopN();
 		},
 		syncQiandaofuli:function(){
 			if(!lib.config[lib.bonusKeyFuliInfo]){
@@ -28127,6 +28128,18 @@
 					}
 				}
 				if(updated) game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
+			}
+		},
+		syncBanAttendTopN:function(){
+			var statsGame=lib.config[lib.statsKeyGame];
+			if(!statsGame) return;
+			var statsByZones=statsGame[lib.statsKeyStatsByZones];
+			if(!statsByZones) return;
+			var statsByZone=statsByZones[lib.statsKeyLocal];
+			if(!statsByZone) return;
+			if(lib.config[lib.statsKeyGame]&&lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]&&lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal]){
+				lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal][lib.statsKeyBanAttendTopN]=get.charactersAttendTopN();
+				game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
 			}
 		},
 		setQiandaofuliCutoffByHour:function(hour){
@@ -37386,16 +37399,7 @@
 								if(isNaN(valTopN)||valTopN<0) alert('请输入大于等于零的数字');
 								else{
 									game.saveConfig('ban_attend_topn',valTopN);
-									var statsGame=lib.config[lib.statsKeyGame];
-									if(!statsGame) return;
-									var statsByZones=statsGame[lib.statsKeyStatsByZones];
-									if(!statsByZones) return;
-									var statsByZone=statsByZones[lib.statsKeyLocal];
-									if(!statsByZone) return;
-									if(lib.config[lib.statsKeyGame]&&lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]&&lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal]){
-										lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal][lib.statsKeyBanAttendTopN]=get.charactersAttendTopN();
-										game.saveConfig(lib.statsKeyGame,lib.config[lib.statsKeyGame]);
-									}
+									game.syncBanAttendTopN();
 								}
 							}
 						}
