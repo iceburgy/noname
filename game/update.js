@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2021.01.17.2',
+	version:'2021.01.17.3',
 	update:'2020.11.06.2',
 	changeLog:[
 		'自动单禁登场率 Top N 的武将（设置可修改）',

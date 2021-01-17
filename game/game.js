@@ -11527,6 +11527,7 @@
 				},
 				waitForPlayer:function(){
 					'step 0'
+					game.syncAllBonus();
 					ui.auto.hide();
 					ui.pause.hide();
 
@@ -51940,10 +51941,6 @@
 		},
 		charactersAndZhuOL:function(allList,zhuList){
 			var libCharacter={};
-			var bannedTopN;
-			if(lib.config[lib.statsKeyGame]&&lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]&&lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal]){
-				bannedTopN=lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal][lib.statsKeyBanAttendTopN];
-			}
 			for(var i=0;i<lib.configOL.characterPack.length;i++){
 				var pack=lib.characterPack[lib.configOL.characterPack[i]];
 				for(var j in pack){
@@ -51952,7 +51949,7 @@
 				}
 			}
 			for(i in libCharacter){
-				if(lib.filter.characterDisabled(i,libCharacter)||bannedTopN&&bannedTopN.contains(i)) continue;
+				if(lib.filter.characterDisabled(i,libCharacter)) continue;
 				allList.push(i);
 				if(lib.character[i][4]&&lib.character[i][4].contains('zhu')){
 					zhuList.push(i);
@@ -51985,10 +51982,30 @@
 			var banTopN=Math.min(banTopN,sortedStats.length);
 			if(!banTopN) return;
 			var topNChars=[];
-			for(var i=0;i<banTopN;i++){
-				topNChars.add(sortedStats[i][0]);
+			var allList=[];
+			var zhuList=[];
+			get.charactersAndZhuOL(allList,zhuList)
+			var i=0;
+			while(i<banTopN){
+				var toBeBanned=sortedStats[i][0];
+				if(allList.contains(toBeBanned)){
+					topNChars.add(toBeBanned);
+				}
+				else{
+					banTopN++;
+				}
+				i++;
 			}
 			return topNChars;
+		},
+		charactersAndZhuOLWithBanAttendTopN:function(allList,zhuList){
+			get.charactersAndZhuOL(allList,zhuList)
+			var bannedTopN;
+			if(lib.config[lib.statsKeyGame]&&lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones]&&lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal]){
+				bannedTopN=lib.config[lib.statsKeyGame][lib.statsKeyStatsByZones][lib.statsKeyLocal][lib.statsKeyBanAttendTopN];
+				allList.remove(bannedTopN);
+				zhuList.remove(bannedTopN);
+			}
 		},
 		trimip:function(str){
 			var len=str.length-5;

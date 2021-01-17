@@ -2130,7 +2130,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					event.allList=[];
 					event.zhuList=[];
-					get.charactersAndZhuOL(event.allList,event.zhuList)
+					get.charactersAndZhuOLWithBanAttendTopN(event.allList,event.zhuList)
 					event.list=event.allList.slice(0);
 					var testAllByGroup=lib.config['test_all_by_group'];
 					if(testAllByGroup>=0){
