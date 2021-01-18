@@ -16962,12 +16962,13 @@
 							tempSkills.push(sk);
 						}
 					}
+					var groupValue=game.phaseNumber?this.group:'unknown';
 					var state={
 						hp:this.hp,
 						maxHp:this.maxHp,
 						nickname:this.nickname,
 						sex:this.sex,
-						group:this.group,
+						group:groupValue,
 						name:this.name,
 						name1:this.name1,
 						name2:this.name2,

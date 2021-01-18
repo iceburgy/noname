@@ -21,6 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.reshensuan2=[];
 					player.markSkill('reshensuan2');
 					player.storage.shaUsed=0;
+					player.storage.jiuUsed=0;
 					player.addTempSkill('reshensuan4');
 				},
 				check:function(event,player){return false},
@@ -75,14 +76,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=result.targets[0];
 					var bool=game.hasPlayer(function(current){
 						return target.canUse(event.cards[0],current);
-					});
-					if(bool&&event.cardsname=='sha'&&target==player){
-						bool=player.getCardUsable('sha')>0;
-					}
+					})&&target.getCardUsable(event.cardsname)>0;
 					if(bool){
 						target.chooseUseTarget(event.cards[0],true,false);
-						if(event.cardsname=='sha'&&target==player){
-							player.storage.shaUsed++;
+						if(target==player){
+							if(event.cardsname=='sha') player.storage.shaUsed++;
+							else if(event.cardsname=='jiu') player.storage.jiuUsed++;
 						}
 					}
 					else{
@@ -105,6 +104,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					cardUsable:function(card,player,num){
 						if(card.name=='sha'){
 							return num-player.storage.shaUsed;
+						}
+						else if(card.name=='jiu'){
+							return num-player.storage.jiuUsed;
 						}
 					},
 				},

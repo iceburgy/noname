@@ -984,6 +984,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							event.shaRequired--;
 							if(event.turn==target){
 								if(result.cards) event.targetCards.addArray(result.cards);
+								else if(result.card) event.targetCards.addArray([result.card]);
 								if(event.shaRequired>0) event.goto(2);
 								else{
 									event.turn=player;
@@ -992,6 +993,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							else{
 								if(result.cards) event.playerCards.addArray(result.cards);
+								else if(result.card) event.playerCards.addArray([result.card]);
 								if(event.shaRequired>0) event.goto(2);
 								else{
 									event.turn=target;
