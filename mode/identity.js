@@ -773,7 +773,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					return;
 				}
-				if(!game.zhu.isAlive()&&get.population('fan')==0&&get.population('zhong')==1&&get.population('nei')==1) return;
+				// xiaoneiaozhan
+				//if(!game.zhu.isAlive()&&get.population('fan')==0&&get.population('zhong')==1&&get.population('nei')==1) return;
 				if(game.zhu.isAlive()&&get.population('fan')+get.population('nei')>0) return;
 				if(game.zhong){
 					game.zhong.identity='zhong';

@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2021.01.18',
+	version:'2021.01.19',
 	update:'2020.11.06.2',
 	changeLog:[
 		'增加孙休修改后技能描述：【宴诛】，【兴学】',
