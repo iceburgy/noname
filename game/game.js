@@ -33466,11 +33466,14 @@
 									_status,lib,game,ui,get,ai);
 							}
 							catch(e){
+								var tmp=event; while (tmp) {console.log(tmp.name); tmp=tmp.parent;}
 								game.print('游戏出错：'+event.name);
 								game.print(e.toString());
 								console.log('游戏出错：'+event.name);
 								console.log(e);
+								console.log(event)
 								if(event.content) console.log(event.content.toString());
+								debugger;
 							}
 						}
 						else{

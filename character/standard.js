@@ -940,7 +940,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'对'+get.translation(target)+'使用一张杀',
 						function(card,player,event){
 							event=event||_status.event;
-							return card.name=='sha'&&event.source.canUse(card,event.target);
+							var canUse=false;
+							var tmp=event;
+							while (tmp) {
+								if(tmp.source&&tmp.target){
+									canUse=tmp.source.canUse(card,tmp.target);
+									break;
+								}
+								tmp=tmp.parent;
+							}
+							return card.name=='sha'&&canUse;
 						});
 						next.set('ai',function(card){
 							var event=_status.event;
