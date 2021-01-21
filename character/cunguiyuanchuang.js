@@ -20,9 +20,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('reshensuan2',{player:'phaseUseAfter'});
 					player.storage.reshensuan2=[];
 					player.markSkill('reshensuan2');
-					player.storage.shaUsed=0;
-					player.storage.jiuUsed=0;
-					player.addTempSkill('reshensuan4');
 				},
 				check:function(event,player){return false},
 			},
@@ -78,11 +75,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return target.canUse(event.cards[0],current);
 					})&&target.getCardUsable(event.cardsname)>0;
 					if(bool){
-						target.chooseUseTarget(event.cards[0],true,false);
-						if(target==player){
-							if(event.cardsname=='sha') player.storage.shaUsed++;
-							else if(event.cardsname=='jiu') player.storage.jiuUsed++;
-						}
+						target.chooseUseTarget(event.cards[0],true,true);
 					}
 					else{
 						target.gain(event.cards,'gain2');
@@ -99,19 +92,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			reshensuan3:{},
-			reshensuan4:{
-				mod:{
-					cardUsable:function(card,player,num){
-						if(card.name=='sha'){
-							return num-player.storage.shaUsed;
-						}
-						else if(card.name=='jiu'){
-							return num-player.storage.jiuUsed;
-						}
-					},
-				},
-				onremove:true,
-			},
 		},
 		translate:{
 			cunguiyuanchuang:'村规原创',
