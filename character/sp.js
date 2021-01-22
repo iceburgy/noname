@@ -12595,15 +12595,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			mingzhe:{
 				audio:2,
-				trigger:{player:['loseAfter']},
+				trigger:{player:['useCard','respond','loseAfter']},
 				frequent:true,
 				filter:function(event,player){
 					if(player==_status.currentPhase) return false;
-					var useCardEvent=game.getEventByName(event,'useCard');
-					if(useCardEvent&&useCardEvent.player==player&&get.color(useCardEvent.card,player)=='red') return true;
-					var respondEvent=game.getEventByName(event,'respond');
-					if(respondEvent&&respondEvent.player==player&&get.color(respondEvent.card,player)=='red') return true;
-					if(event.type=='discard'&&event.cards2){
+					if(event.name!='lose') return get.color(event.card)=='red'&&(event.cards&&event.cards.length&&(event.cards[0].original=='h'||event.cards[0].original=='e'));
+					if(event.type!='discard') return false;
+					if(event.cards2){
 						for(var i=0;i<event.cards2.length;i++){
 							if(get.color(event.cards2[i],player)=='red') return true;
 						}

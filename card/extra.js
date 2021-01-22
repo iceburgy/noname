@@ -555,6 +555,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					if(muniu.cards==undefined) muniu.cards=[];
 					cards[0].style.transform='';
+					cards[0].original='s';
 					muniu.cards.push(cards[0]);
 					game.broadcast(function(muniu,cards,card){
 						card.style.transform='';
