@@ -19200,6 +19200,11 @@
 							}
 						}
 					}
+					if(next.card){
+						if(!next.card.isCard&&next.cards.length){
+							next.card.cards=next.cards.slice(0);
+						}
+					}
 					next.setContent('respond');
 					return next;
 				},

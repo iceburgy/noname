@@ -12599,7 +12599,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				filter:function(event,player){
 					if(player==_status.currentPhase) return false;
-					if(event.name!='lose') return get.color(event.card)=='red'&&(event.cards&&event.cards.length&&(event.cards[0].original=='h'||event.cards[0].original=='e'));
+					var isValid=false;
+					if(event.cards&&event.cards.length){
+						for(var c of event.cards){
+							if(get.color(c,player)=='red'&&(c.original=='h'||c.original=='e')){
+								isValid=true;
+							}
+						}
+					}
+					if(event.name!='lose') return isValid;
 					if(event.type!='discard') return false;
 					if(event.cards2){
 						for(var i=0;i<event.cards2.length;i++){
@@ -12617,11 +12625,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.color(trigger.cards2[i],player)=='red') event.count++;
 						}
 					}
+					else if(trigger.cards&&trigger.cards.length){
+						event.count=0;
+						for(var c of trigger.cards){
+							if(get.color(c,player)=='red'&&(c.original=='h'||c.original=='e')) event.count++;
+						}
+					}
 					"step 1"
 					player.draw();
 					event.count--;
 					"step 2"
-					if(event.count){
+					if(event.count>0){
 						player.chooseBool(get.prompt2('mingzhe')).set('frequentSkill','mingzhe');
 					}
 					else event.finish();
