@@ -3016,7 +3016,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return target.isLinked();
 				},
 				selectTarget:function(){
-					return [1,_status.event.player.countMark('nzry_junlve')];
+					var num=game.countPlayer(function(current){return current.isLinked()});
+					return [1,num];
 				},
 				multiline:true,
 				multitarget:true,
