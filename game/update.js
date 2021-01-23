@@ -1,10 +1,11 @@
 window.noname_update={
-	version:'2021.01.23',
+	version:'2021.01.23.1',
 	update:'2020.11.06.2',
 	changeLog:[
 		'村诸葛弃不出牌来则不能发动神算',
 		'修复虞翻不发动纵玄也可见游戏记录的bug',
 		'修复对刘封陷嗣出杀时读条不重置的bug',
+		'修正界甄姬【倾国】：不能用黑装备当闪',
 	],
 	files:[
 		'card/extra.js',

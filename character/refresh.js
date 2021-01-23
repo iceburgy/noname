@@ -3980,17 +3980,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card){
 					return get.color(card)=='black';
 				},
-				position:'hes',
+				position:'hs',
 				viewAs:{name:'shan'},
 				viewAsFilter:function(player){
-					if(!player.countCards('hes',{color:'black'})) return false;
+					if(!player.countCards('hs',{color:'black'})) return false;
 				},
-				prompt:'将一张黑色牌当闪打出',
+				prompt:'将一张黑色手牌当闪打出',
 				check:function(){return 1},
 				ai:{
 					respondShan:true,
 					skillTagFilter:function(player){
-						if(!player.countCards('he',{color:'black'})) return false;
+						if(!player.countCards('hs',{color:'black'})) return false;
 					},
 					effect:{
 						target:function(card,player,target,current){
@@ -8165,7 +8165,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyaowu:'耀武',
 			reyaowu_info:'锁定技，当你受到牌造成的伤害时，若此牌为红色，则伤害来源摸一张牌；否则你摸一张牌。',
 			reqingguo:'倾国',
-			reqingguo_info:'你可以将一张黑色牌当做【闪】使用或打出。',
+			reqingguo_info:'你可以将一张黑色手牌当做【闪】使用或打出。',
 			
 			qinxue:'勤学',
 			retuxi:'突袭',
