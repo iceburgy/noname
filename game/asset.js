@@ -2804,6 +2804,8 @@ window.noname_asset_list=[
 	'audio/skill/rexingxue2.mp3',
 	'audio/skill/reyanzhu1.mp3',
 	'audio/skill/reyanzhu2.mp3',
+	'audio/skill/reshensuan1.mp3',
+	'audio/skill/reshensuan2.mp3',
 
 	'font/huangcao.ttf',
 	'font/shousha.ttf',
