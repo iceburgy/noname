@@ -12,7 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterTitle:{},
 		skill:{
 			reshensuan:{
-				audio:"guanxing",
+				audio:2,
 				trigger:{player:'phaseUseBegin'},
 				content:function (){
 					"step 0"
@@ -24,7 +24,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(event,player){return false},
 			},
 			reshensuan2:{
-				audio:"guanxing",
+				audio:['reshensuan',2],
 				enable:'phaseUse',
 				marktext:'算',
 				filter:function(event,player){
