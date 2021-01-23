@@ -7,13 +7,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			cun_zhugeliang:['male','shu',3,['reguanxing','kongcheng','reshensuan']],
 		},
 		characterIntro:{
-			cun_zhugeliang:"村规原创，在原有基础上新增村规原创技能【神算】",
+			cun_zhugeliang:"村诸葛亮，村规原创，在原有基础上新增村规原创技能【神算】",
 		},
 		characterTitle:{},
 		skill:{
 			reshensuan:{
 				audio:2,
 				trigger:{player:'phaseUseBegin'},
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
 				content:function (){
 					"step 0"
 					player.chooseToDiscard(1,'he',true);

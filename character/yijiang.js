@@ -10223,7 +10223,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
-				direct:true,
+				frequent:true,
 				content:function(){
 					'step 0'
 					var cards=[];
@@ -11961,6 +11961,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forceaudio:true,
 				direct:true,
+				clearTime:true,
 				prompt:'弃置一名有【逆】的角色的两张【逆】，然后视为对包含其在内的角色使用【杀】。',
 				delay:false,
 				log:false,
