@@ -7003,7 +7003,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				viewAs:{name:'juedou'},
-				group:['zhanjue4'],
+				group:['zhanjue4','zhanjue6'],
 				ai:{
 					damage:true,
 					order:1,
@@ -7072,6 +7072,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhanjue5:{},
+			zhanjue6:{
+				audio:false,
+				trigger:{player:'phaseUseBegin'},
+				silent:true,
+				content:function(){
+					var stat=player.getStat().skill;
+					if(stat.zhanjue_draw<2) stat.zhanjue_draw=0;
+				}
+			},
 			qinwang:{
 				audio:'qinwang1',
 				unique:true,
