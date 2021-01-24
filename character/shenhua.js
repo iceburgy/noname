@@ -3806,6 +3806,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(card.name=='sha'&&get.color(card)=='red') return [1,0.6];
 						},
 						player:function(card,player,target){
+							if(player.hasSkill('kejizhugong')) return [0,0];
 							if(card.name=='sha'&&get.color(card)=='red') return [1,1];
 						}
 					}
