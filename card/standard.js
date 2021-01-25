@@ -154,6 +154,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target,card,isLink){
+							var numh=target.countCards('h');
+							if(numh==0) return -200;
+							if(numh==1) return -100;
 							if(!isLink&&player.hasSkill('jiu')){
 								if(!target.hasSkillTag('filterDamage',null,{
 									player:player,

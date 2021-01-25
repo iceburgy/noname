@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2021.01.24.2',
+	version:'2021.01.24.3',
 	update:'2020.11.06.2',
 	changeLog:[
 		'村诸葛弃不出牌来则不能发动神算',
