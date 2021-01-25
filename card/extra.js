@@ -326,6 +326,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								var t=target.hasSkillTag('nothunder');
 								if(f&&t) return 0;
 								if(f||t) return 0.5;
+								if(get.attitude(player,target)>=0) return 100;
 								return 2;
 							}
 							if(get.attitude(player,target)>=0) return -0.9;

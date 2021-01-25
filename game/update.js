@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2021.01.24.1',
+	version:'2021.01.24.2',
 	update:'2020.11.06.2',
 	changeLog:[
 		'村诸葛弃不出牌来则不能发动神算',
@@ -8,6 +8,7 @@ window.noname_update={
 		'修复对刘封陷嗣出杀时读条不重置的bug',
 		'修复刘谌廖化不能战绝3次的bug',
 		'修正界甄姬【倾国】：不能用黑装备当闪',
+		'调整铁索AI：优先解锁自己人',
 	],
 	files:[
 		'card/extra.js',
