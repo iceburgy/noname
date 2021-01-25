@@ -3243,6 +3243,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			superChangeRole_bg:'换',
 			superChangeRole_info:'N换N，获取方式：小内获胜',
 			fulibi:'杀币',
+			birthdaybonus:'生日福利',
 		},
 		element:{
 			content:{

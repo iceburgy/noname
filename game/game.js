@@ -128,6 +128,351 @@
 			}
 		},
 		configMenu:{
+			cungui:{
+				name:'村规',
+				config:{
+					sync_connect_role_lib_to_single:{
+						name:'同步联机武将池到单机',
+						onclick:function(){
+							if(this.innerHTML=='<span>确认同步</span>'){
+								clearTimeout(this.confirmTimeout);
+
+								var charactersOLList=get.charactersOL();
+								lib.config.banned=[];
+								for(var craw in lib.character){
+									if(!charactersOLList.contains(craw)) lib.config.banned.push(craw);
+								}
+								game.saveConfig('identity_banned',lib.config.banned);
+
+								this.innerHTML='<span>同步成功</span>';
+								var that=this;
+								setTimeout(function(){
+									that.innerHTML='<span>同步联机武将池到单机</span>';
+								},1000);
+							}
+							else{
+								this.innerHTML='<span>确认同步</span>';
+								var that=this;
+								this.confirmTimeout=setTimeout(function(){
+									that.innerHTML='<span>同步联机武将池到单机</span>';
+								},1000);
+							}
+						},
+						clear:true
+					},
+					import_role_lib_by_key:{
+						name:'导入武将池key',
+						onclick:function(){
+							ui.import_role_lib_by_key_button.classList.toggle('hidden');
+						},
+						clear:true
+					},
+					import_role_lib_by_key_button:{
+						name:'<div style="white-space:nowrap;width:calc(100% - 10px)">'+
+						'<input type="file" style="width:calc(100% - 40px)">'+
+						'<button style="width:40px">确定</button></div>',
+						clear:true,
+					},
+					export_role_lib_key_only:{
+						name:'导出武将池key',
+						onclick:function(){
+							var charactersOLList=get.charactersOL();
+							game.export(JSON.stringify(charactersOLList),'noname-rolelib-keyonly'+(new Date()).toLocaleString()+'-'+charactersOLList.length+'.json');
+						},
+						clear:true
+					},
+					export_role_lib:{
+						name:'导出武将池',
+						onclick:function(){
+							var charactersOLList=get.charactersOL();
+							var data=game.buildRoleLibFromCharacters(charactersOLList);
+							game.export(JSON.stringify(data),'noname-rolelib'+(new Date()).toLocaleString()+'.json');
+						},
+						clear:true
+					},
+					export_banned_role_lib:{
+						name:'导出单禁武将',
+						onclick:function(){
+							var data=[];
+							var libCharacter={};
+							for(var i=0;i<lib.configOL.characterPack.length;i++){
+								var pack=lib.characterPack[lib.configOL.characterPack[i]];
+								for(var j in pack){
+									if(lib.character[j]) libCharacter[j]=pack[j];
+								}
+							}
+							for(i in libCharacter){
+								if(lib.filter.characterDisabled(i,libCharacter)||lib.connectBanned.contains(i)) {
+									data.push(get.translation(i));
+								}
+							}
+							game.export(JSON.stringify(data),'noname-bannedrolelib'+(new Date()).toLocaleString()+'.json');
+						},
+						clear:true
+					},
+					force_update_cungui_version:{
+						name:'强制更新村规游戏版本',
+						onclick:function(){
+							var node=this;
+							if(node._clearing){
+								ui.click.configMenu();
+								lib.version='0';
+								game.checkForUpdate(null);
+								return;
+							}
+							node._clearing=true;
+							node.firstChild.innerHTML='单击以确认 (3)';
+							setTimeout(function(){
+								node.firstChild.innerHTML='单击以确认 (2)';
+								setTimeout(function(){
+									node.firstChild.innerHTML='单击以确认 (1)';
+									setTimeout(function(){
+										node.firstChild.innerHTML='强制更新村规游戏版本';
+										delete node._clearing;
+									},1000);
+								},1000);
+							},1000);
+						},
+						clear:true
+					},
+					ban_attend_topn:{
+						name:'单禁登场率topN武将',
+						input:true,
+						frequent:true,
+					},
+					export_leaderboard:{
+						name:'导出战况',
+						onclick:function(){
+							game.export(lib.init.encode(JSON.stringify(lib.config[lib.statsKeyGame])),'leaderboard-'+(new Date()).toLocaleString());
+						},
+						clear:true
+					},
+					import_leaderboard:{
+						name:'导入战况',
+						onclick:function(){
+							ui.import_leaderboard_button.classList.toggle('hidden');
+						},
+						clear:true
+					},
+					import_leaderboard_button:{
+						name:'<div style="white-space:nowrap;width:calc(100% - 10px)">'+
+						'<input type="file" style="width:calc(100% - 40px)">'+
+						'<button style="width:40px">确定</button></div>',
+						clear:true,
+					},
+					fulibibonus_unit:{
+						name:'杀币发放个数',
+						init:10,
+						item:{
+							'1':'1',
+							'2':'2',
+							'3':'3',
+							'4':'4',
+							'5':'5',
+							'10':'10',
+							'15':'15',
+							'20':'20'
+						},
+						onclick:function(unit){
+							game.saveConfig('fulibibonus_unit',parseInt(unit));
+						},
+					},
+					addfulibibonus_by_seat:{
+						name:'发放杀币',
+						init:'0',
+						item:{
+							'0':'一号位',
+							'1':'二号位',
+							'2':'三号位',
+							'3':'四号位',
+							'4':'五号位',
+							'5':'六号位',
+							'6':'七号位',
+							'7':'八号位',
+							'8':'九号位',
+							'9':'十号位'
+						},
+						frequent:true,
+						restart:false,
+						onclick:function(seat,label){
+							this.innerHTML=this.innerHTML.replace('发放杀币','发放中...');
+							game.saveConfig('addfulibibonus_by_seat',seat);
+							var result=game.addFulibiBonusBySeat(seat);
+							var that=this;
+							if(result){
+								setTimeout(function(){
+									that.innerHTML=that.innerHTML.replace('发放中...','发放成功');
+									setTimeout(function(){
+										that.innerHTML=that.innerHTML.replace('发放成功','发放杀币');
+									},1000);
+								},1000);
+							}
+							else{
+								setTimeout(function(){
+									that.innerHTML=that.innerHTML.replace('发放中...',label.innerHTML+'没有人！');
+									setTimeout(function(){
+										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','发放杀币');
+									},1000);
+								},1000);
+							}
+						},
+						intro:'按照座位号发放杀币',
+					},
+					addbirthdaybonus_by_seat:{
+						name:'生日福利或者移除',
+						init:'0',
+						item:{
+							'0':'一号位',
+							'1':'二号位',
+							'2':'三号位',
+							'3':'四号位',
+							'4':'五号位',
+							'5':'六号位',
+							'6':'七号位',
+							'7':'八号位',
+							'8':'九号位',
+							'9':'十号位'
+						},
+						frequent:true,
+						restart:true,
+						onclick:function(seat,label){
+							this.innerHTML=this.innerHTML.replace('生日福利或者移除','设置中...');
+							game.saveConfig('addbirthdaybonus_by_seat',seat);
+							var result=game.addBirthdayBonusBySeat(seat);
+							var that=this;
+							if(result){
+								setTimeout(function(){
+									that.innerHTML=that.innerHTML.replace('设置中...','设置成功');
+									setTimeout(function(){
+										that.innerHTML=that.innerHTML.replace('设置成功','生日福利或者移除');
+									},1000);
+								},1000);
+							}
+							else{
+								setTimeout(function(){
+									that.innerHTML=that.innerHTML.replace('设置中...',label.innerHTML+'没有人！');
+									setTimeout(function(){
+										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','生日福利或者移除');
+									},1000);
+								},1000);
+							}
+						},
+						intro:'按照座位号发生日福利卡，重复发将会移除生日福利卡',
+					},
+					qiandaofuli_cutoff:{
+						name:'早到福利截止时间',
+						init:'19',
+						item:{
+							'-1':'关闭',
+							'6':'早上6点',
+							'18':'晚上6点',
+							'19':'晚上7点',
+							'20':'晚上8点',
+							'24':'开放'
+						},
+						frequent:true,
+						restart:true,
+						intro:'早到福利截止时间',
+						onclick:function(hour,label){
+							this.innerHTML=this.innerHTML.replace('早到福利截止时间','设置中...');
+							game.setQiandaofuliCutoffByHour(hour);
+							game.saveConfig('qiandaofuli_cutoff',hour);
+							var that=this;
+							setTimeout(function(){
+								that.innerHTML=that.innerHTML.replace('设置中...','设置成功');
+								setTimeout(function(){
+									game.reload();
+								},1000);
+							},1000);
+						},
+					},
+					oneclick_reset_server:{
+						name:'一键导入单双禁将表及游戏设置',
+						clear:true,
+						onclick:function(){
+							if(this.innerHTML=='<span>确认导入</span>'){
+								this.innerHTML='<span>导入中...</span>';
+								clearTimeout(this.confirmTimeout);
+
+								var that=this;
+								setTimeout(function(){
+									// 1. import_dropbox_config
+									game.importDropboxConfig();
+
+									// 2. import_forbid_lib
+									game.importForbidLib();
+
+									// 3. import_huanleju_lib
+									game.importHuanlejuLib();
+
+									that.innerHTML='<span>导入成功</span>';
+									setTimeout(function(){
+										game.reload();
+									},1000);
+								},1000);
+							}
+							else{
+								this.innerHTML='<span>确认导入</span>';
+								var that=this;
+								this.confirmTimeout=setTimeout(function(){
+									that.innerHTML='<span>一键导入单双禁将表及游戏设置</span>';
+								},1000);
+							}
+						}
+					},
+					test_all_by_group:{
+						name:'分组测试所有武将',
+						init:'-1',
+						item:{
+							'-1':'关闭',
+							'0':'1-20',
+							'1':'21-40',
+							'2':'41-60',
+							'3':'61-80',
+							'4':'81-100',
+							'5':'101-120',
+							'6':'121-140',
+							'7':'141-160',
+							'8':'161-180',
+							'9':'181-200',
+							'10':'201-220',
+							'11':'221-240',
+							'12':'241-260',
+							'13':'261-280',
+							'14':'281-300'
+						},
+						frequent:true,
+						restart:true,
+						intro:'分组测试所有武将，每组20个',
+						onclick:function(group_id,label){
+							this.innerHTML=this.innerHTML.replace('分组测试所有武将','设置中...');
+							game.saveConfig('test_all_by_group',group_id);
+							var that=this;
+							setTimeout(function(){
+								that.innerHTML=that.innerHTML.replace('设置中...','设置成功');
+								setTimeout(function(){
+									game.reload();
+								},1000);
+							},1000);
+						},
+					},
+					enable_huanleju:{
+						name:'欢乐模式',
+						init:false,
+						intro:'无禁将组合，并开启部分单禁武将',
+						onclick:function(bool){
+							game.saveConfig('enable_huanleju',bool);
+						},
+					},
+					enable_liftcomboban:{
+						name:'解禁组合禁将',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('enable_liftcomboban',bool);
+						},
+					},
+				}
+			},
 			general:{
 				name:'通用',
 				config:{
@@ -3736,369 +4081,6 @@
 						},
 						clear:true
 					},
-					sync_connect_role_lib_to_single:{
-						name:'同步联机武将池到单机',
-						onclick:function(){
-							if(this.innerHTML=='<span>确认同步</span>'){
-								clearTimeout(this.confirmTimeout);
-
-								var charactersOLList=get.charactersOL();
-								lib.config.banned=[];
-								for(var craw in lib.character){
-									if(!charactersOLList.contains(craw)) lib.config.banned.push(craw);
-								}
-								game.saveConfig('identity_banned',lib.config.banned);
-
-								this.innerHTML='<span>同步成功</span>';
-								var that=this;
-								setTimeout(function(){
-									that.innerHTML='<span>同步联机武将池到单机</span>';
-								},1000);
-							}
-							else{
-								this.innerHTML='<span>确认同步</span>';
-								var that=this;
-								this.confirmTimeout=setTimeout(function(){
-									that.innerHTML='<span>同步联机武将池到单机</span>';
-								},1000);
-							}
-						},
-						clear:true
-					},
-					import_role_lib_by_key:{
-						name:'导入武将池key',
-						onclick:function(){
-							ui.import_role_lib_by_key_button.classList.toggle('hidden');
-						},
-						clear:true
-					},
-					import_role_lib_by_key_button:{
-						name:'<div style="white-space:nowrap;width:calc(100% - 10px)">'+
-						'<input type="file" style="width:calc(100% - 40px)">'+
-						'<button style="width:40px">确定</button></div>',
-						clear:true,
-					},
-					export_role_lib_key_only:{
-						name:'导出武将池key',
-						onclick:function(){
-							var charactersOLList=get.charactersOL();
-							game.export(JSON.stringify(charactersOLList),'noname-rolelib-keyonly'+(new Date()).toLocaleString()+'-'+charactersOLList.length+'.json');
-						},
-						clear:true
-					},
-					export_role_lib:{
-						name:'导出武将池',
-						onclick:function(){
-							var charactersOLList=get.charactersOL();
-							var data=game.buildRoleLibFromCharacters(charactersOLList);
-							game.export(JSON.stringify(data),'noname-rolelib'+(new Date()).toLocaleString()+'.json');
-						},
-						clear:true
-					},
-					export_banned_role_lib:{
-						name:'导出单禁武将',
-						onclick:function(){
-							var data=[];
-							var libCharacter={};
-							for(var i=0;i<lib.configOL.characterPack.length;i++){
-								var pack=lib.characterPack[lib.configOL.characterPack[i]];
-								for(var j in pack){
-									if(lib.character[j]) libCharacter[j]=pack[j];
-								}
-							}
-							for(i in libCharacter){
-								if(lib.filter.characterDisabled(i,libCharacter)||lib.connectBanned.contains(i)) {
-									data.push(get.translation(i));
-								}
-							}
-							game.export(JSON.stringify(data),'noname-bannedrolelib'+(new Date()).toLocaleString()+'.json');
-						},
-						clear:true
-					},
-					force_update_cungui_version:{
-						name:'强制更新村规游戏版本',
-						onclick:function(){
-							var node=this;
-							if(node._clearing){
-								ui.click.configMenu();
-								lib.version='0';
-								game.checkForUpdate(null);
-								return;
-							}
-							node._clearing=true;
-							node.firstChild.innerHTML='单击以确认 (3)';
-							setTimeout(function(){
-								node.firstChild.innerHTML='单击以确认 (2)';
-								setTimeout(function(){
-									node.firstChild.innerHTML='单击以确认 (1)';
-									setTimeout(function(){
-										node.firstChild.innerHTML='强制更新村规游戏版本';
-										delete node._clearing;
-									},1000);
-								},1000);
-							},1000);
-						},
-						clear:true
-					},
-					ban_attend_topn:{
-						name:'单禁登场率topN武将',
-						input:true,
-						frequent:true,
-					},
-					reset_leaderboard:{
-						name:'重置战况',
-						clear:true,
-						onclick:function(){
-							if(this.innerHTML=='<span>确认重置</span>'){
-								clearTimeout(this.confirmTimeout);
-								game.saveConfig(lib.statsKeyGame,{});
-								this.innerHTML='<span>重置成功</span>';
-								var that=this;
-								setTimeout(function(){
-									that.innerHTML='<span>重置战况</span>';
-								},1000);
-							}
-							else{
-								this.innerHTML='<span>确认重置</span>';
-								var that=this;
-								this.confirmTimeout=setTimeout(function(){
-									that.innerHTML='<span>重置战况</span>';
-								},1000);
-							}
-						}
-					},
-					export_leaderboard:{
-						name:'导出战况',
-						onclick:function(){
-							game.export(lib.init.encode(JSON.stringify(lib.config[lib.statsKeyGame])),'leaderboard-'+(new Date()).toLocaleString());
-						},
-						clear:true
-					},
-					import_leaderboard:{
-						name:'导入战况',
-						onclick:function(){
-							ui.import_leaderboard_button.classList.toggle('hidden');
-						},
-						clear:true
-					},
-					import_leaderboard_button:{
-						name:'<div style="white-space:nowrap;width:calc(100% - 10px)">'+
-						'<input type="file" style="width:calc(100% - 40px)">'+
-						'<button style="width:40px">确定</button></div>',
-						clear:true,
-					},
-					fulibibonus_unit:{
-						name:'杀币发放个数',
-						init:10,
-						item:{
-							'1':'1',
-							'2':'2',
-							'3':'3',
-							'4':'4',
-							'5':'5',
-							'10':'10',
-							'15':'15',
-							'20':'20'
-						},
-						onclick:function(unit){
-							game.saveConfig('fulibibonus_unit',parseInt(unit));
-						},
-					},
-					addfulibibonus_by_seat:{
-						name:'发放杀币',
-						init:'0',
-						item:{
-							'0':'一号位',
-							'1':'二号位',
-							'2':'三号位',
-							'3':'四号位',
-							'4':'五号位',
-							'5':'六号位',
-							'6':'七号位',
-							'7':'八号位',
-							'8':'九号位',
-							'9':'十号位'
-						},
-						frequent:true,
-						restart:false,
-						onclick:function(seat,label){
-							this.innerHTML=this.innerHTML.replace('发放杀币','发放中...');
-							game.saveConfig('addfulibibonus_by_seat',seat);
-							var result=game.addFulibiBonusBySeat(seat);
-							var that=this;
-							if(result){
-								setTimeout(function(){
-									that.innerHTML=that.innerHTML.replace('发放中...','发放成功');
-									setTimeout(function(){
-										that.innerHTML=that.innerHTML.replace('发放成功','发放杀币');
-									},1000);
-								},1000);
-							}
-							else{
-								setTimeout(function(){
-									that.innerHTML=that.innerHTML.replace('发放中...',label.innerHTML+'没有人！');
-									setTimeout(function(){
-										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','发放杀币');
-									},1000);
-								},1000);
-							}
-						},
-						intro:'按照座位号发放杀币',
-					},
-					addbirthdaybonus_by_seat:{
-						name:'生日福利或者移除',
-						init:'0',
-						item:{
-							'0':'一号位',
-							'1':'二号位',
-							'2':'三号位',
-							'3':'四号位',
-							'4':'五号位',
-							'5':'六号位',
-							'6':'七号位',
-							'7':'八号位',
-							'8':'九号位',
-							'9':'十号位'
-						},
-						frequent:true,
-						restart:true,
-						onclick:function(seat,label){
-							this.innerHTML=this.innerHTML.replace('生日福利或者移除','设置中...');
-							game.saveConfig('addbirthdaybonus_by_seat',seat);
-							var result=game.addBirthdayBonusBySeat(seat);
-							var that=this;
-							if(result){
-								setTimeout(function(){
-									that.innerHTML=that.innerHTML.replace('设置中...','设置成功');
-									setTimeout(function(){
-										game.reload();
-									},1000);
-								},1000);
-							}
-							else{
-								setTimeout(function(){
-									that.innerHTML=that.innerHTML.replace('设置中...',label.innerHTML+'没有人！');
-									setTimeout(function(){
-										that.innerHTML=that.innerHTML.replace(label.innerHTML+'没有人！','生日福利或者移除');
-									},1000);
-								},1000);
-							}
-						},
-						intro:'按照座位号发生日福利卡，重复发将会移除生日福利卡',
-					},
-					qiandaofuli_cutoff:{
-						name:'早到福利截止时间',
-						init:'19',
-						item:{
-							'-1':'关闭',
-							'6':'早上6点',
-							'18':'晚上6点',
-							'19':'晚上7点',
-							'20':'晚上8点',
-							'24':'开放'
-						},
-						frequent:true,
-						restart:true,
-						intro:'早到福利截止时间',
-						onclick:function(hour,label){
-							this.innerHTML=this.innerHTML.replace('早到福利截止时间','设置中...');
-							game.setQiandaofuliCutoffByHour(hour);
-							game.saveConfig('qiandaofuli_cutoff',hour);
-							var that=this;
-							setTimeout(function(){
-								that.innerHTML=that.innerHTML.replace('设置中...','设置成功');
-								setTimeout(function(){
-									game.reload();
-								},1000);
-							},1000);
-						},
-					},
-					oneclick_reset_server:{
-						name:'一键导入单双禁将表及游戏设置',
-						clear:true,
-						onclick:function(){
-							if(this.innerHTML=='<span>确认导入</span>'){
-								this.innerHTML='<span>导入中...</span>';
-								clearTimeout(this.confirmTimeout);
-
-								var that=this;
-								setTimeout(function(){
-									// 1. import_dropbox_config
-									game.importDropboxConfig();
-
-									// 2. import_forbid_lib
-									game.importForbidLib();
-
-									// 3. import_huanleju_lib
-									game.importHuanlejuLib();
-
-									that.innerHTML='<span>导入成功</span>';
-									setTimeout(function(){
-										game.reload();
-									},1000);
-								},1000);
-							}
-							else{
-								this.innerHTML='<span>确认导入</span>';
-								var that=this;
-								this.confirmTimeout=setTimeout(function(){
-									that.innerHTML='<span>一键导入单双禁将表及游戏设置</span>';
-								},1000);
-							}
-						}
-					},
-					test_all_by_group:{
-						name:'分组测试所有武将',
-						init:'-1',
-						item:{
-							'-1':'关闭',
-							'0':'1-20',
-							'1':'21-40',
-							'2':'41-60',
-							'3':'61-80',
-							'4':'81-100',
-							'5':'101-120',
-							'6':'121-140',
-							'7':'141-160',
-							'8':'161-180',
-							'9':'181-200',
-							'10':'201-220',
-							'11':'221-240',
-							'12':'241-260',
-							'13':'261-280',
-							'14':'281-300'
-						},
-						frequent:true,
-						restart:true,
-						intro:'分组测试所有武将，每组20个',
-						onclick:function(group_id,label){
-							this.innerHTML=this.innerHTML.replace('分组测试所有武将','设置中...');
-							game.saveConfig('test_all_by_group',group_id);
-							var that=this;
-							setTimeout(function(){
-								that.innerHTML=that.innerHTML.replace('设置中...','设置成功');
-								setTimeout(function(){
-									game.reload();
-								},1000);
-							},1000);
-						},
-					},
-					enable_huanleju:{
-						name:'欢乐模式',
-						init:false,
-						intro:'无禁将组合，并开启部分单禁武将',
-						onclick:function(bool){
-							game.saveConfig('enable_huanleju',bool);
-						},
-					},
-					enable_liftcomboban:{
-						name:'解禁组合禁将',
-						init:false,
-						onclick:function(bool){
-							game.saveConfig('enable_liftcomboban',bool);
-						},
-					},
-
 					update:function(config,map){
 						if(lib.device||lib.node){
 							map.redownload_game.show();
@@ -27997,6 +27979,9 @@
 		updateBonusBalance:function(player,bonusKey,delta){
 			if(!player) return;
 			game.updateBonusBalanceByNickname(player.nickname,bonusKey,delta);
+			game.updateBonusBalanceUI(player,bonusKey,delta)
+		},
+		updateBonusBalanceUI:function(player,bonusKey,delta){
 			if(_status.waitingForPlayer){
 				game.updateWaiting();
 			}
@@ -28252,13 +28237,19 @@
 			}
 			if(game.connectPlayers&&game.connectPlayers.length&&game.connectPlayers[seat]&&game.connectPlayers[seat].nickname&&game.connectPlayers[seat].nickname!='无名玩家'){
 				var nn=game.connectPlayers[seat].nickname;
-				if (nn in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]) delete lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus][nn];
+				var delta=0;
+				if (nn in lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]){
+					delete lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus][nn];
+					delta=-1;
+				}
 				else{
 					var expire=new Date();
 					expire.setDate(expire.getDate()+1);
 					lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus][nn]=expire;
+					delta=1;
 				}
 				game.saveConfig(lib.bonusKeyFuliInfo,lib.config[lib.bonusKeyFuliInfo]);
+				game.updateBonusBalanceUI(game.connectPlayers[seat],lib.bonusKeyBirthdaybonus,delta);
 				return true;
 			}
 			return false;
