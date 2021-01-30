@@ -225,6 +225,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					game.log(target,'展示了',event.card2);
 					event._result={};
 					player.chooseToDiscard({suit:get.suit(event.card2)},function(card){
+						// fix bug: ai can respond with equip and judge card
+						if(card&&get.itemtype(card)=='card'&&['e','j'].contains(get.position(card))) return 0;
 						var evt=_status.event.getParent();
 						if(get.damageEffect(evt.target,evt.player,evt.player,'fire')>0){
 							return 7-get.value(card,evt.player);

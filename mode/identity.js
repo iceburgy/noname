@@ -2021,6 +2021,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var assignAttempts=1;
 					var assignAttemptsMax=10;
 					var isAssignRepeated;
+					var zhuNeiIDs=['zhu','nei'];
 					do{
 						identityList.randomSort();
 						isAssignRepeated=false;
@@ -2028,7 +2029,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var nameol=game.players[i].nickname;
 							if(nameol&&nameol!='无名玩家'&&playersStatistics&&playersStatistics[nameol]&&playersStatistics[nameol]['lastID']){
 								var lastID=playersStatistics[nameol]['lastID'];
-								if(lastID=='zhu'&&identityList[i]=='zhu'||lastID=='nei'&&identityList[i]=='nei'){
+								if(zhuNeiIDs.contains(lastID)&&zhuNeiIDs.contains(identityList[i])){
 									isAssignRepeated=true;
 									break;
 								}
