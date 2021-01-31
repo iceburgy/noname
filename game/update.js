@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2021.01.31',
+	version:'2021.01.31.1',
 	update:'2020.11.06.2',
 	changeLog:[
 		'开启单禁热度榜TopN模式',
