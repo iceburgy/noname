@@ -2431,7 +2431,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							else if(card.name=='tao'){
 								var hp=player.maxHp-player.hp;
-								if(trigger.targets.contains(player)) hp--;
+								if(trigger.targets&&trigger.targets.contains(player)) hp--;
 								return hp>0?1:0;
 							}
 							return 0;
