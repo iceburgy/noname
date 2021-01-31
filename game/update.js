@@ -1,7 +1,8 @@
 window.noname_update={
-	version:'2021.01.30',
+	version:'2021.01.30.1',
 	update:'2020.11.06.2',
 	changeLog:[
+		'开启单禁热度榜TopN模式',
 		'修复火攻可以弃置装备的bug',
 		'修改避免身份重复机制：上盘当主或内的下盘屏蔽主和内',
 	],

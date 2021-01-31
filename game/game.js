@@ -236,7 +236,12 @@
 						clear:true
 					},
 					ban_attend_topn:{
-						name:'单禁登场率topN武将',
+						name:'单禁热度榜topN武将',
+						input:true,
+						frequent:true,
+					},
+					hot_degree_degrade_rate:{
+						name:'热度衰减率',
 						input:true,
 						frequent:true,
 					},
@@ -27942,7 +27947,7 @@
 					numHuman++;
 				}
 			}
-			return numHuman>=6&&(clients.length==8||clients.length==10)&&!_status.overtie;
+			return numHuman>=6&&(clients.length==8||clients.length==10);
 		},
 		getAllFuliInfo:function(){
 			if(lib.config[lib.bonusKeyFuliInfo]&&lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]){
@@ -32385,59 +32390,6 @@
 			// only record statistics if there are at least certain human players
 			if(_status.connectMode){
 				// game statistics
-				/* lib.config.stats_game
-				{
-					stats_local:{
-						stats_identity:{
-							zhuzhong:0,
-							fan:0,
-							nei:0,
-						}
-						stats_role{
-							"re_zhenji": {
-								"numWin": 3,
-								"numLose": 1,
-								"winRate": 75,
-								"zhuWin": 0,
-								"zhuLose": 0,
-								"zhuRate": "0%",
-								"zhongWin": 1,
-								"zhongLose": 1,
-								"zhongRate": 50,
-								"neiWin": 0,
-								"neiLose": 0,
-								"neiRate": "0%",
-								"fanWin": 2,
-								"fanLose": 0,
-								"fanRate": 100
-							}
-						},
-						stats_player{
-							"nickname": {
-								'numWin':0,
-								'numLose':0,
-								'winRate':'0%',
-								'lastID':'',
-								'zhuWin':0,
-								'zhuLose':0,
-								'zhuRate':'0%',
-								'zhongWin':0,
-								'zhongLose':0,
-								'zhongRate':'0%',
-								'neiWin':0,
-								'neiLose':0,
-								'neiRate':'0%',
-								'fanWin':0,
-								'fanLose':0,
-								'fanRate':'0%',
-							},
-						}
-					},
-					stats_otherZone:{
-						...
-					}
-				}
-				*/
 				if(!lib.config[lib.statsKeyGame]){
 					lib.config[lib.statsKeyGame]={};
 				}
@@ -32463,6 +32415,16 @@
 				var playersStatistics=statsLocal[lib.statsKeyPlayer];
 				if(!playersStatistics){
 					playersStatistics={};
+				}
+
+				// degrade hotDegree
+				if(game.isARealGame()){
+					for(var roleName in rolesStatistics){
+						if(rolesStatistics[roleName]['hotDegree']==undefined){
+							rolesStatistics[roleName]['hotDegree']=0;
+						}
+						rolesStatistics[roleName]['hotDegree']=Math.round(100*rolesStatistics[roleName]['hotDegree']*lib.config.hot_degree_degrade_rate)/100;
+					}
 				}
 
 				clients.sort((a, b) => {
@@ -32505,6 +32467,7 @@
 					}
 					if(game.isARealGame()&&!rolesStatistics[clients[i].name1]){
 						rolesStatistics[clients[i].name1]={
+							'hotDegree':0,
 							'numWin':0,
 							'numLose':0,
 							'winRate':'0',
@@ -32524,6 +32487,7 @@
 					}
 					if(game.isARealGame()&&!rolesStatistics[clients[i].name2]){
 						rolesStatistics[clients[i].name2]={
+							'hotDegree':0,
 							'numWin':0,
 							'numLose':0,
 							'winRate':'0',
@@ -32543,8 +32507,21 @@
 					}
 					playersStatistics[nameol]['lastID']=playerIdentity;
 
-					// stop collecting statistics if it is a tie game
+					// stop collecting statistics if it is a fake game
 					if(!game.isARealGame()) continue;
+
+					// collecting hotDegree data
+					if(rolesStatistics[clients[i].name1]['hotDegree']==undefined){
+						rolesStatistics[clients[i].name1]['hotDegree']=0;
+					}
+					if(rolesStatistics[clients[i].name2]['hotDegree']==undefined){
+						rolesStatistics[clients[i].name2]['hotDegree']=0;
+					}
+					rolesStatistics[clients[i].name1]['hotDegree']++;
+					rolesStatistics[clients[i].name2]['hotDegree']++;
+
+					// stop collecting statistics if it is a tie game
+					if(_status.overtie) continue;
 
 					if(playerWin){
 						playersStatistics[nameol]['numWin']++;
@@ -32596,26 +32573,26 @@
 				switch(winnerId){
 					case 'zhu':
 						winnerText='，主公获胜';
-						if(game.isARealGame()) identityStatistics.zhuzhong++;
+						if(game.isARealGame()&&!_status.overtie) identityStatistics.zhuzhong++;
 						break;
 					case 'zhong':
 						winnerText='，主忠获胜';
-						if(game.isARealGame()) identityStatistics.zhuzhong++;
+						if(game.isARealGame()&&!_status.overtie) identityStatistics.zhuzhong++;
 						break;
 					case 'fan':
 						winnerText='，反贼获胜';
-						if(game.isARealGame()) identityStatistics.fan++;
+						if(game.isARealGame()&&!_status.overtie) identityStatistics.fan++;
 						break;
 					case 'nei':
 						winnerText='，内奸获胜';
-						if(game.isARealGame()) identityStatistics.nei++;
+						if(game.isARealGame()&&!_status.overtie) identityStatistics.nei++;
 						break;
 					default:
 						winnerText='，和了';
 						break;
 				}
 
-				if(game.isARealGame()){
+				if(game.isARealGame()&&!_status.overtie){
 					tableStatistics=document.createElement('table');
 					tr=document.createElement('tr');
 					tr.appendChild(document.createElement('td'));
@@ -35990,43 +35967,7 @@
         		if(obj.hasOwnProperty(key))
         			sortable.push([key, obj[key]]); // each item is an array in format [key, value]
 
-        	if(!sortkey||sortkey=='winRate'){
-				sortable.sort(function(a, b){
-					var wra=parseFloat(a[1].winRate),
-						wrb=parseFloat(b[1].winRate),
-						nwa=parseFloat(a[1].numWin),
-						nwb=parseFloat(b[1].numWin);
-					var ka=a[0].split('_');
-					ka=ka[ka.length-1];
-					var kb=b[0].split('_');
-					kb=kb[kb.length-1];
-
-					if(wra!=wrb){
-						return wra>wrb?-1:1;
-					}
-					if(nwa!=nwb){
-						return nwa>nwb?-1:1;
-					}
-					return ka<=kb?-1:1;
-				});
-			}
-			else if(sortkey==lib.statsKeySortKeyRoleName){
-				sortable.sort(function(a, b){
-					var ka=a[0].split('_');
-					ka=ka[ka.length-1];
-					var kb=b[0].split('_');
-					kb=kb[kb.length-1];
-					var i=0;
-					while(i<ka.length&&i<kb.length){
-						if(ka.charAt(i)<kb.charAt(i)) return -1;
-						else if(ka.charAt(i)>kb.charAt(i)) return 1;
-						else i++;
-					}
-					if(i==kb.length) return -1;
-					else return 1;
-				});
-			}
-			else if(sortkey==lib.statsKeySortKeyNumTotal){
+			if(sortkey==lib.statsKeySortKeyNumTotal){
 				sortable.sort(function(a, b){
 					var nwa=parseFloat(a[1].numWin);
 					var nwb=parseFloat(b[1].numWin);
@@ -36045,28 +35986,36 @@
 					}
 					return ka<=kb?-1:1;
 				});
+				return sortable;
 			}
-			else{
-				sortable.sort(function(a, b){
-					var wra=parseFloat(a[1][sortkey]);
-					var wrb=parseFloat(b[1][sortkey]);
-
-					var ka=a[0].split('_');
-					ka=ka[ka.length-1];
-					var kb=b[0].split('_');
-					kb=kb[kb.length-1];
-
-					if(wra!=wrb){
-						return wra>wrb?-1:1;
-					}
-					else if(sortkey.endsWith('Rate')){
-						var winNuma=parseFloat(a[1][sortkey.split('Rate')[0]+'Win']);
-						var winNumb=parseFloat(b[1][sortkey.split('Rate')[0]+'Win']);
-						if(winNuma!=winNumb) return winNuma>winNumb?-1:1;
-					}
-					return ka<=kb?-1:1;
-				});
+			if(!sortkey) sortkey='winRate';
+			var sortkeys=[sortkey];
+			if(sortkey=='winRate') sortkeys.add('numWin');
+			else if(sortkey.endsWith('Rate')){
+				sortkeys.add(sortkey.split('Rate')[0]+'Win');
 			}
+			sortkeys.remove(lib.statsKeySortKeyRoleName); // will always fall back to lib.statsKeySortKeyRoleName
+			sortable.sort(function(a, b){
+				for(var skey of sortkeys){
+					var sortSign=1; // sort string ascendingly
+					var va=a[1][skey];
+					var	vb=b[1][skey];
+
+					if(!isNaN(parseFloat(va))&&!isNaN(parseFloat(vb))){
+						sortSign=-1; // sort string descendingly
+						va=parseFloat(va);
+						vb=parseFloat(vb);
+					}
+					if(va!=vb){
+						return sortSign*(va<vb?-1:1);
+					}
+				}
+				var ka=a[0].split('_');
+				ka=ka[ka.length-1];
+				var kb=b[0].split('_');
+				kb=kb[kb.length-1];
+				return ka<=kb?-1:1;
+			});
         	return sortable; // array in format [ [ key1, val1 ], [ key2, val2 ], ... ]
         },
 		showExtensionChangeLog:function(str,extname){
@@ -37389,7 +37338,7 @@
 								game.saveConfig('hall_ip',input.innerHTML,'connect');
 							}
 						}
-						else if(config.name=='单禁登场率topN武将'){
+						else if(config.name=='单禁热度榜topN武将'){
 							input.innerHTML=config.init||'0';
 							input.onblur=function(){
 								if(!input.innerHTML){
@@ -37401,6 +37350,20 @@
 								else{
 									game.saveConfig('ban_attend_topn',valTopN);
 									game.syncBanAttendTopN();
+								}
+							}
+						}
+						else if(config.name=='热度衰减率'){
+							input.innerHTML=config.init||'0';
+							input.onblur=function(){
+								if(!input.innerHTML){
+									input.innerHTML='1';
+								}
+								input.innerHTML=input.innerHTML.replace(/<br>/g,'');
+								var val=parseFloat(input.innerHTML);
+								if(isNaN(val)||val<0||val>1) alert('请输入0到1的小数');
+								else{
+									game.saveConfig('hot_degree_degrade_rate',val);
 								}
 							}
 						}
@@ -45817,7 +45780,7 @@
 				ui.cardPileButton.style.display='none';
 				lib.setPopped(ui.cardPileButton,ui.click.cardPileButton,220);
 				ui.leaderboardButton=ui.create.system('战况',null,true);
-				lib.setPopped(ui.leaderboardButton,ui.click.leaderboardButton,630);
+				lib.setPopped(ui.leaderboardButton,ui.click.leaderboardButton,700);
 				ui.changeLogDialog=ui.create.system('版本',null,true);
 				lib.setPopped(ui.changeLogDialog,ui.click.changeLogDialog,450);
 				ui.wuxie=ui.create.system('不询问无懈',ui.click.wuxie,true);
@@ -47808,7 +47771,7 @@
 				if(banAttendTopNChars){
 					var p=document.createElement('p');
 					for(var bc of banAttendTopNChars){
-						if(!p.innerHTML) p.innerHTML='本局单禁登场率 top '+banAttendTopNChars.length+' 的武将：';
+						if(!p.innerHTML) p.innerHTML='本局单禁热度榜 top '+banAttendTopNChars.length+' 的武将：';
 						else{
 							p.innerHTML+='；';
 						}
@@ -47870,6 +47833,10 @@
 				td.appendChild(anchor);
 				tr.appendChild(td);
 				td=document.createElement('td');
+				anchor=createLeaderboardAnchor(hostZone,'hotDegree','热度');
+				td.appendChild(anchor);
+				tr.appendChild(td);
+				td=document.createElement('td');
 				anchor=createLeaderboardAnchor(hostZone,'numWin','胜场');
 				td.appendChild(anchor);
 				tr.appendChild(td);
@@ -47908,6 +47875,9 @@
 					tr=document.createElement('tr');
 					td=document.createElement('td');
 					td.innerHTML=get.translation(roleName);
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=sortedStats[i][1]['hotDegree']||0;
 					tr.appendChild(td);
 					td=document.createElement('td');
 					td.innerHTML=sortedStats[i][1]['numWin'];
@@ -51335,6 +51305,7 @@
 								game.over(_status.maxShuffleCheck());
 							}
 							else{
+								_status.overtie=true;
 								game.over('平局');
 							}
 							return [];
@@ -51367,6 +51338,7 @@
 					}
 				}
 				if(ui.cardPile.hasChildNodes()==false){
+					_status.overtie=true;
 					game.over('平局');
 					return [];
 				}
@@ -51976,7 +51948,7 @@
 			if(!statsByZone) return;
 			var rolesStatistics=statsByZone[lib.statsKeyRole];
 			if(!rolesStatistics) return;
-			var sortedStats=game.sortProperties(rolesStatistics,lib.statsKeySortKeyNumTotal);
+			var sortedStats=game.sortProperties(rolesStatistics,'hotDegree');
 			var banTopN=lib.config.ban_attend_topn;
 			if(!banTopN) return;
 			var banTopN=Math.min(banTopN,sortedStats.length);
@@ -51986,15 +51958,18 @@
 			var zhuList=[];
 			get.charactersAndZhuOL(allList,zhuList)
 			var i=0;
-			while(i<banTopN){
+			var lastHotDegree=parseFloat(sortedStats[0][1]['hotDegree']);
+			while(i<sortedStats.length&&lastHotDegree>0){
 				var toBeBanned=sortedStats[i][0];
 				if(allList.contains(toBeBanned)){
-					topNChars.add(toBeBanned);
-				}
-				else{
-					banTopN++;
+					var curHotDegree=parseFloat(sortedStats[i][1]['hotDegree']);
+					if(topNChars.length<banTopN||curHotDegree==lastHotDegree){
+						topNChars.add(toBeBanned);
+					}
+					else break;
 				}
 				i++;
+				lastHotDegree=curHotDegree;
 			}
 			return topNChars;
 		},
@@ -52770,6 +52745,7 @@
 								game.over(_status.maxShuffleCheck());
 							}
 							else{
+								_status.overtie=true;
 								game.over('平局');
 							}
 							return [];
@@ -52801,6 +52777,7 @@
 					}
 				}
 				if(ui.cardPile.hasChildNodes()==false){
+					_status.overtie=true;
 					game.over('平局');
 					return [];
 				}
