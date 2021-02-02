@@ -55238,7 +55238,8 @@
 			if(!player) player=_status.event.player;
 			if(player.getCards('j').contains(card)){
 				var judgeType=card.node.judgeMark.node.judge.innerHTML;
-				if(['乐','兵'].contains(judgeType)) return -1.5;
+				if(judgeType=='乐') return -1.7;
+				if(judgeType=='兵') return -1.6;
 				var efff=get.effect(player,card,player,player);
 				if(efff>0) return 0.5;
 				if(efff==0) return 0;
