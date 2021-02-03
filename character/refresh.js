@@ -7891,7 +7891,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					save:true,
 				},
 				trigger:{source:'damageEnd'},
-				locked:true,
+				locked:false,
 				direct:true,
 				clearTime:true,
 				filter:function(event,player){
