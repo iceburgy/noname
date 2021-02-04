@@ -4540,9 +4540,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								var c=b.link;
 								if(get.position(c)=='j'){
 									var s=get.suit(c);
-									var judgeType=c.node.judgeMark.node.judge.innerHTML;
-									if(judgeType=='乐') lebuSuit=s;
-									else if(judgeType=='兵') bingliangSuit=s;
+									var judgeType=c.viewAs||c.name;
+									if(judgeType=='lebu') lebuSuit=s;
+									else if(judgeType=='bingliang') bingliangSuit=s;
 								}
 							}
 							for(var b of arguments[1]){
@@ -4563,9 +4563,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							return 11-get.value(card);
 						}
-						var curJudgeType=card.node.judgeMark.node.judge.innerHTML;
-						if(curJudgeType=='乐') return game.needDiscardLebu?100:-1;
-						if(curJudgeType=='兵') return 50;
+						var curJudgeType=card.viewAs||card.name;
+						if(curJudgeType=='lebu') return game.needDiscardLebu?100:-1;
+						if(curJudgeType=='bingliang') return 50;
 						return -1;
 					};
 					next.logSkill='xiuluo';
