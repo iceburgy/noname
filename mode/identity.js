@@ -4499,8 +4499,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					var next=player.discardPlayerCard(player,3,'hej','是否发动【修罗主公】来弃置判定牌？');
-					next.filterButton=function(button){
+					var next=player.discardPlayerCard(player,3,'hej','是否发动【修罗主公】来弃置判定牌？').set('filterButton',function(button){
+						var player=_status.event.player;
 						var card=button.link;
 						if(!lib.filter.cardDiscardable(card,player)) return false;
 						var suitj='';
@@ -4529,8 +4529,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return suithe.includes(suitj);
 						}
 						return true;
-					};
-					next.ai=function(button){
+					}).set('ai',function(button){
 						var card=button.link;
 						var lebuSuit='';
 						var bingliangSuit='';
@@ -4567,7 +4566,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(curJudgeType=='lebu') return game.needDiscardLebu?100:-1;
 						if(curJudgeType=='bingliang') return 50;
 						return -1;
-					};
+					});
 					next.logSkill='xiuluo';
 					"step 1"
 					if(result.bool&&player.countCards('j')) event.goto(0);
