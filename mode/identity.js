@@ -4179,20 +4179,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					if(player==game.me){
-						if(ui.revealXiaonei){
-							ui.revealXiaonei.classList.remove('glow');
-							ui.revealXiaonei.hide();
-						}
-					}
-					else if(player.isOnline2()){
-						if(ui.revealXiaonei){
-							player.send(function(){
-								ui.revealXiaonei.classList.remove('glow');
-								ui.revealXiaonei.hide();
-							});
-						}
-					}
 					player.chooseControlList(true,function(event,player){
 						return 0;
 					},
