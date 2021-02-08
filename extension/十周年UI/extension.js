@@ -3023,7 +3023,7 @@ content:function(config, pack){
                 this.fixed = true;
                 this.moving = true;
                 var x = Math.round((player.offsetWidth - this.offsetWidth) / 2 + player.offsetLeft);
-				if(player==game.me&&!this.classList.contains('isAddJudge')&&this.original!='j') {
+				if(player==game.me&&!this.classList.contains('isAddJudge')&&!(this.original=='j'&&this.isMoveCard)) {
 					x=player.offsetWidth + player.node.handcards1.offsetWidth;
 				}
                 var y = Math.round((player.offsetHeight - this.offsetHeight) / 2 + player.offsetTop);
@@ -3271,6 +3271,7 @@ content:function(config, pack){
                             node = card.copy('card', 'thrown', false);
                             var oriPos=get.position(card)||card.original;
                             if(oriPos) node.original=oriPos;
+                            node.isMoveCard=card.isMoveCard;
                         } else {
                             node = ui.create.div('.card.thrown');
                         }
@@ -3338,6 +3339,7 @@ content:function(config, pack){
                             node = card.copy('card', 'thrown', false);
                             var oriPos=get.position(card)||card.original;
                             if(oriPos) node.original=oriPos;
+                            node.isMoveCard=card.isMoveCard;
                         } else {
                             node = ui.create.div('.card.thrown');
                         }
@@ -3387,6 +3389,7 @@ content:function(config, pack){
                         var cardClone=cards[i].clone;
 						var oriPos=get.position(cards[i])||cards[i].original;
 						if(oriPos) cardClone.original=oriPos;
+						cardClone.isMoveCard=cards[i].isMoveCard;
                         cardClone.moveDelete(this, true);
                         list2.push(cards[i].clone);
                     } else {

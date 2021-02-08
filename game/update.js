@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2021.02.07',
+	version:'2021.02.07.1',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修复【修罗主公】在客户端不执行卡牌花色筛选的bug',

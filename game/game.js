@@ -14025,6 +14025,7 @@
 						else{
 							event.targets[1].addJudge(link);
 						}
+						link.isMoveCard=true;
 						event.targets[0].$give(link,event.targets[1])
 						event.result.card=link;
 						event.result.position=get.position(link);
@@ -15119,6 +15120,7 @@
 							else{
 								cards[i].original=null;
 							}
+							cards[i].isMoveCard=null;
 						}
 					}
 					if(player==game.me) ui.updatehl();
@@ -22317,6 +22319,7 @@
 						var cardCopy=card.copy('thrown');
 						var oriPos=get.position(card)||card.original;
 						if(oriPos) cardCopy.original=oriPos;
+						cardCopy.isMoveCard=card.isMoveCard;
 						node=this.$throwordered(cardCopy,nosource,actualevent);
 						if(time!=undefined){
 							node.fixed=true;
