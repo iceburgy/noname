@@ -1,8 +1,8 @@
 window.noname_update={
-	version:'2021.02.07.1',
+	version:'2021.03.16',
 	update:'2020.11.06.2',
 	changeLog:[
-		'修复【修罗主公】在客户端不执行卡牌花色筛选的bug',
+		'调整张郃巧变没判定牌仍然询问是否跳判定（适用于主动弃牌武将，比如陆逊、张春华）',
 	],
 	files:[
 		'card/extra.js',

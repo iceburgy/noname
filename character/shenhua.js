@@ -3437,14 +3437,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				content:function(){
 					"step 0"
-					if(player.countCards('j')==0&&(!event.isMine()||!lib.config.autoskilllist.contains('qiaobian1'))){
-						event.finish();
-					}
-					else{
-						var next=player.chooseToDiscard(get.prompt('qiaobian'),'弃置一张手牌并跳过判定阶段');
-						next.set('ai',get.unuseful2);
-						next.set('logSkill','qiaobian1');
-					}
+					var next=player.chooseToDiscard(get.prompt('qiaobian'),'弃置一张手牌并跳过判定阶段');
+					next.set('ai',get.unuseful2);
+					next.set('logSkill','qiaobian1');
 					"step 1"
 					if(result.bool){
 						trigger.cancel();
