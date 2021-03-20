@@ -32426,7 +32426,7 @@
 						if(rolesStatistics[roleName]['hotDegree']==undefined){
 							rolesStatistics[roleName]['hotDegree']=0;
 						}
-						rolesStatistics[roleName]['hotDegree']=Math.round(100*rolesStatistics[roleName]['hotDegree']*lib.config.hot_degree_degrade_rate)/100;
+						rolesStatistics[roleName]['hotDegree']=(rolesStatistics[roleName]['hotDegree']*lib.config.hot_degree_degrade_rate).toFixed(2)*100/100;
 					}
 				}
 
@@ -47880,7 +47880,7 @@
 					td.innerHTML=get.translation(roleName);
 					tr.appendChild(td);
 					td=document.createElement('td');
-					td.innerHTML=sortedStats[i][1]['hotDegree']||0;
+					td.innerHTML=(sortedStats[i][1]['hotDegree'])?(sortedStats[i][1]['hotDegree']).toFixed(2)*100/100:0;
 					tr.appendChild(td);
 					td=document.createElement('td');
 					td.innerHTML=sortedStats[i][1]['numWin'];
