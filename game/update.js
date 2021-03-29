@@ -1,9 +1,8 @@
 window.noname_update={
-	version:'2021.03.20',
+	version:'2021.03.28',
 	update:'2020.11.06.2',
 	changeLog:[
-		'调整张郃巧变没判定牌仍然询问是否跳判定（适用于主动弃牌武将，比如陆逊、张春华）',
-		'修复热度值没有被简化至两位小数',
+		'修复小内重复发动的bug',
 	],
 	files:[
 		'card/extra.js',

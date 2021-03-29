@@ -4173,12 +4173,27 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				skillAnimation:'legend',
 				animationColor:'thunder',
 				filter:function(event,player){
+					if(!player.hiddenSkills.contains('woshixiaonei')) return false;
 					if(event.name=='revealXiaonei'||event.name=='chooseToUse'&&event.type=='dying') return true;
 					// only for AI to trigger
 					return !player.isOnline2()&&player!=game.me&&event.name=='phasing';
 				},
 				content:function(){
 					'step 0'
+					if(!player.hiddenSkills.contains('woshixiaonei')) {
+						event.finish();
+						return;
+					}
+					if(player==game.me){
+						ui.revealXiaonei.classList.remove('glow');
+						ui.revealXiaonei.hide();
+					}
+					else if(player.isOnline2()){
+						player.send(function(){
+							ui.revealXiaonei.classList.remove('glow');
+							ui.revealXiaonei.hide();
+						});
+					}
 					player.chooseControlList(true,function(event,player){
 						return 0;
 					},

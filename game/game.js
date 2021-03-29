@@ -44278,6 +44278,7 @@
 						this.classList.remove('glow');
 						this.hide();
 						var player=game.me;
+						if(!player.hiddenSkills.contains('woshixiaonei')) return;
 						if(_status.currentPhase==player&&_status.event.name=='chooseToUse'&&_status.event.player==player&&_status.paused){
 							ui.revealXiaoneiHiddenControl.childNodes[0].click();
 						}
