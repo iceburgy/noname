@@ -1,8 +1,9 @@
 window.noname_update={
-	version:'2021.03.28',
+	version:'2021.04.02',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修复小内重复发动的bug',
+		'修复电脑张郃没判定牌时也弃牌跳判定的bug',
 	],
 	files:[
 		'card/extra.js',
