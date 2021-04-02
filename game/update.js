@@ -1,7 +1,8 @@
 window.noname_update={
-	version:'2021.04.02',
+	version:'2021.04.02.1',
 	update:'2020.11.06.2',
 	changeLog:[
+		'调整：6人局也视为正常局',
 		'修复小内重复发动的bug',
 		'修复电脑张郃没判定牌时也弃牌跳判定的bug',
 	],

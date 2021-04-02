@@ -27950,7 +27950,7 @@
 					numHuman++;
 				}
 			}
-			return numHuman>=6&&(clients.length==8||clients.length==10);
+			return numHuman>=6;
 		},
 		getAllFuliInfo:function(){
 			if(lib.config[lib.bonusKeyFuliInfo]&&lib.config[lib.bonusKeyFuliInfo][lib.bonusKeyBirthdaybonus]){
