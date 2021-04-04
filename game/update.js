@@ -1,10 +1,8 @@
 window.noname_update={
-	version:'2021.04.02.1',
+	version:'2021.04.04',
 	update:'2020.11.06.2',
 	changeLog:[
-		'调整：6人局也视为正常局',
-		'修复小内重复发动的bug',
-		'修复电脑张郃没判定牌时也弃牌跳判定的bug',
+		'增加：单机模式下改善体验，可选择开启选项“自带老谦逊”',
 	],
 	files:[
 		'card/extra.js',

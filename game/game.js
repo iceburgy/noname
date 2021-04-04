@@ -4557,6 +4557,7 @@
 							map.choose_group.show();
 							map.change_choice.show();
 							map.auto_mark_identity.show();
+							map.auto_add_qianxun.show();
 							map.double_character.show();
 							map.free_choose.show();
 							map.change_identity.show();
@@ -4619,6 +4620,7 @@
 							map.zhong_card.hide();
 							map.choose_group.show();
 							map.auto_mark_identity.show();
+							map.auto_add_qianxun.show();
 							map.change_choice.show();
 							map.free_choose.show();
 							map.change_identity.show();
@@ -4743,6 +4745,11 @@
 						name:'自动标记身份',
 						init:true,
 						intro:'根据角色的出牌行为自动标记可能的身份',
+					},
+					auto_add_qianxun:{
+						name:'自带老谦逊',
+						init:true,
+						intro:'单机模式下改善体验，不被顺乐',
 					},
 					// ban_weak:{
 					// 	name:'屏蔽弱将',
