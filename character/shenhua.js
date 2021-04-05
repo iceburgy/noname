@@ -6770,6 +6770,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			hongyan:{
+				trigger:{player:['damageBegin','judgeBegin']},
+				forced:true,
+				priority:15,
+				check:function(event,player){
+					return true;
+				},
+				content:function(){},
 				mod:{
 					suit:function(card,suit){
 						if(suit=='spade') return 'heart';
