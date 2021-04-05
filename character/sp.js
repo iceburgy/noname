@@ -5376,7 +5376,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source:'damageSource',
 					player:'damageEnd',
 				},
-				forced:true,
+				frequent:true,
 				filter:function(event){
 					return event.card&&event.card.name=='sha';
 				},

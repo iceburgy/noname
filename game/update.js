@@ -1,8 +1,9 @@
 window.noname_update={
-	version:'2021.04.04',
+	version:'2021.04.04.1',
 	update:'2020.11.06.2',
 	changeLog:[
 		'增加：单机模式下改善体验，可选择开启选项“自带老谦逊”',
+		'修复：芳魂不应为锁定技',
 	],
 	files:[
 		'card/extra.js',
