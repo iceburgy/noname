@@ -3094,9 +3094,8 @@ content:function(config, pack){
 									
 									default: break;
 								}
+								count = cards.length;
 							}
-							
-							count = muniu.cards.length;
 						}
 					}
 				}

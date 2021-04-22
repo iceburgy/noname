@@ -1,8 +1,9 @@
 window.noname_update={
-	version:'2021.04.21',
+	version:'2021.04.21.1',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修复：张济掠命',
+		'修复：司马徽连铸',
 	],
 	files:[
 		'card/extra.js',

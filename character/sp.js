@@ -14044,6 +14044,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if((player.getStat().skill.smh_lianhuan||0)+(player.getStat().skill.smh_lianhuan1||0)>=3) return false;
 					var tempCard={name:'tiesuo'};
 					var filter=event.filterCard;
+					var hasClub=player.hasCard(function(card){
+						return (get.position(card)=='h'||get.position(card)=='e')&&get.suit(card)=='club';
+					},'he');
+					if(!hasClub) return false;
 					return (filter(tempCard,player,event))&&player.countCards('he',{suit:'club'})>0;
 				},
 				position:'he',
