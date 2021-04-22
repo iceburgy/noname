@@ -4768,7 +4768,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						var card=target.getCards('hej').randomGet();
-						if(card&&card.length) player.gain(card,target,'giveAuto','bySelf');
+						if(card) player.gain(card,target,'giveAuto','bySelf');
 					}
 				},
 				ai:{
