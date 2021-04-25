@@ -355,6 +355,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 			if(!_status.connectMode&&get.config('auto_add_qianxun')){
 				game.me.addSkill('qianxun');
+				game.me.addSkill('reguicai');
 			}
 			_status.videoInited=true;
 			game.addVideo('init',null,info);
