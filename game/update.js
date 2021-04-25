@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'2021.04.22',
+	version:'2021.04.25',
 	update:'2020.11.06.2',
 	changeLog:[
 		'修复：张济掠命',
